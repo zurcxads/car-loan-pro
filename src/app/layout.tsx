@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const ibmPlex = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-ibm-plex",
+});
 
 export const metadata: Metadata = {
   title: "Car Loan Pro — Auto Lending Marketplace",
@@ -12,7 +16,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-[#09090B] text-white antialiased`}>
+      <body className={`${ibmPlex.variable} font-sans bg-navy text-slate-50 antialiased`}>
         {children}
       </body>
     </html>
