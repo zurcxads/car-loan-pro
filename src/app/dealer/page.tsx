@@ -1,10 +1,17 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { getAllApplications } from '@/lib/store';
-import type { Application } from '@/lib/types';
+import { type MockApplication } from '@/lib/mock-data';
+import PortalLayout from '@/components/shared/PortalLayout';
+import BuyerInbox from '@/components/dealer/BuyerInbox';
+import DealFinalization from '@/components/dealer/DealFinalization';
+import ActiveDeals from '@/components/dealer/ActiveDeals';
+import PerformanceDashboard from '@/components/dealer/PerformanceDashboard';
+import DealerSettings from '@/components/dealer/DealerSettings';
+
+type Tab = 'inbox' | 'finalize' | 'deals' | 'performance' | 'settings';
 
 function LoginGate({ onAuth }: { onAuth: () => void }) {
   const [email, setEmail] = useState('');
@@ -29,91 +36,50 @@ function LoginGate({ onAuth }: { onAuth: () => void }) {
   );
 }
 
+const navItems = [
+  { key: 'inbox', label: 'Pre-Approved Buyers', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg> },
+  { key: 'finalize', label: 'Deal Finalization', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> },
+  { key: 'deals', label: 'Active Deals', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg> },
+  { key: 'performance', label: 'Performance', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> },
+  { key: 'settings', label: 'Settings', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg> },
+];
+
 export default function DealerPage() {
   const [authed, setAuthed] = useState(false);
-  const [apps, setApps] = useState<Application[]>([]);
-  const [tab, setTab] = useState<'inbox' | 'finalize'>('inbox');
-  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-  const [finalForm, setFinalForm] = useState({ vin: '', finalPrice: '', fees: '' });
-  const [invited, setInvited] = useState<Set<string>>(new Set());
-  const [finalized, setFinalized] = useState<Set<string>>(new Set());
+  const [tab, setTab] = useState<Tab>('inbox');
+  const [selectedBuyer, setSelectedBuyer] = useState<MockApplication | null>(null);
 
-  useEffect(() => { if (authed) setApps(getAllApplications().filter(a => a.status !== 'draft')); }, [authed]);
   if (!authed) return <LoginGate onAuth={() => setAuthed(true)} />;
 
-  const handleFinalize = (e: React.FormEvent) => { e.preventDefault(); if (selectedApp) { setFinalized(prev => new Set(prev).add(selectedApp.id)); setSelectedApp(null); setFinalForm({ vin: '', finalPrice: '', fees: '' }); } };
-  const getApprovalAmount = (a: Application) => (a.vehicleInfo?.askingPrice || 0) - (a.dealStructure?.cashDownPayment || 0);
-  const getTimeSince = (date?: string) => { if (!date) return 'N/A'; const h = Math.floor((Date.now() - new Date(date).getTime()) / 3600000); return h < 1 ? 'Just now' : h < 24 ? `${h}h ago` : `${Math.floor(h / 24)}d ago`; };
+  const handleStartDeal = (app: MockApplication) => {
+    setSelectedBuyer(app);
+    setTab('finalize');
+  };
+
+  const tabLabels: Record<Tab, string> = {
+    inbox: 'Pre-Approved Buyers',
+    finalize: 'Deal Finalization',
+    deals: 'Active Deals',
+    performance: 'Performance',
+    settings: 'Settings',
+  };
 
   return (
-    <div className="min-h-screen">
-      <div className="border-b border-white/10 bg-[#09090B]/90 backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="text-lg font-semibold tracking-tight">Car Loan Pro</Link>
-            <span className="text-[10px] text-blue-400 bg-blue-600/10 px-2.5 py-1 rounded-full font-medium uppercase tracking-wider">Dealer</span>
-          </div>
-          <button onClick={() => setAuthed(false)} className="text-xs text-zinc-500 hover:text-zinc-50 transition-colors duration-200 cursor-pointer">Sign Out</button>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex gap-1 mb-8 bg-zinc-900/60 rounded-xl p-1 w-fit border border-white/10">
-          {([['inbox', 'Pre-Approved Buyers'], ['finalize', 'Deal Finalization']] as ['inbox' | 'finalize', string][]).map(([key, label]) => (
-            <button key={key} onClick={() => setTab(key)} className={`px-5 py-2.5 text-xs rounded-lg transition-colors duration-200 cursor-pointer ${tab === key ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-500 hover:text-zinc-50'}`}>{label}</button>
-          ))}
-        </div>
-
-        {tab === 'inbox' && (
-          <div className="space-y-3">
-            {apps.length === 0 && <p className="text-sm text-zinc-500 py-16 text-center">No pre-approved buyers at this time</p>}
-            {apps.map((app, i) => (
-              <motion.div key={app.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="rounded-2xl surface surface-hover p-5">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-                  <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
-                    <div><span className="text-[10px] text-zinc-500 block uppercase tracking-wider">Approval</span><span className="font-semibold text-green-400">${getApprovalAmount(app).toLocaleString()}</span></div>
-                    <div><span className="text-[10px] text-zinc-500 block uppercase tracking-wider">Rate Range</span><span className="font-semibold">{(3.49 + i * 0.5).toFixed(2)}% - {(5.99 + i * 0.5).toFixed(2)}%</span></div>
-                    <div><span className="text-[10px] text-zinc-500 block uppercase tracking-wider">Vehicle</span><span className="font-semibold">{app.vehicleInfo?.year} {app.vehicleInfo?.make} {app.vehicleInfo?.model}</span></div>
-                    <div><span className="text-[10px] text-zinc-500 block uppercase tracking-wider">Approved</span><span className="font-semibold">{getTimeSince(app.submittedAt)}</span></div>
-                  </div>
-                  <div className="flex gap-2">
-                    {invited.has(app.id) ? (
-                      <span className="px-4 py-2 text-xs text-green-400 bg-green-500/10 rounded-lg border border-green-500/20 font-medium">Invited</span>
-                    ) : (
-                      <button onClick={() => setInvited(prev => new Set(prev).add(app.id))} className="px-4 py-2 text-xs bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors duration-200 cursor-pointer font-medium">Invite to Visit</button>
-                    )}
-                    {finalized.has(app.id) ? (
-                      <span className="px-4 py-2 text-xs text-green-400 bg-green-500/10 rounded-lg border border-green-500/20 font-medium">Finalized</span>
-                    ) : (
-                      <button onClick={() => { setSelectedApp(app); setTab('finalize'); }} className="px-4 py-2 text-xs border border-white/10 hover:border-white/20 rounded-lg transition-colors duration-200 cursor-pointer font-medium">Finalize Deal</button>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-
-        {tab === 'finalize' && (
-          <div className="max-w-lg">
-            {selectedApp ? (
-              <div className="rounded-2xl surface p-8">
-                <h2 className="text-sm font-semibold mb-1">Finalize Deal</h2>
-                <p className="text-xs text-zinc-500 mb-6">{selectedApp.personalInfo?.firstName} {selectedApp.personalInfo?.lastName} — {selectedApp.vehicleInfo?.year} {selectedApp.vehicleInfo?.make} {selectedApp.vehicleInfo?.model}</p>
-                <form onSubmit={handleFinalize} className="space-y-5">
-                  <div><label className="block text-xs text-zinc-400 mb-2 font-medium">VIN</label><input value={finalForm.vin} onChange={e => setFinalForm(f => ({ ...f, vin: e.target.value }))} maxLength={17} placeholder="17-character VIN" className="w-full px-4 py-3 bg-zinc-900/80 border border-white/10 rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-600/50 transition-colors duration-200" /></div>
-                  <div><label className="block text-xs text-zinc-400 mb-2 font-medium">Final Purchase Price ($)</label><input type="number" value={finalForm.finalPrice} onChange={e => setFinalForm(f => ({ ...f, finalPrice: e.target.value }))} placeholder="30000" className="w-full px-4 py-3 bg-zinc-900/80 border border-white/10 rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-600/50 transition-colors duration-200" /></div>
-                  <div><label className="block text-xs text-zinc-400 mb-2 font-medium">Dealer Fees ($)</label><input type="number" value={finalForm.fees} onChange={e => setFinalForm(f => ({ ...f, fees: e.target.value }))} placeholder="599" className="w-full px-4 py-3 bg-zinc-900/80 border border-white/10 rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-600/50 transition-colors duration-200" /></div>
-                  <div className="flex gap-3 pt-2">
-                    <button type="button" onClick={() => setSelectedApp(null)} className="flex-1 px-4 py-3 text-sm border border-white/10 rounded-xl hover:border-white/20 transition-colors duration-200 cursor-pointer">Cancel</button>
-                    <button type="submit" className="flex-1 px-4 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Submit Deal</button>
-                  </div>
-                </form>
-              </div>
-            ) : <div className="py-16 text-center text-sm text-zinc-500">Select a buyer from the inbox to finalize their deal.</div>}
-          </div>
-        )}
-      </div>
-    </div>
+    <PortalLayout
+      portalName={tabLabels[tab]}
+      portalBadge="Dealer"
+      badgeColor="blue"
+      navItems={navItems}
+      activeTab={tab}
+      onTabChange={(t) => setTab(t as Tab)}
+      onLogout={() => setAuthed(false)}
+      userName="AutoMax Houston"
+    >
+      {tab === 'inbox' && <BuyerInbox onStartDeal={handleStartDeal} />}
+      {tab === 'finalize' && <DealFinalization selectedBuyer={selectedBuyer} />}
+      {tab === 'deals' && <ActiveDeals />}
+      {tab === 'performance' && <PerformanceDashboard />}
+      {tab === 'settings' && <DealerSettings />}
+    </PortalLayout>
   );
 }
