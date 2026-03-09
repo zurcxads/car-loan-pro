@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${ibmPlex.variable} font-sans bg-navy text-slate-50 antialiased`}>
+      <body className={`${ibmPlex.variable} font-sans bg-[#09090B] text-zinc-50 antialiased`}>
         {children}
       </body>
     </html>

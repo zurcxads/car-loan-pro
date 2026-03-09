@@ -17,7 +17,7 @@ const STEP_NAMES = ['Personal Info', 'Address', 'Employment', 'Vehicle', 'Deal S
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs text-slate-400 mb-2 font-medium">{label}</label>
+      <label className="block text-xs text-zinc-400 mb-2 font-medium">{label}</label>
       {children}
       {error && <p className="text-xs text-red-400 mt-1.5">{error}</p>}
     </div>
@@ -29,7 +29,7 @@ function Input({ value, onChange, placeholder, type = 'text', error, maxLength }
 }) {
   return (
     <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength}
-      className={`w-full px-4 py-3 bg-navy-light/80 border ${error ? 'border-red-500/60' : 'border-white/[0.08]'} rounded-xl text-sm placeholder-slate-600 focus:outline-none focus:border-purple/50 transition-colors duration-200`} />
+      className={`w-full px-4 py-3 bg-zinc-900/80 border ${error ? 'border-red-500/60' : 'border-white/10'} rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-600/50 transition-colors duration-200`} />
   );
 }
 
@@ -38,7 +38,7 @@ function Select({ value, onChange, options, placeholder, error }: {
 }) {
   return (
     <select value={value} onChange={e => onChange(e.target.value)}
-      className={`w-full px-4 py-3 bg-navy-light/80 border ${error ? 'border-red-500/60' : 'border-white/[0.08]'} rounded-xl text-sm focus:outline-none focus:border-purple/50 transition-colors duration-200 cursor-pointer ${!value ? 'text-slate-600' : ''}`}>
+      className={`w-full px-4 py-3 bg-zinc-900/80 border ${error ? 'border-red-500/60' : 'border-white/10'} rounded-xl text-sm focus:outline-none focus:border-blue-600/50 transition-colors duration-200 cursor-pointer ${!value ? 'text-zinc-600' : ''}`}>
       {placeholder && <option value="">{placeholder}</option>}
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
@@ -48,10 +48,10 @@ function Select({ value, onChange, options, placeholder, error }: {
 function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <label className="flex items-start gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
-      <div className={`mt-0.5 w-5 h-5 rounded-md border flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${checked ? 'bg-purple border-purple' : 'border-white/20 group-hover:border-white/40'}`}>
+      <div className={`mt-0.5 w-5 h-5 rounded-md border flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${checked ? 'bg-blue-600 border-blue-600' : 'border-white/20 group-hover:border-white/40'}`}>
         {checked && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
       </div>
-      <span className="text-sm text-slate-300 leading-relaxed">{label}</span>
+      <span className="text-sm text-zinc-300 leading-relaxed">{label}</span>
     </label>
   );
 }
@@ -59,11 +59,11 @@ function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v
 function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer">
-      <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${checked ? 'bg-purple' : 'bg-slate-700'}`}
+      <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${checked ? 'bg-blue-600' : 'bg-zinc-700'}`}
         onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
         <div className={`absolute top-[3px] w-4 h-4 rounded-full bg-white transition-transform duration-200 ${checked ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
       </div>
-      <span className="text-sm text-slate-300">{label}</span>
+      <span className="text-sm text-zinc-300">{label}</span>
     </label>
   );
 }
@@ -74,33 +74,14 @@ export default function ApplyPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
-  const [personal, setPersonal] = useState<BorrowerPersonalInfo>({
-    firstName: '', lastName: '', ssn: '', dob: '', email: '', phone: '', preferredLanguage: 'english',
-  });
-  const [address, setAddress] = useState<AddressInfo>({
-    currentAddressLine1: '', currentCity: '', currentState: '', currentZip: '',
-    residenceType: 'rent', monthlyHousingPayment: 0, monthsAtCurrentAddress: 0,
-  });
-  const [employment, setEmployment] = useState<EmploymentInfo>({
-    employmentStatus: 'full_time' as EmploymentStatus, monthsAtEmployer: 0,
-    grossMonthlyIncome: 0, incomeTypePrimary: 'employment' as IncomeType,
-  });
-  const [vehicle, setVehicle] = useState<VehicleInfo>({
-    applicationType: 'used_vehicle' as ApplicationType, vehicleCondition: 'used' as VehicleCondition,
-    year: new Date().getFullYear(), make: '', model: '', askingPrice: 0, isPrivateParty: false,
-  });
-  const [deal, setDeal] = useState<DealStructure>({
-    cashDownPayment: 0, hasTradeIn: false, desiredTermMonths: 60,
-    gapInsuranceInterest: false, extendedWarrantyInterest: false,
-  });
+  const [personal, setPersonal] = useState<BorrowerPersonalInfo>({ firstName: '', lastName: '', ssn: '', dob: '', email: '', phone: '', preferredLanguage: 'english' });
+  const [address, setAddress] = useState<AddressInfo>({ currentAddressLine1: '', currentCity: '', currentState: '', currentZip: '', residenceType: 'rent', monthlyHousingPayment: 0, monthsAtCurrentAddress: 0 });
+  const [employment, setEmployment] = useState<EmploymentInfo>({ employmentStatus: 'full_time' as EmploymentStatus, monthsAtEmployer: 0, grossMonthlyIncome: 0, incomeTypePrimary: 'employment' as IncomeType });
+  const [vehicle, setVehicle] = useState<VehicleInfo>({ applicationType: 'used_vehicle' as ApplicationType, vehicleCondition: 'used' as VehicleCondition, year: new Date().getFullYear(), make: '', model: '', askingPrice: 0, isPrivateParty: false });
+  const [deal, setDeal] = useState<DealStructure>({ cashDownPayment: 0, hasTradeIn: false, desiredTermMonths: 60, gapInsuranceInterest: false, extendedWarrantyInterest: false });
   const [hasCoBorrower, setHasCoBorrower] = useState(false);
-  const [coPersonal, setCoPersonal] = useState<BorrowerPersonalInfo>({
-    firstName: '', lastName: '', ssn: '', dob: '', email: '', phone: '',
-  });
-  const [consent, setConsent] = useState<ConsentInfo>({
-    softPullConsent: false, hardPullConsent: false, tcpaConsent: false,
-    termsOfService: false, privacyPolicy: false, eSignConsent: false,
-  });
+  const [coPersonal, setCoPersonal] = useState<BorrowerPersonalInfo>({ firstName: '', lastName: '', ssn: '', dob: '', email: '', phone: '' });
+  const [consent, setConsent] = useState<ConsentInfo>({ softPullConsent: false, hardPullConsent: false, tcpaConsent: false, termsOfService: false, privacyPolicy: false, eSignConsent: false });
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
@@ -141,12 +122,7 @@ export default function ApplyPage() {
     setSubmitting(true);
     const credit = generateCreditProfile();
     saveCreditProfile(credit);
-    saveApplication({
-      personalInfo: personal, addressInfo: address, employmentInfo: employment,
-      vehicleInfo: vehicle, dealStructure: deal, consent, hasCoBorrower,
-      coBorrowerInfo: hasCoBorrower ? { ...coPersonal, ...address, ...employment } : undefined,
-      status: 'submitted',
-    });
+    saveApplication({ personalInfo: personal, addressInfo: address, employmentInfo: employment, vehicleInfo: vehicle, dealStructure: deal, consent, hasCoBorrower, coBorrowerInfo: hasCoBorrower ? { ...coPersonal, ...address, ...employment } : undefined, status: 'submitted' });
     setTimeout(() => router.push('/offers'), 3000);
   };
 
@@ -155,11 +131,11 @@ export default function ApplyPage() {
       <div className="min-h-screen flex items-center justify-center">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
           <div className="relative w-16 h-16 mx-auto mb-8">
-            <div className="absolute inset-0 rounded-full border-2 border-purple border-t-transparent animate-spin" />
-            <div className="absolute inset-2 rounded-full border-2 border-gold/60 border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+            <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+            <div className="absolute inset-2 rounded-full border-2 border-blue-400 border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
           </div>
           <h2 className="text-xl font-semibold mb-2">Analyzing your application...</h2>
-          <p className="text-sm text-slate-500">Matching you with lenders in our network</p>
+          <p className="text-sm text-zinc-500">Matching you with lenders in our network</p>
         </motion.div>
       </div>
     );
@@ -167,32 +143,29 @@ export default function ApplyPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <div className="border-b border-white/[0.06] bg-navy/90 backdrop-blur-xl sticky top-0 z-40">
+      <div className="border-b border-white/10 bg-[#09090B]/90 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-lg font-semibold tracking-tight">Car Loan Pro</Link>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500 font-medium">Step {step + 1} of 7</span>
-            <span className="text-xs text-gold bg-gold/10 px-2 py-0.5 rounded-full">{STEP_NAMES[step]}</span>
+            <span className="text-xs text-zinc-500 font-medium">Step {step + 1} of 7</span>
+            <span className="text-xs text-blue-400 bg-blue-600/10 px-2.5 py-0.5 rounded-full">{STEP_NAMES[step]}</span>
           </div>
         </div>
       </div>
 
-      {/* Progress */}
       <div className="max-w-3xl mx-auto px-6 pt-8">
         <div className="flex gap-2">
           {STEP_NAMES.map((_, i) => (
-            <div key={i} className="h-1 flex-1 rounded-full overflow-hidden bg-slate-800">
-              <div className={`h-full rounded-full transition-all duration-500 ${i < step ? 'bg-gold w-full' : i === step ? 'bg-purple w-full' : 'w-0'}`} />
+            <div key={i} className="h-1 flex-1 rounded-full overflow-hidden bg-zinc-800">
+              <div className={`h-full rounded-full transition-all duration-500 ${i < step ? 'bg-green-500 w-full' : i === step ? 'bg-blue-600 w-full' : 'w-0'}`} />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Form */}
       <div className="max-w-3xl mx-auto px-6 py-8">
         <AnimatePresence mode="wait">
-          <motion.div key={step} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+          <motion.div key={step} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.25 }}
             className="rounded-2xl surface p-8">
 
             {step === 0 && (
@@ -238,8 +211,8 @@ export default function ApplyPage() {
                   <Field label="Months at Address"><Input type="number" value={address.monthsAtCurrentAddress ? String(address.monthsAtCurrentAddress) : ''} onChange={v => setAddress(a => ({ ...a, monthsAtCurrentAddress: Number(v) }))} placeholder="24" /></Field>
                 </div>
                 {address.monthsAtCurrentAddress > 0 && address.monthsAtCurrentAddress < 24 && (
-                  <div className="pt-6 border-t border-white/[0.06] space-y-5">
-                    <h3 className="text-sm font-medium text-gold">Previous Address</h3>
+                  <div className="pt-6 border-t border-white/10 space-y-5">
+                    <h3 className="text-sm font-medium text-blue-400">Previous Address</h3>
                     <Field label="Street Address"><Input value={address.prevAddressLine1 || ''} onChange={v => setAddress(a => ({ ...a, prevAddressLine1: v }))} /></Field>
                     <div className="grid sm:grid-cols-3 gap-5">
                       <Field label="City"><Input value={address.prevAddressCity || ''} onChange={v => setAddress(a => ({ ...a, prevAddressCity: v }))} /></Field>
@@ -291,7 +264,7 @@ export default function ApplyPage() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
                   <Field label="Year"><Input type="number" value={String(vehicle.year)} onChange={v => setVehicle(ve => ({ ...ve, year: Number(v) }))} /></Field>
-                  <Field label="Make *" error={errors.make}><Select value={vehicle.make} onChange={v => setVehicle(ve => ({ ...ve, make: v }))} options={POPULAR_MAKES.map(m => ({ value: m, label: m }))} placeholder="Select make" error={!!errors.make} /></Field>
+                  <Field label="Make *" error={errors.make}><Select value={vehicle.make} onChange={v => setVehicle(ve => ({ ...ve, make: v }))} options={POPULAR_MAKES.map(m => ({ value: m, label: m }))} placeholder="Select" error={!!errors.make} /></Field>
                   <Field label="Model *" error={errors.model}><Input value={vehicle.model} onChange={v => setVehicle(ve => ({ ...ve, model: v }))} placeholder="e.g. Camry" error={!!errors.model} /></Field>
                   <Field label="Trim"><Input value={vehicle.trim || ''} onChange={v => setVehicle(ve => ({ ...ve, trim: v }))} placeholder="e.g. LE" /></Field>
                 </div>
@@ -299,9 +272,7 @@ export default function ApplyPage() {
                   <Field label="VIN (optional)"><Input value={vehicle.vin || ''} onChange={v => setVehicle(ve => ({ ...ve, vin: v }))} placeholder="17-character VIN" maxLength={17} /></Field>
                   <Field label="Asking Price *" error={errors.price}><Input type="number" value={vehicle.askingPrice ? String(vehicle.askingPrice) : ''} onChange={v => setVehicle(ve => ({ ...ve, askingPrice: Number(v) }))} placeholder="30000" error={!!errors.price} /></Field>
                 </div>
-                {vehicle.vehicleCondition !== 'new' && (
-                  <Field label="Mileage"><Input type="number" value={vehicle.mileage ? String(vehicle.mileage) : ''} onChange={v => setVehicle(ve => ({ ...ve, mileage: Number(v) }))} placeholder="45000" /></Field>
-                )}
+                {vehicle.vehicleCondition !== 'new' && <Field label="Mileage"><Input type="number" value={vehicle.mileage ? String(vehicle.mileage) : ''} onChange={v => setVehicle(ve => ({ ...ve, mileage: Number(v) }))} placeholder="45000" /></Field>}
                 <Toggle checked={vehicle.isPrivateParty} onChange={v => setVehicle(ve => ({ ...ve, isPrivateParty: v }))} label="Private party sale" />
                 {!vehicle.isPrivateParty && (
                   <div className="grid sm:grid-cols-2 gap-5">
@@ -322,7 +293,7 @@ export default function ApplyPage() {
                 <Field label="Max Monthly Payment ($)"><Input type="number" value={deal.maxMonthlyPayment ? String(deal.maxMonthlyPayment) : ''} onChange={v => setDeal(d => ({ ...d, maxMonthlyPayment: Number(v) }))} placeholder="Optional" /></Field>
                 <Toggle checked={deal.hasTradeIn} onChange={v => setDeal(d => ({ ...d, hasTradeIn: v }))} label="I have a trade-in" />
                 {deal.hasTradeIn && (
-                  <div className="pt-5 space-y-5 border-t border-white/[0.06]">
+                  <div className="pt-5 space-y-5 border-t border-white/10">
                     <div className="grid sm:grid-cols-3 gap-5">
                       <Field label="Trade-In Year"><Input type="number" value={deal.tradeInYear ? String(deal.tradeInYear) : ''} onChange={v => setDeal(d => ({ ...d, tradeInYear: Number(v) }))} /></Field>
                       <Field label="Trade-In Make"><Input value={deal.tradeInMake || ''} onChange={v => setDeal(d => ({ ...d, tradeInMake: v }))} /></Field>
@@ -347,7 +318,7 @@ export default function ApplyPage() {
                 <Toggle checked={hasCoBorrower} onChange={v => setHasCoBorrower(v)} label="Add a co-borrower to strengthen your application" />
                 {hasCoBorrower ? (
                   <div className="space-y-5 pt-4">
-                    <p className="text-xs text-slate-500">Adding a co-borrower with good credit can improve your approval odds and rate.</p>
+                    <p className="text-xs text-zinc-500">Adding a co-borrower with good credit can improve your approval odds and rate.</p>
                     <div className="grid sm:grid-cols-2 gap-5">
                       <Field label="First Name"><Input value={coPersonal.firstName} onChange={v => setCoPersonal(p => ({ ...p, firstName: v }))} /></Field>
                       <Field label="Last Name"><Input value={coPersonal.lastName} onChange={v => setCoPersonal(p => ({ ...p, lastName: v }))} /></Field>
@@ -362,7 +333,7 @@ export default function ApplyPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="py-12 text-center text-sm text-slate-500">No co-borrower selected. You can proceed without one.</div>
+                  <div className="py-12 text-center text-sm text-zinc-500">No co-borrower selected. You can proceed without one.</div>
                 )}
               </div>
             )}
@@ -387,15 +358,14 @@ export default function ApplyPage() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Navigation */}
         <div className="flex justify-between mt-8 pb-12">
           {step > 0 ? (
-            <button onClick={back} className="px-6 py-3 text-sm text-slate-400 hover:text-slate-50 border border-white/[0.08] hover:border-white/[0.16] rounded-xl transition-colors duration-200 cursor-pointer">Back</button>
+            <button onClick={back} className="px-6 py-3 text-sm text-zinc-400 hover:text-zinc-50 border border-white/10 hover:border-white/20 rounded-xl transition-colors duration-200 cursor-pointer">Back</button>
           ) : <div />}
           {step < 6 ? (
-            <button onClick={next} className="px-8 py-3 text-sm font-medium bg-purple hover:bg-purple-light rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
+            <button onClick={next} className="px-8 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
           ) : (
-            <button onClick={submit} className="px-8 py-3 text-sm font-medium bg-purple hover:bg-purple-light rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
+            <button onClick={submit} className="px-8 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
           )}
         </div>
       </div>
