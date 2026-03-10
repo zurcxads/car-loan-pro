@@ -41,11 +41,11 @@ function LoginForm() {
     setLoading(true);
     const result = await signIn('credentials', { email, password: pass, redirect: false });
     if (!result?.error) {
-      // Determine redirect based on email
       const redirectMap: Record<string, string> = {
         'lender@demo.com': '/lender',
         'dealer@demo.com': '/dealer',
         'admin@carloanpro.com': '/admin',
+        'marcus.j@email.com': '/status',
       };
       router.push(redirectMap[email] || '/');
       router.refresh();
@@ -90,7 +90,11 @@ function LoginForm() {
         {/* Quick login buttons */}
         <div className="mt-6 space-y-2">
           <p className="text-[10px] text-zinc-600 text-center mb-3 uppercase tracking-wider">Demo Quick Login</p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 gap-2">
+            <button onClick={() => quickLogin('marcus.j@email.com', 'demo123')} disabled={loading}
+              className="py-2.5 text-[10px] font-medium border border-white/10 hover:border-green-600/30 hover:bg-green-600/5 rounded-lg transition-colors duration-200 cursor-pointer text-zinc-400 hover:text-green-400">
+              Consumer
+            </button>
             <button onClick={() => quickLogin('lender@demo.com', 'demo123')} disabled={loading}
               className="py-2.5 text-[10px] font-medium border border-white/10 hover:border-blue-600/30 hover:bg-blue-600/5 rounded-lg transition-colors duration-200 cursor-pointer text-zinc-400 hover:text-blue-400">
               Lender

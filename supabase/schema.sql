@@ -1,152 +1,156 @@
--- EZ Car Loans - Full Schema
+-- Car Loan Pro Database Schema (Production)
 -- Run this in Supabase SQL Editor
 
 -- Sequences
-CREATE SEQUENCE IF NOT EXISTS app_seq START 1;
-CREATE SEQUENCE IF NOT EXISTS offer_seq START 1;
-CREATE SEQUENCE IF NOT EXISTS deal_seq START 1;
+CREATE SEQUENCE IF NOT EXISTS app_seq START 11;
+CREATE SEQUENCE IF NOT EXISTS ofr_seq START 10;
+CREATE SEQUENCE IF NOT EXISTS deal_seq START 5;
+CREATE SEQUENCE IF NOT EXISTS evt_seq START 11;
 
--- Users table (for NextAuth)
+-- Users table
 CREATE TABLE IF NOT EXISTS users (
-  id TEXT PRIMARY KEY DEFAULT ('usr_' || gen_random_uuid()::TEXT),
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
-  name TEXT NOT NULL,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('admin', 'lender', 'dealer', 'consumer')),
+  name TEXT NOT NULL,
+  role TEXT NOT NULL CHECK (role IN ('consumer', 'dealer', 'lender', 'admin')),
   entity_id TEXT,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Lenders
-CREATE TABLE IF NOT EXISTS lenders (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  logo TEXT,
-  tier TEXT[] DEFAULT '{}',
-  min_fico INT DEFAULT 500,
-  max_ltv NUMERIC DEFAULT 150,
-  max_dti NUMERIC DEFAULT 50,
-  states TEXT[] DEFAULT '{}',
-  min_loan NUMERIC DEFAULT 5000,
-  max_loan NUMERIC DEFAULT 100000,
-  approval_rate NUMERIC DEFAULT 50,
-  avg_decision_hrs NUMERIC DEFAULT 4,
-  is_active BOOLEAN DEFAULT true,
-  contact_email TEXT,
-  contact_phone TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Dealers
-CREATE TABLE IF NOT EXISTS dealers (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  address TEXT,
-  city TEXT,
-  state TEXT,
-  phone TEXT,
-  email TEXT,
-  dealer_type TEXT DEFAULT 'franchise',
-  active_buyers INT DEFAULT 0,
-  deals_closed INT DEFAULT 0,
-  avg_deal_size NUMERIC DEFAULT 0,
-  is_active BOOLEAN DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Applications
+-- Applications table
 CREATE TABLE IF NOT EXISTS applications (
   id TEXT PRIMARY KEY DEFAULT ('APP-' || lpad(nextval('app_seq')::TEXT, 3, '0')),
-  borrower JSONB NOT NULL DEFAULT '{}',
-  employment JSONB NOT NULL DEFAULT '{}',
-  credit JSONB NOT NULL DEFAULT '{}',
-  vehicle JSONB NOT NULL DEFAULT '{}',
-  deal_structure JSONB NOT NULL DEFAULT '{}',
-  loan_amount NUMERIC,
+  user_id UUID REFERENCES users(id),
+  borrower JSONB NOT NULL,
+  employment JSONB NOT NULL,
+  credit JSONB,
+  vehicle JSONB NOT NULL,
+  deal_structure JSONB NOT NULL,
+  loan_amount NUMERIC NOT NULL,
   ltv_percent NUMERIC,
   dti_percent NUMERIC,
   pti_percent NUMERIC,
-  status TEXT DEFAULT 'pending_decision' CHECK (status IN ('pending_decision', 'offers_available', 'conditional', 'funded', 'declined')),
-  state TEXT,
-  submitted_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now(),
+  status TEXT NOT NULL DEFAULT 'pending_decision',
+  state TEXT NOT NULL,
+  submitted_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
   lenders_submitted INT DEFAULT 0,
   offers_received INT DEFAULT 0,
   flags TEXT[] DEFAULT '{}'
 );
 
--- Offers
+-- Offers table
 CREATE TABLE IF NOT EXISTS offers (
-  id TEXT PRIMARY KEY DEFAULT ('OFR-' || lpad(nextval('offer_seq')::TEXT, 3, '0')),
+  id TEXT PRIMARY KEY DEFAULT ('OFR-' || lpad(nextval('ofr_seq')::TEXT, 3, '0')),
   application_id TEXT REFERENCES applications(id),
-  lender_id TEXT REFERENCES lenders(id),
-  lender_name TEXT,
+  lender_id TEXT,
+  lender_name TEXT NOT NULL,
   apr NUMERIC NOT NULL,
   term_months INT NOT NULL,
   monthly_payment NUMERIC NOT NULL,
-  total_cost NUMERIC,
-  down_payment_required NUMERIC DEFAULT 0,
-  max_advance NUMERIC,
-  stipulations TEXT[] DEFAULT '{}',
-  status TEXT DEFAULT 'approved' CHECK (status IN ('approved', 'conditional', 'declined', 'selected')),
-  expires_at TIMESTAMPTZ,
-  decision_at TIMESTAMPTZ DEFAULT now(),
-  notes TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
+  approved_amount NUMERIC NOT NULL,
+  status TEXT NOT NULL DEFAULT 'approved',
+  conditions TEXT[] DEFAULT '{}',
+  decision_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '30 days')
 );
 
--- Deals
+-- Lenders table
+CREATE TABLE IF NOT EXISTS lenders (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  tier TEXT NOT NULL,
+  min_fico INT NOT NULL,
+  max_ltv INT NOT NULL,
+  max_dti INT NOT NULL,
+  max_pti INT NOT NULL,
+  min_loan_amount NUMERIC NOT NULL,
+  max_loan_amount NUMERIC NOT NULL,
+  max_vehicle_age INT NOT NULL,
+  max_mileage INT NOT NULL,
+  accepts_cpo BOOLEAN DEFAULT TRUE,
+  accepts_private_party BOOLEAN DEFAULT FALSE,
+  accepts_itin BOOLEAN DEFAULT FALSE,
+  states_active TEXT[] DEFAULT '{"All 50"}',
+  referral_fee NUMERIC NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  integration_status TEXT DEFAULT 'API',
+  avg_decision_time_minutes INT DEFAULT 15,
+  rate_tiers JSONB DEFAULT '[]'
+);
+
+-- Dealers table
+CREATE TABLE IF NOT EXISTS dealers (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  city TEXT NOT NULL,
+  state TEXT NOT NULL,
+  address TEXT NOT NULL,
+  zip TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  website TEXT,
+  contact_email TEXT,
+  franchise_brands TEXT[] DEFAULT '{}',
+  buyers_sent_mtd INT DEFAULT 0,
+  deals_funded_mtd INT DEFAULT 0,
+  plan TEXT DEFAULT 'Starter',
+  plan_price NUMERIC DEFAULT 299,
+  billing_date TEXT,
+  status TEXT DEFAULT 'active',
+  joined_date TEXT,
+  team_members JSONB DEFAULT '[]'
+);
+
+-- Deals table
 CREATE TABLE IF NOT EXISTS deals (
   id TEXT PRIMARY KEY DEFAULT ('DEAL-' || lpad(nextval('deal_seq')::TEXT, 3, '0')),
   application_id TEXT REFERENCES applications(id),
-  offer_id TEXT REFERENCES offers(id),
   dealer_id TEXT REFERENCES dealers(id),
-  lender_id TEXT REFERENCES lenders(id),
-  buyer_name TEXT,
-  vehicle TEXT,
-  amount NUMERIC,
-  apr NUMERIC,
-  term INT,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'docs_sent', 'funded', 'cancelled')),
-  vin TEXT,
+  buyer_first_name TEXT NOT NULL,
+  buyer_last_initial TEXT NOT NULL,
+  vehicle TEXT NOT NULL,
+  vin TEXT NOT NULL,
+  lender_name TEXT NOT NULL,
+  amount NUMERIC NOT NULL,
+  rate NUMERIC NOT NULL,
+  term INT NOT NULL,
+  monthly_payment NUMERIC NOT NULL,
+  status TEXT NOT NULL DEFAULT 'submitted',
+  days_open INT DEFAULT 0,
+  dealer_net NUMERIC DEFAULT 0,
+  submitted_at TIMESTAMPTZ DEFAULT NOW(),
   funded_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
+  events JSONB DEFAULT '[]'
 );
 
--- Activity Events
+-- Activity events
 CREATE TABLE IF NOT EXISTS activity_events (
-  id TEXT PRIMARY KEY DEFAULT ('EVT-' || gen_random_uuid()::TEXT),
+  id TEXT PRIMARY KEY DEFAULT ('EVT-' || lpad(nextval('evt_seq')::TEXT, 3, '0')),
   type TEXT NOT NULL,
-  message TEXT NOT NULL,
-  actor TEXT,
-  entity_type TEXT,
-  entity_id TEXT,
-  timestamp TIMESTAMPTZ DEFAULT now()
+  timestamp TIMESTAMPTZ DEFAULT NOW(),
+  description TEXT NOT NULL
 );
 
--- Compliance Alerts
+-- Compliance alerts
 CREATE TABLE IF NOT EXISTS compliance_alerts (
-  id TEXT PRIMARY KEY DEFAULT ('CMP-' || gen_random_uuid()::TEXT),
+  id TEXT PRIMARY KEY,
   type TEXT NOT NULL,
-  severity TEXT DEFAULT 'medium' CHECK (severity IN ('low', 'medium', 'high', 'critical')),
   message TEXT NOT NULL,
-  entity_type TEXT,
-  entity_id TEXT,
-  resolved BOOLEAN DEFAULT false,
-  timestamp TIMESTAMPTZ DEFAULT now()
+  timestamp TIMESTAMPTZ DEFAULT NOW(),
+  action TEXT NOT NULL,
+  resolved BOOLEAN DEFAULT FALSE
 );
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
-CREATE INDEX IF NOT EXISTS idx_offers_application ON offers(application_id);
-CREATE INDEX IF NOT EXISTS idx_offers_lender ON offers(lender_id);
-CREATE INDEX IF NOT EXISTS idx_deals_dealer ON deals(dealer_id);
-CREATE INDEX IF NOT EXISTS idx_deals_status ON deals(status);
-CREATE INDEX IF NOT EXISTS idx_activity_timestamp ON activity_events(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_applications_state ON applications(state);
+CREATE INDEX IF NOT EXISTS idx_offers_application_id ON offers(application_id);
+CREATE INDEX IF NOT EXISTS idx_deals_dealer_id ON deals(dealer_id);
+CREATE INDEX IF NOT EXISTS idx_deals_application_id ON deals(application_id);
 
--- RLS Policies (basic - expand later)
+-- Row Level Security
 ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE offers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE deals ENABLE ROW LEVEL SECURITY;

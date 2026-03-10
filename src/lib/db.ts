@@ -107,7 +107,7 @@ export async function dbUpdateLender(id: string, updates: Partial<MockLender>): 
     Object.assign(MOCK_LENDERS[idx], updates);
     return MOCK_LENDERS[idx];
   }
-  const { data, error } = await supabase.from('lenders').update(updates).eq('id', id).select().single();
+  const { data, error } = await supabase.from('lenders').update(mapLenderToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToLender(data);
 }
@@ -118,14 +118,14 @@ export async function dbGetDealers(): Promise<MockDealer[]> {
   if (!isSupabaseConfigured()) return MOCK_DEALERS;
   const { data, error } = await supabase.from('dealers').select('*');
   if (error || !data) return MOCK_DEALERS;
-  return data;
+  return data.map(mapDbToDealer);
 }
 
 export async function dbGetDealer(id: string): Promise<MockDealer | null> {
   if (!isSupabaseConfigured()) return MOCK_DEALERS.find(d => d.id === id) || null;
   const { data, error } = await supabase.from('dealers').select('*').eq('id', id).single();
   if (error || !data) return null;
-  return data;
+  return mapDbToDealer(data);
 }
 
 export async function dbUpdateDealer(id: string, updates: Partial<MockDealer>): Promise<MockDealer | null> {
@@ -135,9 +135,9 @@ export async function dbUpdateDealer(id: string, updates: Partial<MockDealer>): 
     Object.assign(MOCK_DEALERS[idx], updates);
     return MOCK_DEALERS[idx];
   }
-  const { data, error } = await supabase.from('dealers').update(updates).eq('id', id).select().single();
+  const { data, error } = await supabase.from('dealers').update(mapDealerToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
-  return data;
+  return mapDbToDealer(data);
 }
 
 // ---------- Deals ----------
@@ -150,7 +150,7 @@ export async function dbGetDeals(dealerId?: string): Promise<MockDeal[]> {
   if (dealerId) query = query.eq('dealer_id', dealerId);
   const { data, error } = await query;
   if (error || !data) return dealerId ? MOCK_DEALS.filter(d => d.dealerId === dealerId) : MOCK_DEALS;
-  return data;
+  return data.map(mapDbToDeal);
 }
 
 export async function dbCreateDeal(deal: Partial<MockDeal>): Promise<MockDeal | null> {
@@ -159,9 +159,9 @@ export async function dbCreateDeal(deal: Partial<MockDeal>): Promise<MockDeal | 
     MOCK_DEALS.push(newDeal);
     return newDeal;
   }
-  const { data, error } = await supabase.from('deals').insert(deal).select().single();
+  const { data, error } = await supabase.from('deals').insert(mapDealToDb(deal)).select().single();
   if (error || !data) return null;
-  return data;
+  return mapDbToDeal(data);
 }
 
 export async function dbUpdateDeal(id: string, updates: Partial<MockDeal>): Promise<MockDeal | null> {
@@ -171,9 +171,9 @@ export async function dbUpdateDeal(id: string, updates: Partial<MockDeal>): Prom
     Object.assign(MOCK_DEALS[idx], updates);
     return MOCK_DEALS[idx];
   }
-  const { data, error } = await supabase.from('deals').update(updates).eq('id', id).select().single();
+  const { data, error } = await supabase.from('deals').update(mapDealToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
-  return data;
+  return mapDbToDeal(data);
 }
 
 // ---------- Activity Events ----------
@@ -182,7 +182,7 @@ export async function dbGetActivityEvents(): Promise<ActivityEvent[]> {
   if (!isSupabaseConfigured()) return MOCK_ACTIVITY_EVENTS;
   const { data, error } = await supabase.from('activity_events').select('*').order('timestamp', { ascending: false });
   if (error || !data) return MOCK_ACTIVITY_EVENTS;
-  return data;
+  return data.map(mapDbToActivityEvent);
 }
 
 export async function dbCreateActivityEvent(event: Omit<ActivityEvent, 'id'>): Promise<void> {
@@ -190,7 +190,11 @@ export async function dbCreateActivityEvent(event: Omit<ActivityEvent, 'id'>): P
     MOCK_ACTIVITY_EVENTS.unshift({ ...event, id: `EVT-${String(MOCK_ACTIVITY_EVENTS.length + 1).padStart(3, '0')}` });
     return;
   }
-  await supabase.from('activity_events').insert(event);
+  await supabase.from('activity_events').insert({
+    type: event.type,
+    description: event.description,
+    timestamp: event.timestamp,
+  });
 }
 
 // ---------- Compliance ----------
@@ -199,7 +203,7 @@ export async function dbGetComplianceAlerts(): Promise<ComplianceAlert[]> {
   if (!isSupabaseConfigured()) return MOCK_COMPLIANCE_ALERTS;
   const { data, error } = await supabase.from('compliance_alerts').select('*').order('timestamp', { ascending: false });
   if (error || !data) return MOCK_COMPLIANCE_ALERTS;
-  return data;
+  return data.map(mapDbToComplianceAlert);
 }
 
 // ---------- Stats ----------
@@ -221,34 +225,283 @@ export async function dbGetPlatformStats() {
       avgApprovalRate: Math.round(lenders.reduce((s, l) => s + l.approvalRate, 0) / lenders.length),
     };
   }
-  // Would aggregate from Supabase in production
+
+  // Aggregate from Supabase
+  const [appsRes, offersRes, lendersRes, dealsRes] = await Promise.all([
+    supabase.from('applications').select('status'),
+    supabase.from('offers').select('id'),
+    supabase.from('lenders').select('is_active'),
+    supabase.from('deals').select('status, amount'),
+  ]);
+
+  const apps = appsRes.data || [];
+  const offers = offersRes.data || [];
+  const lenders = lendersRes.data || [];
+  const deals = dealsRes.data || [];
+
   return {
-    totalApplications: 0, pendingApplications: 0, totalOffers: 0,
-    totalLenders: 0, activeLenders: 0, totalDealsFunded: 0,
-    totalVolumeFunded: 0, avgApprovalRate: 0,
+    totalApplications: apps.length,
+    pendingApplications: apps.filter((a: Record<string, unknown>) => a.status === 'pending_decision').length,
+    totalOffers: offers.length,
+    totalLenders: lenders.length,
+    activeLenders: lenders.filter((l: Record<string, unknown>) => l.is_active).length,
+    totalDealsFunded: deals.filter((d: Record<string, unknown>) => d.status === 'funded').length,
+    totalVolumeFunded: deals.filter((d: Record<string, unknown>) => d.status === 'funded').reduce((s: number, d: Record<string, unknown>) => s + Number(d.amount || 0), 0),
+    avgApprovalRate: 0, // Not stored in production DB per-lender; would need separate tracking
   };
 }
 
 // ---------- Mapper helpers (Supabase snake_case <-> app camelCase) ----------
 
+// --- Applications ---
 function mapDbToApp(row: Record<string, unknown>): MockApplication {
-  // When Supabase is active, map snake_case columns to camelCase
-  // For now, passthrough since mock data already uses correct shape
-  return row as unknown as MockApplication;
+  return {
+    id: row.id as string,
+    borrower: row.borrower as MockApplication['borrower'],
+    employment: row.employment as MockApplication['employment'],
+    credit: row.credit as MockApplication['credit'],
+    vehicle: row.vehicle as MockApplication['vehicle'],
+    dealStructure: row.deal_structure as MockApplication['dealStructure'],
+    loanAmount: Number(row.loan_amount || 0),
+    ltvPercent: Number(row.ltv_percent || 0),
+    dtiPercent: Number(row.dti_percent || 0),
+    ptiPercent: Number(row.pti_percent || 0),
+    status: row.status as MockApplication['status'],
+    state: row.state as string,
+    submittedAt: row.submitted_at as string,
+    updatedAt: row.updated_at as string || new Date().toISOString(),
+    lendersSubmitted: Number(row.lenders_submitted || 0),
+    offersReceived: Number(row.offers_received || 0),
+    flags: (row.flags as string[]) || [],
+  };
 }
 
 function mapAppToDb(app: Partial<MockApplication>): Record<string, unknown> {
-  return app as unknown as Record<string, unknown>;
+  const dbRow: Record<string, unknown> = {};
+  if (app.id !== undefined) dbRow.id = app.id;
+  if (app.borrower !== undefined) dbRow.borrower = app.borrower;
+  if (app.employment !== undefined) dbRow.employment = app.employment;
+  if (app.credit !== undefined) dbRow.credit = app.credit;
+  if (app.vehicle !== undefined) dbRow.vehicle = app.vehicle;
+  if (app.dealStructure !== undefined) dbRow.deal_structure = app.dealStructure;
+  if (app.loanAmount !== undefined) dbRow.loan_amount = app.loanAmount;
+  if (app.ltvPercent !== undefined) dbRow.ltv_percent = app.ltvPercent;
+  if (app.dtiPercent !== undefined) dbRow.dti_percent = app.dtiPercent;
+  if (app.ptiPercent !== undefined) dbRow.pti_percent = app.ptiPercent;
+  if (app.status !== undefined) dbRow.status = app.status;
+  if (app.state !== undefined) dbRow.state = app.state;
+  if (app.submittedAt !== undefined) dbRow.submitted_at = app.submittedAt;
+  if (app.updatedAt !== undefined) dbRow.updated_at = app.updatedAt;
+  if (app.lendersSubmitted !== undefined) dbRow.lenders_submitted = app.lendersSubmitted;
+  if (app.offersReceived !== undefined) dbRow.offers_received = app.offersReceived;
+  if (app.flags !== undefined) dbRow.flags = app.flags;
+  return dbRow;
 }
 
+// --- Offers ---
 function mapDbToOffer(row: Record<string, unknown>): MockOffer {
-  return row as unknown as MockOffer;
+  return {
+    id: row.id as string,
+    applicationId: row.application_id as string,
+    lenderId: (row.lender_id as string) || '',
+    lenderName: row.lender_name as string,
+    apr: Number(row.apr || 0),
+    termMonths: Number(row.term_months || 0),
+    monthlyPayment: Number(row.monthly_payment || 0),
+    approvedAmount: Number(row.approved_amount || 0),
+    status: row.status as MockOffer['status'],
+    conditions: (row.conditions as string[]) || [],
+    decisionAt: row.decision_at as string,
+    expiresAt: row.expires_at as string,
+  };
 }
 
 function mapOfferToDb(offer: Partial<MockOffer>): Record<string, unknown> {
-  return offer as unknown as Record<string, unknown>;
+  const dbRow: Record<string, unknown> = {};
+  if (offer.id !== undefined) dbRow.id = offer.id;
+  if (offer.applicationId !== undefined) dbRow.application_id = offer.applicationId;
+  if (offer.lenderId !== undefined) dbRow.lender_id = offer.lenderId;
+  if (offer.lenderName !== undefined) dbRow.lender_name = offer.lenderName;
+  if (offer.apr !== undefined) dbRow.apr = offer.apr;
+  if (offer.termMonths !== undefined) dbRow.term_months = offer.termMonths;
+  if (offer.monthlyPayment !== undefined) dbRow.monthly_payment = offer.monthlyPayment;
+  if (offer.approvedAmount !== undefined) dbRow.approved_amount = offer.approvedAmount;
+  if (offer.status !== undefined) dbRow.status = offer.status;
+  if (offer.conditions !== undefined) dbRow.conditions = offer.conditions;
+  if (offer.decisionAt !== undefined) dbRow.decision_at = offer.decisionAt;
+  if (offer.expiresAt !== undefined) dbRow.expires_at = offer.expiresAt;
+  return dbRow;
 }
 
+// --- Lenders ---
 function mapDbToLender(row: Record<string, unknown>): MockLender {
-  return row as unknown as MockLender;
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    tier: row.tier as MockLender['tier'],
+    minFico: Number(row.min_fico || 0),
+    maxLtv: Number(row.max_ltv || 0),
+    maxDti: Number(row.max_dti || 0),
+    maxPti: Number(row.max_pti || 0),
+    minLoanAmount: Number(row.min_loan_amount || 0),
+    maxLoanAmount: Number(row.max_loan_amount || 0),
+    maxVehicleAge: Number(row.max_vehicle_age || 0),
+    maxMileage: Number(row.max_mileage || 0),
+    acceptsCPO: (row.accepts_cpo as boolean) ?? true,
+    acceptsPrivateParty: (row.accepts_private_party as boolean) ?? false,
+    acceptsITIN: (row.accepts_itin as boolean) ?? false,
+    statesActive: (row.states_active as string[]) || ['All 50'],
+    referralFee: Number(row.referral_fee || 0),
+    isActive: (row.is_active as boolean) ?? true,
+    integrationStatus: (row.integration_status as string) || 'API',
+    avgDecisionTimeMinutes: Number(row.avg_decision_time_minutes || 0),
+    // Fields not in DB — default to sensible values
+    appsReceivedMTD: 0,
+    approvalRate: 0,
+    totalFundedVolume: 0,
+    totalReferralFeesOwed: 0,
+    lastActivity: new Date().toISOString(),
+    rateTiers: (row.rate_tiers as MockLender['rateTiers']) || [],
+  };
+}
+
+function mapLenderToDb(lender: Partial<MockLender>): Record<string, unknown> {
+  const dbRow: Record<string, unknown> = {};
+  if (lender.id !== undefined) dbRow.id = lender.id;
+  if (lender.name !== undefined) dbRow.name = lender.name;
+  if (lender.tier !== undefined) dbRow.tier = lender.tier;
+  if (lender.minFico !== undefined) dbRow.min_fico = lender.minFico;
+  if (lender.maxLtv !== undefined) dbRow.max_ltv = lender.maxLtv;
+  if (lender.maxDti !== undefined) dbRow.max_dti = lender.maxDti;
+  if (lender.maxPti !== undefined) dbRow.max_pti = lender.maxPti;
+  if (lender.minLoanAmount !== undefined) dbRow.min_loan_amount = lender.minLoanAmount;
+  if (lender.maxLoanAmount !== undefined) dbRow.max_loan_amount = lender.maxLoanAmount;
+  if (lender.maxVehicleAge !== undefined) dbRow.max_vehicle_age = lender.maxVehicleAge;
+  if (lender.maxMileage !== undefined) dbRow.max_mileage = lender.maxMileage;
+  if (lender.acceptsCPO !== undefined) dbRow.accepts_cpo = lender.acceptsCPO;
+  if (lender.acceptsPrivateParty !== undefined) dbRow.accepts_private_party = lender.acceptsPrivateParty;
+  if (lender.acceptsITIN !== undefined) dbRow.accepts_itin = lender.acceptsITIN;
+  if (lender.statesActive !== undefined) dbRow.states_active = lender.statesActive;
+  if (lender.referralFee !== undefined) dbRow.referral_fee = lender.referralFee;
+  if (lender.isActive !== undefined) dbRow.is_active = lender.isActive;
+  if (lender.integrationStatus !== undefined) dbRow.integration_status = lender.integrationStatus;
+  if (lender.avgDecisionTimeMinutes !== undefined) dbRow.avg_decision_time_minutes = lender.avgDecisionTimeMinutes;
+  if (lender.rateTiers !== undefined) dbRow.rate_tiers = lender.rateTiers;
+  return dbRow;
+}
+
+// --- Dealers ---
+function mapDbToDealer(row: Record<string, unknown>): MockDealer {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    city: row.city as string,
+    state: row.state as string,
+    address: row.address as string,
+    zip: row.zip as string,
+    phone: row.phone as string,
+    website: (row.website as string) || '',
+    contactEmail: (row.contact_email as string) || '',
+    franchiseBrands: (row.franchise_brands as string[]) || [],
+    buyersSentMTD: Number(row.buyers_sent_mtd || 0),
+    dealsFundedMTD: Number(row.deals_funded_mtd || 0),
+    plan: (row.plan as string) || 'Starter',
+    planPrice: Number(row.plan_price || 299),
+    billingDate: (row.billing_date as string) || '',
+    status: (row.status as string) || 'active',
+    joinedDate: (row.joined_date as string) || '',
+    teamMembers: (row.team_members as MockDealer['teamMembers']) || [],
+  };
+}
+
+function mapDealerToDb(dealer: Partial<MockDealer>): Record<string, unknown> {
+  const dbRow: Record<string, unknown> = {};
+  if (dealer.id !== undefined) dbRow.id = dealer.id;
+  if (dealer.name !== undefined) dbRow.name = dealer.name;
+  if (dealer.city !== undefined) dbRow.city = dealer.city;
+  if (dealer.state !== undefined) dbRow.state = dealer.state;
+  if (dealer.address !== undefined) dbRow.address = dealer.address;
+  if (dealer.zip !== undefined) dbRow.zip = dealer.zip;
+  if (dealer.phone !== undefined) dbRow.phone = dealer.phone;
+  if (dealer.website !== undefined) dbRow.website = dealer.website;
+  if (dealer.contactEmail !== undefined) dbRow.contact_email = dealer.contactEmail;
+  if (dealer.franchiseBrands !== undefined) dbRow.franchise_brands = dealer.franchiseBrands;
+  if (dealer.buyersSentMTD !== undefined) dbRow.buyers_sent_mtd = dealer.buyersSentMTD;
+  if (dealer.dealsFundedMTD !== undefined) dbRow.deals_funded_mtd = dealer.dealsFundedMTD;
+  if (dealer.plan !== undefined) dbRow.plan = dealer.plan;
+  if (dealer.planPrice !== undefined) dbRow.plan_price = dealer.planPrice;
+  if (dealer.billingDate !== undefined) dbRow.billing_date = dealer.billingDate;
+  if (dealer.status !== undefined) dbRow.status = dealer.status;
+  if (dealer.joinedDate !== undefined) dbRow.joined_date = dealer.joinedDate;
+  if (dealer.teamMembers !== undefined) dbRow.team_members = dealer.teamMembers;
+  return dbRow;
+}
+
+// --- Deals ---
+function mapDbToDeal(row: Record<string, unknown>): MockDeal {
+  return {
+    id: row.id as string,
+    applicationId: row.application_id as string,
+    dealerId: row.dealer_id as string,
+    buyerFirstName: row.buyer_first_name as string,
+    buyerLastInitial: row.buyer_last_initial as string,
+    vehicle: row.vehicle as string,
+    vin: row.vin as string,
+    lenderName: row.lender_name as string,
+    amount: Number(row.amount || 0),
+    rate: Number(row.rate || 0),
+    term: Number(row.term || 0),
+    monthlyPayment: Number(row.monthly_payment || 0),
+    status: row.status as MockDeal['status'],
+    daysOpen: Number(row.days_open || 0),
+    dealerNet: Number(row.dealer_net || 0),
+    submittedAt: row.submitted_at as string,
+    fundedAt: row.funded_at as string | undefined,
+    events: (row.events as MockDeal['events']) || [],
+  };
+}
+
+function mapDealToDb(deal: Partial<MockDeal>): Record<string, unknown> {
+  const dbRow: Record<string, unknown> = {};
+  if (deal.id !== undefined) dbRow.id = deal.id;
+  if (deal.applicationId !== undefined) dbRow.application_id = deal.applicationId;
+  if (deal.dealerId !== undefined) dbRow.dealer_id = deal.dealerId;
+  if (deal.buyerFirstName !== undefined) dbRow.buyer_first_name = deal.buyerFirstName;
+  if (deal.buyerLastInitial !== undefined) dbRow.buyer_last_initial = deal.buyerLastInitial;
+  if (deal.vehicle !== undefined) dbRow.vehicle = deal.vehicle;
+  if (deal.vin !== undefined) dbRow.vin = deal.vin;
+  if (deal.lenderName !== undefined) dbRow.lender_name = deal.lenderName;
+  if (deal.amount !== undefined) dbRow.amount = deal.amount;
+  if (deal.rate !== undefined) dbRow.rate = deal.rate;
+  if (deal.term !== undefined) dbRow.term = deal.term;
+  if (deal.monthlyPayment !== undefined) dbRow.monthly_payment = deal.monthlyPayment;
+  if (deal.status !== undefined) dbRow.status = deal.status;
+  if (deal.daysOpen !== undefined) dbRow.days_open = deal.daysOpen;
+  if (deal.dealerNet !== undefined) dbRow.dealer_net = deal.dealerNet;
+  if (deal.submittedAt !== undefined) dbRow.submitted_at = deal.submittedAt;
+  if (deal.fundedAt !== undefined) dbRow.funded_at = deal.fundedAt;
+  if (deal.events !== undefined) dbRow.events = deal.events;
+  return dbRow;
+}
+
+// --- Activity Events ---
+function mapDbToActivityEvent(row: Record<string, unknown>): ActivityEvent {
+  return {
+    id: row.id as string,
+    type: row.type as ActivityEvent['type'],
+    timestamp: row.timestamp as string,
+    description: row.description as string,
+  };
+}
+
+// --- Compliance Alerts ---
+function mapDbToComplianceAlert(row: Record<string, unknown>): ComplianceAlert {
+  return {
+    id: row.id as string,
+    type: row.type as ComplianceAlert['type'],
+    message: row.message as string,
+    timestamp: row.timestamp as string,
+    action: (row.action as string) || 'View',
+    resolved: (row.resolved as boolean) ?? false,
+  };
 }

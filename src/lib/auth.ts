@@ -32,14 +32,14 @@ export const authOptions: AuthOptions = {
 
           if (user && await bcrypt.compare(credentials.password, user.password_hash)) {
             return {
-              id: user.id,
+              id: String(user.id),
               email: user.email,
               name: user.name,
               role: user.role,
               entityId: user.entity_id,
             };
           }
-          return null;
+          // Fall through to demo users if Supabase lookup fails
         }
 
         // Fallback to demo users
