@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 import { motion } from 'framer-motion';
 import PortalLayout from '@/components/shared/PortalLayout';
 import ApplicationQueue from '@/components/lender/ApplicationQueue';
