@@ -58,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!found) {
       return { success: false, error: 'Invalid email or password' };
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...authUser } = found;
     setUser(authUser);
     localStorage.setItem(AUTH_KEY, JSON.stringify(authUser));
