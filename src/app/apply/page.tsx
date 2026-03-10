@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { US_STATES, POPULAR_MAKES, TERM_OPTIONS } from '@/lib/constants';
-import { saveApplication, generateCreditProfile, saveCreditProfile } from '@/lib/store';
+import { apiPost } from '@/lib/hooks';
 import type {
   BorrowerPersonalInfo, AddressInfo, EmploymentInfo, VehicleInfo,
   DealStructure, ConsentInfo, ApplicationType, VehicleCondition,
@@ -117,13 +118,36 @@ export default function ApplyPage() {
   const next = () => { if (validate()) setStep(s => Math.min(s + 1, 6)); };
   const back = () => setStep(s => Math.max(s - 1, 0));
 
-  const submit = () => {
+  const submit = async () => {
     if (!validate()) return;
     setSubmitting(true);
-    const credit = generateCreditProfile();
-    saveCreditProfile(credit);
-    saveApplication({ personalInfo: personal, addressInfo: address, employmentInfo: employment, vehicleInfo: vehicle, dealStructure: deal, consent, hasCoBorrower, coBorrowerInfo: hasCoBorrower ? { ...coPersonal, ...address, ...employment } : undefined, status: 'submitted' });
-    setTimeout(() => router.push('/offers'), 3000);
+
+    const payload = {
+      personalInfo: personal,
+      addressInfo: address,
+      employmentInfo: employment,
+      vehicleInfo: vehicle,
+      dealStructure: deal,
+      consent,
+      hasCoBorrower,
+      coBorrowerInfo: hasCoBorrower ? { ...coPersonal, ...address, ...employment } : undefined,
+    };
+
+    const { data, error } = await apiPost<{ id: string }>('/api/applications', payload);
+
+    if (error) {
+      toast.error(error);
+      setSubmitting(false);
+      return;
+    }
+
+    // Store the application ID for the offers page
+    if (data) {
+      localStorage.setItem('clp_current_app_id', (data as { id: string }).id);
+    }
+
+    toast.success('Application submitted! Finding your best rates...');
+    setTimeout(() => router.push('/offers'), 2500);
   };
 
   if (submitting) {
@@ -365,7 +389,7 @@ export default function ApplyPage() {
           {step < 6 ? (
             <button onClick={next} className="px-8 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
           ) : (
-            <button onClick={submit} className="px-8 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
+            <button onClick={submit} disabled={submitting} className="px-8 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
           )}
         </div>
       </div>

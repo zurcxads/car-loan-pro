@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans } from "next/font/google";
+import Providers from "@/components/providers/SessionProvider";
 import "./globals.css";
 
 const ibmPlex = IBM_Plex_Sans({
@@ -17,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="dark">
       <body className={`${ibmPlex.variable} font-sans bg-[#09090B] text-zinc-50 antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

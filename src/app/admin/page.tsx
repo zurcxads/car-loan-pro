@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import PortalLayout from '@/components/shared/PortalLayout';
 import PlatformOverview from '@/components/admin/PlatformOverview';
@@ -14,29 +15,6 @@ import SystemSettings from '@/components/admin/SystemSettings';
 
 type Tab = 'overview' | 'applications' | 'lenders' | 'dealers' | 'compliance' | 'revenue' | 'system';
 
-function LoginGate({ onAuth }: { onAuth: () => void }) {
-  const [user, setUser] = useState('');
-  const [pass, setPass] = useState('');
-  const [error, setError] = useState('');
-  const login = (e: React.FormEvent) => { e.preventDefault(); if (user === 'admin@clp' && pass === 'admin2026') onAuth(); else setError('Invalid credentials. Use admin@clp / admin2026'); };
-  return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm rounded-2xl surface p-8">
-        <Link href="/" className="text-lg font-semibold tracking-tight block mb-8">Car Loan Pro</Link>
-        <h2 className="text-lg font-semibold mb-1">Admin Panel</h2>
-        <p className="text-xs text-zinc-500 mb-6">Restricted access</p>
-        <form onSubmit={login} className="space-y-4">
-          <input type="text" value={user} onChange={e => setUser(e.target.value)} placeholder="Username" className="w-full px-4 py-3 bg-zinc-900/80 border border-white/10 rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-600/50 transition-colors duration-200" />
-          <input type="password" value={pass} onChange={e => setPass(e.target.value)} placeholder="Password" className="w-full px-4 py-3 bg-zinc-900/80 border border-white/10 rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-600/50 transition-colors duration-200" />
-          {error && <p className="text-xs text-red-400">{error}</p>}
-          <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer">Sign In</button>
-        </form>
-        <p className="text-[10px] text-zinc-600 mt-4 text-center">Demo: admin@clp / admin2026</p>
-      </motion.div>
-    </div>
-  );
-}
-
 const navItems = [
   { key: 'overview', label: 'Overview', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> },
   { key: 'applications', label: 'Applications', icon: <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> },
@@ -48,10 +26,24 @@ const navItems = [
 ];
 
 export default function AdminPage() {
-  const [authed, setAuthed] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>('overview');
 
-  if (!authed) return <LoginGate onAuth={() => setAuthed(true)} />;
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'unauthenticated') {
+    router.push('/login?callbackUrl=/admin');
+    return null;
+  }
 
   const tabLabels: Record<Tab, string> = {
     overview: 'Platform Overview',
@@ -71,17 +63,19 @@ export default function AdminPage() {
       navItems={navItems}
       activeTab={tab}
       onTabChange={(t) => setTab(t as Tab)}
-      onLogout={() => setAuthed(false)}
-      userName="admin@clp"
+      onLogout={() => signOut({ callbackUrl: '/' })}
+      userName={session?.user?.name || 'Admin'}
       sidebarDark
     >
-      {tab === 'overview' && <PlatformOverview />}
-      {tab === 'applications' && <ApplicationManagement />}
-      {tab === 'lenders' && <LenderManagement />}
-      {tab === 'dealers' && <DealerManagement />}
-      {tab === 'compliance' && <ComplianceCenter />}
-      {tab === 'revenue' && <RevenueBilling />}
-      {tab === 'system' && <SystemSettings />}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+        {tab === 'overview' && <PlatformOverview />}
+        {tab === 'applications' && <ApplicationManagement />}
+        {tab === 'lenders' && <LenderManagement />}
+        {tab === 'dealers' && <DealerManagement />}
+        {tab === 'compliance' && <ComplianceCenter />}
+        {tab === 'revenue' && <RevenueBilling />}
+        {tab === 'system' && <SystemSettings />}
+      </motion.div>
     </PortalLayout>
   );
 }

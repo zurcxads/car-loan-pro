@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { MOCK_APPLICATIONS, type MockOffer, type MockApplication } from '@/lib/mock-data';
 import { formatCurrency, formatAPR, formatDate, daysUntil } from '@/lib/format-utils';
 import { generateApprovalLetter } from '@/lib/generate-approval-letter';
@@ -20,11 +21,10 @@ const PIPELINE = [
 export default function StatusPage() {
   const [app, setApp] = useState<MockApplication | null>(null);
   const [selectedOffer, setSelectedOffer] = useState<MockOffer | null>(null);
-  const [activeStep, setActiveStep] = useState(2); // Default: offers available
+  const [activeStep, setActiveStep] = useState(2);
   const [, setConditionsMet] = useState(false);
 
   useEffect(() => {
-    // Check localStorage for selected offer
     const savedOffer = localStorage.getItem('clp_selected_offer');
     const savedConditions = localStorage.getItem('clp_conditions_met');
 
@@ -37,8 +37,22 @@ export default function StatusPage() {
       setActiveStep(4);
     }
 
-    // Use APP-001 demo app
-    setApp(MOCK_APPLICATIONS[0]);
+    // Try to load from API-created app first
+    const appId = localStorage.getItem('clp_current_app_id');
+    if (appId) {
+      fetch(`/api/applications/${appId}`)
+        .then(r => r.json())
+        .then(json => {
+          if (json.success && json.data) {
+            setApp(json.data);
+          } else {
+            setApp(MOCK_APPLICATIONS[0]);
+          }
+        })
+        .catch(() => setApp(MOCK_APPLICATIONS[0]));
+    } else {
+      setApp(MOCK_APPLICATIONS[0]);
+    }
   }, []);
 
   const handleDownloadApproval = () => {
@@ -54,11 +68,14 @@ export default function StatusPage() {
       expiresAt: selectedOffer.expiresAt,
       conditions: selectedOffer.conditions,
     });
+    toast.success('Approval letter downloaded!');
   };
 
   const handleConditionsMet = () => {
     setConditionsMet(true);
     setActiveStep(4);
+    localStorage.setItem('clp_conditions_met', 'true');
+    toast.success('All conditions met! Your loan is being finalized.');
   };
 
   return (
@@ -175,10 +192,8 @@ export default function StatusPage() {
         {/* Action buttons */}
         <div className="flex gap-4">
           {selectedOffer && (
-            <button
-              onClick={handleDownloadApproval}
-              className="px-6 py-3 text-sm border border-white/10 hover:border-white/20 rounded-xl transition-colors duration-200 cursor-pointer"
-            >
+            <button onClick={handleDownloadApproval}
+              className="px-6 py-3 text-sm border border-white/10 hover:border-white/20 rounded-xl transition-colors duration-200 cursor-pointer">
               Download Approval Letter
             </button>
           )}
@@ -187,7 +202,6 @@ export default function StatusPage() {
           </Link>
         </div>
 
-        {/* No app state */}
         {!app && (
           <div className="py-24 text-center">
             <p className="text-zinc-500 mb-6">No application found. Start by applying.</p>
