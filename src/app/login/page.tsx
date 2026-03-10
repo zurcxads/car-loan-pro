@@ -45,7 +45,7 @@ function LoginForm() {
       const redirectMap: Record<string, string> = {
         'lender@demo.com': '/lender',
         'dealer@demo.com': '/dealer',
-        'admin@clp': '/admin',
+        'admin@carloanpro.com': '/admin',
       };
       router.push(redirectMap[email] || '/');
       router.refresh();
@@ -99,7 +99,7 @@ function LoginForm() {
               className="py-2.5 text-[10px] font-medium border border-white/10 hover:border-blue-600/30 hover:bg-blue-600/5 rounded-lg transition-colors duration-200 cursor-pointer text-zinc-400 hover:text-blue-400">
               Dealer
             </button>
-            <button onClick={() => quickLogin('admin@clp', 'admin2026')} disabled={loading}
+            <button onClick={() => quickLogin('admin@carloanpro.com', 'admin2026')} disabled={loading}
               className="py-2.5 text-[10px] font-medium border border-white/10 hover:border-red-600/30 hover:bg-red-600/5 rounded-lg transition-colors duration-200 cursor-pointer text-zinc-400 hover:text-red-400">
               Admin
             </button>
