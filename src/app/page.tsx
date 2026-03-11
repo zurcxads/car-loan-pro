@@ -68,11 +68,9 @@ export default function LandingPage() {
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <div className="hidden md:flex items-center gap-8 text-sm text-gray-500">
             <Link href="/apply" className="hover:text-gray-900 transition-colors duration-200">Apply</Link>
-            <Link href="/offers" className="hover:text-gray-900 transition-colors duration-200">Offers</Link>
-            <Link href="/status" className="hover:text-gray-900 transition-colors duration-200">Status</Link>
-            <Link href="/lender" className="hover:text-gray-900 transition-colors duration-200">Lenders</Link>
-            <Link href="/dealer" className="hover:text-gray-900 transition-colors duration-200">Dealers</Link>
-            <Link href="/admin" className="hover:text-gray-900 transition-colors duration-200">Admin</Link>
+            <Link href="/status" className="hover:text-gray-900 transition-colors duration-200">Check Status</Link>
+            <Link href="#how-it-works" className="hover:text-gray-900 transition-colors duration-200">How It Works</Link>
+            <Link href="#faq" className="hover:text-gray-900 transition-colors duration-200">FAQ</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer">
@@ -87,10 +85,10 @@ export default function LandingPage() {
           {mobileMenu && (
             <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="md:hidden overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-xl">
               <div className="px-6 py-4 flex flex-col gap-4 text-sm">
-                {[['Apply', '/apply'], ['Offers', '/offers'], ['Status', '/status'], ['Lenders', '/lender'], ['Dealers', '/dealer'], ['Admin', '/admin']].map(([label, href]) => (
+                {[['Apply', '/apply'], ['Check Status', '/status'], ['How It Works', '#how-it-works'], ['FAQ', '#faq']].map(([label, href]) => (
                   <Link key={label} href={href} className="text-gray-500 hover:text-gray-900 py-1 transition-colors duration-200" onClick={() => setMobileMenu(false)}>{label}</Link>
                 ))}
-                <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-gray-900" onClick={() => setMobileMenu(false)}>Check Your Rate</Link>
+                <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-white" onClick={() => setMobileMenu(false)}>Check Your Rate</Link>
               </div>
             </motion.div>
           )}
@@ -132,7 +130,7 @@ export default function LandingPage() {
       </section>
 
       {/* How it Works */}
-      <section className="py-16 md:py-24 px-6">
+      <section id="how-it-works" className="py-16 md:py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900">How It Works</motion.h2>
@@ -214,7 +212,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 md:py-24 px-6">
+      <section id="faq" className="py-16 md:py-24 px-6">
         <div className="max-w-2xl mx-auto">
           <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-12">Frequently Asked Questions</motion.h2>
           <div className="space-y-2">
@@ -256,28 +254,21 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-gray-200 py-12 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 text-sm">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-10 text-sm">
           <div>
             <div className="font-semibold text-gray-900 mb-4">Product</div>
             <div className="space-y-3 text-gray-500">
               <Link href="/apply" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Apply Now</Link>
-              <Link href="/offers" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">View Offers</Link>
               <Link href="/status" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Check Status</Link>
-            </div>
-          </div>
-          <div>
-            <div className="font-semibold text-gray-900 mb-4">Partners</div>
-            <div className="space-y-3 text-gray-500">
-              <Link href="/lender" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Lender Portal</Link>
-              <Link href="/dealer" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Dealer Portal</Link>
+              <Link href="#how-it-works" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">How It Works</Link>
             </div>
           </div>
           <div>
             <div className="font-semibold text-gray-900 mb-4">Company</div>
             <div className="space-y-3 text-gray-500">
-              <Link href="/admin" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Admin</Link>
               <span className="block">About</span>
               <span className="block">Contact</span>
+              <Link href="/login" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Partner Login</Link>
             </div>
           </div>
           <div>
