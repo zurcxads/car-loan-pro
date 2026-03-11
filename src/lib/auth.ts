@@ -7,7 +7,7 @@ import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 const DEMO_USERS = [
   { id: 'usr_lender_1', email: 'lender@demo.com', name: 'Demo Lender', role: 'lender', passwordHash: bcrypt.hashSync('demo123', 10), entityId: 'LND-001' },
   { id: 'usr_dealer_1', email: 'dealer@demo.com', name: 'AutoMax Houston', role: 'dealer', passwordHash: bcrypt.hashSync('demo123', 10), entityId: 'DLR-001' },
-  { id: 'usr_admin_1', email: 'admin@carloanpro.com', name: 'Admin', role: 'admin', passwordHash: bcrypt.hashSync('admin2026', 10), entityId: null },
+  { id: 'usr_admin_1', email: 'admin@autoloanpro.co', name: 'Admin', role: 'admin', passwordHash: bcrypt.hashSync('admin2026', 10), entityId: null },
   { id: 'usr_consumer_1', email: 'marcus.j@email.com', name: 'Marcus Johnson', role: 'consumer', passwordHash: bcrypt.hashSync('demo123', 10), entityId: null },
 ];
 
@@ -81,5 +81,5 @@ export const authOptions: AuthOptions = {
     strategy: 'jwt',
     maxAge: 24 * 60 * 60,
   },
-  secret: process.env.NEXTAUTH_SECRET || 'car-loan-pro-dev-secret-change-in-production',
+  secret: process.env.NEXTAUTH_SECRET || 'auto-loan-pro-dev-secret-change-in-production',
 };

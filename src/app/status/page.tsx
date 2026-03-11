@@ -37,7 +37,6 @@ export default function StatusPage() {
       setActiveStep(4);
     }
 
-    // Try to load from API-created app first
     const appId = localStorage.getItem('clp_current_app_id');
     if (appId) {
       fetch(`/api/applications/${appId}`)
@@ -79,19 +78,18 @@ export default function StatusPage() {
   };
 
   return (
-    <div className="min-h-screen">
-      <div className="border-b border-white/10 bg-[#09090B]/90 backdrop-blur-xl sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50">
+      <div className="border-b border-gray-200 bg-white/90 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight">Car Loan Pro</Link>
-          <Link href="/offers" className="text-xs text-zinc-400 hover:text-zinc-50 transition-colors duration-200 cursor-pointer">View Offers</Link>
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
+          <Link href="/offers" className="text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 cursor-pointer">View Offers</Link>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold mb-8">Application Status</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-8">Application Status</h1>
 
-        {/* Stage tracker */}
-        <div className="rounded-2xl surface p-8 mb-8">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 mb-8">
           {PIPELINE.map((step, i) => (
             <div key={step.key} className="flex gap-5">
               <div className="flex flex-col items-center">
@@ -100,9 +98,9 @@ export default function StatusPage() {
                   animate={{ scale: i <= activeStep ? 1 : 0.8, opacity: 1 }}
                   transition={{ delay: i * 0.08 }}
                   className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 border-2 transition-colors duration-300 ${
-                    i < activeStep ? 'bg-green-500 border-green-500' :
-                    i === activeStep ? 'bg-blue-600 border-blue-600' :
-                    'bg-zinc-800 border-zinc-700'
+                    i < activeStep ? 'bg-green-500 border-green-500 text-white' :
+                    i === activeStep ? 'bg-blue-600 border-blue-600 text-white' :
+                    'bg-gray-100 border-gray-300 text-gray-400'
                   }`}
                 >
                   {i < activeStep ? (
@@ -114,15 +112,15 @@ export default function StatusPage() {
                   )}
                 </motion.div>
                 {i < PIPELINE.length - 1 && (
-                  <div className={`w-0.5 h-12 ${i < activeStep ? 'bg-green-500' : 'bg-zinc-800'}`} />
+                  <div className={`w-0.5 h-12 ${i < activeStep ? 'bg-green-500' : 'bg-gray-200'}`} />
                 )}
               </div>
               <div className="pt-1.5 pb-8">
-                <div className={`text-sm font-medium ${i <= activeStep ? 'text-zinc-50' : 'text-zinc-600'}`}>
+                <div className={`text-sm font-medium ${i <= activeStep ? 'text-gray-900' : 'text-gray-400'}`}>
                   {step.label}
                 </div>
                 {i === activeStep && (
-                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="text-xs text-gray-500 mt-1.5 leading-relaxed">
                     {step.desc}
                   </motion.p>
                 )}
@@ -131,54 +129,51 @@ export default function StatusPage() {
           ))}
         </div>
 
-        {/* Selected offer summary */}
         {selectedOffer && (
-          <div className="rounded-2xl surface p-8 mb-8">
+          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 mb-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-sm font-semibold">Selected Offer</h2>
-              <Link href="/offers" className="text-xs text-blue-400 hover:text-blue-300 transition-colors duration-200">View All Offers</Link>
+              <h2 className="text-sm font-semibold text-gray-900">Selected Offer</h2>
+              <Link href="/offers" className="text-xs text-blue-600 hover:text-blue-500 transition-colors duration-200">View All Offers</Link>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-sm">
               <div>
-                <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Lender</span>
-                <span className="font-semibold">{selectedOffer.lenderName}</span>
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Lender</span>
+                <span className="font-semibold text-gray-900">{selectedOffer.lenderName}</span>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">APR</span>
-                <span className="font-semibold text-blue-400">{formatAPR(selectedOffer.apr)}</span>
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">APR</span>
+                <span className="font-semibold text-blue-600">{formatAPR(selectedOffer.apr)}</span>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Term</span>
-                <span className="font-semibold">{selectedOffer.termMonths} mo</span>
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Term</span>
+                <span className="font-semibold text-gray-900">{selectedOffer.termMonths} mo</span>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Monthly</span>
-                <span className="font-semibold">{formatCurrency(selectedOffer.monthlyPayment)}</span>
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Monthly</span>
+                <span className="font-semibold text-gray-900">{formatCurrency(selectedOffer.monthlyPayment)}</span>
               </div>
               <div>
-                <span className="text-[10px] text-zinc-500 uppercase tracking-wider block mb-1">Expires</span>
-                <span className="font-semibold">{daysUntil(selectedOffer.expiresAt)} days</span>
+                <span className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Expires</span>
+                <span className="font-semibold text-gray-900">{daysUntil(selectedOffer.expiresAt)} days</span>
               </div>
             </div>
           </div>
         )}
 
-        {/* Application details */}
         {app && (
-          <div className="rounded-2xl surface p-8 mb-8">
-            <h2 className="text-sm font-semibold mb-6">Application Details</h2>
+          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8 mb-8">
+            <h2 className="text-sm font-semibold text-gray-900 mb-6">Application Details</h2>
             <div className="grid sm:grid-cols-2 gap-6 text-sm">
-              <div><span className="text-zinc-500 text-xs uppercase tracking-wider">Applicant</span><div className="font-medium mt-1">{app.borrower.firstName} {app.borrower.lastName}</div></div>
-              <div><span className="text-zinc-500 text-xs uppercase tracking-wider">Application ID</span><div className="font-medium font-mono text-xs mt-1">{app.id}</div></div>
-              <div><span className="text-zinc-500 text-xs uppercase tracking-wider">Vehicle</span><div className="font-medium mt-1">{app.vehicle.year} {app.vehicle.make} {app.vehicle.model}</div></div>
-              <div><span className="text-zinc-500 text-xs uppercase tracking-wider">Loan Amount</span><div className="font-medium mt-1">{formatCurrency(app.loanAmount)}</div></div>
-              <div><span className="text-zinc-500 text-xs uppercase tracking-wider">Submitted</span><div className="font-medium mt-1">{formatDate(app.submittedAt)}</div></div>
-              <div><span className="text-zinc-500 text-xs uppercase tracking-wider">Status</span><div className="font-medium mt-1 capitalize">{app.status.replace(/_/g, ' ')}</div></div>
+              <div><span className="text-gray-500 text-xs uppercase tracking-wider">Applicant</span><div className="font-medium text-gray-900 mt-1">{app.borrower.firstName} {app.borrower.lastName}</div></div>
+              <div><span className="text-gray-500 text-xs uppercase tracking-wider">Application ID</span><div className="font-medium font-mono text-xs text-gray-900 mt-1">{app.id}</div></div>
+              <div><span className="text-gray-500 text-xs uppercase tracking-wider">Vehicle</span><div className="font-medium text-gray-900 mt-1">{app.vehicle.year} {app.vehicle.make} {app.vehicle.model}</div></div>
+              <div><span className="text-gray-500 text-xs uppercase tracking-wider">Loan Amount</span><div className="font-medium text-gray-900 mt-1">{formatCurrency(app.loanAmount)}</div></div>
+              <div><span className="text-gray-500 text-xs uppercase tracking-wider">Submitted</span><div className="font-medium text-gray-900 mt-1">{formatDate(app.submittedAt)}</div></div>
+              <div><span className="text-gray-500 text-xs uppercase tracking-wider">Status</span><div className="font-medium text-gray-900 mt-1 capitalize">{app.status.replace(/_/g, ' ')}</div></div>
             </div>
           </div>
         )}
 
-        {/* Document upload center */}
         {selectedOffer && (
           <div className="mb-8">
             <DocumentUploadCenter
@@ -189,23 +184,22 @@ export default function StatusPage() {
           </div>
         )}
 
-        {/* Action buttons */}
         <div className="flex gap-4">
           {selectedOffer && (
             <button onClick={handleDownloadApproval}
-              className="px-6 py-3 text-sm border border-white/10 hover:border-white/20 rounded-xl transition-colors duration-200 cursor-pointer">
+              className="px-6 py-3 text-sm text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-xl transition-colors duration-200 cursor-pointer">
               Download Approval Letter
             </button>
           )}
-          <Link href="/offers" className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer">
+          <Link href="/offers" className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer">
             View Offers
           </Link>
         </div>
 
         {!app && (
           <div className="py-24 text-center">
-            <p className="text-zinc-500 mb-6">No application found. Start by applying.</p>
-            <Link href="/apply" className="inline-flex px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-sm font-medium transition-colors duration-200 cursor-pointer">Apply Now</Link>
+            <p className="text-gray-500 mb-6">No application found. Start by applying.</p>
+            <Link href="/apply" className="inline-flex px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-medium transition-colors duration-200 cursor-pointer">Apply Now</Link>
           </div>
         )}
       </div>

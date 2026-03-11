@@ -16,7 +16,7 @@ const monthlyRevenue = [
 ];
 
 const tooltipStyle = {
-  contentStyle: { backgroundColor: '#18181B', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '12px' },
+  contentStyle: { backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', fontSize: '12px' },
 };
 
 export default function RevenueBilling() {
@@ -44,12 +44,12 @@ export default function RevenueBilling() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <div className="flex gap-1 bg-zinc-900/60 rounded-xl p-1 border border-white/10">
+        <div className="flex gap-1 bg-gray-50 rounded-xl p-1 border border-gray-200">
           {[['month', 'This Month'], ['lastMonth', 'Last Month'], ['90', 'Last 90 Days'], ['ytd', 'YTD']].map(([key, label]) => (
-            <button key={key} onClick={() => setRange(key)} className={`px-4 py-2 text-xs rounded-lg transition-colors cursor-pointer ${range === key ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-500'}`}>{label}</button>
+            <button key={key} onClick={() => setRange(key)} className={`px-4 py-2 text-xs rounded-lg transition-colors cursor-pointer ${range === key ? 'bg-white border border-gray-200 shadow-sm text-gray-900' : 'text-gray-500'}`}>{label}</button>
           ))}
         </div>
-        <button onClick={exportCSV} className="px-4 py-2 text-xs border border-white/10 hover:border-white/20 rounded-lg transition-colors cursor-pointer">Export CSV</button>
+        <button onClick={exportCSV} className="px-4 py-2 text-xs border border-gray-200 hover:border-gray-300 rounded-lg transition-colors cursor-pointer">Export CSV</button>
       </div>
 
       {/* KPIs */}
@@ -63,14 +63,14 @@ export default function RevenueBilling() {
       </div>
 
       {/* Revenue chart */}
-      <div className="rounded-2xl surface p-6 mb-8">
+      <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 mb-8">
         <h3 className="text-sm font-semibold mb-6">Monthly Revenue Breakdown</h3>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlyRevenue}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-              <XAxis dataKey="month" tick={{ fill: '#71717A', fontSize: 11 }} axisLine={false} />
-              <YAxis tick={{ fill: '#71717A', fontSize: 11 }} axisLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+              <XAxis dataKey="month" tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} />
+              <YAxis tick={{ fill: '#6b7280', fontSize: 11 }} axisLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
               <Tooltip {...tooltipStyle} formatter={(value) => formatCurrency(Number(value))} />
               <Legend />
               <Bar dataKey="referral" fill="#3B82F6" name="Referral Fees" stackId="a" radius={[0, 0, 0, 0]} />
@@ -82,24 +82,24 @@ export default function RevenueBilling() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Referral Fees */}
-        <div className="rounded-2xl surface overflow-hidden">
-          <div className="p-6 border-b border-white/10"><h3 className="text-sm font-semibold">Referral Fees by Lender</h3></div>
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200"><h3 className="text-sm font-semibold">Referral Fees by Lender</h3></div>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10">
+              <tr className="border-b border-gray-200">
                 {['Lender', 'Funded', 'Fee Rate', 'Fees Earned', 'Status'].map(h => (
-                  <th key={h} className="text-left py-3 px-4 text-[10px] text-zinc-500 uppercase tracking-wider">{h}</th>
+                  <th key={h} className="text-left py-3 px-4 text-[10px] text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {MOCK_LENDERS.map(l => (
-                <tr key={l.id} className="border-b border-white/[0.04]">
+                <tr key={l.id} className="border-b border-gray-200">
                   <td className="py-3 px-4 font-medium">{l.name}</td>
-                  <td className="py-3 px-4 text-zinc-400">{Math.round(l.totalFundedVolume / 30000)}</td>
-                  <td className="py-3 px-4 text-zinc-400">${l.referralFee}</td>
-                  <td className="py-3 px-4 text-green-400 font-semibold">{formatCurrency(l.totalReferralFeesOwed)}</td>
-                  <td className="py-3 px-4"><span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400">Pending</span></td>
+                  <td className="py-3 px-4 text-gray-500">{Math.round(l.totalFundedVolume / 30000)}</td>
+                  <td className="py-3 px-4 text-gray-500">${l.referralFee}</td>
+                  <td className="py-3 px-4 text-green-600 font-semibold">{formatCurrency(l.totalReferralFeesOwed)}</td>
+                  <td className="py-3 px-4"><span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-600">Pending</span></td>
                 </tr>
               ))}
             </tbody>
@@ -107,24 +107,24 @@ export default function RevenueBilling() {
         </div>
 
         {/* Dealer Subscriptions */}
-        <div className="rounded-2xl surface overflow-hidden">
-          <div className="p-6 border-b border-white/10"><h3 className="text-sm font-semibold">Dealer Subscriptions</h3></div>
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-gray-200"><h3 className="text-sm font-semibold">Dealer Subscriptions</h3></div>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10">
+              <tr className="border-b border-gray-200">
                 {['Dealer', 'Plan', 'Monthly', 'Billing', 'Status'].map(h => (
-                  <th key={h} className="text-left py-3 px-4 text-[10px] text-zinc-500 uppercase tracking-wider">{h}</th>
+                  <th key={h} className="text-left py-3 px-4 text-[10px] text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {MOCK_DEALERS.map(d => (
-                <tr key={d.id} className="border-b border-white/[0.04]">
+                <tr key={d.id} className="border-b border-gray-200">
                   <td className="py-3 px-4 font-medium">{d.name}</td>
-                  <td className="py-3 px-4 text-zinc-300">{d.plan}</td>
+                  <td className="py-3 px-4 text-gray-700">{d.plan}</td>
                   <td className="py-3 px-4">${d.planPrice}</td>
-                  <td className="py-3 px-4 text-zinc-400">{d.billingDate}</td>
-                  <td className="py-3 px-4"><span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/15 text-green-400">Active</span></td>
+                  <td className="py-3 px-4 text-gray-500">{d.billingDate}</td>
+                  <td className="py-3 px-4"><span className="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-600">Active</span></td>
                 </tr>
               ))}
             </tbody>

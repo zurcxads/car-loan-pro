@@ -67,7 +67,6 @@ export default function AdminPage() {
       onTabChange={(t) => setTab(t as Tab)}
       onLogout={() => signOut({ callbackUrl: '/' })}
       userName={session?.user?.name || 'Admin'}
-      sidebarDark
     >
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
         {tab === 'overview' && <PlatformOverview />}

@@ -10,14 +10,14 @@ const ibmPlex = IBM_Plex_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Car Loan Pro — Auto Lending Marketplace",
+  title: "Auto Loan Pro — Auto Lending Marketplace",
   description: "Get pre-approved for an auto loan from multiple lenders with one application. No dealer markup.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${ibmPlex.variable} font-sans bg-[#09090B] text-zinc-50 antialiased`}>
+    <html lang="en">
+      <body className={`${ibmPlex.variable} font-sans bg-white text-gray-900 antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -18,9 +18,9 @@ const STEP_NAMES = ['Personal Info', 'Address', 'Employment', 'Vehicle', 'Deal S
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs text-zinc-400 mb-2 font-medium">{label}</label>
+      <label className="block text-xs text-gray-500 mb-2 font-medium">{label}</label>
       {children}
-      {error && <p className="text-xs text-red-400 mt-1.5">{error}</p>}
+      {error && <p className="text-xs text-red-500 mt-1.5">{error}</p>}
     </div>
   );
 }
@@ -30,7 +30,7 @@ function Input({ value, onChange, placeholder, type = 'text', error, maxLength }
 }) {
   return (
     <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength}
-      className={`w-full px-4 py-3 bg-zinc-900/80 border ${error ? 'border-red-500/60' : 'border-white/10'} rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-600/50 transition-colors duration-200`} />
+      className={`w-full px-4 py-3 bg-gray-50 border ${error ? 'border-red-400' : 'border-gray-200'} rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200`} />
   );
 }
 
@@ -39,7 +39,7 @@ function Select({ value, onChange, options, placeholder, error }: {
 }) {
   return (
     <select value={value} onChange={e => onChange(e.target.value)}
-      className={`w-full px-4 py-3 bg-zinc-900/80 border ${error ? 'border-red-500/60' : 'border-white/10'} rounded-xl text-sm focus:outline-none focus:border-blue-600/50 transition-colors duration-200 cursor-pointer ${!value ? 'text-zinc-600' : ''}`}>
+      className={`w-full px-4 py-3 bg-gray-50 border ${error ? 'border-red-400' : 'border-gray-200'} rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200 cursor-pointer ${!value ? 'text-gray-400' : ''}`}>
       {placeholder && <option value="">{placeholder}</option>}
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
@@ -49,10 +49,10 @@ function Select({ value, onChange, options, placeholder, error }: {
 function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <label className="flex items-start gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
-      <div className={`mt-0.5 w-5 h-5 rounded-md border flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${checked ? 'bg-blue-600 border-blue-600' : 'border-white/20 group-hover:border-white/40'}`}>
+      <div className={`mt-0.5 w-5 h-5 rounded-md border flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300 group-hover:border-gray-400'}`}>
         {checked && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
       </div>
-      <span className="text-sm text-zinc-300 leading-relaxed">{label}</span>
+      <span className="text-sm text-gray-600 leading-relaxed">{label}</span>
     </label>
   );
 }
@@ -60,11 +60,11 @@ function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v
 function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <label className="flex items-center gap-3 cursor-pointer">
-      <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${checked ? 'bg-blue-600' : 'bg-zinc-700'}`}
+      <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${checked ? 'bg-blue-600' : 'bg-gray-300'}`}
         onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
-        <div className={`absolute top-[3px] w-4 h-4 rounded-full bg-white transition-transform duration-200 ${checked ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
+        <div className={`absolute top-[3px] w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
       </div>
-      <span className="text-sm text-zinc-300">{label}</span>
+      <span className="text-sm text-gray-600">{label}</span>
     </label>
   );
 }
@@ -141,7 +141,6 @@ export default function ApplyPage() {
       return;
     }
 
-    // Store the application ID for the offers page
     if (data) {
       localStorage.setItem('clp_current_app_id', (data as { id: string }).id);
     }
@@ -158,21 +157,21 @@ export default function ApplyPage() {
             <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
             <div className="absolute inset-2 rounded-full border-2 border-blue-400 border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Analyzing your application...</h2>
-          <p className="text-sm text-zinc-500">Matching you with lenders in our network</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Analyzing your application...</h2>
+          <p className="text-sm text-gray-500">Matching you with lenders in our network</p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="border-b border-white/10 bg-[#09090B]/90 backdrop-blur-xl sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50">
+      <div className="border-b border-gray-200 bg-white/90 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight">Car Loan Pro</Link>
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-zinc-500 font-medium">Step {step + 1} of 7</span>
-            <span className="text-xs text-blue-400 bg-blue-600/10 px-2.5 py-0.5 rounded-full">{STEP_NAMES[step]}</span>
+            <span className="text-xs text-gray-500 font-medium">Step {step + 1} of 7</span>
+            <span className="text-xs text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full">{STEP_NAMES[step]}</span>
           </div>
         </div>
       </div>
@@ -180,7 +179,7 @@ export default function ApplyPage() {
       <div className="max-w-3xl mx-auto px-6 pt-8">
         <div className="flex gap-2">
           {STEP_NAMES.map((_, i) => (
-            <div key={i} className="h-1 flex-1 rounded-full overflow-hidden bg-zinc-800">
+            <div key={i} className="h-1 flex-1 rounded-full overflow-hidden bg-gray-200">
               <div className={`h-full rounded-full transition-all duration-500 ${i < step ? 'bg-green-500 w-full' : i === step ? 'bg-blue-600 w-full' : 'w-0'}`} />
             </div>
           ))}
@@ -190,11 +189,11 @@ export default function ApplyPage() {
       <div className="max-w-3xl mx-auto px-6 py-8">
         <AnimatePresence mode="wait">
           <motion.div key={step} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.25 }}
-            className="rounded-2xl surface p-8">
+            className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
 
             {step === 0 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold mb-6">Personal Information</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Personal Information</h2>
                 <div className="grid sm:grid-cols-3 gap-5">
                   <Field label="First Name *" error={errors.firstName}><Input value={personal.firstName} onChange={v => setPersonal(p => ({ ...p, firstName: v }))} error={!!errors.firstName} /></Field>
                   <Field label="Middle Name"><Input value={personal.middleName || ''} onChange={v => setPersonal(p => ({ ...p, middleName: v }))} /></Field>
@@ -221,7 +220,7 @@ export default function ApplyPage() {
 
             {step === 1 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold mb-6">Current Address</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Current Address</h2>
                 <Field label="Street Address *" error={errors.address1}><Input value={address.currentAddressLine1} onChange={v => setAddress(a => ({ ...a, currentAddressLine1: v }))} error={!!errors.address1} /></Field>
                 <Field label="Apt / Suite / Unit"><Input value={address.currentAddressLine2 || ''} onChange={v => setAddress(a => ({ ...a, currentAddressLine2: v }))} /></Field>
                 <div className="grid sm:grid-cols-3 gap-5">
@@ -235,8 +234,8 @@ export default function ApplyPage() {
                   <Field label="Months at Address"><Input type="number" value={address.monthsAtCurrentAddress ? String(address.monthsAtCurrentAddress) : ''} onChange={v => setAddress(a => ({ ...a, monthsAtCurrentAddress: Number(v) }))} placeholder="24" /></Field>
                 </div>
                 {address.monthsAtCurrentAddress > 0 && address.monthsAtCurrentAddress < 24 && (
-                  <div className="pt-6 border-t border-white/10 space-y-5">
-                    <h3 className="text-sm font-medium text-blue-400">Previous Address</h3>
+                  <div className="pt-6 border-t border-gray-200 space-y-5">
+                    <h3 className="text-sm font-medium text-blue-600">Previous Address</h3>
                     <Field label="Street Address"><Input value={address.prevAddressLine1 || ''} onChange={v => setAddress(a => ({ ...a, prevAddressLine1: v }))} /></Field>
                     <div className="grid sm:grid-cols-3 gap-5">
                       <Field label="City"><Input value={address.prevAddressCity || ''} onChange={v => setAddress(a => ({ ...a, prevAddressCity: v }))} /></Field>
@@ -251,7 +250,7 @@ export default function ApplyPage() {
 
             {step === 2 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold mb-6">Employment & Income</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Employment & Income</h2>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <Field label="Employment Status"><Select value={employment.employmentStatus} onChange={v => setEmployment(e => ({ ...e, employmentStatus: v as EmploymentStatus }))} options={[{ value: 'full_time', label: 'Full Time' }, { value: 'part_time', label: 'Part Time' }, { value: 'self_employed', label: 'Self Employed' }, { value: 'retired', label: 'Retired' }, { value: 'other', label: 'Other' }]} /></Field>
                   <Field label="Income Type"><Select value={employment.incomeTypePrimary} onChange={v => setEmployment(e => ({ ...e, incomeTypePrimary: v as IncomeType }))} options={[{ value: 'employment', label: 'Employment' }, { value: 'self_employed', label: 'Self-Employment' }, { value: 'retirement', label: 'Retirement' }, { value: 'disability', label: 'Disability' }, { value: 'ssi', label: 'SSI' }, { value: 'other', label: 'Other' }]} /></Field>
@@ -281,7 +280,7 @@ export default function ApplyPage() {
 
             {step === 3 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold mb-6">Vehicle Information</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Vehicle Information</h2>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <Field label="Application Type"><Select value={vehicle.applicationType} onChange={v => setVehicle(ve => ({ ...ve, applicationType: v as ApplicationType }))} options={[{ value: 'new_vehicle', label: 'New Vehicle' }, { value: 'used_vehicle', label: 'Used Vehicle' }, { value: 'refinance', label: 'Refinance' }, { value: 'private_party', label: 'Private Party' }]} /></Field>
                   <Field label="Condition"><Select value={vehicle.vehicleCondition} onChange={v => setVehicle(ve => ({ ...ve, vehicleCondition: v as VehicleCondition }))} options={[{ value: 'new', label: 'New' }, { value: 'used', label: 'Used' }, { value: 'certified_pre_owned', label: 'Certified Pre-Owned' }]} /></Field>
@@ -309,7 +308,7 @@ export default function ApplyPage() {
 
             {step === 4 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold mb-6">Deal Structure</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Deal Structure</h2>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <Field label="Cash Down Payment ($)"><Input type="number" value={deal.cashDownPayment ? String(deal.cashDownPayment) : ''} onChange={v => setDeal(d => ({ ...d, cashDownPayment: Number(v) }))} placeholder="2000" /></Field>
                   <Field label="Desired Term"><Select value={String(deal.desiredTermMonths)} onChange={v => setDeal(d => ({ ...d, desiredTermMonths: Number(v) as 36 | 48 | 60 | 72 | 84 }))} options={TERM_OPTIONS.map(t => ({ value: String(t.value), label: t.label }))} /></Field>
@@ -317,7 +316,7 @@ export default function ApplyPage() {
                 <Field label="Max Monthly Payment ($)"><Input type="number" value={deal.maxMonthlyPayment ? String(deal.maxMonthlyPayment) : ''} onChange={v => setDeal(d => ({ ...d, maxMonthlyPayment: Number(v) }))} placeholder="Optional" /></Field>
                 <Toggle checked={deal.hasTradeIn} onChange={v => setDeal(d => ({ ...d, hasTradeIn: v }))} label="I have a trade-in" />
                 {deal.hasTradeIn && (
-                  <div className="pt-5 space-y-5 border-t border-white/10">
+                  <div className="pt-5 space-y-5 border-t border-gray-200">
                     <div className="grid sm:grid-cols-3 gap-5">
                       <Field label="Trade-In Year"><Input type="number" value={deal.tradeInYear ? String(deal.tradeInYear) : ''} onChange={v => setDeal(d => ({ ...d, tradeInYear: Number(v) }))} /></Field>
                       <Field label="Trade-In Make"><Input value={deal.tradeInMake || ''} onChange={v => setDeal(d => ({ ...d, tradeInMake: v }))} /></Field>
@@ -338,11 +337,11 @@ export default function ApplyPage() {
 
             {step === 5 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold mb-6">Co-Borrower</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Co-Borrower</h2>
                 <Toggle checked={hasCoBorrower} onChange={v => setHasCoBorrower(v)} label="Add a co-borrower to strengthen your application" />
                 {hasCoBorrower ? (
                   <div className="space-y-5 pt-4">
-                    <p className="text-xs text-zinc-500">Adding a co-borrower with good credit can improve your approval odds and rate.</p>
+                    <p className="text-xs text-gray-500">Adding a co-borrower with good credit can improve your approval odds and rate.</p>
                     <div className="grid sm:grid-cols-2 gap-5">
                       <Field label="First Name"><Input value={coPersonal.firstName} onChange={v => setCoPersonal(p => ({ ...p, firstName: v }))} /></Field>
                       <Field label="Last Name"><Input value={coPersonal.lastName} onChange={v => setCoPersonal(p => ({ ...p, lastName: v }))} /></Field>
@@ -357,25 +356,25 @@ export default function ApplyPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="py-12 text-center text-sm text-zinc-500">No co-borrower selected. You can proceed without one.</div>
+                  <div className="py-12 text-center text-sm text-gray-500">No co-borrower selected. You can proceed without one.</div>
                 )}
               </div>
             )}
 
             {step === 6 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold mb-6">Consent & Authorization</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Consent & Authorization</h2>
                 <div className="space-y-5">
-                  <Checkbox checked={consent.softPullConsent} onChange={v => setConsent(c => ({ ...c, softPullConsent: v }))} label="I authorize Car Loan Pro to obtain a soft credit inquiry to match me with lenders. This will not affect my credit score." />
-                  {errors.soft && <p className="text-xs text-red-400 -mt-3 ml-8">You must consent to proceed</p>}
-                  <Checkbox checked={consent.tcpaConsent} onChange={v => setConsent(c => ({ ...c, tcpaConsent: v }))} label="I consent to receive calls, texts, and emails from Car Loan Pro and its lending partners regarding my application." />
-                  {errors.tcpa && <p className="text-xs text-red-400 -mt-3 ml-8">Required</p>}
+                  <Checkbox checked={consent.softPullConsent} onChange={v => setConsent(c => ({ ...c, softPullConsent: v }))} label="I authorize Auto Loan Pro to obtain a soft credit inquiry to match me with lenders. This will not affect my credit score." />
+                  {errors.soft && <p className="text-xs text-red-500 -mt-3 ml-8">You must consent to proceed</p>}
+                  <Checkbox checked={consent.tcpaConsent} onChange={v => setConsent(c => ({ ...c, tcpaConsent: v }))} label="I consent to receive calls, texts, and emails from Auto Loan Pro and its lending partners regarding my application." />
+                  {errors.tcpa && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
                   <Checkbox checked={consent.termsOfService} onChange={v => setConsent(c => ({ ...c, termsOfService: v }))} label="I have read and agree to the Terms of Service." />
-                  {errors.terms && <p className="text-xs text-red-400 -mt-3 ml-8">Required</p>}
+                  {errors.terms && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
                   <Checkbox checked={consent.privacyPolicy} onChange={v => setConsent(c => ({ ...c, privacyPolicy: v }))} label="I have read and agree to the Privacy Policy." />
-                  {errors.privacy && <p className="text-xs text-red-400 -mt-3 ml-8">Required</p>}
+                  {errors.privacy && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
                   <Checkbox checked={consent.eSignConsent} onChange={v => setConsent(c => ({ ...c, eSignConsent: v }))} label="I consent to use electronic signatures and receive documents electronically (E-Sign Act)." />
-                  {errors.esign && <p className="text-xs text-red-400 -mt-3 ml-8">Required</p>}
+                  {errors.esign && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
                 </div>
               </div>
             )}
@@ -384,12 +383,12 @@ export default function ApplyPage() {
 
         <div className="flex justify-between mt-8 pb-12">
           {step > 0 ? (
-            <button onClick={back} className="px-6 py-3 text-sm text-zinc-400 hover:text-zinc-50 border border-white/10 hover:border-white/20 rounded-xl transition-colors duration-200 cursor-pointer">Back</button>
+            <button onClick={back} className="px-6 py-3 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-300 rounded-xl transition-colors duration-200 cursor-pointer">Back</button>
           ) : <div />}
           {step < 6 ? (
-            <button onClick={next} className="px-8 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
+            <button onClick={next} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
           ) : (
-            <button onClick={submit} disabled={submitting} className="px-8 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
+            <button onClick={submit} disabled={submitting} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
           )}
         </div>
       </div>

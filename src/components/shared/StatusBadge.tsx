@@ -10,7 +10,7 @@ const statusStyles: Record<string, string> = {
   // Offer statuses
   approved: 'bg-green-500/15 text-green-400 border-green-500/25',
   selected: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
-  expired: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/25',
+  expired: 'bg-gray-500/15 text-gray-400 border-gray-500/25',
   pending: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
   // Deal statuses
   submitted: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
@@ -23,7 +23,7 @@ const statusStyles: Record<string, string> = {
   subprime: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
   // Admin
   active: 'bg-green-500/15 text-green-400 border-green-500/25',
-  inactive: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/25',
+  inactive: 'bg-gray-500/15 text-gray-400 border-gray-500/25',
   overdue: 'bg-red-500/15 text-red-400 border-red-500/25',
   sent: 'bg-green-500/15 text-green-400 border-green-500/25',
 };
@@ -52,7 +52,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function StatusBadge({ status, label }: { status: string; label?: string }) {
-  const style = statusStyles[status] || 'bg-zinc-500/15 text-zinc-400 border-zinc-500/25';
+  const style = statusStyles[status] || 'bg-gray-500/15 text-gray-400 border-gray-500/25';
   const displayLabel = label || statusLabels[status] || status.replace(/_/g, ' ');
 
   return (

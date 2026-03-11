@@ -3,18 +3,18 @@
 @tailwind utilities;
 
 :root {
-  --bg: #09090B;
-  --surface: #18181B;
-  --surface-hover: #1f1f23;
+  --bg: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-hover: #F9FAFB;
   --blue: #2563EB;
   --blue-hover: #3B82F6;
   --green: #22C55E;
-  --green-dim: rgba(34, 197, 94, 0.15);
-  --text: #FAFAFA;
-  --text-muted: #A1A1AA;
-  --text-dim: #71717A;
-  --border: rgba(255, 255, 255, 0.1);
-  --border-hover: rgba(255, 255, 255, 0.16);
+  --green-dim: rgba(34, 197, 94, 0.1);
+  --text: #111827;
+  --text-muted: #6B7280;
+  --text-dim: #9CA3AF;
+  --border: #E5E7EB;
+  --border-hover: #D1D5DB;
 }
 
 body {
@@ -24,38 +24,10 @@ body {
   color: var(--text);
 }
 
-/* Subtle atmospheric background */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37, 99, 235, 0.06) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(34, 197, 94, 0.03) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-/* Noise texture */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  opacity: 0.015;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-/* Heading glow */
-.text-glow {
-  text-shadow: 0 0 20px rgba(37, 99, 235, 0.15), 0 0 60px rgba(37, 99, 235, 0.05);
-}
-
 /* Custom range */
 input[type="range"] {
   -webkit-appearance: none; appearance: none;
-  height: 6px; border-radius: 3px; background: #27272A; outline: none;
+  height: 6px; border-radius: 3px; background: #E5E7EB; outline: none;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
@@ -66,7 +38,7 @@ input[type="range"]::-webkit-slider-thumb {
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #27272A; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
 
 /* Card surface */
 .surface {
@@ -75,11 +47,12 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .surface-hover {
-  transition: border-color 200ms ease, background-color 200ms ease;
+  transition: border-color 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
 }
 .surface-hover:hover {
   border-color: var(--border-hover);
   background: var(--surface-hover);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 /* Pulse */

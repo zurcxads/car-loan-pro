@@ -68,9 +68,9 @@ export default function DocumentUploadCenter({ conditions, appId, onAllUploaded 
 
   if (conditions.length === 0) {
     return (
-      <div className="rounded-2xl surface p-8">
+      <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
         <h2 className="text-sm font-semibold mb-4">Document Upload</h2>
-        <div className="flex items-center gap-2 text-green-400">
+        <div className="flex items-center gap-2 text-green-600">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
           <span className="text-sm font-medium">No documents required -- ready to fund</span>
         </div>
@@ -79,7 +79,7 @@ export default function DocumentUploadCenter({ conditions, appId, onAllUploaded 
   }
 
   return (
-    <div className="rounded-2xl surface p-8">
+    <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
       <h2 className="text-sm font-semibold mb-6">Upload Required Documents</h2>
 
       <input
@@ -98,44 +98,44 @@ export default function DocumentUploadCenter({ conditions, appId, onAllUploaded 
 
       <div className="space-y-3">
         {docs.map((doc, i) => (
-          <div key={i} className="rounded-xl bg-zinc-800/50 border border-white/[0.06] p-4">
+          <div key={i} className="rounded-xl bg-gray-50 border border-gray-200 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {doc.status === 'not_uploaded' ? (
-                  <div className="w-8 h-8 rounded-lg bg-zinc-700 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                  <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                   </div>
                 ) : (
-                  <div className="w-8 h-8 rounded-lg bg-green-500/15 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                   </div>
                 )}
                 <div>
                   <div className="text-sm font-medium">{doc.type}</div>
                   {doc.fileName && (
-                    <div className="text-[10px] text-zinc-500 mt-0.5">{doc.fileName} ({formatSize(doc.fileSize || 0)})</div>
+                    <div className="text-[10px] text-gray-500 mt-0.5">{doc.fileName} ({formatSize(doc.fileSize || 0)})</div>
                   )}
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                  doc.status === 'not_uploaded' ? 'bg-zinc-700 text-zinc-400' :
-                  doc.status === 'uploaded' ? 'bg-green-500/15 text-green-400' :
-                  'bg-blue-500/15 text-blue-400'
+                  doc.status === 'not_uploaded' ? 'bg-gray-200 text-gray-500' :
+                  doc.status === 'uploaded' ? 'bg-green-50 text-green-600' :
+                  'bg-blue-50 text-blue-600'
                 }`}>
                   {doc.status === 'not_uploaded' ? 'Not Uploaded' : doc.status === 'uploaded' ? 'Uploaded' : 'Verified'}
                 </span>
                 {doc.status === 'not_uploaded' ? (
                   <button
                     onClick={() => { setActiveSlot(i); fileInputRef.current?.click(); }}
-                    className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors duration-200 cursor-pointer font-medium"
+                    className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors duration-200 cursor-pointer font-medium"
                   >
                     Upload
                   </button>
                 ) : (
                   <button
                     onClick={() => removeDoc(i)}
-                    className="px-3 py-1.5 text-xs text-zinc-500 hover:text-red-400 rounded-lg transition-colors duration-200 cursor-pointer"
+                    className="px-3 py-1.5 text-xs text-gray-500 hover:text-red-500 rounded-lg transition-colors duration-200 cursor-pointer"
                   >
                     Remove
                   </button>
@@ -154,7 +154,7 @@ export default function DocumentUploadCenter({ conditions, appId, onAllUploaded 
             onAllUploaded?.();
           }}
           className={`w-full mt-6 py-3 text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer ${
-            allUploaded ? 'bg-blue-600 hover:bg-blue-500' : 'bg-zinc-700 text-zinc-500 cursor-not-allowed'
+            allUploaded ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
           }`}
         >
           Submit Documents

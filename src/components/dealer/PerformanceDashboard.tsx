@@ -26,7 +26,7 @@ const funnelData = [
 ];
 
 const tooltipStyle = {
-  contentStyle: { backgroundColor: '#18181B', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '12px' },
+  contentStyle: { backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '12px', fontSize: '12px' },
 };
 
 export default function PerformanceDashboard() {
@@ -34,9 +34,9 @@ export default function PerformanceDashboard() {
 
   return (
     <div>
-      <div className="flex gap-1 mb-8 bg-zinc-900/60 rounded-xl p-1 w-fit border border-white/10">
+      <div className="flex gap-1 mb-8 bg-gray-50 rounded-xl p-1 w-fit border border-gray-200">
         {[['month', 'This Month'], ['lastMonth', 'Last Month'], ['90', 'Last 90 Days'], ['ytd', 'YTD']].map(([key, label]) => (
-          <button key={key} onClick={() => setRange(key)} className={`px-4 py-2 text-xs rounded-lg transition-colors cursor-pointer ${range === key ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-500'}`}>{label}</button>
+          <button key={key} onClick={() => setRange(key)} className={`px-4 py-2 text-xs rounded-lg transition-colors cursor-pointer ${range === key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>{label}</button>
         ))}
       </div>
 
@@ -51,19 +51,19 @@ export default function PerformanceDashboard() {
       </div>
 
       {/* Funnel */}
-      <div className="rounded-2xl surface p-6 mb-8">
+      <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 mb-8">
         <h3 className="text-sm font-semibold mb-6">Conversion Funnel</h3>
         <div className="space-y-3">
           {funnelData.map((step, i) => (
             <div key={step.stage}>
               <div className="flex items-center justify-between text-sm mb-1">
-                <span className="text-zinc-300">{step.stage}</span>
+                <span className="text-gray-700">{step.stage}</span>
                 <div className="flex items-center gap-3">
                   <span className="font-semibold">{step.count}</span>
-                  {i > 0 && <span className="text-[10px] text-zinc-500">{Math.round((funnelData[i].count / funnelData[i - 1].count) * 100)}% from prev</span>}
+                  {i > 0 && <span className="text-[10px] text-gray-500">{Math.round((funnelData[i].count / funnelData[i - 1].count) * 100)}% from prev</span>}
                 </div>
               </div>
-              <div className="h-3 bg-zinc-800 rounded-full overflow-hidden">
+              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                 <div className="h-full bg-blue-600 rounded-full transition-all" style={{ width: `${step.pct}%` }} />
               </div>
             </div>
@@ -73,14 +73,14 @@ export default function PerformanceDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar chart */}
-        <div className="rounded-2xl surface p-6">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-6">Funded Deals by Week</h3>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyFunded}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="week" tick={{ fill: '#71717A', fontSize: 11 }} axisLine={false} />
-                <YAxis tick={{ fill: '#71717A', fontSize: 11 }} axisLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="week" tick={{ fill: '#6B7280', fontSize: 11 }} axisLine={false} />
+                <YAxis tick={{ fill: '#6B7280', fontSize: 11 }} axisLine={false} />
                 <Tooltip {...tooltipStyle} />
                 <Bar dataKey="deals" fill="#3B82F6" name="Funded" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -89,7 +89,7 @@ export default function PerformanceDashboard() {
         </div>
 
         {/* Donut chart */}
-        <div className="rounded-2xl surface p-6">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-6">Funding by Lender</h3>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">

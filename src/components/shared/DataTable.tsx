@@ -71,19 +71,19 @@ export default function DataTable<T>({
 
   return (
     <div>
-      <div className="rounded-2xl surface overflow-hidden">
+      <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               {table.getHeaderGroups().map(headerGroup => (
-                <tr key={headerGroup.id} className="border-b border-white/10">
+                <tr key={headerGroup.id} className="border-b border-gray-200">
                   {enableSelection && (
                     <th className="py-4 px-5 w-10">
                       <input
                         type="checkbox"
                         checked={selectedRows.size === table.getRowModel().rows.length && selectedRows.size > 0}
                         onChange={toggleAll}
-                        className="rounded border-zinc-600 bg-zinc-800 cursor-pointer"
+                        className="rounded border-gray-300 cursor-pointer"
                       />
                     </th>
                   )}
@@ -91,14 +91,14 @@ export default function DataTable<T>({
                     <th
                       key={header.id}
                       onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
-                      className={`text-left py-4 px-5 text-[10px] text-zinc-500 uppercase tracking-widest font-medium ${
-                        header.column.getCanSort() ? 'cursor-pointer select-none hover:text-zinc-300' : ''
+                      className={`text-left py-4 px-5 text-[10px] text-gray-500 uppercase tracking-widest font-medium ${
+                        header.column.getCanSort() ? 'cursor-pointer select-none hover:text-gray-700' : ''
                       }`}
                     >
                       <div className="flex items-center gap-1.5">
                         {flexRender(header.column.columnDef.header, header.getContext())}
-                        {header.column.getIsSorted() === 'asc' && <span className="text-blue-400">↑</span>}
-                        {header.column.getIsSorted() === 'desc' && <span className="text-blue-400">↓</span>}
+                        {header.column.getIsSorted() === 'asc' && <span className="text-blue-600">↑</span>}
+                        {header.column.getIsSorted() === 'desc' && <span className="text-blue-600">↓</span>}
                       </div>
                     </th>
                   ))}
@@ -113,9 +113,9 @@ export default function DataTable<T>({
                   <tr
                     key={row.id}
                     onClick={() => onRowClick?.(row.original)}
-                    className={`border-b border-white/[0.04] transition-colors duration-150 ${
-                      onRowClick ? 'hover:bg-zinc-800/30 cursor-pointer' : ''
-                    } ${selectedRows.has(rowId) ? 'bg-blue-600/5' : ''}`}
+                    className={`border-b border-gray-100 transition-colors duration-150 ${
+                      onRowClick ? 'hover:bg-gray-50 cursor-pointer' : ''
+                    } ${selectedRows.has(rowId) ? 'bg-blue-50' : ''}`}
                   >
                     {enableSelection && (
                       <td className="py-4 px-5" onClick={e => e.stopPropagation()}>
@@ -123,7 +123,7 @@ export default function DataTable<T>({
                           type="checkbox"
                           checked={selectedRows.has(rowId)}
                           onChange={() => toggleRow(rowId)}
-                          className="rounded border-zinc-600 bg-zinc-800 cursor-pointer"
+                          className="rounded border-gray-300 cursor-pointer"
                         />
                       </td>
                     )}
@@ -140,8 +140,7 @@ export default function DataTable<T>({
         </div>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between mt-4 text-xs text-zinc-500">
+      <div className="flex items-center justify-between mt-4 text-xs text-gray-500">
         <span>
           Showing {table.getState().pagination.pageIndex * pageSize + 1}-
           {Math.min((table.getState().pagination.pageIndex + 1) * pageSize, table.getFilteredRowModel().rows.length)} of{' '}
@@ -151,14 +150,14 @@ export default function DataTable<T>({
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer"
+            className="px-3 py-1.5 rounded-lg border border-gray-200 hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer"
           >
             Previous
           </button>
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer"
+            className="px-3 py-1.5 rounded-lg border border-gray-200 hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer"
           >
             Next
           </button>

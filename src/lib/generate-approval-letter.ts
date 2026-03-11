@@ -21,7 +21,7 @@ export function generateApprovalLetter(data: ApprovalLetterData): void {
   // Header
   doc.setFontSize(24);
   doc.setTextColor(37, 99, 235); // blue-600
-  doc.text('Car Loan Pro', 20, y);
+  doc.text('Auto Loan Pro', 20, y);
   y += 10;
 
   doc.setFontSize(14);
@@ -49,7 +49,7 @@ export function generateApprovalLetter(data: ApprovalLetterData): void {
   // Body paragraph
   doc.setFontSize(10);
   doc.setTextColor(80, 80, 80);
-  const bodyText = `This letter confirms that ${data.firstName} ${data.lastName} has been pre-approved for auto financing through Car Loan Pro's lender network. The following terms have been conditionally approved pending final vehicle selection and verification of information provided.`;
+  const bodyText = `This letter confirms that ${data.firstName} ${data.lastName} has been pre-approved for auto financing through Auto Loan Pro's lender network. The following terms have been conditionally approved pending final vehicle selection and verification of information provided.`;
   const bodyLines = doc.splitTextToSize(bodyText, pageWidth - 40);
   doc.text(bodyLines, 20, y);
   y += bodyLines.length * 6 + 15;
@@ -103,11 +103,11 @@ export function generateApprovalLetter(data: ApprovalLetterData): void {
 
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  const footerText = 'This pre-approval is not a guarantee of final loan terms. Final approval subject to lender underwriting. Car Loan Pro NMLS #000000';
+  const footerText = 'This pre-approval is not a guarantee of final loan terms. Final approval subject to lender underwriting. Auto Loan Pro NMLS #000000';
   const footerLines = doc.splitTextToSize(footerText, pageWidth - 40);
   doc.text(footerLines, 20, y);
 
   // Download
-  const fileName = `CarLoanPro_Approval_${data.lastName}_${new Date().toISOString().split('T')[0]}.pdf`;
+  const fileName = `AutoLoanPro_Approval_${data.lastName}_${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(fileName);
 }

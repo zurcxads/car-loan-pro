@@ -66,7 +66,7 @@ export default function ApplicationQueue() {
   const columns = useMemo(() => [
     columnHelper.accessor('id', {
       header: 'App ID',
-      cell: info => <span className="font-mono text-xs text-zinc-400">{info.getValue()}</span>,
+      cell: info => <span className="font-mono text-xs text-gray-500">{info.getValue()}</span>,
       enableSorting: false,
     }),
     columnHelper.accessor(row => `${row.borrower.firstName} ${row.borrower.lastName.charAt(0)}.`, {
@@ -89,7 +89,7 @@ export default function ApplicationQueue() {
     columnHelper.accessor(row => `${row.vehicle.year} ${row.vehicle.make} ${row.vehicle.model}`, {
       id: 'vehicle',
       header: 'Vehicle',
-      cell: info => <span className="text-sm text-zinc-400">{truncate(info.getValue(), 25)}</span>,
+      cell: info => <span className="text-sm text-gray-500">{truncate(info.getValue(), 25)}</span>,
       enableSorting: false,
     }),
     columnHelper.accessor('ltvPercent', {
@@ -106,7 +106,7 @@ export default function ApplicationQueue() {
     }),
     columnHelper.accessor('submittedAt', {
       header: 'Submitted',
-      cell: info => <span className="text-xs text-zinc-500">{formatRelativeTime(info.getValue())}</span>,
+      cell: info => <span className="text-xs text-gray-500">{formatRelativeTime(info.getValue())}</span>,
     }),
     columnHelper.accessor('status', {
       header: 'Status',
@@ -141,8 +141,8 @@ export default function ApplicationQueue() {
               onClick={() => toggleStatus(opt.key)}
               className={`px-3 py-1.5 text-xs rounded-lg border transition-colors duration-200 cursor-pointer ${
                 statusFilter.includes(opt.key)
-                  ? 'bg-blue-600/15 border-blue-600/30 text-blue-400'
-                  : 'border-white/10 text-zinc-500 hover:text-zinc-50'
+                  ? 'bg-blue-50 border-blue-200 text-blue-600'
+                  : 'border-gray-200 text-gray-500 hover:text-gray-900'
               }`}
             >
               {opt.label}
@@ -155,11 +155,11 @@ export default function ApplicationQueue() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search by App ID or name..."
-            className="w-full px-4 py-2 bg-zinc-900/80 border border-white/10 rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-blue-600/50 transition-colors duration-200"
+            className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50 transition-colors duration-200"
           />
         </div>
         {statusFilter.length > 0 && !statusFilter.includes('all') && (
-          <button onClick={() => setStatusFilter(['all'])} className="text-xs text-zinc-500 hover:text-zinc-300 cursor-pointer">
+          <button onClick={() => setStatusFilter(['all'])} className="text-xs text-gray-500 hover:text-gray-700 cursor-pointer">
             Clear Filters
           </button>
         )}

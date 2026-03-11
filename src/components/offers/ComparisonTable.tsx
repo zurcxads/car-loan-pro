@@ -71,17 +71,17 @@ export default function ComparisonTable({ offers }: ComparisonTableProps) {
   ];
 
   return (
-    <div className="rounded-2xl surface overflow-hidden">
-      <div className="p-6 border-b border-white/10">
+    <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+      <div className="p-6 border-b border-gray-200">
         <h3 className="text-sm font-semibold">Side-by-Side Comparison</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-white/10">
-              <th className="text-left py-4 px-5 text-[10px] text-zinc-500 uppercase tracking-widest font-medium w-40"></th>
+            <tr className="border-b border-gray-200">
+              <th className="text-left py-4 px-5 text-[10px] text-gray-500 uppercase tracking-widest font-medium w-40"></th>
               {offers.map(o => (
-                <th key={o.id} className="text-left py-4 px-5 text-xs font-semibold text-zinc-200">
+                <th key={o.id} className="text-left py-4 px-5 text-xs font-semibold text-gray-900">
                   {o.lenderName}
                 </th>
               ))}
@@ -89,10 +89,10 @@ export default function ComparisonTable({ offers }: ComparisonTableProps) {
           </thead>
           <tbody>
             {rows.map((row, i) => (
-              <tr key={i} className="border-b border-white/[0.04]">
-                <td className="py-3.5 px-5 text-xs text-zinc-500 font-medium">{row.label}</td>
+              <tr key={i} className="border-b border-gray-200">
+                <td className="py-3.5 px-5 text-xs text-gray-500 font-medium">{row.label}</td>
                 {row.values.map((val, j) => (
-                  <td key={j} className={`py-3.5 px-5 text-sm ${val.highlight ? 'text-green-400 font-semibold' : 'text-zinc-300'}`}>
+                  <td key={j} className={`py-3.5 px-5 text-sm ${val.highlight ? 'text-green-600 font-semibold' : 'text-gray-700'}`}>
                     {val.display}
                   </td>
                 ))}

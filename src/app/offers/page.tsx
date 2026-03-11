@@ -35,7 +35,6 @@ export default function OffersPage() {
     if (storedId) setAppId(storedId);
   }, []);
 
-  // Fetch offers from API, fallback to mock
   const { data: apiOffers, isLoading } = useOffers(appId);
 
   const demoApp = MOCK_APPLICATIONS[0];
@@ -62,7 +61,6 @@ export default function OffersPage() {
     });
 
     if (error) {
-      // Non-blocking: still allow selection even if API fails
       console.warn('API offer selection failed:', error);
     }
 
@@ -81,30 +79,30 @@ export default function OffersPage() {
           <div className="relative w-12 h-12 mx-auto mb-6">
             <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
           </div>
-          <p className="text-sm text-zinc-500">Loading offers...</p>
+          <p className="text-sm text-gray-500">Loading offers...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="border-b border-white/10 bg-[#09090B]/90 backdrop-blur-xl sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50">
+      <div className="border-b border-gray-200 bg-white/90 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight">Car Loan Pro</Link>
-          <Link href="/status" className="text-xs text-zinc-400 hover:text-zinc-50 transition-colors duration-200 cursor-pointer">Application Status</Link>
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
+          <Link href="/status" className="text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 cursor-pointer">Application Status</Link>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
           <div>
-            <h1 className="text-2xl font-bold">Your Pre-Qualification Results</h1>
-            <p className="text-sm text-zinc-500 mt-1">
+            <h1 className="text-2xl font-bold text-gray-900">Your Pre-Qualification Results</h1>
+            <p className="text-sm text-gray-500 mt-1">
               Showing results for {demoApp.vehicle.year} {demoApp.vehicle.make} {demoApp.vehicle.model} -- {formatCurrency(demoApp.loanAmount)}
             </p>
           </div>
-          <span className="text-[10px] px-3 py-1.5 rounded-full bg-green-500/15 text-green-400 border border-green-500/25 font-medium whitespace-nowrap self-start">
+          <span className="text-[10px] px-3 py-1.5 rounded-full bg-green-50 text-green-600 border border-green-200 font-medium whitespace-nowrap self-start">
             {offers.length} Offers Available
           </span>
         </div>
@@ -112,7 +110,7 @@ export default function OffersPage() {
         <div className="flex gap-2 mb-8">
           {([['rate', 'Lowest Rate'], ['payment', 'Lowest Payment'], ['term', 'Shortest Term']] as [SortKey, string][]).map(([key, label]) => (
             <button key={key} onClick={() => setSort(key)}
-              className={`px-4 py-2 text-xs rounded-lg border transition-colors duration-200 cursor-pointer ${sort === key ? 'bg-blue-600/15 border-blue-600/30 text-blue-400' : 'border-white/10 text-zinc-500 hover:text-zinc-50 hover:border-white/20'}`}>
+              className={`px-4 py-2 text-xs rounded-lg border transition-colors duration-200 cursor-pointer ${sort === key ? 'bg-blue-50 border-blue-200 text-blue-600' : 'border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300'}`}>
               {label}
             </button>
           ))}
@@ -130,8 +128,8 @@ export default function OffersPage() {
 
         {offers.length === 0 && (
           <div className="py-24 text-center">
-            <p className="text-zinc-500 mb-6">No offers yet. Submit an application first.</p>
-            <Link href="/apply" className="inline-flex px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-sm font-medium transition-colors duration-200 cursor-pointer">Apply Now</Link>
+            <p className="text-gray-500 mb-6">No offers yet. Submit an application first.</p>
+            <Link href="/apply" className="inline-flex px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-medium transition-colors duration-200 cursor-pointer">Apply Now</Link>
           </div>
         )}
       </div>

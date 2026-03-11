@@ -17,7 +17,7 @@ interface Props {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-6">
-      <h3 className="text-[10px] text-zinc-500 uppercase tracking-widest font-medium mb-3">{title}</h3>
+      <h3 className="text-[10px] text-gray-500 uppercase tracking-widest font-medium mb-3">{title}</h3>
       {children}
     </div>
   );
@@ -26,7 +26,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, value, className = '' }: { label: string; value: string | number | null | undefined; className?: string }) {
   return (
     <div>
-      <span className="text-[10px] text-zinc-600 block">{label}</span>
+      <span className="text-[10px] text-gray-400 block">{label}</span>
       <span className={`text-sm font-medium ${className}`}>{value ?? 'N/A'}</span>
     </div>
   );
@@ -51,15 +51,15 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-[560px] bg-[#0c0c0e] border-l border-white/10 overflow-y-auto"
+          className="relative w-full max-w-[560px] bg-white border-l border-gray-200 overflow-y-auto"
         >
           {/* Header */}
-          <div className="sticky top-0 z-10 bg-[#0c0c0e] border-b border-white/10 px-6 py-4 flex items-center justify-between">
+          <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-sm text-zinc-400">{app.id}</span>
+              <span className="font-mono text-sm text-gray-500">{app.id}</span>
               <StatusBadge status={app.status} />
             </div>
-            <button onClick={onClose} className="p-1 text-zinc-500 hover:text-zinc-50 cursor-pointer">
+            <button onClick={onClose} className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>
@@ -122,39 +122,39 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
             <Section title="Computed Underwriting">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-[10px] text-zinc-600 block">LTV (max {lender.maxLtv}%)</span>
+                  <span className="text-[10px] text-gray-400 block">LTV (max {lender.maxLtv}%)</span>
                   <div className="flex items-center gap-2">
                     <span className={`text-sm font-semibold ${ltvColor(app.ltvPercent)}`}>{app.ltvPercent}%</span>
                     {app.ltvPercent <= lender.maxLtv ? (
-                      <span className="text-[10px] text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded">PASS</span>
+                      <span className="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded">PASS</span>
                     ) : (
-                      <span className="text-[10px] text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">FAIL</span>
+                      <span className="text-[10px] text-red-500 bg-red-50 px-1.5 py-0.5 rounded">FAIL</span>
                     )}
                   </div>
                 </div>
                 <div>
-                  <span className="text-[10px] text-zinc-600 block">DTI (max {lender.maxDti}%)</span>
+                  <span className="text-[10px] text-gray-400 block">DTI (max {lender.maxDti}%)</span>
                   <div className="flex items-center gap-2">
                     <span className={`text-sm font-semibold ${dtiColor(app.dtiPercent)}`}>{app.dtiPercent}%</span>
                     {app.dtiPercent <= lender.maxDti ? (
-                      <span className="text-[10px] text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded">PASS</span>
+                      <span className="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded">PASS</span>
                     ) : (
-                      <span className="text-[10px] text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">FAIL</span>
+                      <span className="text-[10px] text-red-500 bg-red-50 px-1.5 py-0.5 rounded">FAIL</span>
                     )}
                   </div>
                 </div>
                 <div>
-                  <span className="text-[10px] text-zinc-600 block">PTI</span>
+                  <span className="text-[10px] text-gray-400 block">PTI</span>
                   <span className={`text-sm font-semibold ${ptiColor(app.ptiPercent)}`}>{app.ptiPercent}%</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-zinc-600 block">FICO (min {lender.minFico})</span>
+                  <span className="text-[10px] text-gray-400 block">FICO (min {lender.minFico})</span>
                   <div className="flex items-center gap-2">
                     <span className={`text-sm font-semibold ${ficoColor(app.credit.ficoScore)}`}>{app.credit.ficoScore ?? 'N/A'}</span>
                     {(app.credit.ficoScore === null || app.credit.ficoScore >= lender.minFico) ? (
-                      <span className="text-[10px] text-green-400 bg-green-500/10 px-1.5 py-0.5 rounded">PASS</span>
+                      <span className="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded">PASS</span>
                     ) : (
-                      <span className="text-[10px] text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">FAIL</span>
+                      <span className="text-[10px] text-red-500 bg-red-50 px-1.5 py-0.5 rounded">FAIL</span>
                     )}
                   </div>
                 </div>
@@ -168,9 +168,9 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
                 <Field label="Score Tier" value={app.credit.scoreTier} />
                 <Field label="Monthly Obligations" value={formatCurrency(app.credit.totalMonthlyObligations)} />
                 <Field label="Open Auto Tradelines" value={app.credit.openAutoTradelines} />
-                <Field label="Derogatory Marks" value={app.credit.derogatoryMarks} className={app.credit.derogatoryMarks > 0 ? 'text-amber-400' : ''} />
-                <Field label="Repo History" value={app.credit.hasRepo ? 'Yes' : 'No'} className={app.credit.hasRepo ? 'text-red-400' : ''} />
-                <Field label="Bankruptcy" value={app.credit.hasBankruptcy ? 'Yes' : 'No'} className={app.credit.hasBankruptcy ? 'text-red-400' : ''} />
+                <Field label="Derogatory Marks" value={app.credit.derogatoryMarks} className={app.credit.derogatoryMarks > 0 ? 'text-amber-600' : ''} />
+                <Field label="Repo History" value={app.credit.hasRepo ? 'Yes' : 'No'} className={app.credit.hasRepo ? 'text-red-500' : ''} />
+                <Field label="Bankruptcy" value={app.credit.hasBankruptcy ? 'Yes' : 'No'} className={app.credit.hasBankruptcy ? 'text-red-500' : ''} />
               </div>
             </Section>
 
@@ -179,10 +179,10 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
               <Section title="Existing Offers">
                 <div className="space-y-2">
                   {offers.map(o => (
-                    <div key={o.id} className="rounded-xl bg-zinc-800/50 p-3 flex items-center justify-between text-sm">
+                    <div key={o.id} className="rounded-xl bg-gray-50 p-3 flex items-center justify-between text-sm">
                       <div>
                         <span className="font-medium">{o.lenderName}</span>
-                        <span className="text-zinc-500 ml-2">{formatAPR(o.apr)} / {o.termMonths}mo</span>
+                        <span className="text-gray-500 ml-2">{formatAPR(o.apr)} / {o.termMonths}mo</span>
                       </div>
                       <StatusBadge status={o.status} />
                     </div>
@@ -193,17 +193,17 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
           </div>
 
           {/* Footer actions */}
-          <div className="sticky bottom-0 bg-[#0c0c0e] border-t border-white/10 px-6 py-4 flex gap-2">
-            <button onClick={onDecline} className="px-4 py-2.5 text-xs border border-red-500/30 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+          <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex gap-2">
+            <button onClick={onDecline} className="px-4 py-2.5 text-xs border border-red-200 text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
               Decline
             </button>
-            <button onClick={onRequestDocs} className="px-4 py-2.5 text-xs border border-white/10 hover:border-white/20 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+            <button onClick={onRequestDocs} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
               Request Docs
             </button>
-            <button onClick={onCounter} className="px-4 py-2.5 text-xs border border-white/10 hover:border-white/20 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+            <button onClick={onCounter} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
               Counter
             </button>
-            <button onClick={onApprove} className="flex-1 px-4 py-2.5 text-xs bg-green-600 hover:bg-green-500 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+            <button onClick={onApprove} className="flex-1 px-4 py-2.5 text-xs bg-green-600 hover:bg-green-500 rounded-xl transition-colors duration-200 cursor-pointer font-medium text-white">
               Approve
             </button>
           </div>

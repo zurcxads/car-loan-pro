@@ -53,26 +53,26 @@ export function getInitials(firstName: string, lastName: string): string {
 }
 
 export function ficoColor(score: number | null): string {
-  if (!score) return 'text-zinc-400';
-  if (score >= 720) return 'text-green-400';
-  if (score >= 660) return 'text-yellow-400';
-  return 'text-red-400';
+  if (!score) return 'text-gray-400';
+  if (score >= 720) return 'text-green-600';
+  if (score >= 660) return 'text-yellow-600';
+  return 'text-red-500';
 }
 
 export function ltvColor(ltv: number): string {
-  if (ltv < 110) return 'text-green-400';
-  if (ltv <= 120) return 'text-yellow-400';
-  return 'text-red-400';
+  if (ltv < 110) return 'text-green-600';
+  if (ltv <= 120) return 'text-yellow-600';
+  return 'text-red-500';
 }
 
 export function dtiColor(dti: number): string {
-  if (dti < 40) return 'text-green-400';
-  if (dti <= 48) return 'text-yellow-400';
-  return 'text-red-400';
+  if (dti < 40) return 'text-green-600';
+  if (dti <= 48) return 'text-yellow-600';
+  return 'text-red-500';
 }
 
 export function ptiColor(pti: number): string {
-  if (pti < 15) return 'text-green-400';
-  if (pti <= 20) return 'text-yellow-400';
-  return 'text-red-400';
+  if (pti < 15) return 'text-green-600';
+  if (pti <= 20) return 'text-yellow-600';
+  return 'text-red-500';
 }

@@ -35,8 +35,8 @@ const topVehicles = [
 ];
 
 const tooltipStyle = {
-  contentStyle: { backgroundColor: '#18181B', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '12px' },
-  labelStyle: { color: '#A1A1AA' },
+  contentStyle: { backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '12px', fontSize: '12px' },
+  labelStyle: { color: '#6B7280' },
 };
 
 export default function Reporting() {
@@ -45,9 +45,9 @@ export default function Reporting() {
   return (
     <div>
       {/* Date range */}
-      <div className="flex gap-1 mb-8 bg-zinc-900/60 rounded-xl p-1 w-fit border border-white/10">
+      <div className="flex gap-1 mb-8 bg-gray-50 rounded-xl p-1 w-fit border border-gray-200">
         {([['week', 'This Week'], ['month', 'This Month'], ['lastMonth', 'Last Month']] as [Range, string][]).map(([key, label]) => (
-          <button key={key} onClick={() => setRange(key)} className={`px-4 py-2 text-xs rounded-lg transition-colors cursor-pointer ${range === key ? 'bg-zinc-800 text-zinc-50' : 'text-zinc-500'}`}>{label}</button>
+          <button key={key} onClick={() => setRange(key)} className={`px-4 py-2 text-xs rounded-lg transition-colors cursor-pointer ${range === key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>{label}</button>
         ))}
       </div>
 
@@ -62,14 +62,14 @@ export default function Reporting() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Bar Chart: Apps by Week */}
-        <div className="rounded-2xl surface p-6">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-6">Applications by Week</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="week" tick={{ fill: '#71717A', fontSize: 11 }} axisLine={false} />
-                <YAxis tick={{ fill: '#71717A', fontSize: 11 }} axisLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="week" tick={{ fill: '#6B7280', fontSize: 11 }} axisLine={false} />
+                <YAxis tick={{ fill: '#6B7280', fontSize: 11 }} axisLine={false} />
                 <Tooltip {...tooltipStyle} />
                 <Bar dataKey="received" fill="#3B82F6" name="Received" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="approved" fill="#22C55E" name="Approved" radius={[4, 4, 0, 0]} />
@@ -80,14 +80,14 @@ export default function Reporting() {
         </div>
 
         {/* Line Chart: Approval Rate */}
-        <div className="rounded-2xl surface p-6">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-6">Approval Rate Trend</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={approvalTrend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="week" tick={{ fill: '#71717A', fontSize: 11 }} axisLine={false} />
-                <YAxis domain={[50, 80]} tick={{ fill: '#71717A', fontSize: 11 }} axisLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
+                <XAxis dataKey="week" tick={{ fill: '#6B7280', fontSize: 11 }} axisLine={false} />
+                <YAxis domain={[50, 80]} tick={{ fill: '#6B7280', fontSize: 11 }} axisLine={false} />
                 <Tooltip {...tooltipStyle} />
                 <Line type="monotone" dataKey="rate" stroke="#3B82F6" strokeWidth={2} dot={{ fill: '#3B82F6', r: 4 }} name="Approval %" />
               </LineChart>
@@ -98,7 +98,7 @@ export default function Reporting() {
 
       {/* Pie Chart: By Tier */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="rounded-2xl surface p-6">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-6">Applications by Credit Tier</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -113,23 +113,23 @@ export default function Reporting() {
         </div>
 
         {/* Top Vehicles */}
-        <div className="rounded-2xl surface p-6">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-6">Top Vehicles Funded</h3>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10">
+              <tr className="border-b border-gray-200">
                 {['Vehicle', 'Count', 'Avg Loan', 'Avg APR'].map(h => (
-                  <th key={h} className="text-left py-3 text-[10px] text-zinc-500 uppercase tracking-wider">{h}</th>
+                  <th key={h} className="text-left py-3 text-[10px] text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {topVehicles.map((v, i) => (
-                <tr key={i} className="border-b border-white/[0.04]">
+                <tr key={i} className="border-b border-gray-200">
                   <td className="py-3 font-medium">{v.vehicle}</td>
-                  <td className="py-3 text-zinc-400">{v.count}</td>
-                  <td className="py-3 text-zinc-300">${v.avgLoan.toLocaleString()}</td>
-                  <td className="py-3 text-zinc-300">{v.avgAPR}%</td>
+                  <td className="py-3 text-gray-500">{v.count}</td>
+                  <td className="py-3 text-gray-700">${v.avgLoan.toLocaleString()}</td>
+                  <td className="py-3 text-gray-700">{v.avgAPR}%</td>
                 </tr>
               ))}
             </tbody>

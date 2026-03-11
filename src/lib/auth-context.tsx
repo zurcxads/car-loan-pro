@@ -21,9 +21,9 @@ interface AuthContextType {
 }
 
 const DEMO_USERS: Array<AuthUser & { password: string }> = [
-  { id: 'usr_admin_1', email: 'admin@carloanpro.com', password: 'demo123', name: 'Admin User', role: 'admin', entityId: null },
-  { id: 'usr_lender_1', email: 'lender@carloanpro.com', password: 'demo123', name: 'Ally Financial', role: 'lender', entityId: 'LND-001' },
-  { id: 'usr_dealer_1', email: 'dealer@carloanpro.com', password: 'demo123', name: 'AutoMax Houston', role: 'dealer', entityId: 'DLR-001' },
+  { id: 'usr_admin_1', email: 'admin@autoloanpro.co', password: 'demo123', name: 'Admin User', role: 'admin', entityId: null },
+  { id: 'usr_lender_1', email: 'lender@autoloanpro.co', password: 'demo123', name: 'Ally Financial', role: 'lender', entityId: 'LND-001' },
+  { id: 'usr_dealer_1', email: 'dealer@autoloanpro.co', password: 'demo123', name: 'AutoMax Houston', role: 'dealer', entityId: 'DLR-001' },
   { id: 'usr_consumer_1', email: 'marcus.j@email.com', password: 'consumer123', name: 'Marcus Johnson', role: 'consumer', entityId: null },
 ];
 

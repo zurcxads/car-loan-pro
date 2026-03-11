@@ -47,17 +47,17 @@ export default function BuyerInbox({ onStartDeal }: BuyerInboxProps) {
     <div>
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-1">Pre-Approved Buyers in Your Market</h2>
-        <p className="text-xs text-zinc-500">Houston, TX area | Buyers with active approvals looking for a vehicle</p>
+        <p className="text-xs text-gray-500">Houston, TX area | Buyers with active approvals looking for a vehicle</p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="flex gap-1">
           {([['all', 'All Active'], ['new', 'New This Week'], ['expiring', 'Expiring Soon'], ['invited', 'Invited']] as [Filter, string][]).map(([key, label]) => (
-            <button key={key} onClick={() => setFilter(key)} className={`px-3 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer ${filter === key ? 'bg-blue-600/15 border-blue-600/30 text-blue-400' : 'border-white/10 text-zinc-500'}`}>{label}</button>
+            <button key={key} onClick={() => setFilter(key)} className={`px-3 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer ${filter === key ? 'bg-blue-50 border-blue-200 text-blue-600' : 'border-gray-200 text-gray-500'}`}>{label}</button>
           ))}
         </div>
-        <select value={sort} onChange={e => setSort(e.target.value as Sort)} className="ml-auto px-3 py-1.5 text-xs bg-zinc-900 border border-white/10 rounded-lg focus:outline-none cursor-pointer">
+        <select value={sort} onChange={e => setSort(e.target.value as Sort)} className="ml-auto px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-lg focus:outline-none cursor-pointer">
           <option value="amount">Highest Approval</option>
           <option value="recent">Most Recent</option>
           <option value="expiring">Expiring Soonest</option>
@@ -81,8 +81,8 @@ export default function BuyerInbox({ onStartDeal }: BuyerInboxProps) {
 
       {buyers.length === 0 && (
         <div className="py-16 text-center">
-          <svg className="w-10 h-10 mx-auto mb-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-          <p className="text-sm text-zinc-500">No pre-approved buyers in your market right now. Check back soon.</p>
+          <svg className="w-10 h-10 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <p className="text-sm text-gray-500">No pre-approved buyers in your market right now. Check back soon.</p>
         </div>
       )}
 
@@ -91,43 +91,43 @@ export default function BuyerInbox({ onStartDeal }: BuyerInboxProps) {
         {detailApp && (
           <div className="fixed inset-0 z-50 flex justify-end">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/50" onClick={() => setDetailApp(null)} />
-            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="relative w-full max-w-md bg-[#0c0c0e] border-l border-white/10 overflow-y-auto">
-              <div className="sticky top-0 bg-[#0c0c0e] border-b border-white/10 px-6 py-4 flex items-center justify-between">
+            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="relative w-full max-w-md bg-white border-l border-gray-200 overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
                 <h3 className="text-sm font-semibold">Buyer Details</h3>
-                <button onClick={() => setDetailApp(null)} className="p-1 text-zinc-500 hover:text-zinc-50 cursor-pointer">
+                <button onClick={() => setDetailApp(null)} className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
               <div className="p-6 space-y-6">
                 <div>
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Approval Amount</span>
-                  <div className="text-2xl font-bold text-blue-400">{formatCurrency(detailApp.loanAmount)}</div>
+                  <span className="text-[10px] text-gray-500 uppercase tracking-wider">Approval Amount</span>
+                  <div className="text-2xl font-bold text-blue-600">{formatCurrency(detailApp.loanAmount)}</div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div><span className="text-[10px] text-zinc-500 block">Credit Tier</span><StatusBadge status={detailApp.credit.scoreTier === 'prime' ? 'prime' : detailApp.credit.scoreTier === 'near_prime' ? 'near_prime' : 'subprime'} /></div>
-                  <div><span className="text-[10px] text-zinc-500 block">Location</span><span className="font-medium">{detailApp.borrower.city}, {detailApp.borrower.state}</span></div>
-                  <div><span className="text-[10px] text-zinc-500 block">Vehicle</span><span className="font-medium">{detailApp.vehicle.year} {detailApp.vehicle.make} {detailApp.vehicle.model}</span></div>
-                  <div><span className="text-[10px] text-zinc-500 block">Condition</span><span className="font-medium capitalize">{detailApp.vehicle.condition}</span></div>
+                  <div><span className="text-[10px] text-gray-500 block">Credit Tier</span><StatusBadge status={detailApp.credit.scoreTier === 'prime' ? 'prime' : detailApp.credit.scoreTier === 'near_prime' ? 'near_prime' : 'subprime'} /></div>
+                  <div><span className="text-[10px] text-gray-500 block">Location</span><span className="font-medium">{detailApp.borrower.city}, {detailApp.borrower.state}</span></div>
+                  <div><span className="text-[10px] text-gray-500 block">Vehicle</span><span className="font-medium">{detailApp.vehicle.year} {detailApp.vehicle.make} {detailApp.vehicle.model}</span></div>
+                  <div><span className="text-[10px] text-gray-500 block">Condition</span><span className="font-medium capitalize">{detailApp.vehicle.condition}</span></div>
                 </div>
 
                 {/* Offers */}
                 {MOCK_OFFERS.filter(o => o.applicationId === detailApp.id).map(offer => (
-                  <div key={offer.id} className="rounded-xl bg-zinc-800/50 border border-white/[0.06] p-4">
+                  <div key={offer.id} className="rounded-xl bg-gray-50 border border-gray-200 p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium">{offer.lenderName}</span>
                       <StatusBadge status={offer.status} />
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-xs">
-                      <div><span className="text-zinc-500">APR</span><div className="font-semibold">{formatAPR(offer.apr)}</div></div>
-                      <div><span className="text-zinc-500">Amount</span><div className="font-semibold">{formatCurrency(offer.approvedAmount)}</div></div>
-                      <div><span className="text-zinc-500">Term</span><div className="font-semibold">{offer.termMonths}mo</div></div>
+                      <div><span className="text-gray-500">APR</span><div className="font-semibold">{formatAPR(offer.apr)}</div></div>
+                      <div><span className="text-gray-500">Amount</span><div className="font-semibold">{formatCurrency(offer.approvedAmount)}</div></div>
+                      <div><span className="text-gray-500">Term</span><div className="font-semibold">{offer.termMonths}mo</div></div>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="sticky bottom-0 bg-[#0c0c0e] border-t border-white/10 px-6 py-4">
-                <button onClick={() => { onStartDeal(detailApp); setDetailApp(null); }} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-sm font-medium rounded-xl transition-colors cursor-pointer">
+              <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4">
+                <button onClick={() => { onStartDeal(detailApp); setDetailApp(null); }} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors cursor-pointer">
                   Start Deal
                 </button>
               </div>

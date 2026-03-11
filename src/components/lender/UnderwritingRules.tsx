@@ -42,19 +42,19 @@ export default function UnderwritingRules() {
   const SliderField = ({ label, value, min, max, suffix, onChange }: { label: string; value: number; min: number; max: number; suffix?: string; onChange: (v: number) => void }) => (
     <div>
       <div className="flex justify-between text-sm mb-3">
-        <span className="text-zinc-400">{label}</span>
-        <span className="font-semibold text-blue-400">{value}{suffix || ''}</span>
+        <span className="text-gray-500">{label}</span>
+        <span className="font-semibold text-blue-600">{value}{suffix || ''}</span>
       </div>
       <input type="range" min={min} max={max} value={value} onChange={e => onChange(Number(e.target.value))} className="w-full cursor-pointer" />
-      <div className="flex justify-between text-[10px] text-zinc-600 mt-1"><span>{min}</span><span>{max}</span></div>
+      <div className="flex justify-between text-[10px] text-gray-400 mt-1"><span>{min}</span><span>{max}</span></div>
     </div>
   );
 
   const Toggle = ({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) => (
     <div className="flex items-center justify-between py-2">
-      <span className="text-sm text-zinc-300">{label}</span>
+      <span className="text-sm text-gray-700">{label}</span>
       <div
-        className={`relative w-11 h-6 rounded-full cursor-pointer transition-colors ${value ? 'bg-blue-600' : 'bg-zinc-700'}`}
+        className={`relative w-11 h-6 rounded-full cursor-pointer transition-colors ${value ? 'bg-blue-600' : 'bg-gray-200'}`}
         onClick={() => onChange(!value)}
       >
         <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${value ? 'translate-x-[22px]' : 'translate-x-1'}`} />
@@ -66,12 +66,12 @@ export default function UnderwritingRules() {
     <div className="max-w-2xl">
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-1">Your Underwriting Parameters</h2>
-        <p className="text-xs text-zinc-500">Changes take effect on the next routing cycle</p>
+        <p className="text-xs text-gray-500">Changes take effect on the next routing cycle</p>
       </div>
 
       <div className="space-y-8">
         {/* Score & Ratios */}
-        <div className="rounded-2xl surface p-8">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
           <h3 className="text-sm font-semibold mb-6">Score & Ratios</h3>
           <div className="space-y-8">
             <SliderField label="Min FICO Score" value={minFico} min={300} max={850} onChange={setMinFico} />
@@ -82,31 +82,31 @@ export default function UnderwritingRules() {
         </div>
 
         {/* Loan Amounts */}
-        <div className="rounded-2xl surface p-8">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
           <h3 className="text-sm font-semibold mb-6">Loan Amounts</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-zinc-400 mb-1.5">Min Loan Amount ($)</label>
-              <input type="number" value={minLoan} onChange={e => setMinLoan(Number(e.target.value))} className="w-full px-4 py-2.5 bg-zinc-800 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
+              <label className="block text-xs text-gray-500 mb-1.5">Min Loan Amount ($)</label>
+              <input type="number" value={minLoan} onChange={e => setMinLoan(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
             </div>
             <div>
-              <label className="block text-xs text-zinc-400 mb-1.5">Max Loan Amount ($)</label>
-              <input type="number" value={maxLoan} onChange={e => setMaxLoan(Number(e.target.value))} className="w-full px-4 py-2.5 bg-zinc-800 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
+              <label className="block text-xs text-gray-500 mb-1.5">Max Loan Amount ($)</label>
+              <input type="number" value={maxLoan} onChange={e => setMaxLoan(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
             </div>
           </div>
         </div>
 
         {/* Vehicle Rules */}
-        <div className="rounded-2xl surface p-8">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
           <h3 className="text-sm font-semibold mb-6">Vehicle Rules</h3>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-xs text-zinc-400 mb-1.5">Max Vehicle Age (years)</label>
-              <input type="number" value={maxAge} onChange={e => setMaxAge(Number(e.target.value))} className="w-full px-4 py-2.5 bg-zinc-800 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
+              <label className="block text-xs text-gray-500 mb-1.5">Max Vehicle Age (years)</label>
+              <input type="number" value={maxAge} onChange={e => setMaxAge(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
             </div>
             <div>
-              <label className="block text-xs text-zinc-400 mb-1.5">Max Mileage</label>
-              <input type="number" value={maxMileage} onChange={e => setMaxMileage(Number(e.target.value))} className="w-full px-4 py-2.5 bg-zinc-800 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
+              <label className="block text-xs text-gray-500 mb-1.5">Max Mileage</label>
+              <input type="number" value={maxMileage} onChange={e => setMaxMileage(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
             </div>
           </div>
           <Toggle label="Accept Certified Pre-Owned" value={acceptCPO} onChange={setAcceptCPO} />
@@ -115,21 +115,21 @@ export default function UnderwritingRules() {
         </div>
 
         {/* Rate Tiers */}
-        <div className="rounded-2xl surface p-8">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
           <h3 className="text-sm font-semibold mb-6">Rate Tiers</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-3 px-3 text-[10px] text-zinc-500 uppercase tracking-wider">FICO Range</th>
-                  <th className="text-left py-3 px-3 text-[10px] text-zinc-500 uppercase tracking-wider">Rate Range</th>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-3 text-[10px] text-gray-500 uppercase tracking-wider">FICO Range</th>
+                  <th className="text-left py-3 px-3 text-[10px] text-gray-500 uppercase tracking-wider">Rate Range</th>
                 </tr>
               </thead>
               <tbody>
                 {rateTiers.map((tier, i) => (
-                  <tr key={i} className="border-b border-white/[0.04]">
-                    <td className="py-3 px-3 text-zinc-300">{tier.ficoMin} - {tier.ficoMax}</td>
-                    <td className="py-3 px-3 text-zinc-300">{tier.rateMin}% - {tier.rateMax}%</td>
+                  <tr key={i} className="border-b border-gray-200">
+                    <td className="py-3 px-3 text-gray-700">{tier.ficoMin} - {tier.ficoMax}</td>
+                    <td className="py-3 px-3 text-gray-700">{tier.rateMin}% - {tier.rateMax}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -138,29 +138,29 @@ export default function UnderwritingRules() {
         </div>
 
         {/* Save */}
-        <button onClick={save} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-sm font-medium rounded-xl transition-colors cursor-pointer">
+        <button onClick={save} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-sm font-medium rounded-xl transition-colors cursor-pointer text-white">
           {saved ? 'Saved' : 'Save Changes'}
         </button>
 
         {/* Change History */}
-        <div className="rounded-2xl surface p-8">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
           <h3 className="text-sm font-semibold mb-4">Change History</h3>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/10">
+              <tr className="border-b border-gray-200">
                 {['Changed By', 'Date', 'Field', 'Old', 'New'].map(h => (
-                  <th key={h} className="text-left py-3 px-3 text-[10px] text-zinc-500 uppercase tracking-wider">{h}</th>
+                  <th key={h} className="text-left py-3 px-3 text-[10px] text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {changeHistory.map((ch, i) => (
-                <tr key={i} className="border-b border-white/[0.04]">
-                  <td className="py-3 px-3 text-zinc-400">{ch.by}</td>
-                  <td className="py-3 px-3 text-zinc-500">{ch.date}</td>
+                <tr key={i} className="border-b border-gray-200">
+                  <td className="py-3 px-3 text-gray-500">{ch.by}</td>
+                  <td className="py-3 px-3 text-gray-500">{ch.date}</td>
                   <td className="py-3 px-3">{ch.field}</td>
-                  <td className="py-3 px-3 text-red-400">{ch.oldVal}</td>
-                  <td className="py-3 px-3 text-green-400">{ch.newVal}</td>
+                  <td className="py-3 px-3 text-red-500">{ch.oldVal}</td>
+                  <td className="py-3 px-3 text-green-600">{ch.newVal}</td>
                 </tr>
               ))}
             </tbody>

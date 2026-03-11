@@ -10,14 +10,14 @@ const eventColors: Record<string, string> = {
   funded: 'bg-green-500',
   offer: 'bg-amber-500',
   declined: 'bg-red-500',
-  system: 'bg-zinc-500',
+  system: 'bg-gray-400',
 };
 
 const alertTypeStyles: Record<string, { icon: string; border: string; text: string }> = {
-  error: { icon: 'text-red-400', border: 'border-red-500/20', text: 'text-red-400' },
-  warning: { icon: 'text-amber-400', border: 'border-amber-500/20', text: 'text-amber-400' },
-  info: { icon: 'text-blue-400', border: 'border-blue-500/20', text: 'text-blue-400' },
-  success: { icon: 'text-green-400', border: 'border-green-500/20', text: 'text-green-400' },
+  error: { icon: 'text-red-500', border: 'border-red-200', text: 'text-red-500' },
+  warning: { icon: 'text-amber-600', border: 'border-amber-200', text: 'text-amber-600' },
+  info: { icon: 'text-blue-600', border: 'border-blue-200', text: 'text-blue-600' },
+  success: { icon: 'text-green-600', border: 'border-green-200', text: 'text-green-600' },
 };
 
 export default function PlatformOverview() {
@@ -52,20 +52,20 @@ export default function PlatformOverview() {
         {/* Main content area */}
         <div className="lg:col-span-2 space-y-6">
           {/* Alerts */}
-          <div className="rounded-2xl surface p-6">
+          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
             <h3 className="text-sm font-semibold mb-4">Alerts Requiring Action</h3>
             <div className="space-y-2">
               {alerts.filter(a => !a.resolved).map(alert => {
                 const styles = alertTypeStyles[alert.type];
                 return (
-                  <div key={alert.id} className={`rounded-xl bg-zinc-800/50 border ${styles.border} p-4 flex items-start justify-between gap-3`}>
+                  <div key={alert.id} className={`rounded-xl bg-gray-50 border ${styles.border} p-4 flex items-start justify-between gap-3`}>
                     <div className="flex-1">
                       <p className={`text-sm ${styles.text}`}>{alert.message}</p>
-                      <p className="text-[10px] text-zinc-600 mt-1">{formatRelativeTime(alert.timestamp)}</p>
+                      <p className="text-[10px] text-gray-400 mt-1">{formatRelativeTime(alert.timestamp)}</p>
                     </div>
                     <button
                       onClick={() => dismissAlert(alert.id)}
-                      className="px-3 py-1.5 text-xs border border-white/10 hover:border-white/20 rounded-lg transition-colors cursor-pointer flex-shrink-0"
+                      className="px-3 py-1.5 text-xs border border-gray-200 hover:border-gray-300 rounded-lg transition-colors cursor-pointer flex-shrink-0"
                     >
                       {alert.action}
                     </button>
@@ -73,22 +73,22 @@ export default function PlatformOverview() {
                 );
               })}
               {alerts.filter(a => !a.resolved).length === 0 && (
-                <p className="text-xs text-zinc-500 text-center py-4">No active alerts</p>
+                <p className="text-xs text-gray-500 text-center py-4">No active alerts</p>
               )}
             </div>
           </div>
         </div>
 
         {/* Activity Feed */}
-        <div className="rounded-2xl surface p-6 max-h-[600px] overflow-y-auto">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 max-h-[600px] overflow-y-auto">
           <h3 className="text-sm font-semibold mb-4">Live Activity Feed</h3>
           <div className="space-y-3">
             {MOCK_ACTIVITY_EVENTS.map(event => (
               <div key={event.id} className="flex gap-3">
                 <div className={`w-2 h-2 rounded-full ${eventColors[event.type]} mt-1.5 flex-shrink-0`} />
                 <div>
-                  <p className="text-xs text-zinc-300">{event.description}</p>
-                  <p className="text-[10px] text-zinc-600 mt-0.5">{formatRelativeTime(event.timestamp)}</p>
+                  <p className="text-xs text-gray-700">{event.description}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{formatRelativeTime(event.timestamp)}</p>
                 </div>
               </div>
             ))}
