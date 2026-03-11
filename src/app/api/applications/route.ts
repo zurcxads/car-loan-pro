@@ -109,7 +109,13 @@ export async function POST(req: NextRequest) {
     const app = await dbCreateApplication(appData);
     if (!app) return apiError('Failed to create application', 500);
 
-    return apiSuccess(app, 201);
+    // Return app with session token for consumer dashboard access
+    return apiSuccess({ 
+      ...app,
+      // Session token is stored in the database but we need to return it
+      // For now, generate it here too (will be cleaned up when we refactor)
+      sessionToken: (app as unknown as { sessionToken?: string }).sessionToken || crypto.randomUUID(),
+    }, 201);
   } catch {
     return apiError('Failed to create application', 500);
   }

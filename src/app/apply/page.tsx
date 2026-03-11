@@ -142,11 +142,12 @@ export default function ApplyPage() {
     }
 
     if (data) {
-      localStorage.setItem('clp_current_app_id', (data as { id: string }).id);
+      const appData = data as { id: string; sessionToken: string };
+      localStorage.setItem('clp_current_app_id', appData.id);
+      
+      toast.success('Application submitted! Finding your best rates...');
+      setTimeout(() => router.push(`/dashboard?token=${appData.sessionToken}`), 2500);
     }
-
-    toast.success('Application submitted! Finding your best rates...');
-    setTimeout(() => router.push('/offers'), 2500);
   };
 
   if (submitting) {

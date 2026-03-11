@@ -32,7 +32,9 @@ CREATE TABLE IF NOT EXISTS applications (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   lenders_submitted INT DEFAULT 0,
   offers_received INT DEFAULT 0,
-  flags TEXT[] DEFAULT '{}'
+  flags TEXT[] DEFAULT '{}',
+  session_token TEXT UNIQUE,
+  session_expires_at TIMESTAMPTZ
 );
 
 CREATE SEQUENCE IF NOT EXISTS app_seq START 11;

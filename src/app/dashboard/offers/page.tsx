@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useOffers, apiPost } from '@/lib/hooks';
@@ -26,14 +26,32 @@ const lenderTiers: Record<string, string> = {
 
 export default function OffersPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
   const [sort, setSort] = useState<SortKey>('rate');
   const [selectedOffer, setSelectedOffer] = useState<MockOffer | null>(null);
   const [appId, setAppId] = useState<string>('APP-001');
+  const [verified, setVerified] = useState(false);
 
   useEffect(() => {
-    const storedId = localStorage.getItem('clp_current_app_id');
-    if (storedId) setAppId(storedId);
-  }, []);
+    if (!token) {
+      router.push('/apply');
+      return;
+    }
+
+    // Verify session token
+    fetch(`/api/dashboard?token=${token}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          router.push('/apply');
+        } else {
+          setAppId(data.application.id);
+          setVerified(true);
+        }
+      })
+      .catch(() => router.push('/apply'));
+  }, [token, router]);
 
   const { data: apiOffers, isLoading } = useOffers(appId);
 
@@ -52,6 +70,17 @@ export default function OffersPage() {
       default: return copy;
     }
   }, [offers, sort]);
+
+  if (!verified) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm text-gray-500">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleConfirm = async (offer: MockOffer) => {
     const { error } = await apiPost('/api/offers', {
@@ -89,8 +118,8 @@ export default function OffersPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="border-b border-gray-200 bg-white/95 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
-          <Link href="/status" className="text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 cursor-pointer">Application Status</Link>
+          <Link href={`/dashboard?token=${token}`} className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
+          <Link href={`/dashboard/status?token=${token}`} className="text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 cursor-pointer">Application Status</Link>
         </div>
       </div>
 

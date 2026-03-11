@@ -77,12 +77,23 @@ export default function StatusPage() {
     toast.success('All conditions met! Your loan is being finalized.');
   };
 
+  if (!verified) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-sm text-gray-500">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="border-b border-gray-200 bg-white/95 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
-          <Link href="/offers" className="text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 cursor-pointer">View Offers</Link>
+          <Link href={`/dashboard?token=${token}`} className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
+          <Link href={`/dashboard/offers?token=${token}`} className="text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 cursor-pointer">View Offers</Link>
         </div>
       </div>
 
