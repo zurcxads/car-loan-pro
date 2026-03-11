@@ -68,9 +68,8 @@ export default function LandingPage() {
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <div className="hidden md:flex items-center gap-8 text-sm text-gray-500">
             <Link href="/apply" className="hover:text-gray-900 transition-colors duration-200">Apply</Link>
-            <Link href="/status" className="hover:text-gray-900 transition-colors duration-200">Check Status</Link>
-            <Link href="#how-it-works" className="hover:text-gray-900 transition-colors duration-200">How It Works</Link>
-            <Link href="#faq" className="hover:text-gray-900 transition-colors duration-200">FAQ</Link>
+            <Link href="/offers" className="hover:text-gray-900 transition-colors duration-200">Offers</Link>
+            <Link href="/status" className="hover:text-gray-900 transition-colors duration-200">Status</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer">
@@ -85,7 +84,7 @@ export default function LandingPage() {
           {mobileMenu && (
             <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="md:hidden overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-xl">
               <div className="px-6 py-4 flex flex-col gap-4 text-sm">
-                {[['Apply', '/apply'], ['Check Status', '/status'], ['How It Works', '#how-it-works'], ['FAQ', '#faq']].map(([label, href]) => (
+                {[['Apply', '/apply'], ['Offers', '/offers'], ['Status', '/status']].map(([label, href]) => (
                   <Link key={label} href={href} className="text-gray-500 hover:text-gray-900 py-1 transition-colors duration-200" onClick={() => setMobileMenu(false)}>{label}</Link>
                 ))}
                 <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-white" onClick={() => setMobileMenu(false)}>Check Your Rate</Link>
@@ -260,7 +259,6 @@ export default function LandingPage() {
             <div className="space-y-3 text-gray-500">
               <Link href="/apply" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Apply Now</Link>
               <Link href="/status" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Check Status</Link>
-              <Link href="#how-it-works" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">How It Works</Link>
             </div>
           </div>
           <div>
@@ -268,7 +266,6 @@ export default function LandingPage() {
             <div className="space-y-3 text-gray-500">
               <span className="block">About</span>
               <span className="block">Contact</span>
-              <Link href="/login" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Partner Login</Link>
             </div>
           </div>
           <div>
