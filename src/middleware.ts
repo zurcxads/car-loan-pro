@@ -1,68 +1,45 @@
-import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const path = req.nextUrl.pathname;
+export async function middleware(request: NextRequest) {
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const { pathname } = request.nextUrl;
 
-    // Role-based route protection
-    if (path.startsWith('/lender') && token?.role !== 'lender' && token?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/login?error=unauthorized', req.url));
-    }
-    if (path.startsWith('/dealer') && token?.role !== 'dealer' && token?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/login?error=unauthorized', req.url));
-    }
-    if (path.startsWith('/admin') && token?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/login?error=unauthorized', req.url));
-    }
+  // Protected portal routes
+  const protectedRoutes = {
+    '/lender': 'lender',
+    '/dealer': 'dealer',
+    '/admin': 'admin',
+  };
 
-    // API route protection
-    if (path.startsWith('/api/lenders') && token?.role !== 'lender' && token?.role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
-    if (path.startsWith('/api/dealers') && token?.role !== 'dealer' && token?.role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
-    if (path.startsWith('/api/admin') && token?.role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
+  // Check if accessing a protected route
+  for (const [route, requiredRole] of Object.entries(protectedRoutes)) {
+    if (pathname.startsWith(route)) {
+      // No token = redirect to login
+      if (!token) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('callbackUrl', pathname);
+        loginUrl.searchParams.set('error', 'unauthorized');
+        return NextResponse.redirect(loginUrl);
+      }
 
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        const path = req.nextUrl.pathname;
+      // Wrong role = forbidden
+      if (token.role !== requiredRole) {
+        return NextResponse.json(
+          { error: 'Forbidden - insufficient permissions' },
+          { status: 403 }
+        );
+      }
 
-        // Public routes - no auth needed
-        if (
-          path === '/' ||
-          path === '/login' ||
-          path.startsWith('/apply') ||
-          path.startsWith('/offers') ||
-          path.startsWith('/status') ||
-          path.startsWith('/api/auth') ||
-          path.startsWith('/api/applications') ||
-          path.startsWith('/api/offers')
-        ) {
-          return true;
-        }
-
-        // All other routes require authentication
-        return !!token;
-      },
-    },
+      // Valid token + correct role = allow
+      return NextResponse.next();
+    }
   }
-);
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: [
-    '/lender/:path*',
-    '/dealer/:path*',
-    '/admin/:path*',
-    '/api/lenders/:path*',
-    '/api/dealers/:path*',
-    '/api/admin/:path*',
-  ],
+  matcher: ['/lender/:path*', '/dealer/:path*', '/admin/:path*'],
 };
