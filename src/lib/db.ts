@@ -26,12 +26,28 @@ export async function dbGetApplication(id: string): Promise<MockApplication | nu
 }
 
 export async function dbCreateApplication(app: Partial<MockApplication>): Promise<MockApplication | null> {
+  // Generate session token for consumer dashboard access
+  const sessionToken = crypto.randomUUID();
+  const sessionExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+  
   if (!isSupabaseConfigured()) {
-    const newApp = { ...app, id: `APP-${String(MOCK_APPLICATIONS.length + 1).padStart(3, '0')}` } as MockApplication;
-    MOCK_APPLICATIONS.push(newApp);
+    const newApp = { 
+      ...app, 
+      id: `APP-${String(MOCK_APPLICATIONS.length + 1).padStart(3, '0')}`,
+      sessionToken,
+      sessionExpiresAt: sessionExpiresAt.toISOString(),
+    } as MockApplication & { sessionToken: string; sessionExpiresAt: string };
+    MOCK_APPLICATIONS.push(newApp as MockApplication);
     return newApp;
   }
-  const { data, error } = await supabase.from('applications').insert(mapAppToDb(app)).select().single();
+  
+  const appWithToken = {
+    ...mapAppToDb(app),
+    session_token: sessionToken,
+    session_expires_at: sessionExpiresAt.toISOString(),
+  };
+  
+  const { data, error } = await supabase.from('applications').insert(appWithToken).select().single();
   if (error || !data) return null;
   return mapDbToApp(data);
 }
