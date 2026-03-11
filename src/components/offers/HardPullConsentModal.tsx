@@ -22,7 +22,7 @@ export default function HardPullConsentModal({ offer, onClose, onConfirm }: Hard
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm px-6"
       >
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
@@ -52,7 +52,7 @@ export default function HardPullConsentModal({ offer, onClose, onConfirm }: Hard
               consent ? 'bg-blue-600 border-blue-600' : 'border-gray-200'
             }`}>
               {consent && (
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3 h-3 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                 </svg>
               )}
@@ -73,7 +73,7 @@ export default function HardPullConsentModal({ offer, onClose, onConfirm }: Hard
               onClick={() => { if (consent) onConfirm(offer); }}
               disabled={!consent}
               className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer ${
-                consent ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                consent ? 'bg-blue-600 hover:bg-blue-500 text-gray-900' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
               }`}
             >
               Confirm & Select Offer

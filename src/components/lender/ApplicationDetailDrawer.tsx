@@ -43,7 +43,7 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/50"
+          className="absolute inset-0 bg-white/50"
           onClick={onClose}
         />
         <motion.div
@@ -203,7 +203,7 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
             <button onClick={onCounter} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
               Counter
             </button>
-            <button onClick={onApprove} className="flex-1 px-4 py-2.5 text-xs bg-green-600 hover:bg-green-500 rounded-xl transition-colors duration-200 cursor-pointer font-medium text-white">
+            <button onClick={onApprove} className="flex-1 px-4 py-2.5 text-xs bg-green-600 hover:bg-green-500 rounded-xl transition-colors duration-200 cursor-pointer font-medium text-gray-900">
               Approve
             </button>
           </div>

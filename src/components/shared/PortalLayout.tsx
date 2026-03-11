@@ -43,7 +43,7 @@ export default function PortalLayout({
   return (
     <div className="min-h-screen flex bg-gray-50">
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-white/20 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-60 bg-white border-r border-gray-200 flex flex-col transform transition-transform duration-200 lg:translate-x-0 ${
@@ -85,7 +85,7 @@ export default function PortalLayout({
       </aside>
 
       <div className="flex-1 min-w-0">
-        <div className="border-b border-gray-200 bg-white/90 backdrop-blur-xl sticky top-0 z-30">
+        <div className="border-b border-gray-200 bg-white/95 backdrop-blur-xl sticky top-0 z-30">
           <div className="px-6 h-14 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button

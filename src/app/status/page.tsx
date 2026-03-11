@@ -79,7 +79,7 @@ export default function StatusPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="border-b border-gray-200 bg-white/90 backdrop-blur-xl sticky top-0 z-40">
+      <div className="border-b border-gray-200 bg-white/95 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <Link href="/offers" className="text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 cursor-pointer">View Offers</Link>
@@ -98,13 +98,13 @@ export default function StatusPage() {
                   animate={{ scale: i <= activeStep ? 1 : 0.8, opacity: 1 }}
                   transition={{ delay: i * 0.08 }}
                   className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 border-2 transition-colors duration-300 ${
-                    i < activeStep ? 'bg-green-500 border-green-500 text-white' :
-                    i === activeStep ? 'bg-blue-600 border-blue-600 text-white' :
+                    i < activeStep ? 'bg-green-500 border-green-500 text-gray-900' :
+                    i === activeStep ? 'bg-blue-600 border-blue-600 text-gray-900' :
                     'bg-gray-100 border-gray-300 text-gray-400'
                   }`}
                 >
                   {i < activeStep ? (
-                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (

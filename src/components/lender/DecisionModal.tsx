@@ -81,7 +81,7 @@ export default function DecisionModal({ app, action, onClose }: Props) {
 
   if (submitted) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm px-6">
         <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white border border-gray-200 rounded-2xl p-8 max-w-md w-full text-center">
           <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-green-50 flex items-center justify-center">
             <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
@@ -99,7 +99,7 @@ export default function DecisionModal({ app, action, onClose }: Props) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-6 overflow-y-auto py-10">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm px-6 overflow-y-auto py-10">
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -162,7 +162,7 @@ export default function DecisionModal({ app, action, onClose }: Props) {
               </div>
               <div className="flex gap-3 mt-6">
                 <button onClick={onClose} className="flex-1 px-4 py-3 text-sm border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
-                <button onClick={handleSubmit} className="flex-1 px-4 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors cursor-pointer text-white">Send Offer to Borrower</button>
+                <button onClick={handleSubmit} className="flex-1 px-4 py-3 text-sm font-medium bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors cursor-pointer text-gray-900">Send Offer to Borrower</button>
               </div>
             </>
           )}
@@ -185,14 +185,14 @@ export default function DecisionModal({ app, action, onClose }: Props) {
                 </div>
                 <label className="flex items-center gap-2 cursor-pointer" onClick={() => setGenerateAdverse(!generateAdverse)}>
                   <div className={`w-4 h-4 rounded border flex items-center justify-center ${generateAdverse ? 'bg-blue-600 border-blue-600' : 'border-gray-200'}`}>
-                    {generateAdverse && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                    {generateAdverse && <svg className="w-3 h-3 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                   </div>
                   <span className="text-xs text-gray-500">Generate ECOA Adverse Action Notice</span>
                 </label>
               </div>
               <div className="flex gap-3 mt-6">
                 <button onClick={onClose} className="flex-1 px-4 py-3 text-sm border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
-                <button onClick={handleSubmit} disabled={!declineReason} className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl transition-colors cursor-pointer ${declineReason ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}>Confirm Decline</button>
+                <button onClick={handleSubmit} disabled={!declineReason} className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl transition-colors cursor-pointer ${declineReason ? 'bg-red-600 hover:bg-red-500 text-gray-900' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}>Confirm Decline</button>
               </div>
             </>
           )}
@@ -208,7 +208,7 @@ export default function DecisionModal({ app, action, onClose }: Props) {
                     {DOC_TYPES.map(d => (
                       <label key={d} className="flex items-center gap-2 cursor-pointer" onClick={() => toggleDoc(d)}>
                         <div className={`w-4 h-4 rounded border flex items-center justify-center ${requestedDocs.includes(d) ? 'bg-blue-600 border-blue-600' : 'border-gray-200'}`}>
-                          {requestedDocs.includes(d) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                          {requestedDocs.includes(d) && <svg className="w-3 h-3 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                         </div>
                         <span className="text-sm text-gray-700">{d}</span>
                       </label>
@@ -222,7 +222,7 @@ export default function DecisionModal({ app, action, onClose }: Props) {
               </div>
               <div className="flex gap-3 mt-6">
                 <button onClick={onClose} className="flex-1 px-4 py-3 text-sm border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer">Cancel</button>
-                <button onClick={handleSubmit} disabled={requestedDocs.length === 0} className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl transition-colors cursor-pointer ${requestedDocs.length > 0 ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}>Send Request</button>
+                <button onClick={handleSubmit} disabled={requestedDocs.length === 0} className={`flex-1 px-4 py-3 text-sm font-medium rounded-xl transition-colors cursor-pointer ${requestedDocs.length > 0 ? 'bg-blue-600 hover:bg-blue-500 text-gray-900' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}>Send Request</button>
               </div>
             </>
           )}

@@ -87,7 +87,7 @@ export default function OffersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="border-b border-gray-200 bg-white/90 backdrop-blur-xl sticky top-0 z-40">
+      <div className="border-b border-gray-200 bg-white/95 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <Link href="/status" className="text-xs text-gray-500 hover:text-gray-900 transition-colors duration-200 cursor-pointer">Application Status</Link>

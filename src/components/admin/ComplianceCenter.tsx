@@ -72,7 +72,7 @@ export default function ComplianceCenter() {
                       <td className="py-4 px-5 text-gray-700">{aa.reasonCode}</td>
                       <td className="py-4 px-5">
                         {aa.status === 'pending' ? (
-                          <button onClick={() => markSent(aa.id)} className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors cursor-pointer">Send Notice</button>
+                          <button onClick={() => markSent(aa.id)} className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-gray-900 rounded-lg transition-colors cursor-pointer">Send Notice</button>
                         ) : (
                           <span className="text-xs text-green-600">Sent</span>
                         )}

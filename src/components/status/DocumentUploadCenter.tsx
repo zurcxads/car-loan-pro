@@ -128,7 +128,7 @@ export default function DocumentUploadCenter({ conditions, appId, onAllUploaded 
                 {doc.status === 'not_uploaded' ? (
                   <button
                     onClick={() => { setActiveSlot(i); fileInputRef.current?.click(); }}
-                    className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors duration-200 cursor-pointer font-medium"
+                    className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-gray-900 rounded-lg transition-colors duration-200 cursor-pointer font-medium"
                   >
                     Upload
                   </button>
@@ -154,7 +154,7 @@ export default function DocumentUploadCenter({ conditions, appId, onAllUploaded 
             onAllUploaded?.();
           }}
           className={`w-full mt-6 py-3 text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer ${
-            allUploaded ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+            allUploaded ? 'bg-blue-600 hover:bg-blue-500 text-gray-900' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
           }`}
         >
           Submit Documents

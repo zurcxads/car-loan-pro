@@ -138,7 +138,7 @@ export default function UnderwritingRules() {
         </div>
 
         {/* Save */}
-        <button onClick={save} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-sm font-medium rounded-xl transition-colors cursor-pointer text-white">
+        <button onClick={save} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-sm font-medium rounded-xl transition-colors cursor-pointer text-gray-900">
           {saved ? 'Saved' : 'Save Changes'}
         </button>
 

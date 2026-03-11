@@ -31,7 +31,7 @@ export default function OfferCard({ offer, isLowestRate, lenderTier, onSelect, o
       {/* Top section */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-lg ${tierColors[lenderTier] || 'bg-gray-400'} flex items-center justify-center text-white text-xs font-bold`}>
+          <div className={`w-10 h-10 rounded-lg ${tierColors[lenderTier] || 'bg-gray-400'} flex items-center justify-center text-gray-900 text-xs font-bold`}>
             {initials}
           </div>
           <div>

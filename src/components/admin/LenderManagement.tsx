@@ -96,7 +96,7 @@ export default function LenderManagement() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Lender Network</h2>
-        <button className="px-4 py-2 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors cursor-pointer font-medium">Add Lender</button>
+        <button className="px-4 py-2 text-xs bg-blue-600 hover:bg-blue-500 text-gray-900 rounded-lg transition-colors cursor-pointer font-medium">Add Lender</button>
       </div>
 
       <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">

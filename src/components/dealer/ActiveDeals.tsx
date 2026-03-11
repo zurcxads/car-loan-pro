@@ -96,7 +96,7 @@ export default function ActiveDeals() {
       {/* Deal detail drawer */}
       {selectedDeal && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedDeal(null)} />
+          <div className="absolute inset-0 bg-white/50" onClick={() => setSelectedDeal(null)} />
           <div className="relative w-full max-w-md bg-white border-l border-gray-200 overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">

@@ -115,7 +115,7 @@ export default function DealFinalization({ selectedBuyer }: Props) {
             <div className="space-y-3">
               <div className="flex gap-2">
                 <input value={vin} onChange={e => setVin(e.target.value.toUpperCase())} maxLength={17} placeholder="VIN (17 characters)" className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-mono focus:outline-none focus:border-blue-600/50" />
-                <button onClick={decodeVIN} disabled={vin.length !== 17 || vinLoading} className={`px-4 py-2.5 text-xs rounded-xl transition-colors cursor-pointer ${vin.length === 17 ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}>
+                <button onClick={decodeVIN} disabled={vin.length !== 17 || vinLoading} className={`px-4 py-2.5 text-xs rounded-xl transition-colors cursor-pointer ${vin.length === 17 ? 'bg-blue-600 hover:bg-blue-500 text-gray-900' : 'bg-gray-200 text-gray-500 cursor-not-allowed'}`}>
                   {vinLoading ? 'Decoding...' : 'Decode VIN'}
                 </button>
               </div>
@@ -228,7 +228,7 @@ export default function DealFinalization({ selectedBuyer }: Props) {
               onClick={() => setSubmitted(true)}
               disabled={ltvExceeds || !salePrice}
               className={`w-full py-3 text-sm font-medium rounded-xl transition-colors cursor-pointer ${
-                ltvExceeds || !salePrice ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500 text-white'
+                ltvExceeds || !salePrice ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500 text-gray-900'
               }`}
             >
               Submit to {offer?.lenderName || 'Lender'} for Funding

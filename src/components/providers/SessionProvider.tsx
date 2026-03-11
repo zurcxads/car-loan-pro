@@ -12,7 +12,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#18181B',
+            background: 'bg-gray-50',
             color: '#FAFAFA',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '12px',
