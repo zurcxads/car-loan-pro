@@ -115,7 +115,7 @@ export default function ConsumerDashboard() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Welcome back, {application.borrower.firstName}
             </h1>
-            <p className="text-gray-500">Here's the status of your auto loan application.</p>
+            <p className="text-gray-500">Here&apos;s the status of your auto loan application.</p>
           </div>
 
           {/* Status Card */}
@@ -194,7 +194,7 @@ export default function ConsumerDashboard() {
               <div>
                 <h3 className="text-sm font-semibold text-gray-900 mb-1">Need Help?</h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  If you have questions about your application or need assistance, we're here to help.
+                  If you have questions about your application or need assistance, we&apos;re here to help.
                 </p>
                 <div className="flex gap-4 text-sm">
                   <a href="mailto:support@autoloanpro.co" className="text-blue-600 hover:text-blue-700 font-medium">
