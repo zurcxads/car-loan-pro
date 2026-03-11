@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -22,12 +22,11 @@ const navItems = [
 ];
 
 export default function LenderPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoading, isAuthenticated, logout } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('applications');
 
-  // Redirect to login if not authenticated
-  if (status === 'loading') {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="relative w-12 h-12">
@@ -37,8 +36,8 @@ export default function LenderPage() {
     );
   }
 
-  if (status === 'unauthenticated') {
-    router.push('/login?callbackUrl=/lender');
+  if (!isAuthenticated) {
+    router.push('/login?redirect=/lender');
     return null;
   }
 
@@ -50,8 +49,8 @@ export default function LenderPage() {
       navItems={navItems}
       activeTab={tab}
       onTabChange={(t) => setTab(t as Tab)}
-      onLogout={() => signOut({ callbackUrl: '/' })}
-      userName={session?.user?.name || session?.user?.email || 'Lender'}
+      onLogout={() => { logout(); router.push('/'); }}
+      userName={user?.name || user?.email || 'Lender'}
     >
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
         {tab === 'applications' && <ApplicationQueue />}

@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR, { type SWRConfiguration } from 'swr';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/lib/auth-context';
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -76,13 +76,13 @@ export function useActivityEvents() {
 // ---------- Auth Helpers ----------
 
 export function useCurrentUser() {
-  const { data: session, status } = useSession();
+  const { user, isLoading, isAuthenticated } = useAuth();
   return {
-    user: session?.user,
-    isLoading: status === 'loading',
-    isAuthenticated: status === 'authenticated',
-    role: session?.user?.role,
-    entityId: (session?.user as { entityId?: string })?.entityId,
+    user,
+    isLoading,
+    isAuthenticated,
+    role: user?.role,
+    entityId: user?.entityId,
   };
 }
 

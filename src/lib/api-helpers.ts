@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { z } from 'zod';
 
 // Standard API response helpers
@@ -40,14 +40,39 @@ export async function parseBody<T>(req: NextRequest, schema: z.ZodType<T>): Prom
 
 // Get authenticated session with role check
 export async function requireAuth(requiredRole?: string) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return { session: null, error: apiError('Unauthorized', 401) };
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll() {
+          // Read-only in API routes
+        },
+      },
+    }
+  );
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return { session: null, user: null, error: apiError('Unauthorized', 401) };
   }
-  if (requiredRole && (session.user as { role: string }).role !== requiredRole && (session.user as { role: string }).role !== 'admin') {
-    return { session: null, error: apiError('Forbidden', 403) };
+
+  const meta = user.user_metadata || {};
+  const role = meta.role || 'consumer';
+
+  if (requiredRole && role !== requiredRole && role !== 'admin') {
+    return { session: null, user: null, error: apiError('Forbidden', 403) };
   }
-  return { session, error: null };
+
+  return {
+    session: { user: { id: user.id, email: user.email, name: meta.name || meta.full_name, role, entityId: meta.entity_id } },
+    user,
+    error: null,
+  };
 }
 
 // Extract query params

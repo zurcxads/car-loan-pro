@@ -67,13 +67,14 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <div className="hidden md:flex items-center gap-8 text-sm text-gray-500">
-            <Link href="/apply" className="hover:text-gray-900 transition-colors duration-200">Apply</Link>
-            <Link href="/offers" className="hover:text-gray-900 transition-colors duration-200">Offers</Link>
-            <Link href="/status" className="hover:text-gray-900 transition-colors duration-200">Status</Link>
+            <Link href="/how-it-works" className="hover:text-gray-900 transition-colors duration-200">How It Works</Link>
+            <Link href="/calculator" className="hover:text-gray-900 transition-colors duration-200">Calculator</Link>
+            <Link href="#" className="hover:text-gray-900 transition-colors duration-200">Resources</Link>
+            <Link href="/login" className="hover:text-gray-900 transition-colors duration-200">Sign In</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer">
-              Check Your Rate
+              Apply Now
             </Link>
             <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden p-2 text-gray-500 cursor-pointer">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm0 5.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" /></svg>
@@ -84,10 +85,10 @@ export default function LandingPage() {
           {mobileMenu && (
             <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="md:hidden overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-xl">
               <div className="px-6 py-4 flex flex-col gap-4 text-sm">
-                {[['Apply', '/apply'], ['Offers', '/offers'], ['Status', '/status']].map(([label, href]) => (
+                {[['How It Works', '/how-it-works'], ['Calculator', '/calculator'], ['Resources', '#'], ['Sign In', '/login']].map(([label, href]) => (
                   <Link key={label} href={href} className="text-gray-500 hover:text-gray-900 py-1 transition-colors duration-200" onClick={() => setMobileMenu(false)}>{label}</Link>
                 ))}
-                <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-white" onClick={() => setMobileMenu(false)}>Check Your Rate</Link>
+                <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-white" onClick={() => setMobileMenu(false)}>Apply Now</Link>
               </div>
             </motion.div>
           )}
@@ -253,27 +254,34 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-gray-200 py-12 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-10 text-sm">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 text-sm">
           <div>
             <div className="font-semibold text-gray-900 mb-4">Product</div>
             <div className="space-y-3 text-gray-500">
+              <Link href="/how-it-works" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">How It Works</Link>
+              <Link href="/calculator" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Calculator</Link>
               <Link href="/apply" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Apply Now</Link>
-              <Link href="/status" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Check Status</Link>
             </div>
           </div>
           <div>
             <div className="font-semibold text-gray-900 mb-4">Company</div>
             <div className="space-y-3 text-gray-500">
-              <span className="block">About</span>
-              <span className="block">Contact</span>
+              <Link href="/about" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">About</Link>
+              <Link href="/contact" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Contact</Link>
             </div>
           </div>
           <div>
             <div className="font-semibold text-gray-900 mb-4">Legal</div>
             <div className="space-y-3 text-gray-500">
-              <span className="block">Privacy Policy</span>
-              <span className="block">Terms of Service</span>
-              <span className="block">FCRA Disclosure</span>
+              <Link href="/privacy" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Privacy Policy</Link>
+              <Link href="/terms" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Terms of Service</Link>
+            </div>
+          </div>
+          <div>
+            <div className="font-semibold text-gray-900 mb-4">Support</div>
+            <div className="space-y-3 text-gray-500">
+              <Link href="/login" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Sign In</Link>
+              <Link href="/contact" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Help Center</Link>
             </div>
           </div>
         </div>
