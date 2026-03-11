@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Configuration, PlaidApi, PlaidEnvironments, Products } from 'plaid';
+import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } from 'plaid';
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[process.env.PLAID_ENV as keyof typeof PlaidEnvironments] || PlaidEnvironments.sandbox,
@@ -21,7 +21,7 @@ export async function POST() {
       },
       client_name: 'Auto Loan Pro',
       products: [Products.Identity, Products.Assets],
-      country_codes: ['US'],
+      country_codes: [CountryCode.Us],
       language: 'en',
     };
 

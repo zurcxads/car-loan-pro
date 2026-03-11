@@ -7,11 +7,10 @@ export function generateStaticParams() {
   return articles.map((article) => ({ slug: article.slug }));
 }
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: { slug: string } };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const article = getArticleBySlug(slug);
+export function generateMetadata({ params }: Props): Metadata {
+  const article = getArticleBySlug(params.slug);
   if (!article) return {};
 
   return {
@@ -25,9 +24,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ArticlePage({ params }: Props) {
-  const { slug } = await params;
-  const article = getArticleBySlug(slug);
+export default function ArticlePage({ params }: Props) {
+  const article = getArticleBySlug(params.slug);
 
   if (!article) {
     notFound();
@@ -128,7 +126,7 @@ export default async function ArticlePage({ params }: Props) {
                 );
               }
 
-              // Regular paragraph with bold/em support
+              // Regular paragraph with bold support
               const html = trimmed
                 .replace(/\*\*([^*]+)\*\*/g, '<strong class="text-gray-900">$1</strong>')
                 .replace(/&ldquo;/g, '\u201C')

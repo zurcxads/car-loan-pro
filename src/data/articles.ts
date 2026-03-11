@@ -347,7 +347,7 @@ The bottom line: a few hours of preparation before buying can save you thousands
   },
   {
     slug: 'first-time-car-buyer-guide',
-    title: "First-Time Car Buyer&apos;s Complete Guide to Auto Financing",
+    title: "First-Time Car Buyer\u0027s Complete Guide to Auto Financing",
     description: 'Everything first-time buyers need to know about budgeting, credit, prequalification, and navigating the dealership experience.',
     category: 'Getting Started',
     readTime: '9 min read',
