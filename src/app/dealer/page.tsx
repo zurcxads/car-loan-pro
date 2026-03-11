@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -25,12 +25,12 @@ const navItems = [
 ];
 
 export default function DealerPage() {
-  const { data: session, status } = useSession();
+  const { user, isLoading, isAuthenticated, logout } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('inbox');
   const [selectedBuyer, setSelectedBuyer] = useState<MockApplication | null>(null);
 
-  if (status === 'loading') {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="relative w-12 h-12">
@@ -40,8 +40,8 @@ export default function DealerPage() {
     );
   }
 
-  if (status === 'unauthenticated') {
-    router.push('/login?callbackUrl=/dealer');
+  if (!isAuthenticated) {
+    router.push('/login?redirect=/dealer');
     return null;
   }
 
@@ -66,8 +66,8 @@ export default function DealerPage() {
       navItems={navItems}
       activeTab={tab}
       onTabChange={(t) => setTab(t as Tab)}
-      onLogout={() => signOut({ callbackUrl: '/' })}
-      userName={session?.user?.name || 'Dealer'}
+      onLogout={() => { logout(); router.push('/'); }}
+      userName={user?.name || 'Dealer'}
     >
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
         {tab === 'inbox' && <BuyerInbox onStartDeal={handleStartDeal} />}
