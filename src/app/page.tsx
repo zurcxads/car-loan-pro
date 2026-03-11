@@ -69,7 +69,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-8 text-sm text-gray-500">
             <Link href="/how-it-works" className="hover:text-gray-900 transition-colors duration-200">How It Works</Link>
             <Link href="/calculator" className="hover:text-gray-900 transition-colors duration-200">Calculator</Link>
-            <Link href="#" className="hover:text-gray-900 transition-colors duration-200">Resources</Link>
+            <Link href="/resources" className="hover:text-gray-900 transition-colors duration-200">Resources</Link>
             <Link href="/login" className="hover:text-gray-900 transition-colors duration-200">Sign In</Link>
           </div>
           <div className="flex items-center gap-4">
@@ -85,7 +85,7 @@ export default function LandingPage() {
           {mobileMenu && (
             <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="md:hidden overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-xl">
               <div className="px-6 py-4 flex flex-col gap-4 text-sm">
-                {[['How It Works', '/how-it-works'], ['Calculator', '/calculator'], ['Resources', '#'], ['Sign In', '/login']].map(([label, href]) => (
+                {[['How It Works', '/how-it-works'], ['Calculator', '/calculator'], ['Resources', '/resources'], ['Sign In', '/login']].map(([label, href]) => (
                   <Link key={label} href={href} className="text-gray-500 hover:text-gray-900 py-1 transition-colors duration-200" onClick={() => setMobileMenu(false)}>{label}</Link>
                 ))}
                 <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-white" onClick={() => setMobileMenu(false)}>Apply Now</Link>
