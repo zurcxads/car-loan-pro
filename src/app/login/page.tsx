@@ -9,10 +9,19 @@ import toast from 'react-hot-toast';
 function LoginForm() {
   const searchParams = useSearchParams();
   const errorParam = searchParams.get('error');
+  const redirect = searchParams.get('redirect');
 
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+
+  // Dev mode: skip login entirely, redirect to the portal with dev=true
+  useEffect(() => {
+    if (searchParams.get('dev') === 'true' || (typeof window !== 'undefined' && window.location.search.includes('dev=true'))) {
+      const target = redirect || '/dashboard';
+      window.location.href = target + (target.includes('?') ? '&' : '?') + 'dev=true';
+    }
+  }, [searchParams, redirect]);
 
   useEffect(() => {
     if (errorParam === 'invalid_token') {

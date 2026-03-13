@@ -405,7 +405,7 @@ function ResultsContent() {
   const maxAmount = Math.max(...offers.map(o => o.maxApprovedAmount || o.approvedAmount));
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="min-h-screen bg-gray-50">
       {showConfetti && <Confetti />}
 
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -923,7 +923,7 @@ function ResultsContent() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 
