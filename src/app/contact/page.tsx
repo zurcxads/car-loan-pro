@@ -86,7 +86,7 @@ export default function ContactPage() {
             <Link href="/login" className="hover:text-gray-900 transition-colors duration-200">Sign In</Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+            <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 active:scale-[0.98] transition-transform">
               Apply Now
             </Link>
             <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden p-2 text-gray-500 cursor-pointer">

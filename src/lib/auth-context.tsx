@@ -55,24 +55,33 @@ const DEV_USERS: Record<string, AuthUser> = {
   '/dashboard': { id: 'dev-consumer', email: 'john@example.com', name: 'John Doe (Dev)', role: 'consumer', entityId: null },
 };
 
+function getInitialDevUser(): AuthUser | null {
+  if (typeof window === 'undefined') return null;
+  if (new URLSearchParams(window.location.search).get('dev') !== 'true') return null;
+  const path = window.location.pathname;
+  const match = Object.entries(DEV_USERS).find(([prefix]) => path.startsWith(prefix));
+  return match ? match[1] : null;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const initialDevUser = typeof window !== 'undefined' ? getInitialDevUser() : null;
+  const [user, setUser] = useState<AuthUser | null>(initialDevUser);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialDevUser);
 
   useEffect(() => {
-    // Dev mode bypass — skip auth entirely
-    if (checkDevMode()) {
-      const path = window.location.pathname;
-      const devUser = Object.entries(DEV_USERS).find(([prefix]) => path.startsWith(prefix));
-      if (devUser) {
-        setUser(devUser[1]);
-        setIsLoading(false);
-        return;
-      }
+    // Dev mode already handled in initial state
+    if (checkDevMode() && user) {
+      return;
     }
 
-    const supabase = createClient();
+    let supabase;
+    try {
+      supabase = createClient();
+    } catch {
+      setIsLoading(false);
+      return;
+    }
 
     // Get initial session
     supabase.auth.getUser().then(({ data: { user: u } }) => {
