@@ -21,6 +21,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" href="/icon-192.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Auto Loan Pro" />
+        <meta name="theme-color" content="#2563EB" />
+      </head>
       <body className={`${ibmPlex.variable} font-sans bg-white text-gray-900 antialiased`}>
         <DevModeProvider>
           <DevModeBanner />
