@@ -1,18 +1,28 @@
 import { NextRequest } from 'next/server';
-import { apiSuccess, apiError } from '@/lib/api-helpers';
+import { apiSuccess, apiError, requireAuth, parseBody } from '@/lib/api-helpers';
+import { z } from 'zod';
+
+const sendPhoneCodeSchema = z.object({
+  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number format'),
+});
+
+const verifyPhoneCodeSchema = z.object({
+  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number format'),
+  code: z.string().length(6).regex(/^\d+$/, 'Code must be 6 digits'),
+});
 
 // POST /api/verify/phone — send verification code via SMS
 export async function POST(req: NextRequest) {
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
+
+  const { data, error } = await parseBody(req, sendPhoneCodeSchema);
+  if (error) return error;
+  if (!data) return apiError('Invalid data');
+
   try {
-    const body = await req.json();
-    const { phone } = body;
-
-    if (!phone || phone.replace(/\D/g, '').length < 10) {
-      return apiError('Invalid phone number', 400);
-    }
-
+    // TODO: Add rate limiting here (3 SMS per hour per user)
     // TODO: Integrate with SMS service (e.g., Twilio, AWS SNS)
-    console.log(`[STUB] Sending verification code to phone: ${phone}`);
 
     // In production, this would:
     // 1. Generate a 6-digit code
@@ -22,28 +32,27 @@ export async function POST(req: NextRequest) {
 
     return apiSuccess({
       message: 'Verification code sent via SMS',
-      phone,
-      expiresIn: 600, // 10 minutes
+      phone: data.phone,
+      expiresIn: 600,
     });
-  } catch (err) {
-    console.error('Phone verification error:', err);
-    return apiError('Failed to send verification code', 500);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to send verification code';
+    console.error('Phone verification error:', error);
+    return apiError(message, 500);
   }
 }
 
 // PUT /api/verify/phone — verify phone with code
 export async function PUT(req: NextRequest) {
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
+
+  const { data, error } = await parseBody(req, verifyPhoneCodeSchema);
+  if (error) return error;
+  if (!data) return apiError('Invalid data');
+
   try {
-    const body = await req.json();
-    const { phone, code } = body;
-
-    if (!phone || !code) {
-      return apiError('Phone and code are required', 400);
-    }
-
     // TODO: Verify code from Redis/DB
-    console.log(`[STUB] Verifying code ${code} for phone: ${phone}`);
-
     // In production, this would:
     // 1. Check code against stored value
     // 2. Check if not expired
@@ -51,16 +60,13 @@ export async function PUT(req: NextRequest) {
     // 4. Return success/failure
 
     // For now, accept any 6-digit code as valid
-    if (code.length === 6 && /^\d+$/.test(code)) {
-      return apiSuccess({
-        verified: true,
-        phone,
-      });
-    }
-
-    return apiError('Invalid verification code', 400);
-  } catch (err) {
-    console.error('Phone verification error:', err);
-    return apiError('Failed to verify code', 500);
+    return apiSuccess({
+      verified: true,
+      phone: data.phone,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to verify code';
+    console.error('Phone verification error:', error);
+    return apiError(message, 500);
   }
 }

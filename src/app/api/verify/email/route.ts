@@ -1,19 +1,28 @@
 import { NextRequest } from 'next/server';
-import { apiSuccess, apiError } from '@/lib/api-helpers';
+import { apiSuccess, apiError, requireAuth, parseBody } from '@/lib/api-helpers';
+import { z } from 'zod';
+
+const sendEmailCodeSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+const verifyEmailCodeSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  code: z.string().length(6).regex(/^\d+$/, 'Code must be 6 digits'),
+});
 
 // POST /api/verify/email — send verification code to email
 export async function POST(req: NextRequest) {
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
+
+  const { data, error } = await parseBody(req, sendEmailCodeSchema);
+  if (error) return error;
+  if (!data) return apiError('Invalid data');
+
   try {
-    const body = await req.json();
-    const { email } = body;
-
-    if (!email || !email.includes('@')) {
-      return apiError('Invalid email address', 400);
-    }
-
-    // TODO: Integrate with OTP service (e.g., Twilio Verify, AWS SES, SendGrid)
-    // For now, return success as a stub
-    console.log(`[STUB] Sending verification code to email: ${email}`);
+    // TODO: Add rate limiting here (5 emails per hour per user)
+    // TODO: Integrate with email service (e.g., SendGrid, AWS SES)
 
     // In production, this would:
     // 1. Generate a 6-digit code
@@ -23,28 +32,27 @@ export async function POST(req: NextRequest) {
 
     return apiSuccess({
       message: 'Verification code sent to your email',
-      email,
-      expiresIn: 600, // 10 minutes
+      email: data.email,
+      expiresIn: 600,
     });
-  } catch (err) {
-    console.error('Email verification error:', err);
-    return apiError('Failed to send verification code', 500);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to send verification code';
+    console.error('Email verification error:', error);
+    return apiError(message, 500);
   }
 }
 
 // PUT /api/verify/email — verify email with code
 export async function PUT(req: NextRequest) {
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
+
+  const { data, error } = await parseBody(req, verifyEmailCodeSchema);
+  if (error) return error;
+  if (!data) return apiError('Invalid data');
+
   try {
-    const body = await req.json();
-    const { email, code } = body;
-
-    if (!email || !code) {
-      return apiError('Email and code are required', 400);
-    }
-
     // TODO: Verify code from Redis/DB
-    console.log(`[STUB] Verifying code ${code} for email: ${email}`);
-
     // In production, this would:
     // 1. Check code against stored value
     // 2. Check if not expired
@@ -52,16 +60,13 @@ export async function PUT(req: NextRequest) {
     // 4. Return success/failure
 
     // For now, accept any 6-digit code as valid
-    if (code.length === 6 && /^\d+$/.test(code)) {
-      return apiSuccess({
-        verified: true,
-        email,
-      });
-    }
-
-    return apiError('Invalid verification code', 400);
-  } catch (err) {
-    console.error('Email verification error:', err);
-    return apiError('Failed to verify code', 500);
+    return apiSuccess({
+      verified: true,
+      email: data.email,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Failed to verify code';
+    console.error('Email verification error:', error);
+    return apiError(message, 500);
   }
 }
