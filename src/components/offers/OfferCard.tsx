@@ -24,7 +24,7 @@ export default function OfferCard({ offer, isLowestRate, lenderTier, onSelect, o
   };
 
   return (
-    <div className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md p-6 relative overflow-hidden">
+    <div className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 p-6 relative overflow-hidden">
       {/* Left accent bar */}
       <div className={`absolute left-0 top-0 bottom-0 w-1 ${isLowestRate ? 'bg-green-500' : 'bg-blue-600'}`} />
 
@@ -99,14 +99,14 @@ export default function OfferCard({ offer, isLowestRate, lenderTier, onSelect, o
         {onViewDetails && (
           <button
             onClick={() => onViewDetails(offer)}
-            className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-300 rounded-xl transition-colors duration-200 cursor-pointer font-medium"
+            className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-300 rounded-xl transition-colors duration-200 cursor-pointer font-medium active:scale-[0.98] transition-transform"
           >
             See Full Details
           </button>
         )}
         <button
           onClick={() => onSelect(offer)}
-          className="flex-1 px-4 py-2.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors duration-200 cursor-pointer"
+          className="flex-1 px-4 py-2.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors duration-200 cursor-pointer active:scale-[0.98] transition-transform"
         >
           Select This Offer
         </button>

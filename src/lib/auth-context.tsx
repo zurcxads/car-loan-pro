@@ -43,12 +43,35 @@ function mapSupabaseUser(user: User): AuthUser {
   };
 }
 
+function checkDevMode(): boolean {
+  if (typeof window === 'undefined') return false;
+  return new URLSearchParams(window.location.search).get('dev') === 'true';
+}
+
+const DEV_USERS: Record<string, AuthUser> = {
+  '/admin': { id: 'dev-admin', email: 'admin@autoloanpro.co', name: 'Admin (Dev)', role: 'admin', entityId: null },
+  '/lender': { id: 'dev-lender', email: 'demo@ally.com', name: 'Ally Financial (Dev)', role: 'lender', entityId: 'LND-001' },
+  '/dealer': { id: 'dev-dealer', email: 'demo@dealer.com', name: 'AutoNation (Dev)', role: 'dealer', entityId: 'DLR-001' },
+  '/dashboard': { id: 'dev-consumer', email: 'john@example.com', name: 'John Doe (Dev)', role: 'consumer', entityId: null },
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Dev mode bypass — skip auth entirely
+    if (checkDevMode()) {
+      const path = window.location.pathname;
+      const devUser = Object.entries(DEV_USERS).find(([prefix]) => path.startsWith(prefix));
+      if (devUser) {
+        setUser(devUser[1]);
+        setIsLoading(false);
+        return;
+      }
+    }
+
     const supabase = createClient();
 
     // Get initial session

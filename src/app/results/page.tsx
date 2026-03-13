@@ -479,7 +479,7 @@ function ResultsContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
-          className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm"
+          className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
         >
           <h3 className="text-sm font-semibold text-gray-900 mb-4">Customize Your Terms</h3>
           <div className="grid md:grid-cols-2 gap-6">
@@ -494,7 +494,7 @@ function ResultsContent() {
                       setCalculating(true);
                       setTimeout(() => setCalculating(false), 300);
                     }}
-                    className={`px-4 py-2.5 min-h-[44px] min-w-[60px] text-xs font-medium rounded-lg border transition-all flex-shrink-0 ${
+                    className={`px-4 py-2.5 min-h-[44px] min-w-[60px] text-xs font-medium rounded-lg border transition-all flex-shrink-0 active:scale-[0.98] transition-transform ${
                       term === t
                         ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
                         : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300'
@@ -542,7 +542,7 @@ function ResultsContent() {
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setSortBy('best_rate')}
-                className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all ${
+                className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
                   sortBy === 'best_rate'
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
@@ -552,7 +552,7 @@ function ResultsContent() {
               </button>
               <button
                 onClick={() => setSortBy('lowest_payment')}
-                className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all ${
+                className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
                   sortBy === 'lowest_payment'
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
@@ -562,7 +562,7 @@ function ResultsContent() {
               </button>
               <button
                 onClick={() => setSortBy('highest_amount')}
-                className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all ${
+                className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
                   sortBy === 'highest_amount'
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
@@ -574,7 +574,7 @@ function ResultsContent() {
           </div>
           <button
             onClick={() => setCompareMode(!compareMode)}
-            className={`px-4 py-2.5 min-h-[44px] text-sm font-medium rounded-lg border transition-all ${
+            className={`px-4 py-2.5 min-h-[44px] text-sm font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
               compareMode
                 ? 'bg-blue-50 border-blue-200 text-blue-700'
                 : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
@@ -630,7 +630,7 @@ function ResultsContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: calculating ? [0, -4, 0] : 0 }}
                 transition={{ delay: 0.9 + index * 0.1, duration: calculating ? 0.3 : 0.5 }}
-                className={`bg-white rounded-2xl border-2 p-6 hover:shadow-lg transition-all flex flex-col h-full ${
+                className={`bg-white rounded-2xl border-2 p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col h-full ${
                   isSelected ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200 hover:border-blue-300'
                 }`}
               >
@@ -735,7 +735,7 @@ function ResultsContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2 }}
-          className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
+          className="bg-blue-50 border border-blue-200 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
         >
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -842,7 +842,7 @@ function ResultsContent() {
                           setShowCompareModal(false);
                           handleSelectClick(offer);
                         }}
-                        className="w-full mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors"
+                        className="w-full mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.98] transition-transform"
                       >
                         Select {offer.label}
                       </button>
@@ -908,13 +908,13 @@ function ResultsContent() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowConfirmModal(false)}
-                  className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors"
+                  className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors active:scale-[0.98] transition-transform"
                 >
                   Go Back
                 </button>
                 <button
                   onClick={handleConfirmSelection}
-                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors"
+                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.98] transition-transform"
                 >
                   Confirm
                 </button>
