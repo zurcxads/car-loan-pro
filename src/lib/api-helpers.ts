@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 // Standard API response helpers
 export function apiSuccess<T>(data: T, status = 200) {
@@ -38,39 +40,31 @@ export async function parseBody<T>(req: NextRequest, schema: z.ZodType<T>): Prom
   }
 }
 
-// Get authenticated session with role check
+// Get authenticated session with role check using NextAuth
 export async function requireAuth(requiredRole?: string) {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll() {
-          // Read-only in API routes
-        },
-      },
-    }
-  );
+  const session = await getServerSession(authOptions);
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { session: null, user: null, error: apiError('Unauthorized', 401) };
+  if (!session || !session.user) {
+    return { session: null, error: apiError('Unauthorized', 401) };
   }
 
-  const meta = user.user_metadata || {};
-  const role = meta.role || 'consumer';
+  const user = session.user as { role: string; id: string; email?: string | null; name?: string | null; entityId?: string | null };
+  const role = user.role || 'consumer';
 
   if (requiredRole && role !== requiredRole && role !== 'admin') {
-    return { session: null, user: null, error: apiError('Forbidden', 403) };
+    return { session: null, error: apiError('Forbidden', 403) };
   }
 
   return {
-    session: { user: { id: user.id, email: user.email, name: meta.name || meta.full_name, role, entityId: meta.entity_id } },
-    user,
+    session: {
+      user: {
+        id: user.id,
+        email: user.email || '',
+        name: user.name || '',
+        role,
+        entityId: user.entityId || null,
+      }
+    },
     error: null,
   };
 }
