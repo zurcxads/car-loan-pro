@@ -12,14 +12,14 @@ export const ApplicationSubmittedTemplate = ({ firstName, applicationId }: Email
       Hi {firstName},
     </p>
     <p style={{ fontSize: '16px', color: '#374151', lineHeight: '1.6' }}>
-      Thank you for applying with Auto Loan Pro! We've received your application and our lender network is reviewing it now.
+      Thank you for applying with Auto Loan Pro! We&apos;ve received your application and our lender network is reviewing it now.
     </p>
     <div style={{ background: '#f3f4f6', padding: '16px', borderRadius: '8px', margin: '24px 0' }}>
       <p style={{ margin: '0', fontSize: '14px', color: '#6b7280' }}>Application ID</p>
       <p style={{ margin: '4px 0 0', fontSize: '18px', fontWeight: '600', color: '#111827' }}>{applicationId}</p>
     </div>
     <p style={{ fontSize: '16px', color: '#374151', lineHeight: '1.6' }}>
-      You'll receive an email as soon as lenders start sending offers. This typically happens within 1-2 hours.
+      You&apos;ll receive an email as soon as lenders start sending offers. This typically happens within 1-2 hours.
     </p>
     <p style={{ fontSize: '16px', color: '#374151', lineHeight: '1.6', marginTop: '24px' }}>
       Best regards,<br />
@@ -71,7 +71,7 @@ export const OfferSelectedTemplate = ({ firstName, lenderName, apr, monthlyPayme
       Hi {firstName},
     </p>
     <p style={{ fontSize: '16px', color: '#374151', lineHeight: '1.6' }}>
-      Congratulations! You've selected an offer from {lenderName}.
+      Congratulations! You&apos;ve selected an offer from {lenderName}.
     </p>
     <div style={{ background: '#f3f4f6', padding: '16px', borderRadius: '8px', margin: '24px 0' }}>
       <p style={{ margin: '0 0 12px', fontSize: '14px', color: '#6b7280' }}>Your Selected Offer</p>

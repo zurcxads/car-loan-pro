@@ -29,7 +29,6 @@ function ReferralsContent() {
   const router = useRouter();
   const token = searchParams.get('token');
 
-  const [referralCode, setReferralCode] = useState('');
   const [referralUrl, setReferralUrl] = useState('');
   const [stats, setStats] = useState<ReferralStats>({
     totalInvites: 0,
@@ -40,7 +39,6 @@ function ReferralsContent() {
   });
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -55,21 +53,18 @@ function ReferralsContent() {
           router.push('/apply');
           return;
         }
-        setUserId(data.application.user_id);
         return fetch(`/api/referrals?userId=${data.application.user_id}`);
       })
       .then(res => res?.json())
       .then(data => {
         if (data) {
-          setReferralCode(data.referralCode || '');
           setReferralUrl(`${window.location.origin}/apply?ref=${data.referralCode}`);
           setStats(data.stats);
           setReferrals(data.referrals || []);
         }
         setLoading(false);
       })
-      .catch(err => {
-        console.error('Load error:', err);
+      .catch(() => {
         setLoading(false);
       });
   }, [token, router]);

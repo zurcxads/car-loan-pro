@@ -36,6 +36,7 @@ export default function AnalyticsPage() {
     if (isAuthenticated) {
       fetchAnalytics();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, isLoading, dateRange, router]);
 
   const fetchAnalytics = async () => {
@@ -149,7 +150,7 @@ export default function AnalyticsPage() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ tier, rate }) => `${tier.split(' ')[0]}: ${rate}%`}
+                      label
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="rate"

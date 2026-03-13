@@ -13,10 +13,9 @@ interface Props {
   show: boolean;
   onComplete: () => void;
   steps: OnboardingStep[];
-  portalType: 'lender' | 'dealer';
 }
 
-export default function OnboardingModal({ show, onComplete, steps, portalType }: Props) {
+export default function OnboardingModal({ show, onComplete, steps }: Props) {
   const [currentStep, setCurrentStep] = useState(0);
 
   if (!show) return null;
@@ -46,7 +45,7 @@ export default function OnboardingModal({ show, onComplete, steps, portalType }:
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-white">
               <h2 className="text-xl font-semibold mb-1">Welcome to Auto Loan Pro</h2>
-              <p className="text-sm text-blue-100">Let's get you set up in just a few steps</p>
+              <p className="text-sm text-blue-100">Let&apos;s get you set up in just a few steps</p>
             </div>
 
             {/* Progress Bar */}

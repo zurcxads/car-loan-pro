@@ -57,8 +57,7 @@ function DocumentsContent() {
         }
         setLoading(false);
       })
-      .catch(err => {
-        console.error('Load error:', err);
+      .catch(() => {
         setLoading(false);
       });
   }, [token, router]);
@@ -85,7 +84,7 @@ function DocumentsContent() {
       } else {
         setDocuments(prev => [data.document, ...prev]);
       }
-    } catch (error) {
+    } catch {
       alert('Upload failed. Please try again.');
     } finally {
       setUploading(null);
@@ -105,7 +104,7 @@ function DocumentsContent() {
       } else {
         alert('Failed to delete document');
       }
-    } catch (error) {
+    } catch {
       alert('Failed to delete document');
     }
   };

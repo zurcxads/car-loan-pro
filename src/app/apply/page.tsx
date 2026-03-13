@@ -146,7 +146,7 @@ export default function ApplyPage() {
           setConsent(data.consent || consent);
           setShowResumeBanner(false);
           toast.success('Application resumed');
-        } catch (e) {
+        } catch {
           toast.error('Failed to resume application');
         }
       }
