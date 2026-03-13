@@ -32,6 +32,20 @@ function DashboardContent() {
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [daysRemaining, setDaysRemaining] = useState(30);
+
+  // Calculate days remaining for pre-approval expiration
+  useEffect(() => {
+    if (application) {
+      const submittedDate = new Date(application.submittedAt);
+      const expirationDate = new Date(submittedDate);
+      expirationDate.setDate(expirationDate.getDate() + 30);
+      const today = new Date();
+      const diffTime = expirationDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      setDaysRemaining(Math.max(0, diffDays));
+    }
+  }, [application]);
 
   useEffect(() => {
     // Dev mode: show mock data
@@ -123,160 +137,323 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
-          <div className="text-sm text-gray-500">
-            Application {application.id}
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex text-sm text-gray-500">
+              Application {application.id}
+            </div>
+            <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           {/* Welcome */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {application.borrower.firstName}
             </h1>
-            <p className="text-gray-500">Here&apos;s the status of your auto loan application.</p>
+            <p className="text-gray-600">Track your pre-approval and manage your application</p>
           </div>
 
-          {/* Status Card */}
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <div className="text-sm text-gray-500 mb-1">Application Status</div>
-                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${statusColors[application.status] || 'bg-gray-100 text-gray-700'}`}>
-                  {statusLabels[application.status] || application.status}
-                </span>
-              </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-500 mb-1">{application.hasVehicle ? 'Loan Amount' : 'Pre-Approval Type'}</div>
-                <div className="text-xl font-bold text-gray-900">
-                  {application.hasVehicle && application.loanAmount
-                    ? `$${application.loanAmount.toLocaleString()}`
-                    : 'Income-Based'}
+          {/* Status Hero Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 mb-8 text-white shadow-xl"
+          >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-sm text-blue-100 mb-0.5">Your Pre-Approval</div>
+                    <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-white/20 border border-white/30">
+                      {statusLabels[application.status] || application.status}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </div>
-            {application.vehicle && (
-              <div className="text-xs text-gray-600 mb-2">
-                {application.vehicle.year} {application.vehicle.make} {application.vehicle.model}
-              </div>
-            )}
-            {!application.hasVehicle && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
-                <p className="text-xs text-blue-900">
-                  <strong>Pre-Approved!</strong> Your offers show the maximum amount you qualify for based on your income and credit. Once you find a vehicle, we&apos;ll finalize your approval.
-                </p>
-              </div>
-            )}
-            <div className="text-xs text-gray-400">
-              Submitted on {new Date(application.submittedAt).toLocaleDateString()}
-            </div>
-          </div>
 
-          {/* Quick Actions Grid - Single column on mobile */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            {/* View Offers */}
-            <Link
-              href={isDev ? `/results?dev=true` : `/dashboard/offers?token=${token}`}
-              className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
+                <div className="mb-6">
+                  <div className="text-5xl font-bold mb-2">
+                    {application.loanAmount ? `$${application.loanAmount.toLocaleString()}` : 'Up to $35,000'}
+                  </div>
+                  <div className="text-blue-100 text-sm">
+                    {application.hasVehicle
+                      ? `${application.vehicle?.year} ${application.vehicle?.make} ${application.vehicle?.model}`
+                      : 'Pre-approved for any vehicle'}
+                  </div>
                 </div>
-                {application.offersReceived > 0 && (
-                  <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
-                    {application.offersReceived} Available
-                  </span>
+
+                {!application.hasVehicle && (
+                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-white">
+                      <strong>Blank Check Pre-Approval</strong> — Shop at any dealer with confidence. Your rate is locked for {daysRemaining} days.
+                    </p>
+                  </div>
                 )}
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-1">View Offers</h3>
-              <p className="text-sm text-gray-500">
-                {application.offersReceived > 0
-                  ? 'Compare loan offers from multiple lenders'
-                  : 'Offers will appear here once lenders review your application'}
-              </p>
-            </Link>
 
-            {/* Application Status */}
-            <Link
-              href={`/dashboard/status?token=${token}`}
-              className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center group-hover:bg-purple-100 transition-colors">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                  </svg>
+              <div className="flex-shrink-0">
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 text-center">
+                  <div className="text-sm text-blue-100 mb-2">Expires in</div>
+                  <div className="text-4xl font-bold mb-1">{daysRemaining}</div>
+                  <div className="text-sm text-blue-100">days</div>
+                  <div className="mt-4 text-xs text-blue-200">
+                    {new Date(new Date(application.submittedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </div>
                 </div>
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-1">Application Status</h3>
-              <p className="text-sm text-gray-500">Track your application progress and next steps</p>
-            </Link>
+            </div>
+          </motion.div>
 
-            {/* Documents */}
-            <Link
-              href={`/dashboard/documents?token=${token}`}
-              className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center group-hover:bg-green-100 transition-colors">
-                  <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          {/* Status Timeline */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 mb-8"
+          >
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Application Progress</h2>
+            <div className="relative">
+              {/* Progress bar background */}
+              <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200" />
+              <div className="absolute top-5 left-0 h-0.5 bg-blue-600 transition-all duration-500" style={{ width: application.status === 'offer_selected' ? '75%' : '50%' }} />
+
+              <div className="grid grid-cols-4 gap-4 relative">
+                {[
+                  { label: 'Applied', icon: '📝', completed: true },
+                  { label: 'Matched', icon: '🔍', completed: true },
+                  { label: 'Pre-Approved', icon: '✅', completed: application.status === 'offer_selected' || application.status === 'approved' },
+                  { label: 'Documents', icon: '📄', completed: application.status === 'approved' },
+                ].map((step, i) => (
+                  <div key={i} className="flex flex-col items-center text-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg mb-2 border-2 transition-all ${
+                      step.completed
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg scale-110'
+                        : 'bg-white border-gray-300 text-gray-400'
+                    }`}>
+                      {step.completed ? '✓' : step.icon}
+                    </div>
+                    <div className={`text-xs font-medium ${step.completed ? 'text-gray-900' : 'text-gray-400'}`}>
+                      {step.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* What's Next Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-gradient-to-br from-green-50 to-blue-50 border border-green-200 rounded-2xl p-6 mb-8"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-semibold text-gray-900 mb-2">What&apos;s Next?</h3>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  {!application.hasVehicle && (
+                    <>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-600 mt-0.5">→</span>
+                        <span><strong>Find your vehicle:</strong> Visit any dealer or browse online listings</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-600 mt-0.5">→</span>
+                        <span><strong>Show your letter:</strong> Download your pre-approval letter to present at the dealer</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-600 mt-0.5">→</span>
+                        <span><strong>Finalize your loan:</strong> Once you choose a vehicle, we&apos;ll complete your funding</span>
+                      </li>
+                    </>
+                  )}
+                  {application.hasVehicle && (
+                    <>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-600 mt-0.5">→</span>
+                        <span><strong>Upload documents:</strong> Provide proof of income and insurance</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-green-600 mt-0.5">→</span>
+                        <span><strong>Final approval:</strong> We&apos;re reviewing your application (2-3 business days)</span>
+                      </li>
+                    </>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Recent Activity Feed */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white rounded-2xl border border-gray-200 p-6 mb-8"
+          >
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+            <div className="space-y-4">
+              <div className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                 </div>
-              </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-1">Upload Documents</h3>
-              <p className="text-sm text-gray-500">Upload required documents to complete your application</p>
-            </Link>
-
-            {/* Approval Letter */}
-            <Link
-              href={isDev ? `/dashboard/approval-letter?dev=true` : `/dashboard/approval-letter?token=${token}`}
-              className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center group-hover:bg-orange-100 transition-colors">
-                  <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-900 mb-0.5">Offer Selected</div>
+                  <div className="text-xs text-gray-500">You selected Offer A at 4.2% APR</div>
+                  <div className="text-xs text-gray-400 mt-1">2 hours ago</div>
                 </div>
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-1">
-                {application.hasVehicle ? 'Approval Letter' : 'Pre-Approval Letter'}
-              </h3>
-              <p className="text-sm text-gray-500">
-                {application.hasVehicle
-                  ? 'Download your approval letter'
-                  : 'Present this at any participating dealer'}
-              </p>
-            </Link>
+              <div className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                    <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-900 mb-0.5">Offers Ready</div>
+                  <div className="text-xs text-gray-500">3 personalized offers available to review</div>
+                  <div className="text-xs text-gray-400 mt-1">1 day ago</div>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-900 mb-0.5">Application Submitted</div>
+                  <div className="text-xs text-gray-500">Your application has been received and is under review</div>
+                  <div className="text-xs text-gray-400 mt-1">{new Date(application.submittedAt).toLocaleDateString()}</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
-            {/* Add Vehicle (if pre-approval without vehicle) */}
-            {!application.hasVehicle && (
+          {/* Quick Actions Grid - Single column on mobile */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* View Offers */}
               <Link
-                href={`/dashboard/add-vehicle?token=${token}`}
-                className="block bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl border border-blue-600 p-6 hover:from-blue-500 hover:to-blue-600 hover:shadow-lg transition-all group"
+                href={isDev ? `/results?dev=true` : `/dashboard/offers?token=${token}`}
+                className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-blue-400 hover:shadow-lg transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  {application.offersReceived > 0 && (
+                    <span className="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full border border-green-200">
+                      {application.offersReceived} New
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 mb-1.5">View Offers</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  {application.offersReceived > 0
+                    ? 'Compare rates and terms from multiple lenders'
+                    : 'Check back soon for personalized offers'}
+                </p>
+              </Link>
+
+              {/* Approval Letter */}
+              <Link
+                href={isDev ? `/dashboard/approval-letter?dev=true` : `/dashboard/approval-letter?token=${token}`}
+                className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-green-400 hover:shadow-lg transition-all group"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                 </div>
-                <h3 className="text-base font-semibold text-white mb-1">Add Vehicle Info</h3>
-                <p className="text-sm text-blue-100">Found a vehicle? Add it here to finalize your loan</p>
+                <h3 className="text-base font-semibold text-gray-900 mb-1.5">
+                  {application.hasVehicle ? 'Approval Letter' : 'Pre-Approval Letter'}
+                </h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Download PDF to present at dealerships
+                </p>
               </Link>
-            )}
-          </div>
+
+              {/* Documents */}
+              <Link
+                href={`/dashboard/documents?token=${token}`}
+                className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-purple-400 hover:shadow-lg transition-all group"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
+                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <span className="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full border border-yellow-200">
+                    Optional
+                  </span>
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 mb-1.5">Upload Documents</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Speed up approval with proof of income
+                </p>
+              </Link>
+
+              {/* Add Vehicle (if pre-approval without vehicle) */}
+              {!application.hasVehicle && (
+                <Link
+                  href={`/dashboard/add-vehicle?token=${token}`}
+                  className="block bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl border-2 border-blue-600 p-5 hover:from-blue-500 hover:to-blue-600 hover:shadow-xl transition-all group md:col-span-2 lg:col-span-1"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:bg-white/30 transition-all shadow-md">
+                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </div>
+                    <span className="px-2.5 py-1 bg-white/20 text-white text-xs font-semibold rounded-full border border-white/30">
+                      New
+                    </span>
+                  </div>
+                  <h3 className="text-base font-semibold text-white mb-1.5">Add Vehicle Info</h3>
+                  <p className="text-xs text-blue-100 leading-relaxed">
+                    Found your car? Add details to finalize loan
+                  </p>
+                </Link>
+              )}
+            </div>
+          </motion.div>
 
           {/* Help Section */}
           <div className="mt-8 bg-blue-50 border border-blue-100 rounded-2xl p-6">
