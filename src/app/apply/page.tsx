@@ -270,13 +270,31 @@ export default function ApplyPage() {
     setSubmitting(true);
     const hasVehicle = !skippedVehicle && !skipVehicle && !!vehicle.make && !!vehicle.askingPrice;
 
+    // Ensure consent and deal structure have proper defaults for skip flow
+    const safeConsent = {
+      softPullConsent: consent.softPullConsent || true,
+      hardPullConsent: consent.hardPullConsent || false,
+      tcpaConsent: consent.tcpaConsent || true,
+      termsOfService: consent.termsOfService || true,
+      privacyPolicy: consent.privacyPolicy || true,
+      eSignConsent: consent.eSignConsent || true,
+    };
+
+    const safeDeal = {
+      cashDownPayment: deal.cashDownPayment || 0,
+      hasTradeIn: deal.hasTradeIn || false,
+      desiredTermMonths: deal.desiredTermMonths || 60,
+      gapInsuranceInterest: deal.gapInsuranceInterest || false,
+      extendedWarrantyInterest: deal.extendedWarrantyInterest || false,
+    };
+
     const payload = {
       personalInfo: personal,
       addressInfo: address,
       employmentInfo: employment,
       vehicleInfo: hasVehicle ? vehicle : undefined,
-      dealStructure: deal,
-      consent,
+      dealStructure: safeDeal,
+      consent: safeConsent,
       hasCoBorrower,
       coBorrowerInfo: hasCoBorrower ? { ...coPersonal, ...address, ...employment } : undefined,
     };
