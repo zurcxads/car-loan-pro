@@ -260,15 +260,11 @@ export default function ApplyPage() {
   const next = () => { if (validate()) setStep(s => Math.min(s + 1, 6)); };
   const back = () => setStep(s => Math.max(s - 1, 0));
 
+  const checkDevMode = () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('dev') === 'true';
+
   const skipVehicleStep = () => {
     setSkipVehicle(true);
-    // In dev mode, go straight to results with mock data
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('dev') === 'true') {
-      router.push('/results?dev=true');
-      return;
-    }
-    // Submit directly without validation (vehicle is optional)
+    if (checkDevMode()) { router.push('/results?dev=true'); return; }
     submitApplication(true);
   };
 
@@ -770,7 +766,7 @@ export default function ApplyPage() {
           {step === 5 ? (
             <button onClick={next} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue to Vehicle Info</button>
           ) : step === 6 && !skipVehicle ? (
-            <button onClick={() => { const params = new URLSearchParams(window.location.search); if (params.get('dev') === 'true') { router.push('/results?dev=true'); return; } if (validate()) submitApplication(); }} disabled={submitting} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
+            <button onClick={() => { if (checkDevMode()) { router.push('/results?dev=true'); return; } if (validate()) submitApplication(); }} disabled={submitting} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
           ) : step < 5 ? (
             <button onClick={next} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
           ) : null}
