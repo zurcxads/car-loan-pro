@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createApplicationEvent } from '@/lib/application-events';
+import { dbCreateNotification } from '@/lib/db';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
-const DOCUMENT_TYPES = ['drivers_license', 'proof_of_income', 'proof_of_insurance', 'proof_of_address'];
+const DOCUMENT_TYPES = ['paystub', 'bank_statement', 'proof_of_residence', 'tax_return', 'drivers_license', 'proof_of_insurance', 'proof_of_income', 'proof_of_address', 'other'];
 
 export async function POST(req: NextRequest) {
   try {
@@ -89,6 +91,26 @@ export async function POST(req: NextRequest) {
         { error: 'Failed to save document record' },
         { status: 500 }
       );
+    }
+
+    // Create application event if application ID is provided
+    if (applicationId) {
+      await createApplicationEvent(
+        applicationId,
+        'document_uploaded',
+        `Document uploaded: ${type}`,
+        { document_id: document.id, file_name: file.name }
+      );
+
+      // Create notification for the user
+      await dbCreateNotification({
+        userId: applicationId,
+        type: 'document_requested',
+        title: 'Document Uploaded',
+        message: `Your ${type.replace(/_/g, ' ')} has been uploaded successfully and is being reviewed.`,
+        read: false,
+        data: { document_id: document.id, type },
+      });
     }
 
     return NextResponse.json({ document });
