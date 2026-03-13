@@ -79,6 +79,19 @@ export default function ApplyPage() {
   const [showResumeBanner, setShowResumeBanner] = useState(false);
   const [hasSavedData, setHasSavedData] = useState(false);
 
+  // Check for dev mode and auto-fill
+  const [isDevMode, setIsDevMode] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const devParam = urlParams.get('dev');
+      const devCookie = document.cookie.split('; ').find(row => row.startsWith('alp_dev_mode='));
+      const hasDevMode = devParam === 'true' || devCookie?.split('=')[1] === 'true';
+      setIsDevMode(hasDevMode);
+    }
+  }, []);
+
   const [personal, setPersonal] = useState<BorrowerPersonalInfo>({ firstName: '', lastName: '', ssn: '', dob: '', email: '', phone: '', preferredLanguage: 'english' });
   const [address, setAddress] = useState<AddressInfo>({ currentAddressLine1: '', currentCity: '', currentState: '', currentZip: '', residenceType: 'rent', monthlyHousingPayment: 0, monthsAtCurrentAddress: 0 });
   const [employment, setEmployment] = useState<EmploymentInfo>({ employmentStatus: 'full_time' as EmploymentStatus, monthsAtEmployer: 0, grossMonthlyIncome: 0, incomeTypePrimary: 'employment' as IncomeType });
@@ -90,6 +103,21 @@ export default function ApplyPage() {
   const [skipVehicle, setSkipVehicle] = useState(false);
   const [emailVerified] = useState(false); // setEmailVerified will be used for OTP verification later
   const [phoneVerified] = useState(false); // setPhoneVerified will be used for OTP verification later
+
+  // Auto-fill with test data in dev mode
+  useEffect(() => {
+    if (isDevMode && step === 0 && !personal.firstName) {
+      // Import test data dynamically to avoid errors
+      import('@/lib/test-data').then(({ TEST_PERSONAL_INFO, TEST_ADDRESS_INFO, TEST_EMPLOYMENT_INFO, TEST_VEHICLE_INFO, TEST_DEAL_STRUCTURE, TEST_CONSENT }) => {
+        setPersonal(TEST_PERSONAL_INFO);
+        setAddress(TEST_ADDRESS_INFO);
+        setEmployment(TEST_EMPLOYMENT_INFO);
+        setVehicle(TEST_VEHICLE_INFO);
+        setDeal(TEST_DEAL_STRUCTURE);
+        setConsent(TEST_CONSENT);
+      });
+    }
+  }, [isDevMode, step, personal.firstName]);
 
   // Format SSN as user types
   const formatSSN = (value: string) => {
@@ -182,6 +210,12 @@ export default function ApplyPage() {
   };
 
   const validate = (): boolean => {
+    // In dev mode, skip validation
+    if (isDevMode) {
+      setErrors({});
+      return true;
+    }
+
     const e: Record<string, string> = {};
     if (step === 0) {
       // Personal Info
@@ -288,6 +322,11 @@ export default function ApplyPage() {
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <div className="flex items-center gap-3">
+            {isDevMode && (
+              <span className="text-xs text-yellow-600 bg-yellow-50 px-2.5 py-0.5 rounded-full font-medium border border-yellow-200">
+                Auto-filled
+              </span>
+            )}
             <span className="text-xs text-gray-500 font-medium">Step {step + 1} of 7</span>
             <span className="text-xs text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full">{STEP_NAMES[step]}</span>
           </div>
