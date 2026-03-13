@@ -22,7 +22,6 @@ function OffersContent() {
   const token = searchParams.get('token');
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [applicationId, setApplicationId] = useState('');
 
   useEffect(() => {
     if (!token) return;
@@ -32,7 +31,6 @@ function OffersContent() {
       .then(res => res.json())
       .then(data => {
         if (data.application) {
-          setApplicationId(data.application.id);
           // Then fetch offers for this application
           return fetch(`/api/offers?applicationId=${data.application.id}`);
         }
