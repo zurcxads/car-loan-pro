@@ -1,17 +1,12 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import { createColumnHelper } from '@tanstack/react-table';
 import { type MockApplication } from '@/lib/mock-data';
-import { formatCurrency, formatRelativeTime, ficoColor, ltvColor, dtiColor, ptiColor, truncate } from '@/lib/format-utils';
-import DataTable from '@/components/shared/DataTable';
-import KPICard from '@/components/shared/KPICard';
+import { formatCurrency, ficoColor } from '@/lib/format-utils';
 import StatusBadge from '@/components/shared/StatusBadge';
 import ApplicationDetailDrawer from './ApplicationDetailDrawer';
 import DecisionModal from './DecisionModal';
 import { dbGetApplications } from '@/lib/db';
-
-const columnHelper = createColumnHelper<MockApplication>();
 
 type StatusFilter = 'all' | 'pending_decision' | 'offers_available' | 'conditional' | 'declined' | 'funded';
 type DecisionAction = 'approve' | 'decline' | 'counter' | 'request_docs';
@@ -22,7 +17,6 @@ export default function ApplicationQueue() {
   const [selectedApp, setSelectedApp] = useState<MockApplication | null>(null);
   const [decisionApp, setDecisionApp] = useState<MockApplication | null>(null);
   const [decisionAction, setDecisionAction] = useState<DecisionAction>('approve');
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [apps, setApps] = useState<MockApplication[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,57 +67,6 @@ export default function ApplicationQueue() {
     setDecisionAction(action);
     setSelectedApp(null);
   };
-
-  const columns = useMemo(() => [
-    columnHelper.accessor('id', {
-      header: 'App ID',
-      cell: info => <span className="font-mono text-xs text-gray-500">{info.getValue()}</span>,
-      enableSorting: false,
-    }),
-    columnHelper.accessor(row => `${row.borrower.firstName} ${row.borrower.lastName.charAt(0)}.`, {
-      id: 'borrower',
-      header: 'Borrower',
-      cell: info => <span className="font-medium text-sm">{info.getValue()}</span>,
-    }),
-    columnHelper.accessor(row => row.credit.ficoScore, {
-      id: 'fico',
-      header: 'FICO',
-      cell: info => {
-        const val = info.getValue();
-        return <span className={`font-semibold text-sm ${ficoColor(val)}`}>{val || 'N/A'}</span>;
-      },
-    }),
-    columnHelper.accessor('loanAmount', {
-      header: 'Loan Amount',
-      cell: info => <span className="text-sm">{info.getValue() ? formatCurrency(info.getValue()!) : 'Pre-Approval'}</span>,
-    }),
-    columnHelper.accessor(row => row.vehicle ? `${row.vehicle.year} ${row.vehicle.make} ${row.vehicle.model}` : 'No vehicle', {
-      id: 'vehicle',
-      header: 'Vehicle',
-      cell: info => <span className="text-sm text-gray-500">{truncate(info.getValue(), 25)}</span>,
-      enableSorting: false,
-    }),
-    columnHelper.accessor('ltvPercent', {
-      header: 'LTV',
-      cell: info => <span className={`font-semibold text-sm ${ltvColor(info.getValue() || 0)}`}>{info.getValue() ?? 'N/A'}{info.getValue() ? '%' : ''}</span>,
-    }),
-    columnHelper.accessor('dtiPercent', {
-      header: 'DTI',
-      cell: info => <span className={`font-semibold text-sm ${dtiColor(info.getValue())}`}>{info.getValue()}%</span>,
-    }),
-    columnHelper.accessor('ptiPercent', {
-      header: 'PTI',
-      cell: info => <span className={`font-semibold text-sm ${ptiColor(info.getValue() || 0)}`}>{info.getValue() ?? 'N/A'}{info.getValue() ? '%' : ''}</span>,
-    }),
-    columnHelper.accessor('submittedAt', {
-      header: 'Submitted',
-      cell: info => <span className="text-xs text-gray-500">{formatRelativeTime(info.getValue())}</span>,
-    }),
-    columnHelper.accessor('status', {
-      header: 'Status',
-      cell: info => <StatusBadge status={info.getValue()} />,
-    }),
-  ], []);
 
   const statusOptions: { key: StatusFilter; label: string }[] = [
     { key: 'all', label: 'All' },

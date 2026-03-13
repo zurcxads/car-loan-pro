@@ -45,7 +45,7 @@ export function LineChart({ data, height = 240, color = '#3B82F6' }: { data: Lin
 
         {/* Line path */}
         <polyline
-          points={points.split(' ').map((p, i) => {
+          points={points.split(' ').map((p) => {
             const [x, y] = p.split(',').map(Number);
             return `${padding.left / 100 * 100 + x},${padding.top + y}`;
           }).join(' ')}

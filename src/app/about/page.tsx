@@ -126,6 +126,71 @@ export default function AboutPage() {
         </motion.div>
       </section>
 
+      {/* Auto Loan Pro vs Traditional */}
+      <section className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-12">Auto Loan Pro vs Traditional Financing</motion.h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="text-left py-4 px-6 text-sm font-semibold text-gray-900"></th>
+                    <th className="text-center py-4 px-6 text-sm font-semibold text-blue-600">Auto Loan Pro</th>
+                    <th className="text-center py-4 px-6 text-sm font-semibold text-gray-500">Traditional Process</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  <tr>
+                    <td className="py-4 px-6 text-sm font-medium text-gray-900">Time to pre-approval</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-700">2 minutes</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-500">15-30 hours</td>
+                  </tr>
+                  <tr>
+                    <td className="py-4 px-6 text-sm font-medium text-gray-900">Number of lenders</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-700">Multiple (5-10+)</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-500">1-3 (manually)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-4 px-6 text-sm font-medium text-gray-900">Credit pulls</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-700">1 soft pull</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-500">Multiple hard pulls</td>
+                  </tr>
+                  <tr>
+                    <td className="py-4 px-6 text-sm font-medium text-gray-900">Dealer markup</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-700">None (0%)</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-500">1-3% typical</td>
+                  </tr>
+                  <tr>
+                    <td className="py-4 px-6 text-sm font-medium text-gray-900">Cost to consumer</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-700">Free</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-500">Free (but higher rates)</td>
+                  </tr>
+                  <tr>
+                    <td className="py-4 px-6 text-sm font-medium text-gray-900">Shop anywhere</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-700">
+                      <svg className="w-5 h-5 text-green-600 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-500">
+                      <svg className="w-5 h-5 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="py-4 px-6 text-sm font-medium text-gray-900">Negotiating power</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-700">High (pre-approved)</td>
+                    <td className="py-4 px-6 text-sm text-center text-gray-500">Low (at dealer mercy)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Values */}
       <section className="py-16 px-6">
         <div className="max-w-5xl mx-auto">
@@ -168,14 +233,73 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Trust Badges */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-12">Security & Compliance</motion.h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid sm:grid-cols-3 gap-6">
+            <motion.div variants={fadeUp} className="p-8 rounded-2xl border border-gray-200 bg-gray-50 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
+                <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">256-bit SSL Encryption</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">Bank-level encryption protects your personal and financial data</p>
+            </motion.div>
+            <motion.div variants={fadeUp} className="p-8 rounded-2xl border border-gray-200 bg-gray-50 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">Soft Pull Only</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">Credit check will not impact your credit score</p>
+            </motion.div>
+            <motion.div variants={fadeUp} className="p-8 rounded-2xl border border-gray-200 bg-gray-50 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
+                <svg className="w-8 h-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 mb-2">FCRA Compliant</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">All credit reporting follows federal regulations</p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Team */}
       <section className="py-16 px-6">
-        <div className="max-w-3xl mx-auto">
-          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6">The Team</motion.h2>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
-            <p className="text-gray-600 leading-relaxed">
+        <div className="max-w-5xl mx-auto">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-12">The Team</motion.h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="bg-gray-50 border border-gray-200 rounded-2xl p-10 text-center">
+            <p className="text-gray-600 leading-relaxed max-w-2xl mx-auto mb-8">
               Auto Loan Pro is built by a team of fintech and lending industry veterans committed to making auto financing transparent and accessible. Our platform is backed by years of experience in consumer lending, credit underwriting, and marketplace technology.
             </p>
+            <div className="grid sm:grid-cols-3 gap-8 max-w-3xl mx-auto">
+              <div className="flex flex-col items-center">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 mb-4 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-blue-600">Team</span>
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">Leadership</h3>
+                <p className="text-sm text-gray-500">Fintech Veterans</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 mb-4 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-purple-600">Tech</span>
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">Engineering</h3>
+                <p className="text-sm text-gray-500">Building the Future</p>
+              </div>
+              <div className="flex flex-col items-center">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green-100 to-green-200 mb-4 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-green-600">Partners</span>
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">Partnerships</h3>
+                <p className="text-sm text-gray-500">Lender Network</p>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>

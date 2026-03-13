@@ -2,7 +2,7 @@
 
 import { formatRelativeTime } from '@/lib/format-utils';
 import { useState, useEffect, useMemo } from 'react';
-import { dbGetApplications, dbGetOffers, dbGetActivityEvents, dbGetComplianceAlerts, dbGetPlatformStats } from '@/lib/db';
+import { dbGetApplications, dbGetOffers, dbGetActivityEvents, dbGetComplianceAlerts } from '@/lib/db';
 import type { MockApplication, MockOffer, ActivityEvent, ComplianceAlert } from '@/lib/mock-data';
 import { LineChart, DonutChart, DistributionBars, TrendIndicator } from '@/components/shared/charts';
 
