@@ -94,7 +94,7 @@ export default function LandingPage() {
             <Link href="/login" className="hover:text-gray-900 transition-colors duration-200">Sign In</Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer">
+            <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 min-h-[40px] items-center bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer">
               Apply Now
             </Link>
             <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden p-2 text-gray-500 cursor-pointer">
@@ -150,7 +150,7 @@ export default function LandingPage() {
 
             {/* Right: Mini Form */}
             <motion.div variants={fadeUp}>
-              <form onSubmit={handleHeroSubmit} className="bg-white rounded-2xl border border-gray-200 shadow-lg p-8">
+              <form onSubmit={handleHeroSubmit} className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">Get Your Rate</h3>
                 <p className="text-sm text-gray-500 mb-6">Takes less than 5 minutes. No credit impact.</p>
 
@@ -202,7 +202,7 @@ export default function LandingPage() {
 
                   <button
                     type="submit"
-                    className="w-full px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors cursor-pointer"
+                    className="w-full px-8 py-4 min-h-[48px] bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors cursor-pointer"
                   >
                     Check My Rate — Free
                   </button>
@@ -217,9 +217,9 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Value Props */}
+      {/* Value Props - 2x2 grid on mobile */}
       <section className="py-12 border-y border-gray-200 bg-white">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {valueProps.map((prop, i) => (
             <motion.div key={i} variants={fadeUp} className="text-center">
               <div className="text-3xl mb-3">{prop.icon}</div>
@@ -349,8 +349,8 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Ready to save on your auto loan?</motion.h2>
             <motion.p variants={fadeUp} className="text-gray-500 mb-10">Get pre-approved in minutes with no impact to your credit score.</motion.p>
-            <motion.div variants={fadeUp}>
-              <Link href="/apply" className="inline-flex px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200 cursor-pointer">
+            <motion.div variants={fadeUp} className="w-full sm:w-auto">
+              <Link href="/apply" className="inline-flex w-full sm:w-auto justify-center px-8 py-4 min-h-[48px] items-center bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200 cursor-pointer">
                 Check Your Rate — Free
               </Link>
             </motion.div>

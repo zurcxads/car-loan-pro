@@ -32,7 +32,7 @@ function Input({ value, onChange, placeholder, type = 'text', error, maxLength, 
   return (
     <div className="relative">
       <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength}
-        className={`w-full px-4 py-3 bg-gray-50 border ${error ? 'border-red-400' : 'border-gray-200'} rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200`} />
+        className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 border ${error ? 'border-red-400' : 'border-gray-200'} rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200`} />
       {isValid && value && !error && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
@@ -51,7 +51,7 @@ function Select({ value, onChange, options, placeholder, error }: {
 }) {
   return (
     <select value={value} onChange={e => onChange(e.target.value)}
-      className={`w-full px-4 py-3 bg-gray-50 border ${error ? 'border-red-400' : 'border-gray-200'} rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200 cursor-pointer ${!value ? 'text-gray-400' : ''}`}>
+      className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 border ${error ? 'border-red-400' : 'border-gray-200'} rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200 cursor-pointer ${!value ? 'text-gray-400' : ''}`}>
       {placeholder && <option value="">{placeholder}</option>}
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
@@ -60,11 +60,11 @@ function Select({ value, onChange, options, placeholder, error }: {
 
 function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string | React.ReactNode }) {
   return (
-    <label className="flex items-start gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
-      <div className={`mt-0.5 w-5 h-5 rounded-md border flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300 group-hover:border-gray-400'}`}>
-        {checked && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+    <label className="flex items-start gap-3 cursor-pointer group min-h-[44px]" onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
+      <div className={`mt-0.5 w-6 h-6 min-w-[24px] rounded-md border flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300 group-hover:border-gray-400'}`}>
+        {checked && <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
       </div>
-      <span className="text-sm text-gray-600 leading-relaxed">{label}</span>
+      <span className="text-sm text-gray-600 leading-relaxed py-1">{label}</span>
     </label>
   );
 }
@@ -286,8 +286,8 @@ export default function ApplyPage() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 pt-8">
-        <div className="flex gap-2">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-4 sm:pt-8">
+        <div className="flex gap-1.5 sm:gap-2">
           {STEP_NAMES.map((_, i) => (
             <div key={i} className="h-1 flex-1 rounded-full overflow-hidden bg-gray-200">
               <div className={`h-full rounded-full transition-all duration-500 ${i < step ? 'bg-green-500 w-full' : i === step ? 'bg-blue-600 w-full' : 'w-0'}`} />
@@ -296,10 +296,10 @@ export default function ApplyPage() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-24 sm:pb-8">
         <AnimatePresence mode="wait">
           <motion.div key={step} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.25 }}
-            className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
+            className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4 sm:p-8">
 
             {/* STEP 1: About You (Personal + Address) */}
             {step === 0 && (
@@ -702,11 +702,11 @@ export default function ApplyPage() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Bottom Navigation - Fixed on Mobile */}
-        <div className="fixed md:static bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:border-0 md:bg-transparent">
-          <div className="max-w-3xl mx-auto px-6 py-4 md:py-0 md:mt-8 md:pb-12 flex justify-between items-center">
+        {/* Bottom Navigation - Sticky on Mobile with Backdrop Blur */}
+        <div className="fixed md:static bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 md:border-0 md:bg-transparent md:backdrop-blur-none shadow-lg md:shadow-none safe-bottom z-30">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-0 md:mt-8 md:pb-12 flex justify-between items-center gap-3">
             {step > 0 ? (
-              <button onClick={back} className="px-6 py-3 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-300 rounded-xl transition-colors duration-200 cursor-pointer">
+              <button onClick={back} className="px-4 sm:px-6 py-3 min-h-[44px] text-sm text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-300 rounded-xl transition-colors duration-200 cursor-pointer">
                 Back
               </button>
             ) : <div />}
@@ -715,14 +715,14 @@ export default function ApplyPage() {
               <button
                 onClick={submitApplication}
                 disabled={submitting}
-                className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm"
+                className="flex-1 sm:flex-none px-6 sm:px-8 py-3 min-h-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm"
               >
                 Submit Application
               </button>
             ) : (
               <button
                 onClick={next}
-                className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm"
+                className="flex-1 sm:flex-none px-6 sm:px-8 py-3 min-h-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm"
               >
                 Next Step
               </button>

@@ -353,7 +353,7 @@ function ResultsContent() {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-xs text-gray-500 mb-3 font-medium">Loan Term</label>
-              <div className="grid grid-cols-6 gap-2">
+              <div className="flex overflow-x-auto gap-2 pb-1 -mx-1 px-1 scrollbar-hide">
                 {TERM_OPTIONS.map(t => (
                   <button
                     key={t}
@@ -362,7 +362,7 @@ function ResultsContent() {
                       setCalculating(true);
                       setTimeout(() => setCalculating(false), 300);
                     }}
-                    className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all ${
+                    className={`px-4 py-2.5 min-h-[44px] min-w-[60px] text-xs font-medium rounded-lg border transition-all flex-shrink-0 ${
                       term === t
                         ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
                         : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300'
@@ -388,7 +388,7 @@ function ResultsContent() {
                   setCalculating(true);
                   setTimeout(() => setCalculating(false), 300);
                 }}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                className="w-full cursor-pointer"
               />
               <div className="flex justify-between text-xs text-gray-400 mt-2">
                 <span>$0</span>
@@ -398,8 +398,8 @@ function ResultsContent() {
           </div>
         </motion.div>
 
-        {/* Offers Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        {/* Offers Grid - Single column on mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {offers.slice(0, 3).map((offer, index) => {
             const payment = calculatePayment(offer, term, downPayment);
             const totalCost = calculateTotalCost(offer, term, downPayment);
@@ -463,7 +463,7 @@ function ResultsContent() {
                 <button
                   onClick={() => handleSelectClick(offer)}
                   disabled={calculating}
-                  className="w-full mt-6 px-6 py-4 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+                  className="w-full mt-6 px-6 py-4 min-h-[48px] bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
                 >
                   Select This Offer
                 </button>

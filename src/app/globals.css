@@ -22,17 +22,49 @@ body {
   font-family: var(--font-ibm-plex), 'IBM Plex Sans', sans-serif;
   background: var(--bg);
   color: var(--text);
+  overflow-x: hidden;
+  font-size: 16px; /* Prevent mobile zoom on inputs */
 }
 
-/* Custom range */
+/* Ensure minimum font size on mobile for readability */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+
+  /* Don't let text get too small on mobile */
+  .text-xs {
+    font-size: 0.75rem; /* 12px */
+  }
+}
+
+/* Safe area for notched phones */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Hide scrollbar for horizontal scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom range - larger thumb for mobile touch */
 input[type="range"] {
   -webkit-appearance: none; appearance: none;
-  height: 6px; border-radius: 3px; background: #E5E7EB; outline: none;
+  height: 8px; border-radius: 4px; background: #E5E7EB; outline: none;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
-  width: 24px; height: 24px; border-radius: 50%;
-  background: var(--blue); cursor: pointer; border: 2px solid rgba(37, 99, 235, 0.5);
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--blue); cursor: pointer; border: 3px solid white; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--blue); cursor: pointer; border: 3px solid white; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* Scrollbar */

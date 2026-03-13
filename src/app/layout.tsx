@@ -14,6 +14,7 @@ const ibmPlex = IBM_Plex_Sans({
 export const metadata: Metadata = {
   title: "Auto Loan Pro — Auto Lending Marketplace",
   description: "Get pre-approved for an auto loan from multiple lenders with one application. No dealer markup.",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

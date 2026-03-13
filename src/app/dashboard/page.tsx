@@ -124,7 +124,7 @@ function DashboardContent() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <div className="text-sm text-gray-500">
             Application {application.id}
@@ -133,7 +133,7 @@ function DashboardContent() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
           {/* Welcome */}
           <div className="mb-8">
@@ -178,8 +178,8 @@ function DashboardContent() {
             </div>
           </div>
 
-          {/* Quick Actions Grid */}
-          <div className="grid md:grid-cols-2 gap-6">
+          {/* Quick Actions Grid - Single column on mobile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* View Offers */}
             <Link
               href={isDev ? `/results?dev=true` : `/dashboard/offers?token=${token}`}
