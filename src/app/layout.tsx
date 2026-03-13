@@ -4,6 +4,7 @@ import Providers from "@/components/providers/SessionProvider";
 import { DevModeProvider } from "@/contexts/DevModeContext";
 import DevModeBanner from "@/components/dev/DevModeBanner";
 import CookieConsent from "@/components/shared/CookieConsent";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import "./globals.css";
 
 const ibmPlex = IBM_Plex_Sans({
@@ -32,11 +33,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
       <body className={`${ibmPlex.variable} font-sans bg-white text-gray-900 antialiased`}>
-        <DevModeProvider>
-          <DevModeBanner />
-          <Providers>{children}</Providers>
-          <CookieConsent />
-        </DevModeProvider>
+        <ErrorBoundary>
+          <DevModeProvider>
+            <DevModeBanner />
+            <Providers>{children}</Providers>
+            <CookieConsent />
+          </DevModeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
