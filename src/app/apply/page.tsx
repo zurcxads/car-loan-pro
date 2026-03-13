@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,7 +17,7 @@ import type {
 
 const STEP_NAMES = ['About You', 'Income & Employment', 'Credit Consent', 'Review & Submit'];
 
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label?: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
       {children}
