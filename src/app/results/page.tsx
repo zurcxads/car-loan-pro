@@ -37,9 +37,22 @@ function ResultsContent() {
   const [downPayment, setDownPayment] = useState(0);
   const [calculating, setCalculating] = useState(false);
 
+  const isDev = searchParams.get('dev') === 'true';
+
   useEffect(() => {
-    if (!token) {
-      router.push('/apply');
+    // Dev mode: show mock offers without token
+    if (isDev || !token) {
+      if (!token && !isDev) {
+        router.push('/apply');
+        return;
+      }
+      // Mock offers for dev/preview mode
+      setOffers([
+        { id: 'demo-1', label: 'Offer A', lenderId: 'LND-001', apr: 4.2, baseApr: 4.2, monthlyPayment: 465, approvedAmount: 32000, maxApprovedAmount: 35000, rateTiers: [] },
+        { id: 'demo-2', label: 'Offer B', lenderId: 'LND-002', apr: 5.8, baseApr: 5.8, monthlyPayment: 398, approvedAmount: 30000, maxApprovedAmount: 32000, rateTiers: [] },
+        { id: 'demo-3', label: 'Offer C', lenderId: 'LND-003', apr: 7.1, baseApr: 7.1, monthlyPayment: 542, approvedAmount: 28000, maxApprovedAmount: 30000, rateTiers: [] },
+      ]);
+      setLoading(false);
       return;
     }
 
