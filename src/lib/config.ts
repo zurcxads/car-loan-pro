@@ -24,9 +24,3 @@ export const CREDIT_PULL_PROVIDER = {
   endpoint: '',
   credentialsConfigured: false,
 };
-
-export const AUTH_CREDENTIALS = {
-  lender: { email: 'lender@demo.com', password: 'demo123' },
-  dealer: { email: 'dealer@demo.com', password: 'demo123' },
-  admin: { username: 'admin@clp', password: 'admin2026' },
-};
