@@ -7,10 +7,15 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ dealerId: string }> }
 ) {
-  const { error } = await requireAuth('dealer');
+  const { session, error } = await requireAuth('dealer');
   if (error) return error;
 
-  await params; // dealerId not used in current implementation
+  const { dealerId } = await params;
+
+  // AUTHORIZATION: Verify dealer owns this resource
+  if (dealerId !== session?.user.entityId) {
+    return apiError('You can only view buyers for your own dealership', 403);
+  }
 
   try {
     // Get all applications with offers

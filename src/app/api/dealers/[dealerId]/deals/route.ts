@@ -21,10 +21,15 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ dealerId: string }> }
 ) {
-  const { error } = await requireAuth('dealer');
+  const { session, error } = await requireAuth('dealer');
   if (error) return error;
 
   const { dealerId } = await params;
+
+  // AUTHORIZATION: Verify dealer owns this resource
+  if (dealerId !== session?.user.entityId) {
+    return apiError('You can only view deals for your own dealership', 403);
+  }
 
   try {
     const deals = await dbGetDeals(dealerId);
@@ -39,10 +44,16 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ dealerId: string }> }
 ) {
-  const { error: authError } = await requireAuth('dealer');
+  const { session, error: authError } = await requireAuth('dealer');
   if (authError) return authError;
 
   const { dealerId } = await params;
+
+  // AUTHORIZATION: Verify dealer owns this resource
+  if (dealerId !== session?.user.entityId) {
+    return apiError('You can only create deals for your own dealership', 403);
+  }
+
   const { data, error } = await parseBody(req, dealSchema);
   if (error) return error;
   if (!data) return apiError('Invalid data');

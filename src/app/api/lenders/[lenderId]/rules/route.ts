@@ -23,10 +23,15 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ lenderId: string }> }
 ) {
-  const { error } = await requireAuth('lender');
+  const { session, error } = await requireAuth('lender');
   if (error) return error;
 
   const { lenderId } = await params;
+
+  // AUTHORIZATION: Verify lender owns this resource
+  if (lenderId !== session?.user.entityId) {
+    return apiError('You can only view rules for your own lender account', 403);
+  }
 
   try {
     const lender = await dbGetLender(lenderId);
@@ -45,10 +50,16 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ lenderId: string }> }
 ) {
-  const { error: authError } = await requireAuth('lender');
+  const { session, error: authError } = await requireAuth('lender');
   if (authError) return authError;
 
   const { lenderId } = await params;
+
+  // AUTHORIZATION: Verify lender owns this resource
+  if (lenderId !== session?.user.entityId) {
+    return apiError('You can only update rules for your own lender account', 403);
+  }
+
   const { data, error } = await parseBody(req, rulesSchema);
   if (error) return error;
   if (!data) return apiError('Invalid data');

@@ -23,6 +23,12 @@ export async function POST(
   if (authError) return authError;
 
   const { lenderId } = await params;
+
+  // AUTHORIZATION: Verify lender owns this resource
+  if (lenderId !== session?.user.entityId) {
+    return apiError('You can only make decisions for your own lender account', 403);
+  }
+
   const { data, error } = await parseBody(req, decisionSchema);
   if (error) return error;
   if (!data) return apiError('Invalid data');
