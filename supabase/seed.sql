@@ -2,15 +2,17 @@
 -- Run AFTER schema.sql
 
 -- Users (bcrypt hashed passwords)
--- admin@carloanpro.com / admin2026
--- lender@demo.com / demo123
--- dealer@demo.com / demo123
--- marcus.j@email.com / demo123
+-- Password for all demo accounts: AutoLoanPro2026!
+-- admin@autoloanpro.co / AutoLoanPro2026!
+-- demo@ally.com / AutoLoanPro2026!
+-- demo@dealer.com / AutoLoanPro2026!
+-- marcus.j@email.com / AutoLoanPro2026!
+-- Hash generated with: bcrypt.hashSync('AutoLoanPro2026!', 10)
 INSERT INTO users (email, name, password_hash, role, entity_id) VALUES
-  ('admin@carloanpro.com', 'Admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin', NULL),
-  ('lender@demo.com', 'Demo Lender', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'lender', 'LND-001'),
-  ('dealer@demo.com', 'AutoMax Houston', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'dealer', 'DLR-001'),
-  ('marcus.j@email.com', 'Marcus Johnson', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'consumer', NULL)
+  ('admin@autoloanpro.co', 'Platform Admin', '$2a$10$rQ/YvN8dJ1p7PJqL0lXvj.mXZMfQUV5xY3rQ5KZYwUhZE3FqG3GWq', 'admin', NULL),
+  ('demo@ally.com', 'Ally Financial Demo', '$2a$10$rQ/YvN8dJ1p7PJqL0lXvj.mXZMfQUV5xY3rQ5KZYwUhZE3FqG3GWq', 'lender', 'LND-001'),
+  ('demo@dealer.com', 'AutoMax Houston Demo', '$2a$10$rQ/YvN8dJ1p7PJqL0lXvj.mXZMfQUV5xY3rQ5KZYwUhZE3FqG3GWq', 'dealer', 'DLR-001'),
+  ('marcus.j@email.com', 'Marcus Johnson', '$2a$10$rQ/YvN8dJ1p7PJqL0lXvj.mXZMfQUV5xY3rQ5KZYwUhZE3FqG3GWq', 'consumer', NULL)
 ON CONFLICT (email) DO NOTHING;
 
 -- Lenders

@@ -31,26 +31,77 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Protected routes — redirect to /login if not authenticated
-  if (pathname.startsWith('/dashboard')) {
-    if (!user) {
+  // Get user role from metadata
+  const userRole = user?.user_metadata?.role || '';
+
+  // Auth pages — redirect to home if already authenticated
+  if (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register')) {
+    if (user) {
       const url = request.nextUrl.clone();
-      url.pathname = '/login';
-      url.searchParams.set('redirect', pathname);
+      if (userRole === 'admin') {
+        url.pathname = '/admin';
+      } else if (userRole === 'lender') {
+        url.pathname = '/lender';
+      } else if (userRole === 'dealer') {
+        url.pathname = '/dealer';
+      } else {
+        url.pathname = '/dashboard';
+      }
       return NextResponse.redirect(url);
     }
   }
 
-  // Admin/dealer/lender portals — redirect to /login
-  if (
-    pathname.startsWith('/admin') ||
-    pathname.startsWith('/dealer') ||
-    pathname.startsWith('/lender')
-  ) {
+  // Protected routes — redirect to /auth/login if not authenticated
+  if (pathname.startsWith('/dashboard')) {
     if (!user) {
       const url = request.nextUrl.clone();
-      url.pathname = '/login';
-      url.searchParams.set('redirect', pathname);
+      url.pathname = '/auth/login';
+      url.searchParams.set('redirectTo', pathname);
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // Admin portal — requires admin role
+  if (pathname.startsWith('/admin')) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/auth/login';
+      url.searchParams.set('redirectTo', pathname);
+      return NextResponse.redirect(url);
+    }
+    if (userRole !== 'admin') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // Lender portal — requires lender role
+  if (pathname.startsWith('/lender')) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/auth/login';
+      url.searchParams.set('redirectTo', pathname);
+      return NextResponse.redirect(url);
+    }
+    if (userRole !== 'lender' && userRole !== 'admin') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // Dealer portal — requires dealer role
+  if (pathname.startsWith('/dealer')) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/auth/login';
+      url.searchParams.set('redirectTo', pathname);
+      return NextResponse.redirect(url);
+    }
+    if (userRole !== 'dealer' && userRole !== 'admin') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/';
       return NextResponse.redirect(url);
     }
   }
