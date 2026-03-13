@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS applications (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   lenders_submitted INT DEFAULT 0,
   offers_received INT DEFAULT 0,
-  flags TEXT[] DEFAULT '{}'
+  flags TEXT[] DEFAULT '{}',
+  session_token TEXT UNIQUE,
+  session_expires_at TIMESTAMPTZ
 );
 
 -- Offers table
@@ -143,12 +145,27 @@ CREATE TABLE IF NOT EXISTS compliance_alerts (
   resolved BOOLEAN DEFAULT FALSE
 );
 
+-- Notifications table
+CREATE SEQUENCE IF NOT EXISTS notif_seq START 1;
+CREATE TABLE IF NOT EXISTS notifications (
+  id TEXT PRIMARY KEY DEFAULT ('NOTIF-' || lpad(nextval('notif_seq')::TEXT, 5, '0')),
+  user_id UUID REFERENCES users(id),
+  type TEXT NOT NULL CHECK (type IN ('new_application', 'offer_ready', 'offer_selected', 'document_requested', 'deal_funded', 'system')),
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  data JSONB DEFAULT '{}'
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
 CREATE INDEX IF NOT EXISTS idx_applications_state ON applications(state);
 CREATE INDEX IF NOT EXISTS idx_offers_application_id ON offers(application_id);
 CREATE INDEX IF NOT EXISTS idx_deals_dealer_id ON deals(dealer_id);
 CREATE INDEX IF NOT EXISTS idx_deals_application_id ON deals(application_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(read);
 
 -- Row Level Security
 ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
@@ -157,6 +174,7 @@ ALTER TABLE deals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE lenders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dealers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
 -- Allow service role full access (API routes use service role key)
 CREATE POLICY "Service role full access" ON applications FOR ALL USING (true) WITH CHECK (true);
@@ -165,3 +183,4 @@ CREATE POLICY "Service role full access" ON deals FOR ALL USING (true) WITH CHEC
 CREATE POLICY "Service role full access" ON users FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access" ON lenders FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access" ON dealers FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access" ON notifications FOR ALL USING (true) WITH CHECK (true);
