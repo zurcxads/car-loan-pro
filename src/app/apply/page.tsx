@@ -13,7 +13,7 @@ import type {
   ResidenceType, EmploymentStatus, IncomeType,
 } from '@/lib/types';
 
-const STEP_NAMES = ['Personal Info', 'Address', 'Employment', 'Vehicle', 'Deal Structure', 'Co-Borrower', 'Consent'];
+const STEP_NAMES = ['Personal Info', 'Address', 'Employment', 'Credit Consent', 'Co-Borrower', 'Review', 'Vehicle (Optional)'];
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
@@ -87,6 +87,26 @@ export default function ApplyPage() {
   const [hasCoBorrower, setHasCoBorrower] = useState(false);
   const [coPersonal, setCoPersonal] = useState<BorrowerPersonalInfo>({ firstName: '', lastName: '', ssn: '', dob: '', email: '', phone: '' });
   const [consent, setConsent] = useState<ConsentInfo>({ softPullConsent: false, hardPullConsent: false, tcpaConsent: false, termsOfService: false, privacyPolicy: false, eSignConsent: false });
+  const [skipVehicle, setSkipVehicle] = useState(false);
+  const [emailVerified] = useState(false); // setEmailVerified will be used for OTP verification later
+  const [phoneVerified] = useState(false); // setPhoneVerified will be used for OTP verification later
+
+  // Format SSN as user types
+  const formatSSN = (value: string) => {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5, 9)}`;
+  };
+
+  const validateSSN = (ssn: string): boolean => {
+    const digits = ssn.replace(/\D/g, '');
+    if (digits.length !== 9) return false;
+    // Basic validation: no all-zeros, no starting with 9, no sequential
+    if (digits === '000000000') return false;
+    if (digits.startsWith('9')) return false;
+    return true;
+  };
 
   // Load saved data on mount
   useEffect(() => {
@@ -164,6 +184,7 @@ export default function ApplyPage() {
   const validate = (): boolean => {
     const e: Record<string, string> = {};
     if (step === 0) {
+      // Personal Info
       if (!personal.firstName.trim()) e.firstName = 'Required';
       if (!personal.lastName.trim()) e.lastName = 'Required';
       if (!personal.ssn || personal.ssn.replace(/\D/g, '').length !== 9) e.ssn = 'Valid SSN required';
@@ -171,22 +192,32 @@ export default function ApplyPage() {
       if (!personal.email.includes('@')) e.email = 'Valid email required';
       if (!personal.phone || personal.phone.replace(/\D/g, '').length < 10) e.phone = 'Valid phone required';
     } else if (step === 1) {
+      // Address
       if (!address.currentAddressLine1.trim()) e.address1 = 'Required';
       if (!address.currentCity.trim()) e.city = 'Required';
       if (!address.currentState) e.state = 'Required';
       if (!address.currentZip || address.currentZip.length < 5) e.zip = 'Valid ZIP required';
     } else if (step === 2) {
+      // Employment & Income
       if (!employment.grossMonthlyIncome || employment.grossMonthlyIncome <= 0) e.income = 'Required';
     } else if (step === 3) {
-      if (!vehicle.make) e.make = 'Required';
-      if (!vehicle.model.trim()) e.model = 'Required';
-      if (!vehicle.askingPrice || vehicle.askingPrice <= 0) e.price = 'Required';
-    } else if (step === 6) {
-      if (!consent.termsOfService) e.terms = 'Required';
+      // Credit Consent
       if (!consent.softPullConsent) e.soft = 'Required';
       if (!consent.hardPullConsent) e.creditCheck = 'Required';
+    } else if (step === 4) {
+      // Co-Borrower (optional, no required validation)
+    } else if (step === 5) {
+      // Review & Submit
+      if (!consent.termsOfService) e.terms = 'Required';
       if (!consent.tcpaConsent) e.tcpa = 'Required';
       if (!consent.eSignConsent) e.esign = 'Required';
+    } else if (step === 6) {
+      // Vehicle Info (optional)
+      if (!skipVehicle) {
+        if (!vehicle.make) e.make = 'Required';
+        if (!vehicle.model?.trim()) e.model = 'Required';
+        if (!vehicle.askingPrice || vehicle.askingPrice <= 0) e.price = 'Required';
+      }
     }
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -195,15 +226,22 @@ export default function ApplyPage() {
   const next = () => { if (validate()) setStep(s => Math.min(s + 1, 6)); };
   const back = () => setStep(s => Math.max(s - 1, 0));
 
+  const skipVehicleStep = () => {
+    setSkipVehicle(true);
+    submit();
+  };
+
   const submit = async () => {
     if (!validate()) return;
     setSubmitting(true);
+
+    const hasVehicle = !skipVehicle && !!vehicle.make && !!vehicle.askingPrice;
 
     const payload = {
       personalInfo: personal,
       addressInfo: address,
       employmentInfo: employment,
-      vehicleInfo: vehicle,
+      vehicleInfo: hasVehicle ? vehicle : undefined,
       dealStructure: deal,
       consent,
       hasCoBorrower,
@@ -223,7 +261,8 @@ export default function ApplyPage() {
       localStorage.setItem('clp_current_app_id', appData.id);
       localStorage.removeItem(STORAGE_KEY); // Clear saved draft
 
-      toast.success('Application submitted! Finding your best rates...');
+      const successMsg = hasVehicle ? 'Application submitted! Finding your best rates...' : 'Pre-approval submitted! Finding your best rates...';
+      toast.success(successMsg);
       setTimeout(() => router.push(`/dashboard?token=${appData.sessionToken}`), 2500);
     }
   };
@@ -323,7 +362,16 @@ export default function ApplyPage() {
                 </div>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <Field label="Suffix"><Select value={personal.suffix || ''} onChange={v => setPersonal(p => ({ ...p, suffix: v }))} options={[{ value: 'Jr', label: 'Jr.' }, { value: 'Sr', label: 'Sr.' }, { value: 'II', label: 'II' }, { value: 'III', label: 'III' }, { value: 'IV', label: 'IV' }]} placeholder="None" /></Field>
-                  <Field label="SSN *" error={errors.ssn}><Input value={personal.ssn} onChange={v => setPersonal(p => ({ ...p, ssn: v }))} placeholder="###-##-####" maxLength={11} error={!!errors.ssn} /></Field>
+                  <Field label="SSN *" error={errors.ssn}>
+                    <Input
+                      value={personal.ssn}
+                      onChange={v => setPersonal(p => ({ ...p, ssn: formatSSN(v) }))}
+                      placeholder="###-##-####"
+                      maxLength={11}
+                      error={!!errors.ssn}
+                    />
+                    {personal.ssn && !validateSSN(personal.ssn) && <p className="text-xs text-amber-600 mt-1">Enter a valid 9-digit SSN</p>}
+                  </Field>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-5">
                   <Field label="Date of Birth *" error={errors.dob}><Input type="date" value={personal.dob} onChange={v => setPersonal(p => ({ ...p, dob: v }))} error={!!errors.dob} /></Field>
@@ -334,8 +382,36 @@ export default function ApplyPage() {
                   <Field label="DL State"><Select value={personal.driversLicenseState || ''} onChange={v => setPersonal(p => ({ ...p, driversLicenseState: v }))} options={US_STATES} placeholder="Select state" /></Field>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-5">
-                  <Field label="Email *" error={errors.email}><Input type="email" value={personal.email} onChange={v => setPersonal(p => ({ ...p, email: v }))} error={!!errors.email} /></Field>
-                  <Field label="Phone *" error={errors.phone}><Input type="tel" value={personal.phone} onChange={v => setPersonal(p => ({ ...p, phone: v }))} placeholder="(555) 123-4567" error={!!errors.phone} /></Field>
+                  <Field label="Email *" error={errors.email}>
+                    <div className="relative">
+                      <Input type="email" value={personal.email} onChange={v => setPersonal(p => ({ ...p, email: v }))} error={!!errors.email} />
+                      {emailVerified && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <div className="flex items-center gap-1 text-xs text-green-600">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">We&apos;ll send a verification code (coming soon)</p>
+                  </Field>
+                  <Field label="Phone *" error={errors.phone}>
+                    <div className="relative">
+                      <Input type="tel" value={personal.phone} onChange={v => setPersonal(p => ({ ...p, phone: v }))} placeholder="(555) 123-4567" error={!!errors.phone} />
+                      {phoneVerified && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <div className="flex items-center gap-1 text-xs text-green-600">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">We&apos;ll send an SMS code (coming soon)</p>
+                  </Field>
                 </div>
               </div>
             )}
@@ -400,100 +476,14 @@ export default function ApplyPage() {
               </div>
             )}
 
+
             {step === 3 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Vehicle Information</h2>
-                <div className="grid sm:grid-cols-2 gap-5">
-                  <Field label="Application Type"><Select value={vehicle.applicationType} onChange={v => setVehicle(ve => ({ ...ve, applicationType: v as ApplicationType }))} options={[{ value: 'new_vehicle', label: 'New Vehicle' }, { value: 'used_vehicle', label: 'Used Vehicle' }, { value: 'refinance', label: 'Refinance' }, { value: 'private_party', label: 'Private Party' }]} /></Field>
-                  <Field label="Condition"><Select value={vehicle.vehicleCondition} onChange={v => setVehicle(ve => ({ ...ve, vehicleCondition: v as VehicleCondition }))} options={[{ value: 'new', label: 'New' }, { value: 'used', label: 'Used' }, { value: 'certified_pre_owned', label: 'Certified Pre-Owned' }]} /></Field>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
-                  <Field label="Year"><Input type="number" value={String(vehicle.year)} onChange={v => setVehicle(ve => ({ ...ve, year: Number(v) }))} /></Field>
-                  <Field label="Make *" error={errors.make}><Select value={vehicle.make} onChange={v => setVehicle(ve => ({ ...ve, make: v }))} options={POPULAR_MAKES.map(m => ({ value: m, label: m }))} placeholder="Select" error={!!errors.make} /></Field>
-                  <Field label="Model *" error={errors.model}><Input value={vehicle.model} onChange={v => setVehicle(ve => ({ ...ve, model: v }))} placeholder="e.g. Camry" error={!!errors.model} /></Field>
-                  <Field label="Trim"><Input value={vehicle.trim || ''} onChange={v => setVehicle(ve => ({ ...ve, trim: v }))} placeholder="e.g. LE" /></Field>
-                </div>
-                <div className="grid sm:grid-cols-2 gap-5">
-                  <Field label="VIN (optional)"><Input value={vehicle.vin || ''} onChange={v => setVehicle(ve => ({ ...ve, vin: v }))} placeholder="17-character VIN" maxLength={17} /></Field>
-                  <Field label="Asking Price *" error={errors.price}><Input type="number" value={vehicle.askingPrice ? String(vehicle.askingPrice) : ''} onChange={v => setVehicle(ve => ({ ...ve, askingPrice: Number(v) }))} placeholder="30000" error={!!errors.price} /></Field>
-                </div>
-                {vehicle.vehicleCondition !== 'new' && <Field label="Mileage"><Input type="number" value={vehicle.mileage ? String(vehicle.mileage) : ''} onChange={v => setVehicle(ve => ({ ...ve, mileage: Number(v) }))} placeholder="45000" /></Field>}
-                <Toggle checked={vehicle.isPrivateParty} onChange={v => setVehicle(ve => ({ ...ve, isPrivateParty: v }))} label="Private party sale" />
-                {!vehicle.isPrivateParty && (
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <Field label="Dealer Name"><Input value={vehicle.dealerName || ''} onChange={v => setVehicle(ve => ({ ...ve, dealerName: v }))} /></Field>
-                    <Field label="Dealer ZIP"><Input value={vehicle.dealerZip || ''} onChange={v => setVehicle(ve => ({ ...ve, dealerZip: v }))} maxLength={5} /></Field>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {step === 4 && (
-              <div className="space-y-5">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Deal Structure</h2>
-                <div className="grid sm:grid-cols-2 gap-5">
-                  <Field label="Cash Down Payment ($)"><Input type="number" value={deal.cashDownPayment ? String(deal.cashDownPayment) : ''} onChange={v => setDeal(d => ({ ...d, cashDownPayment: Number(v) }))} placeholder="2000" /></Field>
-                  <Field label="Desired Term"><Select value={String(deal.desiredTermMonths)} onChange={v => setDeal(d => ({ ...d, desiredTermMonths: Number(v) as 36 | 48 | 60 | 72 | 84 }))} options={TERM_OPTIONS.map(t => ({ value: String(t.value), label: t.label }))} /></Field>
-                </div>
-                <Field label="Max Monthly Payment ($)"><Input type="number" value={deal.maxMonthlyPayment ? String(deal.maxMonthlyPayment) : ''} onChange={v => setDeal(d => ({ ...d, maxMonthlyPayment: Number(v) }))} placeholder="Optional" /></Field>
-                <Toggle checked={deal.hasTradeIn} onChange={v => setDeal(d => ({ ...d, hasTradeIn: v }))} label="I have a trade-in" />
-                {deal.hasTradeIn && (
-                  <div className="pt-5 space-y-5 border-t border-gray-200">
-                    <div className="grid sm:grid-cols-3 gap-5">
-                      <Field label="Trade-In Year"><Input type="number" value={deal.tradeInYear ? String(deal.tradeInYear) : ''} onChange={v => setDeal(d => ({ ...d, tradeInYear: Number(v) }))} /></Field>
-                      <Field label="Trade-In Make"><Input value={deal.tradeInMake || ''} onChange={v => setDeal(d => ({ ...d, tradeInMake: v }))} /></Field>
-                      <Field label="Trade-In Model"><Input value={deal.tradeInModel || ''} onChange={v => setDeal(d => ({ ...d, tradeInModel: v }))} /></Field>
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-5">
-                      <Field label="Trade-In VIN"><Input value={deal.tradeInVin || ''} onChange={v => setDeal(d => ({ ...d, tradeInVin: v }))} maxLength={17} /></Field>
-                      <Field label="Payoff Amount ($)"><Input type="number" value={deal.tradeInPayoffAmount ? String(deal.tradeInPayoffAmount) : ''} onChange={v => setDeal(d => ({ ...d, tradeInPayoffAmount: Number(v) }))} /></Field>
-                    </div>
-                  </div>
-                )}
-                <div className="flex flex-col gap-4 pt-2">
-                  <Toggle checked={deal.gapInsuranceInterest} onChange={v => setDeal(d => ({ ...d, gapInsuranceInterest: v }))} label="Interested in GAP insurance" />
-                  <Toggle checked={deal.extendedWarrantyInterest} onChange={v => setDeal(d => ({ ...d, extendedWarrantyInterest: v }))} label="Interested in extended warranty" />
-                </div>
-              </div>
-            )}
-
-            {step === 5 && (
-              <div className="space-y-5">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Co-Borrower</h2>
-                <Toggle checked={hasCoBorrower} onChange={v => setHasCoBorrower(v)} label="Add a co-borrower to strengthen your application" />
-                {hasCoBorrower ? (
-                  <div className="space-y-5 pt-4">
-                    <p className="text-xs text-gray-500">Adding a co-borrower with good credit can improve your approval odds and rate.</p>
-                    <div className="grid sm:grid-cols-2 gap-5">
-                      <Field label="First Name"><Input value={coPersonal.firstName} onChange={v => setCoPersonal(p => ({ ...p, firstName: v }))} /></Field>
-                      <Field label="Last Name"><Input value={coPersonal.lastName} onChange={v => setCoPersonal(p => ({ ...p, lastName: v }))} /></Field>
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-5">
-                      <Field label="SSN"><Input value={coPersonal.ssn} onChange={v => setCoPersonal(p => ({ ...p, ssn: v }))} placeholder="###-##-####" maxLength={11} /></Field>
-                      <Field label="Date of Birth"><Input type="date" value={coPersonal.dob} onChange={v => setCoPersonal(p => ({ ...p, dob: v }))} /></Field>
-                    </div>
-                    <div className="grid sm:grid-cols-2 gap-5">
-                      <Field label="Email"><Input type="email" value={coPersonal.email} onChange={v => setCoPersonal(p => ({ ...p, email: v }))} /></Field>
-                      <Field label="Phone"><Input type="tel" value={coPersonal.phone} onChange={v => setCoPersonal(p => ({ ...p, phone: v }))} /></Field>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="py-12 text-center text-sm text-gray-500">No co-borrower selected. You can proceed without one.</div>
-                )}
-              </div>
-            )}
-
-            {step === 6 && (
-              <div className="space-y-5">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Consent & Authorization</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Credit Authorization</h2>
+                <p className="text-sm text-gray-600 mb-6">
+                  To provide you with personalized offers, we need your authorization to check your credit. This will be a <strong>soft pull</strong> that won&apos;t affect your credit score.
+                </p>
                 <div className="space-y-5">
-                  <Checkbox
-                    checked={consent.termsOfService}
-                    onChange={v => setConsent(c => ({ ...c, termsOfService: v }))}
-                    label={<>I agree to the <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-500 underline">Terms of Service</Link> and <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-500 underline">Privacy Policy</Link></>}
-                  />
-                  {errors.terms && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
-
                   <Checkbox
                     checked={consent.softPullConsent}
                     onChange={v => setConsent(c => ({ ...c, softPullConsent: v }))}
@@ -507,6 +497,62 @@ export default function ApplyPage() {
                     label="I authorize a soft credit inquiry that will NOT affect my credit score. I understand this allows Auto Loan Pro to check my credit for pre-qualification purposes."
                   />
                   {errors.creditCheck && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+                    <div className="flex gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Why We Check Your Credit</h3>
+                        <p className="text-xs text-gray-600 leading-relaxed">
+                          We use a soft credit pull to match you with lenders who are likely to approve your application. This does NOT impact your credit score. Only when you select a specific offer and the lender performs final approval will there be a hard inquiry.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {step === 5 && (
+              <div className="space-y-5">
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Review & Submit</h2>
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
+                  <div>
+                    <h3 className="text-xs font-medium text-gray-500 mb-1">Applicant</h3>
+                    <p className="text-sm text-gray-900">{personal.firstName} {personal.lastName}</p>
+                    <p className="text-sm text-gray-600">{personal.email} • {personal.phone}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-medium text-gray-500 mb-1">Address</h3>
+                    <p className="text-sm text-gray-900">{address.currentAddressLine1}</p>
+                    <p className="text-sm text-gray-600">{address.currentCity}, {address.currentState} {address.currentZip}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-medium text-gray-500 mb-1">Income</h3>
+                    <p className="text-sm text-gray-900">${employment.grossMonthlyIncome.toLocaleString()} / month</p>
+                    {employment.employerName && <p className="text-sm text-gray-600">{employment.employerName}</p>}
+                  </div>
+                  {hasCoBorrower && (
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-500 mb-1">Co-Borrower</h3>
+                      <p className="text-sm text-gray-900">{coPersonal.firstName} {coPersonal.lastName}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-5 mt-6">
+                  <Checkbox
+                    checked={consent.termsOfService}
+                    onChange={v => setConsent(c => ({ ...c, termsOfService: v }))}
+                    label={<>I agree to the <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-500 underline">Terms of Service</Link> and <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-500 underline">Privacy Policy</Link></>}
+                  />
+                  {errors.terms && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
 
                   <Checkbox
                     checked={consent.tcpaConsent}
@@ -536,6 +582,111 @@ export default function ApplyPage() {
                 </div>
               </div>
             )}
+
+            {step === 4 && (
+              <div className="space-y-5">
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Co-Borrower (Optional)</h2>
+                <Toggle checked={hasCoBorrower} onChange={v => setHasCoBorrower(v)} label="Add a co-borrower to strengthen your application" />
+                {hasCoBorrower ? (
+                  <div className="space-y-5 pt-4">
+                    <p className="text-xs text-gray-500">Adding a co-borrower with good credit can improve your approval odds and rate.</p>
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <Field label="First Name"><Input value={coPersonal.firstName} onChange={v => setCoPersonal(p => ({ ...p, firstName: v }))} /></Field>
+                      <Field label="Last Name"><Input value={coPersonal.lastName} onChange={v => setCoPersonal(p => ({ ...p, lastName: v }))} /></Field>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <Field label="SSN"><Input value={coPersonal.ssn} onChange={v => setCoPersonal(p => ({ ...p, ssn: v }))} placeholder="###-##-####" maxLength={11} /></Field>
+                      <Field label="Date of Birth"><Input type="date" value={coPersonal.dob} onChange={v => setCoPersonal(p => ({ ...p, dob: v }))} /></Field>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <Field label="Email"><Input type="email" value={coPersonal.email} onChange={v => setCoPersonal(p => ({ ...p, email: v }))} /></Field>
+                      <Field label="Phone"><Input type="tel" value={coPersonal.phone} onChange={v => setCoPersonal(p => ({ ...p, phone: v }))} /></Field>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="py-12 text-center text-sm text-gray-500">No co-borrower selected. You can proceed without one.</div>
+                )}
+              </div>
+            )}
+
+            {step === 6 && (
+              <div className="space-y-5">
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-2">Vehicle Information (Optional)</h2>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Already found a vehicle? Add it here to get vehicle-specific offers. If you haven&apos;t found one yet, you can skip this step and receive a pre-approval amount.
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={skipVehicleStep}
+                      className="px-6 py-3 text-sm font-medium text-blue-600 bg-white border-2 border-blue-600 rounded-xl hover:bg-blue-50 transition-colors duration-200"
+                    >
+                      Skip - Get Pre-Approved
+                    </button>
+                    <button
+                      onClick={() => setSkipVehicle(false)}
+                      className="px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200"
+                    >
+                      I Have a Vehicle
+                    </button>
+                  </div>
+                </div>
+
+                {!skipVehicle && (
+                  <>
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <Field label="Application Type"><Select value={vehicle.applicationType || 'used_vehicle'} onChange={v => setVehicle(ve => ({ ...ve, applicationType: v as ApplicationType }))} options={[{ value: 'new_vehicle', label: 'New Vehicle' }, { value: 'used_vehicle', label: 'Used Vehicle' }, { value: 'refinance', label: 'Refinance' }, { value: 'private_party', label: 'Private Party' }]} /></Field>
+                      <Field label="Condition"><Select value={vehicle.vehicleCondition || 'used'} onChange={v => setVehicle(ve => ({ ...ve, vehicleCondition: v as VehicleCondition }))} options={[{ value: 'new', label: 'New' }, { value: 'used', label: 'Used' }, { value: 'certified_pre_owned', label: 'Certified Pre-Owned' }]} /></Field>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+                      <Field label="Year"><Input type="number" value={String(vehicle.year || new Date().getFullYear())} onChange={v => setVehicle(ve => ({ ...ve, year: Number(v) }))} /></Field>
+                      <Field label="Make *" error={errors.make}><Select value={vehicle.make || ''} onChange={v => setVehicle(ve => ({ ...ve, make: v }))} options={POPULAR_MAKES.map(m => ({ value: m, label: m }))} placeholder="Select" error={!!errors.make} /></Field>
+                      <Field label="Model *" error={errors.model}><Input value={vehicle.model || ''} onChange={v => setVehicle(ve => ({ ...ve, model: v }))} placeholder="e.g. Camry" error={!!errors.model} /></Field>
+                      <Field label="Trim"><Input value={vehicle.trim || ''} onChange={v => setVehicle(ve => ({ ...ve, trim: v }))} placeholder="e.g. LE" /></Field>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <Field label="VIN (optional)"><Input value={vehicle.vin || ''} onChange={v => setVehicle(ve => ({ ...ve, vin: v }))} placeholder="17-character VIN" maxLength={17} /></Field>
+                      <Field label="Asking Price *" error={errors.price}><Input type="number" value={vehicle.askingPrice ? String(vehicle.askingPrice) : ''} onChange={v => setVehicle(ve => ({ ...ve, askingPrice: Number(v) }))} placeholder="30000" error={!!errors.price} /></Field>
+                    </div>
+                    {vehicle.vehicleCondition !== 'new' && <Field label="Mileage"><Input type="number" value={vehicle.mileage ? String(vehicle.mileage) : ''} onChange={v => setVehicle(ve => ({ ...ve, mileage: Number(v) }))} placeholder="45000" /></Field>}
+                    <Toggle checked={vehicle.isPrivateParty || false} onChange={v => setVehicle(ve => ({ ...ve, isPrivateParty: v }))} label="Private party sale" />
+                    {!vehicle.isPrivateParty && (
+                      <div className="grid sm:grid-cols-2 gap-5">
+                        <Field label="Dealer Name"><Input value={vehicle.dealerName || ''} onChange={v => setVehicle(ve => ({ ...ve, dealerName: v }))} /></Field>
+                        <Field label="Dealer ZIP"><Input value={vehicle.dealerZip || ''} onChange={v => setVehicle(ve => ({ ...ve, dealerZip: v }))} maxLength={5} /></Field>
+                      </div>
+                    )}
+
+                    <div className="pt-6 border-t border-gray-200 space-y-5">
+                      <h3 className="text-sm font-medium text-gray-900">Deal Structure</h3>
+                      <div className="grid sm:grid-cols-2 gap-5">
+                        <Field label="Cash Down Payment ($)"><Input type="number" value={deal.cashDownPayment ? String(deal.cashDownPayment) : ''} onChange={v => setDeal(d => ({ ...d, cashDownPayment: Number(v) }))} placeholder="2000" /></Field>
+                        <Field label="Desired Term"><Select value={String(deal.desiredTermMonths)} onChange={v => setDeal(d => ({ ...d, desiredTermMonths: Number(v) as 36 | 48 | 60 | 72 | 84 }))} options={TERM_OPTIONS.map(t => ({ value: String(t.value), label: t.label }))} /></Field>
+                      </div>
+                      <Field label="Max Monthly Payment ($)"><Input type="number" value={deal.maxMonthlyPayment ? String(deal.maxMonthlyPayment) : ''} onChange={v => setDeal(d => ({ ...d, maxMonthlyPayment: Number(v) }))} placeholder="Optional" /></Field>
+                      <Toggle checked={deal.hasTradeIn || false} onChange={v => setDeal(d => ({ ...d, hasTradeIn: v }))} label="I have a trade-in" />
+                      {deal.hasTradeIn && (
+                        <div className="pt-5 space-y-5 border-t border-gray-200">
+                          <div className="grid sm:grid-cols-3 gap-5">
+                            <Field label="Trade-In Year"><Input type="number" value={deal.tradeInYear ? String(deal.tradeInYear) : ''} onChange={v => setDeal(d => ({ ...d, tradeInYear: Number(v) }))} /></Field>
+                            <Field label="Trade-In Make"><Input value={deal.tradeInMake || ''} onChange={v => setDeal(d => ({ ...d, tradeInMake: v }))} /></Field>
+                            <Field label="Trade-In Model"><Input value={deal.tradeInModel || ''} onChange={v => setDeal(d => ({ ...d, tradeInModel: v }))} /></Field>
+                          </div>
+                          <div className="grid sm:grid-cols-2 gap-5">
+                            <Field label="Trade-In VIN"><Input value={deal.tradeInVin || ''} onChange={v => setDeal(d => ({ ...d, tradeInVin: v }))} maxLength={17} /></Field>
+                            <Field label="Payoff Amount ($)"><Input type="number" value={deal.tradeInPayoffAmount ? String(deal.tradeInPayoffAmount) : ''} onChange={v => setDeal(d => ({ ...d, tradeInPayoffAmount: Number(v) }))} /></Field>
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex flex-col gap-4 pt-2">
+                        <Toggle checked={deal.gapInsuranceInterest || false} onChange={v => setDeal(d => ({ ...d, gapInsuranceInterest: v }))} label="Interested in GAP insurance" />
+                        <Toggle checked={deal.extendedWarrantyInterest || false} onChange={v => setDeal(d => ({ ...d, extendedWarrantyInterest: v }))} label="Interested in extended warranty" />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
 
@@ -543,11 +694,13 @@ export default function ApplyPage() {
           {step > 0 ? (
             <button onClick={back} className="px-6 py-3 text-sm text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-300 rounded-xl transition-colors duration-200 cursor-pointer">Back</button>
           ) : <div />}
-          {step < 6 ? (
-            <button onClick={next} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
-          ) : (
+          {step === 5 ? (
+            <button onClick={next} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue to Vehicle Info</button>
+          ) : step === 6 && !skipVehicle ? (
             <button onClick={submit} disabled={submitting} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
-          )}
+          ) : step < 5 ? (
+            <button onClick={next} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
+          ) : null}
         </div>
       </div>
     </div>

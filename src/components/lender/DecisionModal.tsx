@@ -111,7 +111,7 @@ export default function DecisionModal({ app, action, onClose }: Props) {
             <>
               <h3 className="text-lg font-semibold mb-1">{action === 'approve' ? 'Build Offer' : 'Counter Offer'} -- {app.id}</h3>
               {action === 'counter' && (
-                <p className="text-xs text-gray-500 mb-4">Original request: {formatCurrency(app.loanAmount)} at {app.dealStructure.requestedTerm} months</p>
+                <p className="text-xs text-gray-500 mb-4">Original request: {app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'} at {app.dealStructure.requestedTerm} months</p>
               )}
               <div className="space-y-4 mt-4">
                 <div>

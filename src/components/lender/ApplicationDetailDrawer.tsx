@@ -93,27 +93,37 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
             </Section>
 
             {/* Vehicle */}
-            <Section title="Vehicle">
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Vehicle" value={`${app.vehicle.year} ${app.vehicle.make} ${app.vehicle.model} ${app.vehicle.trim}`} />
-                <Field label="VIN" value={app.vehicle.vin} />
-                <Field label="Mileage" value={`${app.vehicle.mileage.toLocaleString()} mi`} />
-                <Field label="Condition" value={app.vehicle.condition} />
-                <Field label="Asking Price" value={formatCurrency(app.vehicle.askingPrice)} />
-                <Field label="Book Value" value={formatCurrency(app.vehicle.bookValue)} />
-                <Field label="Dealer" value={app.vehicle.dealerName} />
-              </div>
-            </Section>
+            {app.vehicle ? (
+              <Section title="Vehicle">
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Vehicle" value={`${app.vehicle.year} ${app.vehicle.make} ${app.vehicle.model} ${app.vehicle.trim || ''}`} />
+                  <Field label="VIN" value={app.vehicle.vin || 'N/A'} />
+                  <Field label="Mileage" value={`${app.vehicle.mileage?.toLocaleString() || 0} mi`} />
+                  <Field label="Condition" value={app.vehicle.condition || 'N/A'} />
+                  <Field label="Asking Price" value={formatCurrency(app.vehicle.askingPrice || 0)} />
+                  <Field label="Book Value" value={formatCurrency(app.vehicle.bookValue || 0)} />
+                  <Field label="Dealer" value={app.vehicle.dealerName || 'N/A'} />
+                </div>
+              </Section>
+            ) : (
+              <Section title="Pre-Approval">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-900">
+                    This is an income-based pre-approval. No vehicle has been selected yet.
+                  </p>
+                </div>
+              </Section>
+            )}
 
             {/* Deal Structure */}
             <Section title="Deal Structure">
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Sale Price" value={formatCurrency(app.dealStructure.salePrice)} />
-                <Field label="Down Payment" value={formatCurrency(app.dealStructure.downPayment)} />
+                <Field label="Sale Price" value={app.dealStructure.salePrice ? formatCurrency(app.dealStructure.salePrice) : 'N/A'} />
+                <Field label="Down Payment" value={app.dealStructure.downPayment ? formatCurrency(app.dealStructure.downPayment) : '$0'} />
                 <Field label="Trade-In" value={app.dealStructure.tradeInValue ? formatCurrency(app.dealStructure.tradeInValue) : 'None'} />
-                <Field label="Doc Fee" value={formatCurrency(app.dealStructure.docFee)} />
-                <Field label="Tax/Fees" value={formatCurrency(app.dealStructure.taxAndFees)} />
-                <Field label="Amount Financed" value={formatCurrency(app.dealStructure.totalAmountFinanced)} />
+                <Field label="Doc Fee" value={app.dealStructure.docFee ? formatCurrency(app.dealStructure.docFee) : 'N/A'} />
+                <Field label="Tax/Fees" value={app.dealStructure.taxAndFees ? formatCurrency(app.dealStructure.taxAndFees) : 'N/A'} />
+                <Field label="Amount Financed" value={app.dealStructure.totalAmountFinanced ? formatCurrency(app.dealStructure.totalAmountFinanced) : 'N/A'} />
                 <Field label="Requested Term" value={`${app.dealStructure.requestedTerm} months`} />
               </div>
             </Section>
@@ -124,11 +134,17 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
                 <div>
                   <span className="text-[10px] text-gray-400 block">LTV (max {lender.maxLtv}%)</span>
                   <div className="flex items-center gap-2">
-                    <span className={`text-sm font-semibold ${ltvColor(app.ltvPercent)}`}>{app.ltvPercent}%</span>
-                    {app.ltvPercent <= lender.maxLtv ? (
-                      <span className="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded">PASS</span>
+                    {app.ltvPercent ? (
+                      <>
+                        <span className={`text-sm font-semibold ${ltvColor(app.ltvPercent)}`}>{app.ltvPercent}%</span>
+                        {app.ltvPercent <= lender.maxLtv ? (
+                          <span className="text-[10px] text-green-600 bg-green-50 px-1.5 py-0.5 rounded">PASS</span>
+                        ) : (
+                          <span className="text-[10px] text-red-500 bg-red-50 px-1.5 py-0.5 rounded">FAIL</span>
+                        )}
+                      </>
                     ) : (
-                      <span className="text-[10px] text-red-500 bg-red-50 px-1.5 py-0.5 rounded">FAIL</span>
+                      <span className="text-sm text-gray-500">N/A (No vehicle)</span>
                     )}
                   </div>
                 </div>
@@ -145,7 +161,7 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
                 </div>
                 <div>
                   <span className="text-[10px] text-gray-400 block">PTI</span>
-                  <span className={`text-sm font-semibold ${ptiColor(app.ptiPercent)}`}>{app.ptiPercent}%</span>
+                  <span className={`text-sm font-semibold ${ptiColor(app.ptiPercent || 0)}`}>{app.ptiPercent ?? 'N/A'}{app.ptiPercent ? '%' : ''}</span>
                 </div>
                 <div>
                   <span className="text-[10px] text-gray-400 block">FICO (min {lender.minFico})</span>

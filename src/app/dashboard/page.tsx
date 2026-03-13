@@ -12,9 +12,15 @@ interface Application {
     firstName: string;
     lastName: string;
   };
-  loanAmount: number;
+  loanAmount?: number;
+  hasVehicle: boolean;
   offersReceived: number;
   submittedAt: string;
+  vehicle?: {
+    year: number;
+    make: string;
+    model: string;
+  };
 }
 
 function DashboardContent() {
@@ -128,12 +134,26 @@ function DashboardContent() {
                 </span>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-500 mb-1">Loan Amount</div>
+                <div className="text-sm text-gray-500 mb-1">{application.hasVehicle ? 'Loan Amount' : 'Pre-Approval Type'}</div>
                 <div className="text-xl font-bold text-gray-900">
-                  ${application.loanAmount.toLocaleString()}
+                  {application.hasVehicle && application.loanAmount
+                    ? `$${application.loanAmount.toLocaleString()}`
+                    : 'Income-Based'}
                 </div>
               </div>
             </div>
+            {application.vehicle && (
+              <div className="text-xs text-gray-600 mb-2">
+                {application.vehicle.year} {application.vehicle.make} {application.vehicle.model}
+              </div>
+            )}
+            {!application.hasVehicle && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                <p className="text-xs text-blue-900">
+                  <strong>Pre-Approved!</strong> Your offers show the maximum amount you qualify for based on your income and credit. Once you find a vehicle, we&apos;ll finalize your approval.
+                </p>
+              </div>
+            )}
             <div className="text-xs text-gray-400">
               Submitted on {new Date(application.submittedAt).toLocaleDateString()}
             </div>
@@ -210,9 +230,33 @@ function DashboardContent() {
                   </svg>
                 </div>
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-1">Approval Letter</h3>
-              <p className="text-sm text-gray-500">Download your pre-approval letter</p>
+              <h3 className="text-base font-semibold text-gray-900 mb-1">
+                {application.hasVehicle ? 'Approval Letter' : 'Pre-Approval Letter'}
+              </h3>
+              <p className="text-sm text-gray-500">
+                {application.hasVehicle
+                  ? 'Download your approval letter'
+                  : 'Present this at any participating dealer'}
+              </p>
             </Link>
+
+            {/* Add Vehicle (if pre-approval without vehicle) */}
+            {!application.hasVehicle && (
+              <Link
+                href={`/dashboard/add-vehicle?token=${token}`}
+                className="block bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl border border-blue-600 p-6 hover:from-blue-500 hover:to-blue-600 hover:shadow-lg transition-all group"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-base font-semibold text-white mb-1">Add Vehicle Info</h3>
+                <p className="text-sm text-blue-100">Found a vehicle? Add it here to finalize your loan</p>
+              </Link>
+            )}
           </div>
 
           {/* Help Section */}

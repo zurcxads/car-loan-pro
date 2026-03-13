@@ -44,11 +44,11 @@ export default function DealFinalization({ selectedBuyer }: Props) {
   const offer = selectedBuyer ? MOCK_OFFERS.find(o => o.applicationId === selectedBuyer.id) : null;
 
   useEffect(() => {
-    if (selectedBuyer) {
-      setSalePrice(String(selectedBuyer.vehicle.askingPrice));
-      setCashDown(String(selectedBuyer.dealStructure.downPayment));
+    if (selectedBuyer && selectedBuyer.vehicle) {
+      setSalePrice(String(selectedBuyer.vehicle.askingPrice || 0));
+      setCashDown(String(selectedBuyer.dealStructure.downPayment || 0));
       // Auto-compute sales tax at ~6.25%
-      setSalesTax(String(Math.round(selectedBuyer.vehicle.askingPrice * 0.0625)));
+      setSalesTax(String(Math.round((selectedBuyer.vehicle.askingPrice || 0) * 0.0625)));
     }
   }, [selectedBuyer]);
 
@@ -112,7 +112,10 @@ export default function DealFinalization({ selectedBuyer }: Props) {
     <div className="max-w-4xl">
       <div className="mb-6">
         <h2 className="text-lg font-semibold mb-1">Finalize Deal</h2>
-        <p className="text-xs text-gray-500">{selectedBuyer.borrower.firstName} {selectedBuyer.borrower.lastName.charAt(0)}. -- {selectedBuyer.vehicle.year} {selectedBuyer.vehicle.make} {selectedBuyer.vehicle.model}</p>
+        <p className="text-xs text-gray-500">
+          {selectedBuyer.borrower.firstName} {selectedBuyer.borrower.lastName.charAt(0)}.
+          {selectedBuyer.vehicle && ` -- ${selectedBuyer.vehicle.year} ${selectedBuyer.vehicle.make} ${selectedBuyer.vehicle.model}`}
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

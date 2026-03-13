@@ -16,7 +16,7 @@ export default function BuyerCard({ app, invited, onInvite, onViewDetails }: Buy
   const offers = MOCK_OFFERS.filter(o => o.applicationId === app.id);
   const minRate = offers.length > 0 ? Math.min(...offers.map(o => o.apr)) : 0;
   const maxRate = offers.length > 0 ? Math.max(...offers.map(o => o.apr)) : 0;
-  const maxApproval = offers.length > 0 ? Math.max(...offers.map(o => o.approvedAmount)) : app.loanAmount;
+  const maxApproval = offers.length > 0 ? Math.max(...offers.map(o => o.approvedAmount)) : (app.loanAmount || 0);
   const minTerm = offers.length > 0 ? Math.min(...offers.map(o => o.termMonths)) : 60;
   const maxTerm = offers.length > 0 ? Math.max(...offers.map(o => o.termMonths)) : 60;
   const expiry = offers.length > 0 ? daysUntil(offers[0].expiresAt) : 30;
@@ -56,10 +56,17 @@ export default function BuyerCard({ app, invited, onInvite, onViewDetails }: Buy
         {app.borrower.zip} ({app.borrower.city} area)
       </div>
 
-      {app.vehicle.make && (
+      {app.vehicle?.make && (
         <div className="flex items-center gap-2 mb-4 text-xs text-gray-500">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" /></svg>
           Looking for: {app.vehicle.year} {app.vehicle.make} {app.vehicle.model}
+        </div>
+      )}
+
+      {!app.hasVehicle && (
+        <div className="flex items-center gap-2 mb-4 text-xs bg-blue-50 text-blue-700 px-3 py-2 rounded-lg">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          Pre-approved - No vehicle selected yet
         </div>
       )}
 

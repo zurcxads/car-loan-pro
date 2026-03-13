@@ -30,14 +30,26 @@ export async function POST(req: NextRequest) {
     // Generate credit profile
     const credit = generateCreditProfile();
 
+    // Check if vehicle info was provided
+    const hasVehicle = !!(data.vehicleInfo?.make && data.vehicleInfo?.askingPrice);
+
     // Calculate loan metrics
-    const loanAmount = data.vehicleInfo.askingPrice - data.dealStructure.cashDownPayment;
-    const ltvPercent = Math.round((loanAmount / data.vehicleInfo.askingPrice) * 100);
+    let loanAmount: number | undefined;
+    let ltvPercent: number | undefined;
+    let ptiPercent: number | undefined;
+
+    if (hasVehicle && data.vehicleInfo?.askingPrice) {
+      const downPayment = data.dealStructure.cashDownPayment || 0;
+      loanAmount = data.vehicleInfo.askingPrice - downPayment;
+      ltvPercent = Math.round((loanAmount / data.vehicleInfo.askingPrice) * 100);
+
+      const monthlyRate = 5 / 100 / 12; // estimate 5% APR
+      const estPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, data.dealStructure.desiredTermMonths)) /
+        (Math.pow(1 + monthlyRate, data.dealStructure.desiredTermMonths) - 1);
+      ptiPercent = Math.round((estPayment / data.employmentInfo.grossMonthlyIncome) * 100);
+    }
+
     const dtiPercent = Math.round((credit.totalMonthlyObligations / data.employmentInfo.grossMonthlyIncome) * 100);
-    const monthlyRate = 5 / 100 / 12; // estimate 5% APR
-    const estPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, data.dealStructure.desiredTermMonths)) /
-      (Math.pow(1 + monthlyRate, data.dealStructure.desiredTermMonths) - 1);
-    const ptiPercent = Math.round((estPayment / data.employmentInfo.grossMonthlyIncome) * 100);
 
     const appData: Partial<MockApplication> = {
       borrower: {
@@ -72,25 +84,25 @@ export async function POST(req: NextRequest) {
         hasRepo: credit.hasRepo,
         hasBankruptcy: credit.hasBankruptcy,
       },
-      vehicle: {
-        year: data.vehicleInfo.year,
-        make: data.vehicleInfo.make,
-        model: data.vehicleInfo.model,
+      vehicle: hasVehicle && data.vehicleInfo ? {
+        year: data.vehicleInfo.year || new Date().getFullYear(),
+        make: data.vehicleInfo.make || '',
+        model: data.vehicleInfo.model || '',
         trim: data.vehicleInfo.trim || '',
         vin: data.vehicleInfo.vin || '',
         mileage: data.vehicleInfo.mileage || 0,
-        condition: data.vehicleInfo.vehicleCondition,
-        bookValue: data.vehicleInfo.askingPrice,
-        askingPrice: data.vehicleInfo.askingPrice,
+        condition: data.vehicleInfo.vehicleCondition || 'used',
+        bookValue: data.vehicleInfo.askingPrice || 0,
+        askingPrice: data.vehicleInfo.askingPrice || 0,
         dealerName: data.vehicleInfo.dealerName || '',
-      },
+      } : undefined,
       dealStructure: {
-        salePrice: data.vehicleInfo.askingPrice,
-        downPayment: data.dealStructure.cashDownPayment,
+        salePrice: hasVehicle && data.vehicleInfo?.askingPrice ? data.vehicleInfo.askingPrice : undefined,
+        downPayment: data.dealStructure.cashDownPayment || 0,
         tradeInValue: 0,
         tradeInPayoff: data.dealStructure.tradeInPayoffAmount || 0,
-        docFee: 499,
-        taxAndFees: Math.round(data.vehicleInfo.askingPrice * 0.065),
+        docFee: hasVehicle ? 499 : undefined,
+        taxAndFees: hasVehicle && data.vehicleInfo?.askingPrice ? Math.round(data.vehicleInfo.askingPrice * 0.065) : undefined,
         totalAmountFinanced: loanAmount,
         requestedTerm: data.dealStructure.desiredTermMonths,
       },
@@ -98,6 +110,7 @@ export async function POST(req: NextRequest) {
       ltvPercent,
       dtiPercent,
       ptiPercent,
+      hasVehicle,
       status: 'pending_decision',
       state: data.addressInfo.currentState,
       submittedAt: new Date().toISOString(),

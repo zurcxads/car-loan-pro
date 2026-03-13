@@ -37,7 +37,7 @@ export default function BuyerInbox({ onStartDeal }: BuyerInboxProps) {
     }
 
     switch (sort) {
-      case 'amount': return apps.sort((a, b) => b.loanAmount - a.loanAmount);
+      case 'amount': return apps.sort((a, b) => (b.loanAmount || 0) - (a.loanAmount || 0));
       case 'expiring': return apps.sort((a, b) => new Date(a.submittedAt).getTime() - new Date(b.submittedAt).getTime());
       default: return apps.sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());
     }
@@ -100,14 +100,23 @@ export default function BuyerInbox({ onStartDeal }: BuyerInboxProps) {
               </div>
               <div className="p-6 space-y-6">
                 <div>
-                  <span className="text-[10px] text-gray-500 uppercase tracking-wider">Approval Amount</span>
-                  <div className="text-2xl font-bold text-blue-600">{formatCurrency(detailApp.loanAmount)}</div>
+                  <span className="text-[10px] text-gray-500 uppercase tracking-wider">{detailApp.hasVehicle ? 'Approval Amount' : 'Pre-Approved Up To'}</span>
+                  <div className="text-2xl font-bold text-blue-600">{detailApp.loanAmount ? formatCurrency(detailApp.loanAmount) : 'See Offers'}</div>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div><span className="text-[10px] text-gray-500 block">Credit Tier</span><StatusBadge status={detailApp.credit.scoreTier === 'prime' ? 'prime' : detailApp.credit.scoreTier === 'near_prime' ? 'near_prime' : 'subprime'} /></div>
                   <div><span className="text-[10px] text-gray-500 block">Location</span><span className="font-medium">{detailApp.borrower.city}, {detailApp.borrower.state}</span></div>
-                  <div><span className="text-[10px] text-gray-500 block">Vehicle</span><span className="font-medium">{detailApp.vehicle.year} {detailApp.vehicle.make} {detailApp.vehicle.model}</span></div>
-                  <div><span className="text-[10px] text-gray-500 block">Condition</span><span className="font-medium capitalize">{detailApp.vehicle.condition}</span></div>
+                  {detailApp.vehicle && (
+                    <>
+                      <div><span className="text-[10px] text-gray-500 block">Vehicle</span><span className="font-medium">{detailApp.vehicle.year} {detailApp.vehicle.make} {detailApp.vehicle.model}</span></div>
+                      <div><span className="text-[10px] text-gray-500 block">Condition</span><span className="font-medium capitalize">{detailApp.vehicle.condition}</span></div>
+                    </>
+                  )}
+                  {!detailApp.hasVehicle && (
+                    <div className="col-span-2 bg-blue-50 text-blue-700 text-xs px-3 py-2 rounded-lg">
+                      Pre-approved - No specific vehicle selected yet
+                    </div>
+                  )}
                 </div>
 
                 {/* Offers */}

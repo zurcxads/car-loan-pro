@@ -61,6 +61,25 @@
 
 ---
 
+## 🧠 CORE PRODUCT VISION (Updated March 13)
+
+**Auto Loan Pro is a pre-approval platform, not a vehicle purchase platform.**
+- Consumer applies based on WHO THEY ARE (income, credit, employment) — vehicle is optional
+- Pre-approved with a dollar amount + rate range = "blank check"
+- Two monetization paths:
+  1. **Lender referral fees** — lenders pay us when loans fund
+  2. **Dealer lead fees** — pre-approved consumers are premium leads, sold to dealer network
+- Vehicle info is optional (moved to end of form, skippable)
+- A pre-approved consumer is the product — worth more than raw leads because financing is done
+
+## 📋 UPCOMING (Queued)
+
+- [ ] **Contact field verification** — phone (SMS OTP), email (verification link), SSN format validation, no fake data
+- [ ] **Dealer network funnel** — after pre-approval, route consumers to preferred dealers in their area
+- [ ] **Lead distribution system** — package pre-approved consumers as leads, sell to dealer network
+
+---
+
 ## 🔮 FUTURE PHASES
 
 ### Phase 4 — Production Readiness

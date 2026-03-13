@@ -84,9 +84,9 @@ export default function ApplicationQueue() {
     }),
     columnHelper.accessor('loanAmount', {
       header: 'Loan Amount',
-      cell: info => <span className="text-sm">{formatCurrency(info.getValue())}</span>,
+      cell: info => <span className="text-sm">{info.getValue() ? formatCurrency(info.getValue()!) : 'Pre-Approval'}</span>,
     }),
-    columnHelper.accessor(row => `${row.vehicle.year} ${row.vehicle.make} ${row.vehicle.model}`, {
+    columnHelper.accessor(row => row.vehicle ? `${row.vehicle.year} ${row.vehicle.make} ${row.vehicle.model}` : 'No vehicle', {
       id: 'vehicle',
       header: 'Vehicle',
       cell: info => <span className="text-sm text-gray-500">{truncate(info.getValue(), 25)}</span>,
@@ -94,7 +94,7 @@ export default function ApplicationQueue() {
     }),
     columnHelper.accessor('ltvPercent', {
       header: 'LTV',
-      cell: info => <span className={`font-semibold text-sm ${ltvColor(info.getValue())}`}>{info.getValue()}%</span>,
+      cell: info => <span className={`font-semibold text-sm ${ltvColor(info.getValue() || 0)}`}>{info.getValue() ?? 'N/A'}{info.getValue() ? '%' : ''}</span>,
     }),
     columnHelper.accessor('dtiPercent', {
       header: 'DTI',
@@ -102,7 +102,7 @@ export default function ApplicationQueue() {
     }),
     columnHelper.accessor('ptiPercent', {
       header: 'PTI',
-      cell: info => <span className={`font-semibold text-sm ${ptiColor(info.getValue())}`}>{info.getValue()}%</span>,
+      cell: info => <span className={`font-semibold text-sm ${ptiColor(info.getValue() || 0)}`}>{info.getValue() ?? 'N/A'}{info.getValue() ? '%' : ''}</span>,
     }),
     columnHelper.accessor('submittedAt', {
       header: 'Submitted',

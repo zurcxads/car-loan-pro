@@ -28,7 +28,11 @@ export async function GET(
       const dti = app.dtiPercent || 0;
       const pti = app.ptiPercent || 0;
       const loanAmount = app.loanAmount || 0;
-      const vehicleAge = new Date().getFullYear() - app.vehicle.year;
+
+      // Only applications with vehicle info can be matched for lender portal
+      if (!app.hasVehicle || !app.vehicle) return false;
+
+      const vehicleAge = new Date().getFullYear() - (app.vehicle.year || 0);
 
       // Check if application meets lender's criteria
       return (
@@ -39,7 +43,7 @@ export async function GET(
         loanAmount >= lender.minLoanAmount &&
         loanAmount <= lender.maxLoanAmount &&
         vehicleAge <= lender.maxVehicleAge &&
-        app.vehicle.mileage <= lender.maxMileage &&
+        (app.vehicle.mileage || 0) <= lender.maxMileage &&
         (lender.statesActive.includes('All 50') || lender.statesActive.includes(app.state))
       );
     });

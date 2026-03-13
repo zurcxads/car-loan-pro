@@ -32,7 +32,7 @@ function KanbanCard({ app }: { app: MockApplication }) {
       </div>
       <div className="text-sm font-medium mb-1">{app.borrower.firstName} {app.borrower.lastName.charAt(0)}.</div>
       <div className="flex items-center justify-between text-xs">
-        <span className="text-gray-500">{formatCurrency(app.loanAmount)}</span>
+        <span className="text-gray-500">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</span>
         <span className={`font-semibold ${ficoColor(app.credit.ficoScore)}`}>{app.credit.ficoScore ?? 'N/A'}</span>
       </div>
     </div>
@@ -51,8 +51,8 @@ export default function Pipeline() {
     const rows = funded.map(a => [
       a.id,
       `${a.borrower.firstName} ${a.borrower.lastName}`,
-      `${a.vehicle.year} ${a.vehicle.make} ${a.vehicle.model}`,
-      a.loanAmount.toString(),
+      a.vehicle ? `${a.vehicle.year} ${a.vehicle.make} ${a.vehicle.model}` : 'Pre-Approval',
+      a.loanAmount?.toString() || '0',
       '300',
     ]);
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -115,8 +115,8 @@ export default function Pipeline() {
                     <tr key={app.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                       <td className="py-4 px-5 font-mono text-xs text-gray-500">{app.id}</td>
                       <td className="py-4 px-5 font-medium">{app.borrower.firstName} {app.borrower.lastName.charAt(0)}.</td>
-                      <td className="py-4 px-5 text-gray-500">{app.vehicle.year} {app.vehicle.make} {app.vehicle.model}</td>
-                      <td className="py-4 px-5">{formatCurrency(app.loanAmount)}</td>
+                      <td className="py-4 px-5 text-gray-500">{app.vehicle ? `${app.vehicle.year} ${app.vehicle.make} ${app.vehicle.model}` : 'Pre-Approval'}</td>
+                      <td className="py-4 px-5">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</td>
                       <td className={`py-4 px-5 font-semibold ${ficoColor(app.credit.ficoScore)}`}>{app.credit.ficoScore ?? 'N/A'}</td>
                       <td className="py-4 px-5"><StatusBadge status={app.status} /></td>
                       <td className="py-4 px-5 text-gray-500">{days}d</td>

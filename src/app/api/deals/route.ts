@@ -23,13 +23,14 @@ export async function POST(req: NextRequest) {
   try {
     const app = await dbGetApplication(data.applicationId);
     if (!app) return apiError('Application not found', 404);
+    if (!app.vehicle) return apiError('Application must have vehicle information to create a deal', 400);
 
     const deal = await dbCreateDeal({
       applicationId: data.applicationId,
       dealerId: data.dealerId,
       buyerFirstName: app.borrower.firstName,
       buyerLastInitial: app.borrower.lastName[0],
-      vehicle: `${app.vehicle.year} ${app.vehicle.make} ${app.vehicle.model} ${app.vehicle.trim}`,
+      vehicle: `${app.vehicle.year} ${app.vehicle.make} ${app.vehicle.model} ${app.vehicle.trim || ''}`.trim(),
       vin: data.vin,
       lenderName: 'Selected Lender',
       amount: data.salePrice - data.downPayment,

@@ -16,6 +16,7 @@ export interface GeneratedOffer {
   termMonths: number;
   monthlyPayment: number;
   approvedAmount: number;
+  maxApprovedAmount?: number; // For no-vehicle pre-approvals
   status: 'approved' | 'conditional' | 'declined';
   conditions: string[];
 }
@@ -70,52 +71,15 @@ export async function matchLendersAndGenerateOffers(application: MockApplication
  */
 function checkLenderEligibility(app: MockApplication, lender: MockLender): MatchResult {
   const ficoScore = app.credit.ficoScore || 0;
-  const vehicleAge = new Date().getFullYear() - app.vehicle.year;
 
   // Check FICO score
   if (ficoScore > 0 && ficoScore < lender.minFico) {
     return { matched: false, reason: `FICO ${ficoScore} below min ${lender.minFico}` };
   }
 
-  // Check LTV
-  if (app.ltvPercent > lender.maxLtv) {
-    return { matched: false, reason: `LTV ${app.ltvPercent}% exceeds max ${lender.maxLtv}%` };
-  }
-
-  // Check DTI
+  // Check DTI (always required)
   if (app.dtiPercent > lender.maxDti) {
     return { matched: false, reason: `DTI ${app.dtiPercent}% exceeds max ${lender.maxDti}%` };
-  }
-
-  // Check PTI
-  if (app.ptiPercent > lender.maxPti) {
-    return { matched: false, reason: `PTI ${app.ptiPercent}% exceeds max ${lender.maxPti}%` };
-  }
-
-  // Check loan amount
-  if (app.loanAmount < lender.minLoanAmount || app.loanAmount > lender.maxLoanAmount) {
-    return { matched: false, reason: `Loan amount ${app.loanAmount} outside range $${lender.minLoanAmount}-$${lender.maxLoanAmount}` };
-  }
-
-  // Check vehicle age
-  if (vehicleAge > lender.maxVehicleAge) {
-    return { matched: false, reason: `Vehicle age ${vehicleAge} years exceeds max ${lender.maxVehicleAge}` };
-  }
-
-  // Check mileage
-  if (app.vehicle.mileage && app.vehicle.mileage > lender.maxMileage) {
-    return { matched: false, reason: `Mileage ${app.vehicle.mileage} exceeds max ${lender.maxMileage}` };
-  }
-
-  // Check CPO acceptance
-  if (app.vehicle.condition === 'certified_pre_owned' && !lender.acceptsCPO) {
-    return { matched: false, reason: 'Does not accept CPO vehicles' };
-  }
-
-  // Check private party
-  const isPrivateParty = app.vehicle.dealerName === '' || app.dealStructure.salePrice === app.vehicle.askingPrice;
-  if (isPrivateParty && !lender.acceptsPrivateParty) {
-    return { matched: false, reason: 'Does not accept private party sales' };
   }
 
   // Check ITIN
@@ -126,6 +90,47 @@ function checkLenderEligibility(app: MockApplication, lender: MockLender): Match
   // Check state
   if (!lender.statesActive.includes('All 50') && !lender.statesActive.includes(app.state)) {
     return { matched: false, reason: `Not active in ${app.state}` };
+  }
+
+  // If vehicle info provided, check vehicle-specific criteria
+  if (app.hasVehicle && app.vehicle) {
+    const vehicleAge = new Date().getFullYear() - (app.vehicle.year || 0);
+
+    // Check LTV
+    if (app.ltvPercent && app.ltvPercent > lender.maxLtv) {
+      return { matched: false, reason: `LTV ${app.ltvPercent}% exceeds max ${lender.maxLtv}%` };
+    }
+
+    // Check PTI
+    if (app.ptiPercent && app.ptiPercent > lender.maxPti) {
+      return { matched: false, reason: `PTI ${app.ptiPercent}% exceeds max ${lender.maxPti}%` };
+    }
+
+    // Check loan amount
+    if (app.loanAmount && (app.loanAmount < lender.minLoanAmount || app.loanAmount > lender.maxLoanAmount)) {
+      return { matched: false, reason: `Loan amount ${app.loanAmount} outside range $${lender.minLoanAmount}-$${lender.maxLoanAmount}` };
+    }
+
+    // Check vehicle age
+    if (vehicleAge > lender.maxVehicleAge) {
+      return { matched: false, reason: `Vehicle age ${vehicleAge} years exceeds max ${lender.maxVehicleAge}` };
+    }
+
+    // Check mileage
+    if (app.vehicle.mileage && app.vehicle.mileage > lender.maxMileage) {
+      return { matched: false, reason: `Mileage ${app.vehicle.mileage} exceeds max ${lender.maxMileage}` };
+    }
+
+    // Check CPO acceptance
+    if (app.vehicle.condition === 'certified_pre_owned' && !lender.acceptsCPO) {
+      return { matched: false, reason: 'Does not accept CPO vehicles' };
+    }
+
+    // Check private party
+    const isPrivateParty = !app.vehicle.dealerName || app.dealStructure.salePrice === app.vehicle.askingPrice;
+    if (isPrivateParty && !lender.acceptsPrivateParty) {
+      return { matched: false, reason: 'Does not accept private party sales' };
+    }
   }
 
   return { matched: true };
@@ -151,15 +156,62 @@ function generateOfferFromLender(app: MockApplication, lender: MockLender): Gene
   const variance = (Math.random() - 0.5) * aprRange * 0.3; // +/- 15% of range
   const apr = Math.max(tier.rateMin, Math.min(tier.rateMax, tier.rateMin + aprRange / 2 + variance));
 
-  // Determine approved amount (may be less than requested for higher risk)
-  let approvedAmount = app.loanAmount;
-  if (ficoScore < 620 || app.ltvPercent > 110) {
+  const termMonths = app.dealStructure.requestedTerm;
+
+  // NO VEHICLE INFO: Calculate max approved amount based on income and credit
+  if (!app.hasVehicle || !app.vehicle) {
+    const monthlyIncome = app.employment.grossMonthlyIncome;
+
+    // Formula: max approved = min(lender.maxLoanAmount, monthlyIncome * 0.15 * requestedTerm)
+    // Adjusted by credit tier
+    const creditMultiplier = ficoScore >= 720 ? 1.0 : ficoScore >= 660 ? 0.9 : ficoScore >= 620 ? 0.75 : 0.6;
+    const incomeBasedMax = Math.floor(monthlyIncome * 0.15 * termMonths * creditMultiplier);
+    const maxApprovedAmount = Math.min(lender.maxLoanAmount, incomeBasedMax);
+
+    // For no-vehicle, we show a range. Use 80% of max as the display amount
+    const approvedAmount = Math.floor(maxApprovedAmount * 0.8);
+
+    // Estimate monthly payment at approved amount
+    const monthlyRate = apr / 100 / 12;
+    const monthlyPayment = Math.round(
+      (approvedAmount * monthlyRate * Math.pow(1 + monthlyRate, termMonths)) /
+      (Math.pow(1 + monthlyRate, termMonths) - 1)
+    );
+
+    // Determine conditions
+    const conditions: string[] = [];
+    if (ficoScore < 650) {
+      conditions.push('Proof of income required');
+    }
+    if (app.employment.monthsAtEmployer < 12) {
+      conditions.push('2 recent paystubs');
+    }
+    if (lender.tier === 'subprime' && app.dtiPercent > 45) {
+      conditions.push('Co-signer may improve terms');
+    }
+    conditions.push('Final approval subject to vehicle verification');
+
+    return {
+      lenderId: lender.id,
+      lenderName: lender.name,
+      apr: parseFloat(apr.toFixed(2)),
+      termMonths,
+      monthlyPayment,
+      approvedAmount,
+      maxApprovedAmount, // Show the ceiling
+      status: 'conditional',
+      conditions,
+    };
+  }
+
+  // HAS VEHICLE INFO: Use existing vehicle-based logic
+  let approvedAmount = app.loanAmount || 0;
+  if (ficoScore < 620 || (app.ltvPercent && app.ltvPercent > 110)) {
     // Reduce approved amount for higher risk
-    approvedAmount = Math.floor(app.loanAmount * 0.95);
+    approvedAmount = Math.floor(approvedAmount * 0.95);
   }
 
   // Calculate monthly payment
-  const termMonths = app.dealStructure.requestedTerm;
   const monthlyRate = apr / 100 / 12;
   const monthlyPayment = Math.round(
     (approvedAmount * monthlyRate * Math.pow(1 + monthlyRate, termMonths)) /
@@ -171,7 +223,7 @@ function generateOfferFromLender(app: MockApplication, lender: MockLender): Gene
   if (ficoScore < 650) {
     conditions.push('Proof of income required');
   }
-  if (app.ltvPercent > 100) {
+  if (app.ltvPercent && app.ltvPercent > 100) {
     conditions.push('Full coverage insurance required');
   }
   if (app.employment.monthsAtEmployer < 12) {

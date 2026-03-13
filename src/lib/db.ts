@@ -285,10 +285,11 @@ function mapDbToApp(row: Record<string, unknown>): MockApplication {
     credit: row.credit as MockApplication['credit'],
     vehicle: row.vehicle as MockApplication['vehicle'],
     dealStructure: row.deal_structure as MockApplication['dealStructure'],
-    loanAmount: Number(row.loan_amount || 0),
-    ltvPercent: Number(row.ltv_percent || 0),
+    loanAmount: row.loan_amount ? Number(row.loan_amount) : undefined,
+    ltvPercent: row.ltv_percent ? Number(row.ltv_percent) : undefined,
     dtiPercent: Number(row.dti_percent || 0),
-    ptiPercent: Number(row.pti_percent || 0),
+    ptiPercent: row.pti_percent ? Number(row.pti_percent) : undefined,
+    hasVehicle: (row.has_vehicle as boolean) ?? false,
     status: row.status as MockApplication['status'],
     state: row.state as string,
     submittedAt: row.submitted_at as string,
@@ -318,6 +319,7 @@ function mapAppToDb(app: Partial<MockApplication>): Record<string, unknown> {
   if (app.ltvPercent !== undefined) dbRow.ltv_percent = app.ltvPercent;
   if (app.dtiPercent !== undefined) dbRow.dti_percent = app.dtiPercent;
   if (app.ptiPercent !== undefined) dbRow.pti_percent = app.ptiPercent;
+  if (app.hasVehicle !== undefined) dbRow.has_vehicle = app.hasVehicle;
   if (app.status !== undefined) dbRow.status = app.status;
   if (app.state !== undefined) dbRow.state = app.state;
   if (app.submittedAt !== undefined) dbRow.submitted_at = app.submittedAt;

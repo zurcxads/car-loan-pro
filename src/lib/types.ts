@@ -58,26 +58,26 @@ export interface EmploymentInfo {
   incomeVerificationMethod?: string;
 }
 
-// Step 4: Vehicle
+// Step 4: Vehicle (OPTIONAL - for pre-approval with vehicle)
 export interface VehicleInfo {
-  applicationType: ApplicationType;
-  vehicleCondition: VehicleCondition;
-  year: number;
-  make: string;
-  model: string;
+  applicationType?: ApplicationType;
+  vehicleCondition?: VehicleCondition;
+  year?: number;
+  make?: string;
+  model?: string;
   trim?: string;
   vin?: string;
   mileage?: number;
-  askingPrice: number;
-  isPrivateParty: boolean;
+  askingPrice?: number;
+  isPrivateParty?: boolean;
   dealerName?: string;
   dealerZip?: string;
 }
 
-// Step 5: Deal Structure
+// Step 5: Deal Structure (partially optional - core fields required)
 export interface DealStructure {
-  cashDownPayment: number;
-  hasTradeIn: boolean;
+  cashDownPayment?: number;
+  hasTradeIn?: boolean;
   tradeInYear?: number;
   tradeInMake?: string;
   tradeInModel?: string;
@@ -85,8 +85,8 @@ export interface DealStructure {
   tradeInPayoffAmount?: number;
   desiredTermMonths: 36 | 48 | 60 | 72 | 84;
   maxMonthlyPayment?: number;
-  gapInsuranceInterest: boolean;
-  extendedWarrantyInterest: boolean;
+  gapInsuranceInterest?: boolean;
+  extendedWarrantyInterest?: boolean;
 }
 
 // Step 7: Consent
@@ -107,11 +107,12 @@ export interface Application {
   personalInfo: BorrowerPersonalInfo;
   addressInfo: AddressInfo;
   employmentInfo: EmploymentInfo;
-  vehicleInfo: VehicleInfo;
+  vehicleInfo?: VehicleInfo; // Optional - pre-approval without vehicle
   dealStructure: DealStructure;
   consent: ConsentInfo;
   hasCoBorrower: boolean;
   coBorrowerInfo?: BorrowerPersonalInfo & AddressInfo & EmploymentInfo;
+  hasVehicle: boolean; // Track whether vehicle info was provided
   createdAt: string;
   submittedAt?: string;
   expiresAt?: string;
@@ -126,6 +127,7 @@ export interface LenderOffer {
   tier: LenderTier;
   status: OfferStatus;
   approvedAmount: number;
+  maxApprovedAmount?: number; // For no-vehicle pre-approvals (range ceiling)
   apr: number;
   termMonths: number;
   monthlyPayment: number;

@@ -39,7 +39,7 @@ export interface MockApplication {
     hasRepo: boolean;
     hasBankruptcy: boolean;
   };
-  vehicle: {
+  vehicle?: {
     year: number;
     make: string;
     model: string;
@@ -52,19 +52,20 @@ export interface MockApplication {
     dealerName: string;
   };
   dealStructure: {
-    salePrice: number;
-    downPayment: number;
-    tradeInValue: number;
-    tradeInPayoff: number;
-    docFee: number;
-    taxAndFees: number;
-    totalAmountFinanced: number;
+    salePrice?: number;
+    downPayment?: number;
+    tradeInValue?: number;
+    tradeInPayoff?: number;
+    docFee?: number;
+    taxAndFees?: number;
+    totalAmountFinanced?: number;
     requestedTerm: number;
   };
-  loanAmount: number;
-  ltvPercent: number;
+  loanAmount?: number;
+  ltvPercent?: number;
   dtiPercent: number;
-  ptiPercent: number;
+  ptiPercent?: number;
+  hasVehicle: boolean;
   status: MockAppStatus;
   state: string;
   submittedAt: string;
@@ -83,6 +84,7 @@ export interface MockOffer {
   termMonths: number;
   monthlyPayment: number;
   approvedAmount: number;
+  maxApprovedAmount?: number; // For no-vehicle pre-approvals
   status: MockOfferStatus;
   conditions: string[];
   decisionAt: string;
@@ -184,7 +186,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: 742, scoreTier: 'prime', totalMonthlyObligations: 1984, openAutoTradelines: 1, derogatoryMarks: 0, hasRepo: false, hasBankruptcy: false },
     vehicle: { year: 2022, make: 'Toyota', model: 'Camry', trim: 'SE', vin: '4T1BF1FK0NU123456', mileage: 28000, condition: 'used', bookValue: 29000, askingPrice: 29000, dealerName: 'AutoMax Houston' },
     dealStructure: { salePrice: 29000, downPayment: 2500, tradeInValue: 0, tradeInPayoff: 0, docFee: 499, taxAndFees: 1800, totalAmountFinanced: 28500, requestedTerm: 60 },
-    loanAmount: 28500, ltvPercent: 98, dtiPercent: 32, ptiPercent: 14, status: 'offers_available', state: 'TX',
+    loanAmount: 28500, ltvPercent: 98, dtiPercent: 32, ptiPercent: 14, hasVehicle: true, status: 'offers_available', state: 'TX',
     submittedAt: '2026-03-07T14:30:00Z', updatedAt: '2026-03-07T15:00:00Z', lendersSubmitted: 4, offersReceived: 3, flags: [],
   },
   {
@@ -194,7 +196,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: 681, scoreTier: 'near_prime', totalMonthlyObligations: 2214, openAutoTradelines: 0, derogatoryMarks: 1, hasRepo: false, hasBankruptcy: false },
     vehicle: { year: 2020, make: 'Honda', model: 'Civic', trim: 'EX', vin: '2HGFC2F63LH567890', mileage: 42000, condition: 'used', bookValue: 18300, askingPrice: 19200, dealerName: 'Sunshine Nissan' },
     dealStructure: { salePrice: 19200, downPayment: 1500, tradeInValue: 0, tradeInPayoff: 0, docFee: 499, taxAndFees: 1200, totalAmountFinanced: 19200, requestedTerm: 60 },
-    loanAmount: 19200, ltvPercent: 105, dtiPercent: 41, ptiPercent: 17, status: 'pending_decision', state: 'FL',
+    loanAmount: 19200, ltvPercent: 105, dtiPercent: 41, ptiPercent: 17, hasVehicle: true, status: 'pending_decision', state: 'FL',
     submittedAt: '2026-03-08T09:15:00Z', updatedAt: '2026-03-08T09:15:00Z', lendersSubmitted: 3, offersReceived: 2, flags: [],
   },
   {
@@ -204,7 +206,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: 598, scoreTier: 'subprime', totalMonthlyObligations: 2112, openAutoTradelines: 1, derogatoryMarks: 3, hasRepo: false, hasBankruptcy: false },
     vehicle: { year: 2018, make: 'Ford', model: 'F-150', trim: 'XLT', vin: '1FTEW1EG5JFB12345', mileage: 68000, condition: 'used', bookValue: 14100, askingPrice: 15800, dealerName: 'Premier Ford Dallas' },
     dealStructure: { salePrice: 15800, downPayment: 1000, tradeInValue: 0, tradeInPayoff: 0, docFee: 499, taxAndFees: 950, totalAmountFinanced: 15800, requestedTerm: 60 },
-    loanAmount: 15800, ltvPercent: 112, dtiPercent: 44, ptiPercent: 18, status: 'conditional', state: 'GA',
+    loanAmount: 15800, ltvPercent: 112, dtiPercent: 44, ptiPercent: 18, hasVehicle: true, status: 'conditional', state: 'GA',
     submittedAt: '2026-03-06T11:45:00Z', updatedAt: '2026-03-07T08:30:00Z', lendersSubmitted: 3, offersReceived: 1, flags: [],
   },
   {
@@ -214,7 +216,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: 724, scoreTier: 'prime', totalMonthlyObligations: 2088, openAutoTradelines: 0, derogatoryMarks: 0, hasRepo: false, hasBankruptcy: false },
     vehicle: { year: 2023, make: 'Chevrolet', model: 'Equinox', trim: 'LT', vin: '3GNAXUEV5PL234567', mileage: 12000, condition: 'certified_pre_owned', bookValue: 35500, askingPrice: 34000, dealerName: 'AutoMax Houston' },
     dealStructure: { salePrice: 34000, downPayment: 3000, tradeInValue: 2500, tradeInPayoff: 0, docFee: 499, taxAndFees: 2100, totalAmountFinanced: 34000, requestedTerm: 60 },
-    loanAmount: 34000, ltvPercent: 96, dtiPercent: 29, ptiPercent: 13, status: 'funded', state: 'OH',
+    loanAmount: 34000, ltvPercent: 96, dtiPercent: 29, ptiPercent: 13, hasVehicle: true, status: 'funded', state: 'OH',
     submittedAt: '2026-02-20T16:00:00Z', updatedAt: '2026-03-05T10:00:00Z', lendersSubmitted: 4, offersReceived: 3, flags: [],
   },
   {
@@ -224,7 +226,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: 612, scoreTier: 'subprime', totalMonthlyObligations: 2193, openAutoTradelines: 2, derogatoryMarks: 2, hasRepo: false, hasBankruptcy: false },
     vehicle: { year: 2019, make: 'Nissan', model: 'Altima', trim: 'SV', vin: '1N4BL4BV9KC345678', mileage: 55000, condition: 'used', bookValue: 20300, askingPrice: 22100, dealerName: 'Pacific Toyota' },
     dealStructure: { salePrice: 22100, downPayment: 1500, tradeInValue: 0, tradeInPayoff: 0, docFee: 499, taxAndFees: 1400, totalAmountFinanced: 22100, requestedTerm: 60 },
-    loanAmount: 22100, ltvPercent: 109, dtiPercent: 43, ptiPercent: 19, status: 'pending_decision', state: 'CA',
+    loanAmount: 22100, ltvPercent: 109, dtiPercent: 43, ptiPercent: 19, hasVehicle: true, status: 'pending_decision', state: 'CA',
     submittedAt: '2026-03-08T12:30:00Z', updatedAt: '2026-03-08T12:30:00Z', lendersSubmitted: 3, offersReceived: 0, flags: [],
   },
   {
@@ -234,7 +236,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: 758, scoreTier: 'prime', totalMonthlyObligations: 3375, openAutoTradelines: 0, derogatoryMarks: 0, hasRepo: false, hasBankruptcy: false },
     vehicle: { year: 2023, make: 'BMW', model: '3 Series', trim: '330i', vin: 'WBA5R1C58PFH78901', mileage: 8000, condition: 'certified_pre_owned', bookValue: 44100, askingPrice: 41500, dealerName: 'Pacific Toyota' },
     dealStructure: { salePrice: 41500, downPayment: 5000, tradeInValue: 0, tradeInPayoff: 0, docFee: 499, taxAndFees: 3300, totalAmountFinanced: 41500, requestedTerm: 60 },
-    loanAmount: 41500, ltvPercent: 94, dtiPercent: 27, ptiPercent: 12, status: 'offers_available', state: 'NY',
+    loanAmount: 41500, ltvPercent: 94, dtiPercent: 27, ptiPercent: 12, hasVehicle: true, status: 'offers_available', state: 'NY',
     submittedAt: '2026-03-07T10:00:00Z', updatedAt: '2026-03-07T11:30:00Z', lendersSubmitted: 5, offersReceived: 4, flags: [],
   },
   {
@@ -244,7 +246,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: 555, scoreTier: 'subprime', totalMonthlyObligations: 1456, openAutoTradelines: 1, derogatoryMarks: 5, hasRepo: true, hasBankruptcy: false },
     vehicle: { year: 2016, make: 'Hyundai', model: 'Elantra', trim: 'SE', vin: '5NPD84LF2GH456789', mileage: 95000, condition: 'used', bookValue: 10100, askingPrice: 11900, dealerName: 'AutoMax Houston' },
     dealStructure: { salePrice: 11900, downPayment: 500, tradeInValue: 0, tradeInPayoff: 0, docFee: 499, taxAndFees: 750, totalAmountFinanced: 11900, requestedTerm: 60 },
-    loanAmount: 11900, ltvPercent: 118, dtiPercent: 52, ptiPercent: 22, status: 'declined', state: 'TX',
+    loanAmount: 11900, ltvPercent: 118, dtiPercent: 52, ptiPercent: 22, hasVehicle: true, status: 'declined', state: 'TX',
     submittedAt: '2026-03-08T08:00:00Z', updatedAt: '2026-03-08T09:00:00Z', lendersSubmitted: 2, offersReceived: 0, flags: ['high_dti', 'repo_history'],
   },
   {
@@ -254,7 +256,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: 693, scoreTier: 'near_prime', totalMonthlyObligations: 3610, openAutoTradelines: 1, derogatoryMarks: 1, hasRepo: false, hasBankruptcy: false },
     vehicle: { year: 2021, make: 'Subaru', model: 'Outback', trim: 'Premium', vin: '4S4BTACC3M3123456', mileage: 35000, condition: 'used', bookValue: 25900, askingPrice: 26700, dealerName: 'Premier Ford Dallas' },
     dealStructure: { salePrice: 26700, downPayment: 2000, tradeInValue: 3500, tradeInPayoff: 1200, docFee: 499, taxAndFees: 1700, totalAmountFinanced: 26700, requestedTerm: 60 },
-    loanAmount: 26700, ltvPercent: 103, dtiPercent: 38, ptiPercent: 16, status: 'conditional', state: 'WA',
+    loanAmount: 26700, ltvPercent: 103, dtiPercent: 38, ptiPercent: 16, hasVehicle: true, status: 'conditional', state: 'WA',
     submittedAt: '2026-03-06T15:20:00Z', updatedAt: '2026-03-07T14:00:00Z', lendersSubmitted: 4, offersReceived: 2, flags: [],
   },
   {
@@ -264,7 +266,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: null, scoreTier: 'itin', totalMonthlyObligations: 1840, openAutoTradelines: 0, derogatoryMarks: 0, hasRepo: false, hasBankruptcy: false },
     vehicle: { year: 2019, make: 'Toyota', model: 'RAV4', trim: 'LE', vin: '2T3F1RFV5KW789012', mileage: 48000, condition: 'used', bookValue: 16300, askingPrice: 17400, dealerName: 'AutoMax Houston' },
     dealStructure: { salePrice: 17400, downPayment: 2000, tradeInValue: 0, tradeInPayoff: 0, docFee: 499, taxAndFees: 1100, totalAmountFinanced: 17400, requestedTerm: 60 },
-    loanAmount: 17400, ltvPercent: 107, dtiPercent: 40, ptiPercent: 17, status: 'pending_decision', state: 'TX',
+    loanAmount: 17400, ltvPercent: 107, dtiPercent: 40, ptiPercent: 17, hasVehicle: true, status: 'pending_decision', state: 'TX',
     submittedAt: '2026-03-08T14:45:00Z', updatedAt: '2026-03-08T14:45:00Z', lendersSubmitted: 2, offersReceived: 0, flags: ['itin_borrower'],
   },
   {
@@ -274,7 +276,7 @@ export const MOCK_APPLICATIONS: MockApplication[] = [
     credit: { ficoScore: 637, scoreTier: 'near_prime', totalMonthlyObligations: 2088, openAutoTradelines: 1, derogatoryMarks: 2, hasRepo: false, hasBankruptcy: false },
     vehicle: { year: 2020, make: 'Kia', model: 'Sorento', trim: 'LX', vin: '5XYPG4A56LG345678', mileage: 51000, condition: 'used', bookValue: 20000, askingPrice: 20800, dealerName: 'Sunshine Nissan' },
     dealStructure: { salePrice: 20800, downPayment: 1500, tradeInValue: 0, tradeInPayoff: 0, docFee: 499, taxAndFees: 1300, totalAmountFinanced: 20800, requestedTerm: 60 },
-    loanAmount: 20800, ltvPercent: 104, dtiPercent: 36, ptiPercent: 15, status: 'funded', state: 'NC',
+    loanAmount: 20800, ltvPercent: 104, dtiPercent: 36, ptiPercent: 15, hasVehicle: true, status: 'funded', state: 'NC',
     submittedAt: '2026-02-25T10:00:00Z', updatedAt: '2026-03-06T16:00:00Z', lendersSubmitted: 3, offersReceived: 2, flags: [],
   },
 ];

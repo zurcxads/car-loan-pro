@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     if (data.decision === 'approve' || data.decision === 'counter') {
       // Create an offer
-      const loanAmount = app.loanAmount;
+      const loanAmount = app.loanAmount || data.approvedAmount || 0;
       const apr = data.apr || 5.99;
       const termMonths = data.termMonths || 60;
       const monthlyRate = apr / 100 / 12;

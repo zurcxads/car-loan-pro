@@ -24,7 +24,7 @@ export default function PlatformOverview() {
   const [alerts, setAlerts] = useState(MOCK_COMPLIANCE_ALERTS);
   const apps = MOCK_APPLICATIONS;
   const funded = apps.filter(a => a.status === 'funded');
-  const totalVolume = funded.reduce((s, a) => s + a.loanAmount, 0);
+  const totalVolume = funded.reduce((s, a) => s + (a.loanAmount || 0), 0);
   const offersToday = MOCK_OFFERS.filter(o => new Date(o.decisionAt).toDateString() === new Date().toDateString()).length || 4;
   const pendingAdverse = 1;
 
