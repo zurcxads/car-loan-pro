@@ -61,6 +61,8 @@ export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [returningVisitor, setReturningVisitor] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
 
   // Mini hero form state
   const [heroForm, setHeroForm] = useState({ name: '', creditRange: '', loanAmount: '' });
@@ -69,6 +71,18 @@ export default function LandingPage() {
     const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
+  }, []);
+
+  // Check for returning visitor (has session token in localStorage)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const sessionToken = localStorage.getItem('alp_session_token');
+      const appId = localStorage.getItem('clp_current_app_id');
+      if (sessionToken || appId) {
+        setReturningVisitor(true);
+        setShowBanner(true);
+      }
+    }
   }, []);
 
   const handleHeroSubmit = (e: React.FormEvent) => {
@@ -116,8 +130,50 @@ export default function LandingPage() {
         </AnimatePresence>
       </nav>
 
+      {/* Return Visitor Banner */}
+      <AnimatePresence>
+        {showBanner && returningVisitor && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-16 left-0 right-0 z-40 bg-gradient-to-r from-blue-600 to-blue-700 border-b border-blue-500 shadow-lg"
+          >
+            <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-white text-sm font-medium">Welcome back!</p>
+                  <p className="text-blue-100 text-xs">Continue where you left off</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/dashboard"
+                  className="px-4 py-2 bg-white text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-50 transition-colors"
+                >
+                  View Dashboard
+                </Link>
+                <button
+                  onClick={() => setShowBanner(false)}
+                  className="p-1 text-white/80 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hero - Tool as Hero */}
-      <section className="pt-24 pb-16 px-6">
+      <section className={`pt-24 pb-16 px-6 ${showBanner && returningVisitor ? 'mt-14' : ''}`}>
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-5xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Copy */}

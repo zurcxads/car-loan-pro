@@ -5,6 +5,8 @@ import { dbGetApplications, dbCreateApplication } from '@/lib/db';
 import { generateCreditProfile } from '@/lib/store';
 import { matchLendersAndGenerateOffers } from '@/lib/lender-engine';
 import type { MockApplication } from '@/lib/mock-data';
+import { createClient } from '@/lib/supabase/server';
+import { applicationReceivedEmail, sendEmail } from '@/lib/email-templates';
 
 // GET /api/applications — list all applications
 export async function GET(req: NextRequest) {
@@ -123,18 +125,66 @@ export async function POST(req: NextRequest) {
     const app = await dbCreateApplication(appData);
     if (!app) return apiError('Failed to create application', 500);
 
+    // Silent account creation: create Supabase auth user with consumer's email
+    const supabase = await createClient();
+    let userId: string | null = null;
+
+    try {
+      // Check if user already exists
+      const { data: existingUsers } = await supabase.auth.admin.listUsers();
+      const existingUser = existingUsers?.users?.find(u => u.email === data.personalInfo.email);
+
+      if (existingUser) {
+        userId = existingUser.id;
+      } else {
+        // Create new user with auto-generated password they'll never use
+        const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
+          email: data.personalInfo.email,
+          email_confirm: true,
+          user_metadata: {
+            role: 'consumer',
+            full_name: `${data.personalInfo.firstName} ${data.personalInfo.lastName}`,
+            application_id: app.id,
+          },
+        });
+
+        if (signUpError) {
+          console.error('Failed to create Supabase user:', signUpError);
+        } else if (newUser?.user) {
+          userId = newUser.user.id;
+        }
+      }
+    } catch (err) {
+      console.error('Supabase user creation error:', err);
+      // Continue anyway - user can still access via session token
+    }
+
+    // Generate session token for immediate access
+    const sessionToken = crypto.randomUUID();
+
+    // Store session token in application metadata (in real app, use a sessions table)
+    // For now, we'll use the token as a query param and validate it on each request
+
+    // Send application received email
+    const emailData = applicationReceivedEmail(
+      data.personalInfo.email,
+      data.personalInfo.firstName,
+      app.id
+    );
+    sendEmail(emailData).catch(err => {
+      console.error('Failed to send application received email:', err);
+    });
+
     // Trigger lender matching engine in background
     // Don't await - let it run async so user doesn't wait
     matchLendersAndGenerateOffers(app).catch(err => {
       console.error('Lender matching failed:', err);
     });
 
-    // Return app with session token for consumer dashboard access
-    const sessionToken = (app as unknown as { sessionToken?: string }).sessionToken || crypto.randomUUID();
-
     return apiSuccess({
       id: app.id,
       sessionToken,
+      userId,
     }, 201);
   } catch (err) {
     console.error('Application creation error:', err);

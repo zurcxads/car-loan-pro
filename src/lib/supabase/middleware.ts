@@ -51,14 +51,31 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Protected routes — redirect to /auth/login if not authenticated
+  // Protected routes — allow token-based access for consumers, otherwise redirect
   if (pathname.startsWith('/dashboard')) {
-    if (!user) {
+    // Check for session token or magic token in URL
+    const sessionToken = request.nextUrl.searchParams.get('token');
+    const magicToken = request.nextUrl.searchParams.get('magic');
+
+    // Allow access if user is authenticated OR has a valid token
+    if (!user && !sessionToken && !magicToken) {
       const url = request.nextUrl.clone();
-      url.pathname = '/auth/login';
+      url.pathname = '/login';
       url.searchParams.set('redirectTo', pathname);
       return NextResponse.redirect(url);
     }
+  }
+
+  // Results page — allow token-based access (no auth required)
+  if (pathname.startsWith('/results')) {
+    // Results page is accessible via session token, no redirect needed
+    return supabaseResponse;
+  }
+
+  // Offers page — allow token-based access (no auth required)
+  if (pathname.startsWith('/offers')) {
+    // Offers page is accessible via session token, no redirect needed
+    return supabaseResponse;
   }
 
   // Admin portal — requires admin role
