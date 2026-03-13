@@ -25,14 +25,14 @@ function KanbanCard({ app }: { app: MockApplication }) {
   const daysInStage = Math.floor((Date.now() - new Date(app.updatedAt).getTime()) / (1000 * 60 * 60 * 24));
 
   return (
-    <div className="rounded-xl bg-white border border-gray-200 p-3.5 hover:border-gray-200 transition-colors cursor-pointer shadow-sm">
+    <div className="rounded-lg bg-white border border-gray-200 p-3 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
       <div className="flex items-center justify-between mb-2">
         <span className="font-mono text-[10px] text-gray-500">{app.id}</span>
-        <span className="text-[10px] text-gray-400">{daysInStage}d</span>
+        <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded">{daysInStage}d</span>
       </div>
-      <div className="text-sm font-medium mb-1">{app.borrower.firstName} {app.borrower.lastName.charAt(0)}.</div>
+      <div className="text-sm font-medium text-gray-900 mb-2">{app.borrower.firstName} {app.borrower.lastName.charAt(0)}.</div>
       <div className="flex items-center justify-between text-xs">
-        <span className="text-gray-500">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</span>
+        <span className="text-gray-600">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</span>
         <span className={`font-semibold ${ficoColor(app.credit.ficoScore)}`}>{app.credit.ficoScore ?? 'N/A'}</span>
       </div>
     </div>
@@ -69,11 +69,11 @@ export default function Pipeline() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-1 bg-gray-50 rounded-xl p-1 border border-gray-200">
-          <button onClick={() => setView('kanban')} className={`px-4 py-2 text-xs rounded-lg transition-colors cursor-pointer ${view === 'kanban' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>Kanban</button>
-          <button onClick={() => setView('table')} className={`px-4 py-2 text-xs rounded-lg transition-colors cursor-pointer ${view === 'table' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>Table</button>
+          <button onClick={() => setView('kanban')} className={`px-4 py-2 text-sm rounded-lg transition-colors cursor-pointer ${view === 'kanban' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>Kanban</button>
+          <button onClick={() => setView('table')} className={`px-4 py-2 text-sm rounded-lg transition-colors cursor-pointer ${view === 'table' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>Table</button>
         </div>
         {view === 'table' && (
-          <button onClick={exportCSV} className="px-4 py-2 text-xs border border-gray-200 hover:border-gray-200 rounded-lg transition-colors cursor-pointer">Export CSV</button>
+          <button onClick={exportCSV} className="px-4 py-2.5 text-sm border border-gray-200 hover:border-gray-300 rounded-xl transition-colors cursor-pointer">Export CSV</button>
         )}
       </div>
 
@@ -82,14 +82,14 @@ export default function Pipeline() {
           {COLUMNS.map(col => {
             const colApps = getAppsForColumn(col);
             return (
-              <div key={col.key} className="rounded-2xl bg-gray-50 border border-gray-200 p-4 min-h-[300px]">
-                <div className="flex items-center justify-between mb-4">
+              <div key={col.key} className="rounded-xl bg-gray-50 border border-gray-200 p-3 min-h-[400px]">
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
                   <h3 className="text-xs font-semibold text-gray-700">{col.label}</h3>
-                  <span className="text-[10px] text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">{colApps.length}</span>
+                  <span className="text-[10px] text-gray-600 bg-white px-2 py-1 rounded-full border border-gray-200">{colApps.length}</span>
                 </div>
                 <div className="space-y-2">
                   {colApps.map(app => <KanbanCard key={app.id} app={app} />)}
-                  {colApps.length === 0 && <p className="text-xs text-gray-400 text-center py-8">No applications</p>}
+                  {colApps.length === 0 && <p className="text-xs text-gray-500 text-center py-12">Empty</p>}
                 </div>
               </div>
             );
@@ -98,13 +98,13 @@ export default function Pipeline() {
       )}
 
       {view === 'table' && (
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  {['App ID', 'Borrower', 'Vehicle', 'Loan Amount', 'FICO', 'Status', 'Days in Stage', 'Referral Fee'].map(h => (
-                    <th key={h} className="text-left py-4 px-5 text-[10px] text-gray-500 uppercase tracking-widest font-medium">{h}</th>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  {['App ID', 'Borrower', 'Vehicle', 'Loan Amount', 'FICO', 'Status', 'Days in Stage', 'Fee'].map(h => (
+                    <th key={h} className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -112,15 +112,15 @@ export default function Pipeline() {
                 {apps.map(app => {
                   const days = Math.floor((Date.now() - new Date(app.updatedAt).getTime()) / (1000 * 60 * 60 * 24));
                   return (
-                    <tr key={app.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-5 font-mono text-xs text-gray-500">{app.id}</td>
-                      <td className="py-4 px-5 font-medium">{app.borrower.firstName} {app.borrower.lastName.charAt(0)}.</td>
-                      <td className="py-4 px-5 text-gray-500">{app.vehicle ? `${app.vehicle.year} ${app.vehicle.make} ${app.vehicle.model}` : 'Pre-Approval'}</td>
-                      <td className="py-4 px-5">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</td>
-                      <td className={`py-4 px-5 font-semibold ${ficoColor(app.credit.ficoScore)}`}>{app.credit.ficoScore ?? 'N/A'}</td>
-                      <td className="py-4 px-5"><StatusBadge status={app.status} /></td>
-                      <td className="py-4 px-5 text-gray-500">{days}d</td>
-                      <td className="py-4 px-5 text-green-600">{app.status === 'funded' ? '$300' : '--'}</td>
+                    <tr key={app.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                      <td className="py-4 px-4 font-mono text-xs text-gray-500">{app.id}</td>
+                      <td className="py-4 px-4 font-medium text-gray-900">{app.borrower.firstName} {app.borrower.lastName.charAt(0)}.</td>
+                      <td className="py-4 px-4 text-sm text-gray-600">{app.vehicle ? `${app.vehicle.year} ${app.vehicle.make} ${app.vehicle.model}` : 'Pre-Approval'}</td>
+                      <td className="py-4 px-4 font-medium text-gray-900">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</td>
+                      <td className={`py-4 px-4 font-semibold ${ficoColor(app.credit.ficoScore)}`}>{app.credit.ficoScore ?? 'N/A'}</td>
+                      <td className="py-4 px-4"><StatusBadge status={app.status} /></td>
+                      <td className="py-4 px-4 text-sm text-gray-600">{days}d</td>
+                      <td className="py-4 px-4 text-sm font-medium text-green-600">{app.status === 'funded' ? '$300' : '--'}</td>
                     </tr>
                   );
                 })}
