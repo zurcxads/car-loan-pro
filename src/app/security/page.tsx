@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Shield, Lock, Eye, FileCheck, Trash2, UserCheck, Clock, AlertTriangle } from 'lucide-react';
 import type { Metadata } from 'next';
 

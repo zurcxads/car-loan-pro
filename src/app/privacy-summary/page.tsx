@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { Database, Eye, Share2, Clock, UserX, FileText } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
@@ -73,9 +74,9 @@ export default function PrivacySummaryPage() {
       color: 'gray',
       items: [
         'Email privacy@autoloanpro.co with your request',
-        'We'll confirm your identity and process within 30 days',
+        'We will confirm your identity and process within 30 days',
         'Some data must be kept for 7 years (FCRA requirement)',
-        'You'll get confirmation when deletion is complete',
+        'You will get confirmation when deletion is complete',
       ],
     },
   ];
@@ -147,7 +148,7 @@ export default function PrivacySummaryPage() {
             <div className="flex items-start gap-3">
               <span className="text-blue-600 font-bold">✓</span>
               <p>
-                <strong>We only share with lenders you pick.</strong> If you don't select an offer, that lender never sees your info.
+                <strong>We only share with lenders you pick.</strong> If you do not select an offer, that lender never sees your info.
               </p>
             </div>
             <div className="flex items-start gap-3">
@@ -159,7 +160,7 @@ export default function PrivacySummaryPage() {
             <div className="flex items-start gap-3">
               <span className="text-blue-600 font-bold">✓</span>
               <p>
-                <strong>Soft pull only.</strong> Checking your rate with us doesn't hurt your credit score.
+                <strong>Soft pull only.</strong> Checking your rate with us does not hurt your credit score.
               </p>
             </div>
             <div className="flex items-start gap-3">
@@ -177,8 +178,8 @@ export default function PrivacySummaryPage() {
             About Cookies
           </h2>
           <p className="text-sm text-gray-700 mb-3">
-            We use essential cookies to make the site work (like remembering you're logged in).
-            We don't use tracking cookies or sell data to advertisers.
+            We use essential cookies to make the site work (like remembering you are logged in).
+            We do not use tracking cookies or sell data to advertisers.
           </p>
           <p className="text-sm text-gray-600">
             Types of cookies we use:

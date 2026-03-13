@@ -77,7 +77,7 @@ export async function matchLendersAndGenerateOffers(application: MockApplication
     // Create notification
     await dbCreateNotification({
       userId: application.id,
-      type: 'offers_ready',
+      type: 'offer_ready',
       title: 'Your Offers Are Ready!',
       message: `You have ${offers.length} pre-approval offer${offers.length > 1 ? 's' : ''} waiting for you.`,
       read: false,

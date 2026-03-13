@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { CheckCircle, AlertCircle, Mail } from 'lucide-react';
 import type { Metadata } from 'next';
 
