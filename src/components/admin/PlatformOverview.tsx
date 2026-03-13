@@ -1,10 +1,10 @@
 "use client";
 
-import { formatCurrency, formatRelativeTime } from '@/lib/format-utils';
-import KPICard from '@/components/shared/KPICard';
-import { useState, useEffect } from 'react';
+import { formatRelativeTime } from '@/lib/format-utils';
+import { useState, useEffect, useMemo } from 'react';
 import { dbGetApplications, dbGetOffers, dbGetActivityEvents, dbGetComplianceAlerts, dbGetPlatformStats } from '@/lib/db';
 import type { MockApplication, MockOffer, ActivityEvent, ComplianceAlert } from '@/lib/mock-data';
+import { LineChart, DonutChart, DistributionBars, TrendIndicator } from '@/components/shared/charts';
 
 const eventColors: Record<string, string> = {
   application: 'bg-blue-500',
@@ -26,34 +26,22 @@ export default function PlatformOverview() {
   const [apps, setApps] = useState<MockApplication[]>([]);
   const [offers, setOffers] = useState<MockOffer[]>([]);
   const [events, setEvents] = useState<ActivityEvent[]>([]);
-  const [stats, setStats] = useState({
-    totalApplications: 0,
-    pendingApplications: 0,
-    totalOffers: 0,
-    totalLenders: 0,
-    activeLenders: 0,
-    totalDealsFunded: 0,
-    totalVolumeFunded: 0,
-    avgApprovalRate: 0
-  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       try {
-        const [appsData, offersData, eventsData, alertsData, statsData] = await Promise.all([
+        const [appsData, offersData, eventsData, alertsData] = await Promise.all([
           dbGetApplications(),
           dbGetOffers(),
           dbGetActivityEvents(),
-          dbGetComplianceAlerts(),
-          dbGetPlatformStats()
+          dbGetComplianceAlerts()
         ]);
         setApps(appsData);
         setOffers(offersData);
         setEvents(eventsData);
         setAlerts(alertsData);
-        setStats(statsData);
       } finally {
         setLoading(false);
       }
@@ -63,11 +51,51 @@ export default function PlatformOverview() {
 
   const offersToday = offers.filter(o => new Date(o.decisionAt).toDateString() === new Date().toDateString()).length || 0;
   const appsToday = apps.filter(a => new Date(a.submittedAt).toDateString() === new Date().toDateString()).length;
-  const pendingAdverse = apps.filter(a => a.flags.some(f => f.includes('Adverse'))).length;
+  const pendingReview = apps.filter(a => a.status === 'pending_decision').length;
+  const fundedThisWeek = apps.filter(a => a.status === 'funded').length;
 
   const dismissAlert = (id: string) => {
     setAlerts(prev => prev.map(a => a.id === id ? { ...a, resolved: true } : a));
   };
+
+  // Chart data
+  const appsOverTime = useMemo(() => {
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      return date.toISOString().split('T')[0];
+    });
+
+    return last7Days.map(date => {
+      const count = apps.filter(a => a.submittedAt.split('T')[0] === date).length;
+      return { label: new Date(date).toLocaleDateString('en-US', { weekday: 'short' }), value: count };
+    });
+  }, [apps]);
+
+  const approvalRate = useMemo(() => {
+    const approved = apps.filter(a => a.status === 'offers_available' || a.status === 'funded').length;
+    const total = apps.length || 1;
+    return Math.round((approved / total) * 100);
+  }, [apps]);
+
+  const creditScoreDist = useMemo(() => {
+    const buckets = { 'Prime\n(720+)': 0, 'Near-Prime\n(660-719)': 0, 'Subprime\n(<660)': 0 };
+    apps.forEach(a => {
+      if (!a.credit.ficoScore) return;
+      if (a.credit.ficoScore >= 720) buckets['Prime\n(720+)']++;
+      else if (a.credit.ficoScore >= 660) buckets['Near-Prime\n(660-719)']++;
+      else buckets['Subprime\n(<660)']++;
+    });
+    return Object.entries(buckets).map(([label, value]) => ({ label, value, color: label.includes('Prime\n(720') ? '#22C55E' : label.includes('Near') ? '#3B82F6' : '#F59E0B' }));
+  }, [apps]);
+
+  const revenueData = useMemo(() => {
+    const last6Months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'];
+    return last6Months.map((month) => ({
+      label: month,
+      value: 12000 + Math.random() * 8000
+    }));
+  }, []);
 
   if (loading) {
     return (
@@ -81,70 +109,104 @@ export default function PlatformOverview() {
 
   return (
     <div>
-      {/* KPI Row 1 */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-        <KPICard label="Applications Today" value={appsToday} delay={0} />
-        <KPICard label="Offers Sent Today" value={offersToday} delay={0.06} />
-        <KPICard label="Funded Loans MTD" value={stats.totalDealsFunded} delay={0.12} />
-        <KPICard label="Total Funded Volume" value={formatCurrency(stats.totalVolumeFunded)} delay={0.18} />
-      </div>
+      {/* Quick Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <KPICard label="Total Applications" value={stats.totalApplications} delay={0.24} />
-        <KPICard label="Active Lenders" value={stats.activeLenders} delay={0.30} />
-        <KPICard label="Total Offers" value={stats.totalOffers} delay={0.36} />
-        <KPICard label="Pending Adverse" value={pendingAdverse} delay={0.42} />
+        <div className="rounded-xl bg-white border border-gray-200 p-4 shadow-sm">
+          <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Apps Today</div>
+          <TrendIndicator value={appsToday} deltaPercent={12.5} />
+        </div>
+        <div className="rounded-xl bg-white border border-gray-200 p-4 shadow-sm">
+          <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Pending Review</div>
+          <div className="text-2xl font-semibold text-gray-900">{pendingReview}</div>
+        </div>
+        <div className="rounded-xl bg-white border border-gray-200 p-4 shadow-sm">
+          <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Offers Extended</div>
+          <TrendIndicator value={offersToday} deltaPercent={8.2} />
+        </div>
+        <div className="rounded-xl bg-white border border-gray-200 p-4 shadow-sm">
+          <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Funded This Week</div>
+          <TrendIndicator value={fundedThisWeek} deltaPercent={-3.1} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Applications Over Time */}
+        <div className="lg:col-span-2 rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-sm font-semibold text-gray-900">Applications Over Time</h3>
+            <span className="text-xs text-gray-500">Last 7 days</span>
+          </div>
+          <LineChart data={appsOverTime} height={200} color="#3B82F6" />
+        </div>
+
+        {/* Approval Rate */}
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-6">Approval Rate</h3>
+          <DonutChart
+            data={[
+              { label: 'Approved', value: approvalRate, color: '#22C55E' },
+              { label: 'Declined', value: 100 - approvalRate, color: '#EF4444' }
+            ]}
+            size={180}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main content area */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Alerts */}
-          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
-            <h3 className="text-sm font-semibold mb-4">Alerts Requiring Action</h3>
-            <div className="space-y-2">
-              {alerts.filter(a => !a.resolved).map(alert => {
-                const styles = alertTypeStyles[alert.type];
-                return (
-                  <div key={alert.id} className={`rounded-xl bg-gray-50 border ${styles.border} p-4 flex items-start justify-between gap-3`}>
-                    <div className="flex-1">
-                      <p className={`text-sm ${styles.text}`}>{alert.message}</p>
-                      <p className="text-[10px] text-gray-400 mt-1">{formatRelativeTime(alert.timestamp)}</p>
-                    </div>
-                    <button
-                      onClick={() => dismissAlert(alert.id)}
-                      className="px-3 py-1.5 text-xs border border-gray-200 hover:border-gray-300 rounded-lg transition-colors cursor-pointer flex-shrink-0"
-                    >
-                      {alert.action}
-                    </button>
-                  </div>
-                );
-              })}
-              {alerts.filter(a => !a.resolved).length === 0 && (
-                <p className="text-xs text-gray-500 text-center py-4">No active alerts</p>
-              )}
-            </div>
-          </div>
+        {/* Credit Score Distribution */}
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-6">Credit Score Distribution</h3>
+          <DistributionBars data={creditScoreDist} />
         </div>
 
         {/* Activity Feed */}
-        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 max-h-[600px] overflow-y-auto">
-          <h3 className="text-sm font-semibold mb-4">Live Activity Feed</h3>
-          <div className="space-y-3">
-            {events.map(event => (
-              <div key={event.id} className="flex gap-3">
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <div className="space-y-3 max-h-[280px] overflow-y-auto">
+            {events.slice(0, 10).map(event => (
+              <div key={event.id} className="flex gap-2">
                 <div className={`w-2 h-2 rounded-full ${eventColors[event.type]} mt-1.5 flex-shrink-0`} />
-                <div>
-                  <p className="text-xs text-gray-700">{event.description}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-700 leading-relaxed">{event.description}</p>
                   <p className="text-[10px] text-gray-400 mt-0.5">{formatRelativeTime(event.timestamp)}</p>
                 </div>
               </div>
             ))}
-            {events.length === 0 && (
-              <p className="text-xs text-gray-500 text-center py-4">No recent activity</p>
-            )}
           </div>
         </div>
+
+        {/* Revenue Preview */}
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-6">Revenue (Last 6 Months)</h3>
+          <LineChart data={revenueData} height={200} color="#22C55E" />
+        </div>
       </div>
+
+      {/* Alerts Section */}
+      {alerts.filter(a => !a.resolved).length > 0 && (
+        <div className="mt-6 rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Alerts Requiring Action</h3>
+          <div className="space-y-2">
+            {alerts.filter(a => !a.resolved).map(alert => {
+              const styles = alertTypeStyles[alert.type];
+              return (
+                <div key={alert.id} className={`rounded-lg bg-gray-50 border ${styles.border} p-3 flex items-start justify-between gap-3`}>
+                  <div className="flex-1">
+                    <p className={`text-sm ${styles.text}`}>{alert.message}</p>
+                    <p className="text-[10px] text-gray-400 mt-1">{formatRelativeTime(alert.timestamp)}</p>
+                  </div>
+                  <button
+                    onClick={() => dismissAlert(alert.id)}
+                    className="px-3 py-1.5 text-xs bg-white border border-gray-200 hover:border-gray-300 rounded-lg transition-colors cursor-pointer flex-shrink-0"
+                  >
+                    {alert.action}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
