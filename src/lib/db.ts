@@ -535,3 +535,85 @@ function mapDbToComplianceAlert(row: Record<string, unknown>): ComplianceAlert {
     resolved: (row.resolved as boolean) ?? false,
   };
 }
+
+// ---------- Notifications ----------
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'new_application' | 'offer_ready' | 'offer_selected' | 'document_requested' | 'deal_funded' | 'system';
+  title: string;
+  message: string;
+  read: boolean;
+  createdAt: string;
+  data: Record<string, unknown>;
+}
+
+export async function dbGetNotifications(userId: string): Promise<Notification[]> {
+  if (!isSupabaseConfigured()) return [];
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(50);
+  if (error || !data) return [];
+  return data.map(row => ({
+    id: row.id as string,
+    userId: row.user_id as string,
+    type: row.type as Notification['type'],
+    title: row.title as string,
+    message: row.message as string,
+    read: row.read as boolean,
+    createdAt: row.created_at as string,
+    data: (row.data as Record<string, unknown>) || {},
+  }));
+}
+
+export async function dbCreateNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification | null> {
+  if (!isSupabaseConfigured()) return null;
+  const { data, error } = await supabase
+    .from('notifications')
+    .insert({
+      user_id: notification.userId,
+      type: notification.type,
+      title: notification.title,
+      message: notification.message,
+      read: notification.read,
+      data: notification.data,
+    })
+    .select()
+    .single();
+  if (error || !data) return null;
+  return {
+    id: data.id as string,
+    userId: data.user_id as string,
+    type: data.type as Notification['type'],
+    title: data.title as string,
+    message: data.message as string,
+    read: data.read as boolean,
+    createdAt: data.created_at as string,
+    data: (data.data as Record<string, unknown>) || {},
+  };
+}
+
+export async function dbMarkNotificationRead(id: string): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  await supabase.from('notifications').update({ read: true }).eq('id', id);
+}
+
+export async function dbMarkAllNotificationsRead(userId: string): Promise<void> {
+  if (!isSupabaseConfigured()) return;
+  await supabase.from('notifications').update({ read: true }).eq('user_id', userId).eq('read', false);
+}
+
+export async function dbGetUnreadNotificationCount(userId: string): Promise<number> {
+  if (!isSupabaseConfigured()) return 0;
+  const { count, error } = await supabase
+    .from('notifications')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('read', false);
+  if (error) return 0;
+  return count || 0;
+}
