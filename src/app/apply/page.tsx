@@ -228,14 +228,13 @@ export default function ApplyPage() {
 
   const skipVehicleStep = () => {
     setSkipVehicle(true);
-    submit();
+    // Submit directly without validation (vehicle is optional)
+    submitApplication(true);
   };
 
-  const submit = async () => {
-    if (!validate()) return;
+  const submitApplication = async (skippedVehicle = false) => {
     setSubmitting(true);
-
-    const hasVehicle = !skipVehicle && !!vehicle.make && !!vehicle.askingPrice;
+    const hasVehicle = !skippedVehicle && !skipVehicle && !!vehicle.make && !!vehicle.askingPrice;
 
     const payload = {
       personalInfo: personal,
@@ -625,14 +624,14 @@ export default function ApplyPage() {
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-2">Vehicle Information (Optional)</h2>
                   <p className="text-sm text-gray-600 mb-4">
-                    Already found a vehicle? Add it here to get vehicle-specific offers. If you haven&apos;t found one yet, you can skip this step and receive a pre-approval amount.
+                    Already have a vehicle in mind? Add it for vehicle-specific offers. Otherwise, skip this step to get pre-approved — we can connect you with our preferred dealer network after.
                   </p>
                   <div className="flex gap-3">
                     <button
                       onClick={skipVehicleStep}
                       className="px-6 py-3 text-sm font-medium text-blue-600 bg-white border-2 border-blue-600 rounded-xl hover:bg-blue-50 transition-colors duration-200"
                     >
-                      Skip - Get Pre-Approved
+                      Skip — Get Pre-Approved
                     </button>
                     <button
                       onClick={() => setSkipVehicle(false)}
@@ -708,7 +707,7 @@ export default function ApplyPage() {
           {step === 5 ? (
             <button onClick={next} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue to Vehicle Info</button>
           ) : step === 6 && !skipVehicle ? (
-            <button onClick={submit} disabled={submitting} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
+            <button onClick={() => { if (validate()) submitApplication(); }} disabled={submitting} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer">Submit Application</button>
           ) : step < 5 ? (
             <button onClick={next} className="px-8 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
           ) : null}
