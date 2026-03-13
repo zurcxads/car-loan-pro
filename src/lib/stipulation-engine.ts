@@ -50,23 +50,11 @@ export interface StipulationRules {
   income_mismatch: { manual_review: boolean };
 }
 
-const DEFAULT_RULES: StipulationRules = {
-  fico_720_plus: { stips: [], auto_approve: true },
-  fico_660_719: { stips: ['paystub_2'], auto_approve: false },
-  fico_580_659: { stips: ['bank_statement_3', 'proof_of_residence'], auto_approve: false },
-  fico_below_580: { stips: ['bank_statement_3', 'proof_of_residence', 'co_signer_encouraged'], auto_approve: false },
-  self_employed: { stips: ['bank_statement_3', 'tax_return_1'], auto_approve: false },
-  employment_lt_6_months: { stips: ['employment_letter'], auto_approve: false },
-  income_gt_8000: { stips: ['income_verification'], auto_approve: false },
-  income_mismatch: { manual_review: true },
-};
-
 /**
  * Generate stipulations based on application profile
  */
 export function generateStipulations(
-  profile: ApplicationProfile,
-  rules: StipulationRules = DEFAULT_RULES
+  profile: ApplicationProfile
 ): {
   stipulations: Stipulation[];
   requiresManualReview: boolean;

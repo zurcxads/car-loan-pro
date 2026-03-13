@@ -32,9 +32,9 @@ export async function POST(req: NextRequest) {
       status: 'selected',
     });
 
-    // Update application status to offer_selected
+    // Update application status to conditional (offer selected but pending final docs)
     await dbUpdateApplication(application.id, {
-      status: 'offer_selected',
+      status: 'conditional',
       updatedAt: new Date().toISOString(),
     });
 

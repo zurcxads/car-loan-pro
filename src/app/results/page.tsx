@@ -33,7 +33,6 @@ function ResultsContent() {
 
   const [offers, setOffers] = useState<AnonymizedOffer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOffer, setSelectedOffer] = useState<AnonymizedOffer | null>(null);
   const [term, setTerm] = useState(60);
   const [downPayment, setDownPayment] = useState(0);
   const [calculating, setCalculating] = useState(false);
@@ -220,11 +219,7 @@ function ResultsContent() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`bg-white rounded-2xl border-2 p-6 transition-all ${
-                    selectedOffer?.id === offer.id
-                      ? 'border-blue-600 shadow-lg'
-                      : 'border-gray-200 hover:border-blue-300 hover:shadow-sm'
-                  }`}
+                  className="bg-white rounded-2xl border-2 p-6 transition-all border-gray-200 hover:border-blue-300 hover:shadow-sm"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-gray-900">{offer.label}</h3>
