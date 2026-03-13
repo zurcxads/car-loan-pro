@@ -2,6 +2,7 @@
 
 import { useDevMode } from '@/contexts/DevModeContext';
 import { useState } from 'react';
+import { User, Car, Building, Store, Settings } from 'lucide-react';
 
 export default function DevModeBanner() {
   const { isDevMode, currentRole, setRole, disableDevMode } = useDevMode();
@@ -10,11 +11,11 @@ export default function DevModeBanner() {
   if (!isDevMode) return null;
 
   const roles = [
-    { value: null, label: 'No Role (Guest)', icon: '👤' },
-    { value: 'consumer' as const, label: 'Consumer', icon: '🚗' },
-    { value: 'lender' as const, label: 'Lender', icon: '🏦' },
-    { value: 'dealer' as const, label: 'Dealer', icon: '🏪' },
-    { value: 'admin' as const, label: 'Admin', icon: '⚙️' },
+    { value: null, label: 'No Role (Guest)', icon: User },
+    { value: 'consumer' as const, label: 'Consumer', icon: Car },
+    { value: 'lender' as const, label: 'Lender', icon: Building },
+    { value: 'dealer' as const, label: 'Dealer', icon: Store },
+    { value: 'admin' as const, label: 'Admin', icon: Settings },
   ];
 
   const currentRoleData = roles.find(r => r.value === currentRole) || roles[0];
@@ -34,7 +35,7 @@ export default function DevModeBanner() {
             onClick={() => setShowRoleMenu(!showRoleMenu)}
             className="flex items-center gap-2 px-3 py-1 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-sm font-medium transition-colors"
           >
-            <span>{currentRoleData.icon}</span>
+            <currentRoleData.icon className="w-4 h-4" />
             <span>{currentRoleData.label}</span>
             <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -59,7 +60,7 @@ export default function DevModeBanner() {
                       currentRole === role.value ? 'bg-yellow-50 text-yellow-900 font-medium' : 'text-gray-700'
                     }`}
                   >
-                    <span>{role.icon}</span>
+                    <role.icon className="w-4 h-4" />
                     <span>{role.label}</span>
                     {currentRole === role.value && (
                       <svg className="w-4 h-4 ml-auto text-yellow-600" fill="currentColor" viewBox="0 0 20 20">

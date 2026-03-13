@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { BarChart3, Scale, Megaphone, Map } from 'lucide-react';
 
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
@@ -11,25 +12,25 @@ const disclosures = [
     title: 'Fair Credit Reporting Act (FCRA)',
     description: 'Learn about your rights under the FCRA, including credit inquiries, credit reports, and how to dispute errors.',
     href: '/disclosures/fcra',
-    icon: '📊',
+    Icon: BarChart3,
   },
   {
     title: 'Equal Credit Opportunity Act (ECOA)',
     description: 'Understand your rights to equal credit opportunity and protection against discrimination in lending.',
     href: '/disclosures/ecoa',
-    icon: '⚖️',
+    Icon: Scale,
   },
   {
     title: 'Advertising Disclosures',
     description: 'Important information about APR ranges, rate estimates, and loan terms advertised on our platform.',
     href: '/disclosures/advertising',
-    icon: '📢',
+    Icon: Megaphone,
   },
   {
     title: 'State-Specific Disclosures',
     description: 'Disclosures and notices for residents of specific states, including licensing and regulatory information.',
     href: '/disclosures/state',
-    icon: '🗺️',
+    Icon: Map,
   },
 ];
 
@@ -70,7 +71,9 @@ export default function DisclosuresHubPage() {
               <motion.div key={i} variants={fadeUp}>
                 <Link href={item.href} className="block p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 h-full">
                   <div className="flex items-start gap-4">
-                    <div className="text-3xl flex-shrink-0">{item.icon}</div>
+                    <div className="flex-shrink-0">
+                      <item.Icon className="w-8 h-8 text-blue-600" />
+                    </div>
                     <div className="flex-1">
                       <h3 className="text-base font-semibold text-gray-900 mb-2">{item.title}</h3>
                       <p className="text-sm text-gray-600 leading-relaxed">{item.description}</p>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { Car, Wrench, User, Building, Store, Settings, Palette, Plug, FileText } from 'lucide-react';
 
 const pages = [
   { section: 'Consumer Flow', links: [
@@ -81,21 +82,21 @@ export default function DevPage() {
 
   const quickActions = [
     {
-      icon: '🚗',
+      Icon: Car,
       label: 'Create Test Application',
       description: 'Pre-approval only (no vehicle)',
       onClick: () => createTestApp(false),
       color: 'blue',
     },
     {
-      icon: '🔧',
+      Icon: Wrench,
       label: 'Create Test Application (with vehicle)',
       description: 'Full application with vehicle data',
       onClick: () => createTestApp(true),
       color: 'green',
     },
     {
-      icon: '👤',
+      Icon: User,
       label: 'View as Consumer',
       description: 'Opens consumer dashboard',
       onClick: () => {
@@ -105,7 +106,7 @@ export default function DevPage() {
       color: 'purple',
     },
     {
-      icon: '🏦',
+      Icon: Building,
       label: 'View as Lender',
       description: 'Opens lender portal',
       onClick: () => {
@@ -115,7 +116,7 @@ export default function DevPage() {
       color: 'orange',
     },
     {
-      icon: '🏪',
+      Icon: Store,
       label: 'View as Dealer',
       description: 'Opens dealer portal',
       onClick: () => {
@@ -125,7 +126,7 @@ export default function DevPage() {
       color: 'teal',
     },
     {
-      icon: '⚙️',
+      Icon: Settings,
       label: 'View as Admin',
       description: 'Opens admin panel',
       onClick: () => {
@@ -162,7 +163,7 @@ export default function DevPage() {
                 className={`group relative overflow-hidden bg-gray-900 border border-gray-800 rounded-xl p-6 text-left hover:border-${action.color}-600 hover:bg-gray-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <div className="flex items-start gap-4">
-                  <div className="text-3xl">{action.icon}</div>
+                  <action.Icon className="w-8 h-8 text-gray-400 group-hover:text-white transition-colors" />
                   <div className="flex-1">
                     <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-${action.color}-400 transition-colors">
                       {action.label}
@@ -184,7 +185,7 @@ export default function DevPage() {
               href="/dev/components"
               className="flex items-center gap-3 px-6 py-4 bg-gray-900 border border-gray-800 rounded-xl hover:border-blue-600 hover:bg-gray-800 transition-all duration-200"
             >
-              <span className="text-2xl">🎨</span>
+              <Palette className="w-6 h-6 text-gray-400" />
               <div>
                 <h3 className="text-sm font-semibold text-white">Component Gallery</h3>
                 <p className="text-xs text-gray-400">Preview all UI components</p>
@@ -194,7 +195,7 @@ export default function DevPage() {
               href="/dev/api"
               className="flex items-center gap-3 px-6 py-4 bg-gray-900 border border-gray-800 rounded-xl hover:border-blue-600 hover:bg-gray-800 transition-all duration-200"
             >
-              <span className="text-2xl">🔌</span>
+              <Plug className="w-6 h-6 text-gray-400" />
               <div>
                 <h3 className="text-sm font-semibold text-white">API Explorer</h3>
                 <p className="text-xs text-gray-400">Test API endpoints</p>
@@ -206,7 +207,7 @@ export default function DevPage() {
               }}
               className="flex items-center gap-3 px-6 py-4 bg-gray-900 border border-gray-800 rounded-xl hover:border-blue-600 hover:bg-gray-800 transition-all duration-200 text-left"
             >
-              <span className="text-2xl">📝</span>
+              <FileText className="w-6 h-6 text-gray-400" />
               <div>
                 <h3 className="text-sm font-semibold text-white">Test Apply Form</h3>
                 <p className="text-xs text-gray-400">Pre-filled with test data</p>

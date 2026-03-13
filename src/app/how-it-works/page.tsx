@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { Lock, CheckCircle, Building, Zap } from 'lucide-react';
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
@@ -59,10 +60,10 @@ const steps = [
 ];
 
 const trustBadges = [
-  { icon: '🔒', title: '256-bit Encryption', desc: 'Bank-level security protects your data' },
-  { icon: '✓', title: 'Soft Pull Only', desc: 'No impact to your credit score' },
-  { icon: '🏦', title: 'FDIC Insured Lenders', desc: 'All partners are regulated institutions' },
-  { icon: '⚡', title: 'Results in Minutes', desc: 'Most applicants get offers in under 5 min' },
+  { Icon: Lock, title: '256-bit Encryption', desc: 'Bank-level security protects your data' },
+  { Icon: CheckCircle, title: 'Soft Pull Only', desc: 'No impact to your credit score' },
+  { Icon: Building, title: 'FDIC Insured Lenders', desc: 'All partners are regulated institutions' },
+  { Icon: Zap, title: 'Results in Minutes', desc: 'Most applicants get offers in under 5 min' },
 ];
 
 export default function HowItWorksPage() {
@@ -188,7 +189,9 @@ export default function HowItWorksPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {trustBadges.map((badge, i) => (
               <motion.div key={i} variants={fadeUp} className="text-center p-6 rounded-2xl border border-gray-200 bg-gray-50">
-                <div className="text-3xl mb-3">{badge.icon}</div>
+                <div className="flex justify-center mb-3">
+                  <badge.Icon className="w-8 h-8 text-blue-600" />
+                </div>
                 <h3 className="text-sm font-semibold text-gray-900 mb-1">{badge.title}</h3>
                 <p className="text-xs text-gray-500">{badge.desc}</p>
               </motion.div>

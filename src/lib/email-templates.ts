@@ -83,7 +83,7 @@ export function offersReadyEmail(
 ): EmailData {
   const content = `
     <div class="content">
-      <h2 style="color: #111827; margin-top: 0;">🎉 Your Offers Are Ready!</h2>
+      <h2 style="color: #111827; margin-top: 0;">Your Offers Are Ready!</h2>
       <p style="color: #374151; line-height: 1.6;">Hi ${firstName},</p>
       <p style="color: #374151; line-height: 1.6;">
         Great news! You have <strong>${offerCount} pre-approval offer${offerCount > 1 ? 's' : ''}</strong>
@@ -147,7 +147,7 @@ export function approvalLetterEmail(
 ): EmailData {
   const content = `
     <div class="content">
-      <h2 style="color: #111827; margin-top: 0;">✅ Pre-Approved!</h2>
+      <h2 style="color: #111827; margin-top: 0;">Pre-Approved!</h2>
       <p style="color: #374151; line-height: 1.6;">Hi ${firstName},</p>
       <p style="color: #374151; line-height: 1.6;">
         Congratulations! You've been pre-approved by <strong>${lenderName}</strong>.
@@ -317,7 +317,7 @@ export async function sendEmail(emailData: EmailData): Promise<{ success: boolea
 
   if (!resendApiKey) {
     // Dev mode: just log the email
-    console.log('\n📧 EMAIL (DEV MODE - NOT SENT)');
+    console.log('\nEMAIL (DEV MODE - NOT SENT)');
     console.log('To:', emailData.to);
     console.log('Subject:', emailData.subject);
     console.log('HTML:', emailData.html.substring(0, 200) + '...\n');

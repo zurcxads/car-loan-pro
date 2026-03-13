@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { CreditCard, DollarSign, ShieldCheck, Home } from 'lucide-react';
 
 interface Document {
   id: string;
@@ -16,10 +17,10 @@ interface Document {
 }
 
 const DOCUMENT_TYPES = [
-  { key: 'drivers_license', label: 'Driver\'s License', icon: '🪪' },
-  { key: 'proof_of_income', label: 'Proof of Income', icon: '💰' },
-  { key: 'proof_of_insurance', label: 'Proof of Insurance', icon: '🛡️' },
-  { key: 'proof_of_address', label: 'Proof of Address', icon: '🏠' },
+  { key: 'drivers_license', label: 'Driver\'s License', Icon: CreditCard },
+  { key: 'proof_of_income', label: 'Proof of Income', Icon: DollarSign },
+  { key: 'proof_of_insurance', label: 'Proof of Insurance', Icon: ShieldCheck },
+  { key: 'proof_of_address', label: 'Proof of Address', Icon: Home },
 ];
 
 function DocumentsContent() {
@@ -164,8 +165,8 @@ function DocumentsContent() {
                 <div key={docType.key} className="bg-white rounded-2xl border border-gray-200 p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center text-lg">
-                        {docType.icon}
+                      <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center">
+                        <docType.Icon className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
                         <h3 className="text-sm font-semibold text-gray-900">{docType.label}</h3>

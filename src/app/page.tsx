@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Zap, Building, CheckCircle } from 'lucide-react';
 import Footer from '@/components/shared/Footer';
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
 
 const valueProps = [
-  { icon: '🔒', title: 'No Credit Impact', desc: 'Soft pull only — won\'t affect your score' },
-  { icon: '⚡', title: '2-Minute Application', desc: 'Quick and easy online process' },
-  { icon: '🏦', title: 'Multiple Lenders', desc: 'Compare offers from our network' },
-  { icon: '✓', title: 'Pre-Approved in Minutes', desc: 'Get your answer fast' },
+  { Icon: Lock, title: 'No Credit Impact', desc: 'Soft pull only — won\'t affect your score' },
+  { Icon: Zap, title: '2-Minute Application', desc: 'Quick and easy online process' },
+  { Icon: Building, title: 'Multiple Lenders', desc: 'Compare offers from our network' },
+  { Icon: CheckCircle, title: 'Pre-Approved in Minutes', desc: 'Get your answer fast' },
 ];
 
 const steps = [
@@ -278,7 +279,9 @@ export default function LandingPage() {
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
           {valueProps.map((prop, i) => (
             <motion.div key={i} variants={fadeUp} className="text-center">
-              <div className="text-3xl mb-3">{prop.icon}</div>
+              <div className="flex justify-center mb-3">
+                <prop.Icon className="w-8 h-8 text-blue-600" />
+              </div>
               <div className="text-sm font-semibold text-gray-900 mb-1">{prop.title}</div>
               <div className="text-xs text-gray-500 leading-relaxed">{prop.desc}</div>
             </motion.div>
