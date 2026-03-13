@@ -193,21 +193,21 @@ export default function ApplyPage() {
     return Object.keys(e).length === 0;
   };
 
-  const next = () => { if (validate()) setStep(s => Math.min(s + 1, 3)); };
+  const next = () => { if (checkDevMode() || validate()) setStep(s => Math.min(s + 1, 3)); };
   const back = () => setStep(s => Math.max(s - 1, 0));
 
   const checkDevMode = () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('dev') === 'true';
 
   const submitApplication = async () => {
-    if (!validate()) return;
-
-    setSubmitting(true);
-
-    // Dev mode: skip API, go straight to results
+    // Dev mode: skip EVERYTHING, go straight to results
     if (checkDevMode()) {
+      setSubmitting(true);
       router.push('/results?dev=true');
       return;
     }
+
+    if (!validate()) return;
+    setSubmitting(true);
 
     const safeConsent = {
       softPullConsent: consent.softPullConsent || true,
