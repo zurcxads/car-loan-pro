@@ -1,8 +1,10 @@
 // Lender Matching Engine
 // Takes an application and matches it with eligible lenders, generates offers
 
-import { dbGetLenders, dbCreateOffer, dbUpdateApplication } from './db';
+import { dbGetLenders, dbCreateOffer, dbUpdateApplication, dbCreateNotification } from './db';
+import { createApplicationEvent } from './application-events';
 import type { MockApplication, MockLender } from './mock-data';
+import { offersReadyEmail, sendEmail } from './email-templates';
 
 interface MatchResult {
   matched: boolean;
@@ -62,6 +64,38 @@ export async function matchLendersAndGenerateOffers(application: MockApplication
     offersReceived: offers.length,
     status: offers.length > 0 ? 'offers_available' : 'declined',
   });
+
+  // Create application event
+  if (offers.length > 0) {
+    await createApplicationEvent(
+      application.id,
+      'offer_received',
+      `${offers.length} offer${offers.length > 1 ? 's' : ''} received from lenders`,
+      { offer_count: offers.length }
+    );
+
+    // Create notification
+    await dbCreateNotification({
+      userId: application.id,
+      type: 'offers_ready',
+      title: 'Your Offers Are Ready!',
+      message: `You have ${offers.length} pre-approval offer${offers.length > 1 ? 's' : ''} waiting for you.`,
+      read: false,
+      data: { offer_count: offers.length },
+    });
+
+    // Send email
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?token=${(application as unknown as { sessionToken?: string }).sessionToken}`;
+    const emailData = offersReadyEmail(
+      application.borrower.email,
+      application.borrower.firstName,
+      offers.length,
+      dashboardUrl
+    );
+    sendEmail(emailData).catch(err => {
+      console.error('Failed to send offers ready email:', err);
+    });
+  }
 
   return offers;
 }
