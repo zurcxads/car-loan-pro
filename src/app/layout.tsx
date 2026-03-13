@@ -3,6 +3,7 @@ import { IBM_Plex_Sans } from "next/font/google";
 import Providers from "@/components/providers/SessionProvider";
 import { DevModeProvider } from "@/contexts/DevModeContext";
 import DevModeBanner from "@/components/dev/DevModeBanner";
+import CookieConsent from "@/components/shared/CookieConsent";
 import "./globals.css";
 
 const ibmPlex = IBM_Plex_Sans({
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <DevModeProvider>
           <DevModeBanner />
           <Providers>{children}</Providers>
+          <CookieConsent />
         </DevModeProvider>
       </body>
     </html>
