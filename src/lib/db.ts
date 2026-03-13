@@ -271,7 +271,7 @@ export async function dbGetPlatformStats() {
 
 // --- Applications ---
 function mapDbToApp(row: Record<string, unknown>): MockApplication {
-  return {
+  const app = {
     id: row.id as string,
     borrower: row.borrower as MockApplication['borrower'],
     employment: row.employment as MockApplication['employment'],
@@ -290,6 +290,13 @@ function mapDbToApp(row: Record<string, unknown>): MockApplication {
     offersReceived: Number(row.offers_received || 0),
     flags: (row.flags as string[]) || [],
   };
+
+  // Include session token if present (used for consumer dashboard access)
+  if (row.session_token) {
+    (app as unknown as { sessionToken: string }).sessionToken = row.session_token as string;
+  }
+
+  return app;
 }
 
 function mapAppToDb(app: Partial<MockApplication>): Record<string, unknown> {

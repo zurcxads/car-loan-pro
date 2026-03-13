@@ -3,6 +3,7 @@ import { apiSuccess, apiError, parseBody } from '@/lib/api-helpers';
 import { applicationSubmitSchema } from '@/lib/validations';
 import { dbGetApplications, dbCreateApplication } from '@/lib/db';
 import { generateCreditProfile } from '@/lib/store';
+import { matchLendersAndGenerateOffers } from '@/lib/lender-engine';
 import type { MockApplication } from '@/lib/mock-data';
 
 // GET /api/applications — list all applications
@@ -109,14 +110,21 @@ export async function POST(req: NextRequest) {
     const app = await dbCreateApplication(appData);
     if (!app) return apiError('Failed to create application', 500);
 
+    // Trigger lender matching engine in background
+    // Don't await - let it run async so user doesn't wait
+    matchLendersAndGenerateOffers(app).catch(err => {
+      console.error('Lender matching failed:', err);
+    });
+
     // Return app with session token for consumer dashboard access
-    return apiSuccess({ 
-      ...app,
-      // Session token is stored in the database but we need to return it
-      // For now, generate it here too (will be cleaned up when we refactor)
-      sessionToken: (app as unknown as { sessionToken?: string }).sessionToken || crypto.randomUUID(),
+    const sessionToken = (app as unknown as { sessionToken?: string }).sessionToken || crypto.randomUUID();
+
+    return apiSuccess({
+      id: app.id,
+      sessionToken,
     }, 201);
-  } catch {
+  } catch (err) {
+    console.error('Application creation error:', err);
     return apiError('Failed to create application', 500);
   }
 }

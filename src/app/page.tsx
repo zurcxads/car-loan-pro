@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
@@ -50,15 +51,29 @@ function StarIcon({ filled }: { filled: boolean }) {
 }
 
 export default function LandingPage() {
+  const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  // Mini hero form state
+  const [heroForm, setHeroForm] = useState({ name: '', creditRange: '', loanAmount: '' });
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
   }, []);
+
+  const handleHeroSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Pass data to apply page via URL params
+    const params = new URLSearchParams();
+    if (heroForm.name) params.set('name', heroForm.name);
+    if (heroForm.creditRange) params.set('creditRange', heroForm.creditRange);
+    if (heroForm.loanAmount) params.set('loanAmount', heroForm.loanAmount);
+    router.push(`/apply?${params.toString()}`);
+  };
 
   return (
     <div className="min-h-screen">
@@ -95,25 +110,104 @@ export default function LandingPage() {
         </AnimatePresence>
       </nav>
 
-      {/* Hero */}
-      <section className="pt-32 pb-24 px-6">
-        <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-3xl mx-auto text-center">
-          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-600 text-xs font-medium mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-            No credit impact — check in under 5 minutes
-          </motion.div>
-          <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.08] text-gray-900">
-            Stop overpaying<br />at the dealer
-          </motion.h1>
-          <motion.p variants={fadeUp} className="mt-6 text-lg text-gray-500 max-w-xl mx-auto leading-relaxed font-light">
-            One application. Multiple lenders competing for your auto loan. Get pre-approved in minutes with no impact to your credit score.
-          </motion.p>
-          <motion.div variants={fadeUp} className="mt-10">
-            <Link href="/apply" className="inline-flex px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200 cursor-pointer">
-              Check Your Rate — Free
-            </Link>
-          </motion.div>
-          <motion.p variants={fadeUp} className="mt-4 text-xs text-gray-400">No credit impact. No obligation. Results in under 5 minutes.</motion.p>
+      {/* Hero - Tool as Hero */}
+      <section className="pt-24 pb-16 px-6">
+        <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-5xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Copy */}
+            <div>
+              <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-600 text-xs font-medium mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                No credit impact — check in under 5 minutes
+              </motion.div>
+              <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.08] text-gray-900 mb-6">
+                Stop overpaying<br />at the dealer
+              </motion.h1>
+              <motion.p variants={fadeUp} className="text-lg text-gray-500 leading-relaxed font-light mb-8">
+                One application. Multiple lenders competing for your auto loan. Get pre-approved in minutes with no impact to your credit score.
+              </motion.p>
+              <motion.div variants={fadeUp} className="flex flex-wrap gap-6 text-sm">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  No dealer visits
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  Soft credit pull only
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  Free for consumers
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Right: Mini Form */}
+            <motion.div variants={fadeUp}>
+              <form onSubmit={handleHeroSubmit} className="bg-white rounded-2xl border border-gray-200 shadow-lg p-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-1">Get Your Rate</h3>
+                <p className="text-sm text-gray-500 mb-6">Takes less than 5 minutes. No credit impact.</p>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-2 font-medium">Your Name</label>
+                    <input
+                      type="text"
+                      value={heroForm.name}
+                      onChange={e => setHeroForm(f => ({ ...f, name: e.target.value }))}
+                      placeholder="John Smith"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-2 font-medium">Estimated Credit Score</label>
+                    <select
+                      value={heroForm.creditRange}
+                      onChange={e => setHeroForm(f => ({ ...f, creditRange: e.target.value }))}
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors cursor-pointer"
+                    >
+                      <option value="">Select range</option>
+                      <option value="750+">Excellent (750+)</option>
+                      <option value="700-749">Good (700-749)</option>
+                      <option value="650-699">Fair (650-699)</option>
+                      <option value="600-649">Poor (600-649)</option>
+                      <option value="<600">Very Poor (&lt;600)</option>
+                      <option value="unsure">Not sure</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs text-gray-500 mb-2 font-medium">Desired Loan Amount</label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
+                      <input
+                        type="text"
+                        value={heroForm.loanAmount}
+                        onChange={e => {
+                          const val = e.target.value.replace(/[^0-9]/g, '');
+                          setHeroForm(f => ({ ...f, loanAmount: val }));
+                        }}
+                        placeholder="30,000"
+                        className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors cursor-pointer"
+                  >
+                    Check My Rate — Free
+                  </button>
+
+                  <p className="text-xs text-gray-400 text-center">
+                    By continuing, you agree to our <Link href="/terms" className="underline">Terms</Link> and <Link href="/privacy" className="underline">Privacy Policy</Link>
+                  </p>
+                </div>
+              </form>
+            </motion.div>
+          </div>
         </motion.div>
       </section>
 
