@@ -38,7 +38,7 @@ function LoginForm() {
 
       setSent(true);
       toast.success('Check your email for a login link!');
-    } catch (err) {
+    } catch {
       toast.error('Failed to send magic link. Please try again.');
     } finally {
       setLoading(false);

@@ -12,6 +12,7 @@ export interface EmailData {
 }
 
 const BRAND_COLOR = '#2563eb'; // blue-600
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://autoloanpro.co';
 
 function emailWrapper(content: string): string {
