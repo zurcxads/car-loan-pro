@@ -1,4 +1,3 @@
-import { NextRequest } from 'next/server';
 import { setupDatabase } from '@/lib/setup-db';
 import { apiSuccess, apiError } from '@/lib/api-helpers';
 
