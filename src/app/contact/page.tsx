@@ -3,17 +3,63 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Footer from '@/components/shared/Footer';
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
 
+const faqs = [
+  {
+    question: "How quickly can I get pre-approved?",
+    answer: "Most applicants receive pre-approval offers within 2 minutes of submitting their application. Our platform instantly matches your profile with multiple lenders in real-time."
+  },
+  {
+    question: "Will this affect my credit score?",
+    answer: "No. Auto Loan Pro uses a soft credit pull for the initial pre-qualification, which does not impact your credit score. Your credit is only affected if you choose to accept a specific offer and proceed with that lender."
+  },
+  {
+    question: "Do I need to choose a vehicle first?",
+    answer: "No. You can get pre-approved for a loan amount before you find a car. This gives you negotiating power when you shop, knowing exactly how much you can spend."
+  },
+  {
+    question: "How many lenders will see my application?",
+    answer: "Your application is sent to our network of lenders who specialize in your credit tier and loan requirements. Typically 5-10 lenders will review your profile and make offers."
+  },
+  {
+    question: "Is Auto Loan Pro really free?",
+    answer: "Yes, 100% free for consumers. We earn referral fees from lenders when loans are successfully funded, so our incentive is to find you the best deal possible."
+  },
+  {
+    question: "What if I have bad credit?",
+    answer: "We work with lenders across the full credit spectrum, from prime to subprime. Even if you have less-than-perfect credit, you may still receive multiple offers."
+  },
+  {
+    question: "Can I use this for a used car?",
+    answer: "Absolutely. Our lenders finance both new and used vehicles from dealerships and private sellers."
+  },
+  {
+    question: "How long is my pre-approval valid?",
+    answer: "Pre-approval offers are typically valid for 30-45 days, giving you plenty of time to shop for the right vehicle."
+  },
+  {
+    question: "What documents will I need?",
+    answer: "For pre-approval, we only need basic information. If you accept an offer, the lender may request proof of income, employment verification, and identification."
+  },
+  {
+    question: "Can I cancel or change my application?",
+    answer: "Yes. You can withdraw or update your application at any time before accepting a specific offer. There is no obligation."
+  }
+];
+
 export default function ContactPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('General');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -36,7 +82,7 @@ export default function ContactPage() {
           <div className="hidden md:flex items-center gap-8 text-sm text-gray-500">
             <Link href="/how-it-works" className="hover:text-gray-900 transition-colors duration-200">How It Works</Link>
             <Link href="/calculator" className="hover:text-gray-900 transition-colors duration-200">Calculator</Link>
-            <Link href="#" className="hover:text-gray-900 transition-colors duration-200">Resources</Link>
+            <Link href="/resources" className="hover:text-gray-900 transition-colors duration-200">Resources</Link>
             <Link href="/login" className="hover:text-gray-900 transition-colors duration-200">Sign In</Link>
           </div>
           <div className="flex items-center gap-4">
@@ -52,21 +98,21 @@ export default function ContactPage() {
           <div className="md:hidden border-t border-gray-200 bg-white px-6 py-4 flex flex-col gap-4 text-sm">
             <Link href="/how-it-works" className="text-gray-500 hover:text-gray-900" onClick={() => setMobileMenu(false)}>How It Works</Link>
             <Link href="/calculator" className="text-gray-500 hover:text-gray-900" onClick={() => setMobileMenu(false)}>Calculator</Link>
-            <Link href="#" className="text-gray-500 hover:text-gray-900" onClick={() => setMobileMenu(false)}>Resources</Link>
+            <Link href="/resources" className="text-gray-500 hover:text-gray-900" onClick={() => setMobileMenu(false)}>Resources</Link>
             <Link href="/login" className="text-gray-500 hover:text-gray-900" onClick={() => setMobileMenu(false)}>Sign In</Link>
             <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-white" onClick={() => setMobileMenu(false)}>Apply Now</Link>
           </div>
         )}
       </nav>
 
-      <section className="pt-32 pb-24 px-6">
+      <section className="pt-32 pb-16 px-6">
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-2xl mx-auto">
           <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 text-center">Contact Us</motion.h1>
           <motion.p variants={fadeUp} className="mt-4 text-lg text-gray-500 text-center font-light">
             Have a question? We&apos;re here to help.
           </motion.p>
 
-          <motion.div variants={fadeUp} className="mt-12 grid sm:grid-cols-2 gap-6 mb-12">
+          <motion.div variants={fadeUp} className="mt-12 grid sm:grid-cols-3 gap-6 mb-12">
             <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center">
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-3">
                 <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -74,7 +120,17 @@ export default function ContactPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold text-gray-900 mb-1">Email</h3>
-              <a href="mailto:support@autoloanpro.co" className="text-sm text-blue-600 hover:text-blue-500 transition-colors">support@autoloanpro.co</a>
+              <a href="mailto:hello@autoloanpro.co" className="text-sm text-blue-600 hover:text-blue-500 transition-colors">hello@autoloanpro.co</a>
+            </div>
+            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">Business Hours</h3>
+              <p className="text-sm text-gray-600">Mon-Fri: 9am-6pm ET</p>
+              <p className="text-xs text-gray-500 mt-1">Weekend: Closed</p>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6 text-center">
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-3">
@@ -83,7 +139,7 @@ export default function ContactPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold text-gray-900 mb-1">FAQ</h3>
-              <Link href="/#faq" className="text-sm text-blue-600 hover:text-blue-500 transition-colors">View Common Questions</Link>
+              <a href="#faq" className="text-sm text-blue-600 hover:text-blue-500 transition-colors">View Common Questions</a>
             </div>
           </motion.div>
 
@@ -123,6 +179,20 @@ export default function ContactPage() {
                 />
               </div>
               <div>
+                <label className="block text-xs text-gray-500 mb-2 font-medium">Subject</label>
+                <select
+                  value={subject}
+                  onChange={e => setSubject(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200 cursor-pointer"
+                >
+                  <option>General</option>
+                  <option>Support</option>
+                  <option>Lender Partnership</option>
+                  <option>Dealer Partnership</option>
+                  <option>Press</option>
+                </select>
+              </div>
+              <div>
                 <label className="block text-xs text-gray-500 mb-2 font-medium">Message</label>
                 <textarea
                   value={message}
@@ -141,43 +211,130 @@ export default function ContactPage() {
         </motion.div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-12 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 text-sm">
-          <div>
-            <div className="font-semibold text-gray-900 mb-4">Product</div>
-            <div className="space-y-3 text-gray-500">
-              <Link href="/how-it-works" className="block hover:text-gray-900 transition-colors duration-200">How It Works</Link>
-              <Link href="/calculator" className="block hover:text-gray-900 transition-colors duration-200">Calculator</Link>
-              <Link href="/apply" className="block hover:text-gray-900 transition-colors duration-200">Apply Now</Link>
-            </div>
-          </div>
-          <div>
-            <div className="font-semibold text-gray-900 mb-4">Company</div>
-            <div className="space-y-3 text-gray-500">
-              <Link href="/about" className="block hover:text-gray-900 transition-colors duration-200">About</Link>
-              <Link href="/contact" className="block hover:text-gray-900 transition-colors duration-200">Contact</Link>
-            </div>
-          </div>
-          <div>
-            <div className="font-semibold text-gray-900 mb-4">Legal</div>
-            <div className="space-y-3 text-gray-500">
-              <Link href="/privacy" className="block hover:text-gray-900 transition-colors duration-200">Privacy Policy</Link>
-              <Link href="/terms" className="block hover:text-gray-900 transition-colors duration-200">Terms of Service</Link>
-            </div>
-          </div>
-          <div>
-            <div className="font-semibold text-gray-900 mb-4">Support</div>
-            <div className="space-y-3 text-gray-500">
-              <Link href="/login" className="block hover:text-gray-900 transition-colors duration-200">Sign In</Link>
-              <Link href="/contact" className="block hover:text-gray-900 transition-colors duration-200">Help Center</Link>
-            </div>
-          </div>
+      {/* FAQ Section */}
+      <section id="faq" className="py-16 px-6 bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-12">
+            Frequently Asked Questions
+          </motion.h2>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="space-y-3">
+            {faqs.map((faq, i) => (
+              <motion.div key={i} variants={fadeUp} className="rounded-xl bg-white border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  <span className="text-sm font-semibold text-gray-900 pr-4">{faq.question}</span>
+                  <svg
+                    className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${expandedFaq === i ? 'rotate-180' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {expandedFaq === i && (
+                  <div className="px-6 pb-4 pt-1">
+                    <p className="text-sm text-gray-600 leading-relaxed">{faq.answer}</p>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
-        <div className="max-w-5xl mx-auto mt-10 pt-8 border-t border-gray-200 text-xs text-gray-400 text-center">
-          Auto Loan Pro is not a lender. Offers are subject to credit approval. NMLS #000000
+      </section>
+
+      {/* Partnership Sections */}
+      <section className="py-16 px-6">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+          {/* For Lenders */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="rounded-2xl border border-gray-200 bg-white p-8">
+            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">For Lenders</h3>
+            <p className="text-sm text-gray-600 leading-relaxed mb-6">
+              Join our lender network and access high-quality, pre-screened auto loan applicants. We handle lead generation, underwriting support, and compliance — you focus on funding great deals.
+            </p>
+            <ul className="space-y-2 mb-6">
+              <li className="flex items-start gap-2 text-sm text-gray-600">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Pre-qualified, high-intent applicants
+              </li>
+              <li className="flex items-start gap-2 text-sm text-gray-600">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                API integration for seamless decisioning
+              </li>
+              <li className="flex items-start gap-2 text-sm text-gray-600">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Flexible underwriting criteria
+              </li>
+              <li className="flex items-start gap-2 text-sm text-gray-600">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Real-time application delivery
+              </li>
+            </ul>
+            <a href="mailto:lenders@autoloanpro.co" className="inline-flex px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+              Partner with Us
+            </a>
+          </motion.div>
+
+          {/* For Dealers */}
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="rounded-2xl border border-gray-200 bg-white p-8">
+            <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">For Dealers</h3>
+            <p className="text-sm text-gray-600 leading-relaxed mb-6">
+              Receive pre-approved shoppers ready to buy. Our customers come to your lot with financing already secured, reducing time on the lot and closing more deals faster.
+            </p>
+            <ul className="space-y-2 mb-6">
+              <li className="flex items-start gap-2 text-sm text-gray-600">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Pre-approved, ready-to-buy customers
+              </li>
+              <li className="flex items-start gap-2 text-sm text-gray-600">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Faster deal closures
+              </li>
+              <li className="flex items-start gap-2 text-sm text-gray-600">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                No cost to list or participate
+              </li>
+              <li className="flex items-start gap-2 text-sm text-gray-600">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                Lead management dashboard
+              </li>
+            </ul>
+            <a href="mailto:dealers@autoloanpro.co" className="inline-flex px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+              Become a Partner Dealer
+            </a>
+          </motion.div>
         </div>
-      </footer>
+      </section>
+
+      <Footer />
     </div>
   );
 }
