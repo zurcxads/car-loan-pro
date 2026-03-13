@@ -77,6 +77,13 @@ export async function dbGetOffers(applicationId?: string): Promise<MockOffer[]> 
   return data.map(mapDbToOffer);
 }
 
+export async function dbGetOffer(id: string): Promise<MockOffer | null> {
+  if (!isSupabaseConfigured()) return MOCK_OFFERS.find(o => o.id === id) || null;
+  const { data, error } = await supabase.from('offers').select('*').eq('id', id).single();
+  if (error || !data) return null;
+  return mapDbToOffer(data);
+}
+
 export async function dbCreateOffer(offer: Partial<MockOffer>): Promise<MockOffer | null> {
   if (!isSupabaseConfigured()) {
     const newOffer = { ...offer, id: `OFR-${String(MOCK_OFFERS.length + 1).padStart(3, '0')}` } as MockOffer;

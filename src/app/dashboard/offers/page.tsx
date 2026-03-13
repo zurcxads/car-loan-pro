@@ -2,8 +2,10 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import OfferSelectionModal from '@/components/offers/OfferSelectionModal';
 
 interface Offer {
   id: string;
@@ -19,9 +21,13 @@ interface Offer {
 
 function OffersContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const token = searchParams.get('token');
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSelecting, setIsSelecting] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -46,6 +52,42 @@ function OffersContent() {
         setLoading(false);
       });
   }, [token]);
+
+  const handleSelectOffer = (offer: Offer) => {
+    setSelectedOffer(offer);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmSelection = async () => {
+    if (!selectedOffer) return;
+
+    setIsSelecting(true);
+    try {
+      const response = await fetch(`/api/offers/${selectedOffer.id}/select`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Offer selected successfully!');
+        setIsModalOpen(false);
+
+        // Redirect to approval letter page
+        setTimeout(() => {
+          router.push(`/dashboard/approval-letter?token=${token}`);
+        }, 500);
+      } else {
+        toast.error(data.error || 'Failed to select offer');
+      }
+    } catch (error) {
+      console.error('Error selecting offer:', error);
+      toast.error('Failed to select offer');
+    } finally {
+      setIsSelecting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -146,6 +188,7 @@ function OffersContent() {
                     Expires {new Date(offer.expiresAt).toLocaleDateString()}
                   </div>
                   <button
+                    onClick={() => handleSelectOffer(offer)}
                     className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors"
                   >
                     Select This Offer
@@ -156,6 +199,17 @@ function OffersContent() {
           </div>
         )}
       </div>
+
+      {/* Selection Modal */}
+      {selectedOffer && (
+        <OfferSelectionModal
+          offer={selectedOffer}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={handleConfirmSelection}
+          loading={isSelecting}
+        />
+      )}
     </div>
   );
 }
