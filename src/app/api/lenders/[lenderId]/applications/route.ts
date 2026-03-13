@@ -4,10 +4,10 @@ import { dbGetApplications, dbGetLender } from '@/lib/db';
 
 // GET /api/lenders/[lenderId]/applications — get applications that match lender criteria
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ lenderId: string }> }
 ) {
-  const { session, error } = await requireAuth('lender');
+  const { error } = await requireAuth('lender');
   if (error) return error;
 
   const { lenderId } = await params;

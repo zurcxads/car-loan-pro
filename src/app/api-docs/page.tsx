@@ -404,7 +404,7 @@ export default function ApiDocsPage() {
             <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl p-8 text-white">
               <h2 className="text-2xl font-bold mb-2">Coming Soon: Official SDKs</h2>
               <p className="text-blue-100 mb-6">
-                We're building official client libraries to make integration even easier.
+                We&apos;re building official client libraries to make integration even easier.
               </p>
               <div className="flex gap-4">
                 <div className="px-4 py-2 bg-white/10 rounded-lg border border-white/20 text-sm font-medium">

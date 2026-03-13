@@ -61,7 +61,7 @@ export default function OfferSelectionModal({
                   </button>
                 </div>
                 <p className="text-blue-100 text-sm">
-                  You're about to select this offer from {offer.lenderName}
+                  You&apos;re about to select this offer from {offer.lenderName}
                 </p>
               </div>
 
@@ -114,7 +114,7 @@ export default function OfferSelectionModal({
                   <ol className="space-y-1.5 text-sm text-blue-800">
                     <li className="flex gap-2">
                       <span className="font-semibold">1.</span>
-                      <span>We'll generate your pre-approval letter</span>
+                      <span>We&apos;ll generate your pre-approval letter</span>
                     </li>
                     <li className="flex gap-2">
                       <span className="font-semibold">2.</span>

@@ -145,7 +145,7 @@ function StatusContent() {
         </div>
 
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-2xl p-6">
-          <h2 className="text-sm font-semibold text-blue-900 mb-3">What's Next?</h2>
+          <h2 className="text-sm font-semibold text-blue-900 mb-3">What&apos;s Next?</h2>
           {application.offersReceived > 0 ? (
             <div className="text-sm text-blue-800 space-y-2">
               <p>You have {application.offersReceived} loan offer{application.offersReceived > 1 ? 's' : ''} waiting for you!</p>
@@ -158,7 +158,7 @@ function StatusContent() {
             </div>
           ) : (
             <p className="text-sm text-blue-800">
-              Our lending partners are reviewing your application. You'll receive offers within 2-15 minutes.
+              Our lending partners are reviewing your application. You&apos;ll receive offers within 2-15 minutes.
             </p>
           )}
         </div>

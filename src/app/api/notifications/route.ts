@@ -1,9 +1,8 @@
-import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, requireAuth } from '@/lib/api-helpers';
 import { dbGetNotifications, dbGetUnreadNotificationCount, dbMarkAllNotificationsRead } from '@/lib/db';
 
 // GET /api/notifications — get user's notifications
-export async function GET(req: NextRequest) {
+export async function GET() {
   const { session, error } = await requireAuth();
   if (error) return error;
   if (!session) return apiError('Unauthorized', 401);
@@ -19,7 +18,7 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/notifications/mark-all-read
-export async function POST(req: NextRequest) {
+export async function POST() {
   const { session, error } = await requireAuth();
   if (error) return error;
   if (!session) return apiError('Unauthorized', 401);

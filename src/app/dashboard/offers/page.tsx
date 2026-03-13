@@ -6,26 +6,15 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import OfferSelectionModal from '@/components/offers/OfferSelectionModal';
-
-interface Offer {
-  id: string;
-  lenderName: string;
-  apr: number;
-  termMonths: number;
-  monthlyPayment: number;
-  approvedAmount: number;
-  status: string;
-  conditions: string[];
-  expiresAt: string;
-}
+import { MockOffer } from '@/lib/mock-data';
 
 function OffersContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token');
-  const [offers, setOffers] = useState<Offer[]>([]);
+  const [offers, setOffers] = useState<MockOffer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [selectedOffer, setSelectedOffer] = useState<MockOffer | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
 
@@ -53,7 +42,7 @@ function OffersContent() {
       });
   }, [token]);
 
-  const handleSelectOffer = (offer: Offer) => {
+  const handleSelectOffer = (offer: MockOffer) => {
     setSelectedOffer(offer);
     setIsModalOpen(true);
   };

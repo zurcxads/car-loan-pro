@@ -4,13 +4,13 @@ import { dbGetApplications, dbGetOffers } from '@/lib/db';
 
 // GET /api/dealers/[dealerId]/buyers — get pre-approved consumers in dealer's area
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ dealerId: string }> }
 ) {
   const { error } = await requireAuth('dealer');
   if (error) return error;
 
-  const { dealerId } = await params;
+  await params; // dealerId not used in current implementation
 
   try {
     // Get all applications with offers
