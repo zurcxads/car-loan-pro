@@ -57,6 +57,131 @@ const faqs = [
   { q: 'How long does the process take?', a: 'Most applicants receive their first offers within 2 minutes of submitting. The entire process from application to pre-approval takes under 5 minutes.' },
 ];
 
+const creditScoreRanges = [
+  { label: 'Fair (580-669)', value: 'fair', rateRange: [8.99, 14.99], avgRate: 11.99 },
+  { label: 'Good (670-739)', value: 'good', rateRange: [5.99, 8.99], avgRate: 7.49 },
+  { label: 'Very Good (740-799)', value: 'very_good', rateRange: [4.49, 5.99], avgRate: 5.24 },
+  { label: 'Excellent (800+)', value: 'excellent', rateRange: [3.49, 4.99], avgRate: 4.24 }
+];
+
+function RateCalculator() {
+  const router = useRouter();
+  const [loanAmount, setLoanAmount] = useState(25000);
+  const [creditRange, setCreditRange] = useState('good');
+
+  const selectedCredit = creditScoreRanges.find(c => c.value === creditRange) || creditScoreRanges[1];
+  const termMonths = 60;
+
+  // Calculate monthly payment range
+  const calculatePayment = (amount: number, apr: number, months: number) => {
+    const monthlyRate = apr / 100 / 12;
+    if (monthlyRate === 0) return amount / months;
+    return (amount * monthlyRate * Math.pow(1 + monthlyRate, months)) / (Math.pow(1 + monthlyRate, months) - 1);
+  };
+
+  const minPayment = Math.round(calculatePayment(loanAmount, selectedCredit.rateRange[0], termMonths));
+  const maxPayment = Math.round(calculatePayment(loanAmount, selectedCredit.rateRange[1], termMonths));
+  const avgPayment = Math.round(calculatePayment(loanAmount, selectedCredit.avgRate, termMonths));
+
+  return (
+    <section className="py-16 md:py-24 px-6 bg-gray-50">
+      <div className="max-w-4xl mx-auto">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-8">
+          <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900">Estimate Your Rate</motion.h2>
+          <motion.p variants={fadeUp} className="mt-3 text-gray-500 text-sm">See what you might qualify for without applying</motion.p>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm"
+        >
+          {/* Loan Amount Slider */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-gray-700">Loan Amount</label>
+              <span className="text-2xl font-bold text-blue-600">${loanAmount.toLocaleString()}</span>
+            </div>
+            <input
+              type="range"
+              min="10000"
+              max="75000"
+              step="1000"
+              value={loanAmount}
+              onChange={e => setLoanAmount(Number(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              style={{
+                background: `linear-gradient(to right, #2563eb 0%, #2563eb ${((loanAmount - 10000) / (75000 - 10000)) * 100}%, #e5e7eb ${((loanAmount - 10000) / (75000 - 10000)) * 100}%, #e5e7eb 100%)`
+              }}
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <span>$10,000</span>
+              <span>$75,000</span>
+            </div>
+          </div>
+
+          {/* Credit Score Range */}
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-gray-700 mb-3">Estimated Credit Score</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {creditScoreRanges.map(range => (
+                <button
+                  key={range.value}
+                  onClick={() => setCreditRange(range.value)}
+                  className={`px-3 py-3 min-h-[44px] text-xs font-medium rounded-lg border transition-all ${
+                    creditRange === range.value
+                      ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                      : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  {range.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Results */}
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 mb-6">
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div>
+                <div className="text-xs text-blue-700 font-medium mb-2">Estimated APR Range</div>
+                <div className="text-3xl font-bold text-gray-900">
+                  {selectedCredit.rateRange[0].toFixed(2)}% - {selectedCredit.rateRange[1].toFixed(2)}%
+                </div>
+                <div className="text-xs text-gray-600 mt-1">Based on {selectedCredit.label.split(' ')[0]} credit</div>
+              </div>
+              <div>
+                <div className="text-xs text-blue-700 font-medium mb-2">Estimated Monthly Payment</div>
+                <div className="text-3xl font-bold text-gray-900">
+                  ${avgPayment.toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-600 mt-1">Range: ${minPayment.toLocaleString()} - ${maxPayment.toLocaleString()}/mo for 60 months</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Disclaimer */}
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
+            <p className="text-xs text-gray-600 text-center">
+              <strong>Estimates only.</strong> Apply to see your actual offers. Rates shown are illustrative and based on market averages. Your actual rate will depend on your credit profile, vehicle, and lender.
+            </p>
+          </div>
+
+          {/* CTA */}
+          <button
+            onClick={() => router.push('/apply')}
+            className="w-full px-8 py-4 min-h-[48px] bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors shadow-sm"
+          >
+            See Your Real Offers — Takes 2 Minutes
+          </button>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 export default function LandingPage() {
   const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -468,6 +593,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+
+      {/* Interactive Rate Calculator */}
+      <RateCalculator />
 
       {/* FAQ */}
       <section id="faq" className="py-16 md:py-24 px-6">
