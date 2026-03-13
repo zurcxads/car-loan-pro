@@ -71,7 +71,7 @@ export default function SecurityPage() {
       {/* Main Content */}
       <div className="max-w-5xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
         {/* Security Features Grid */}
-        <div className="grid md:grid-cols-2 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
           {securityFeatures.map((feature, index) => {
             const Icon = feature.icon;
             return (

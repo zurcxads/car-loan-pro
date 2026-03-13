@@ -176,7 +176,7 @@ export default function LandingPage() {
       {/* Hero - Tool as Hero */}
       <section className={`pt-24 pb-16 px-6 ${showBanner && returningVisitor ? 'mt-14' : ''}`}>
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-5xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left: Copy */}
             <div>
               <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-600 text-xs font-medium mb-6">
@@ -312,7 +312,7 @@ export default function LandingPage() {
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900">The Old Way vs Auto Loan Pro</motion.h2>
             <motion.p variants={fadeUp} className="mt-3 text-gray-500 text-sm">The average car buyer spends 15+ hours on financing. We cut that to under 5 minutes.</motion.p>
           </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-2 gap-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <motion.div variants={fadeUp} className="bg-white rounded-2xl border border-gray-200 p-8">
               <div className="text-xs text-red-600 mb-3 uppercase tracking-wider font-medium">Traditional Route</div>
               <div className="space-y-4 mb-6">
@@ -404,7 +404,7 @@ export default function LandingPage() {
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900">How It Works</motion.h2>
             <motion.p variants={fadeUp} className="mt-3 text-gray-500 text-sm">At a dealership, this takes 3-5 visits. With us, it takes one coffee break.</motion.p>
           </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-3 gap-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {steps.map((s, i) => (
               <motion.div key={i} variants={fadeUp} className="relative p-7 rounded-2xl surface surface-hover">
                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4">
@@ -428,7 +428,7 @@ export default function LandingPage() {
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900">Lenders For Every Credit Profile</motion.h2>
             <motion.p variants={fadeUp} className="mt-3 text-gray-500 text-sm">Our network covers the full credit spectrum</motion.p>
           </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid sm:grid-cols-2 gap-4">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {tiers.map((t, i) => (
               <motion.div key={i} variants={fadeUp} className="flex items-center gap-5 p-5 rounded-2xl surface surface-hover">
                 <div className={`w-1.5 h-14 rounded-full ${t.color}`} />
@@ -447,7 +447,7 @@ export default function LandingPage() {
       <section className="py-16 md:py-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 mb-12">Dealer vs Auto Loan Pro</motion.h2>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid sm:grid-cols-2 gap-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <motion.div variants={fadeUp} className="p-8 rounded-2xl surface">
               <div className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-medium">Average Dealer Rate</div>
               <div className="text-5xl font-bold text-red-500">7.9%</div>

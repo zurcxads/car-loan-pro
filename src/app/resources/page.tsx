@@ -45,7 +45,7 @@ export default function ResourcesPage() {
 
       {/* Article Grid */}
       <section className="pb-24 px-6">
-        <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           {articles.map((article) => (
             <Link
               key={article.slug}

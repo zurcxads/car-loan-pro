@@ -513,8 +513,8 @@ export default function ApplyPage() {
                       </datalist>
                     </Field>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                      <div className="col-span-2 md:col-span-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+                      <div className="col-span-1 sm:col-span-2 md:col-span-2">
                         <Field error={errors.city}>
                           <FloatingLabelInput
                             label="City *"
@@ -546,7 +546,7 @@ export default function ApplyPage() {
                       </Field>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                       <Field>
                         <Select
                           value={address.residenceType}
@@ -583,7 +583,7 @@ export default function ApplyPage() {
               <div className="space-y-5">
                 <h2 className="text-lg font-semibold text-gray-900 mb-6">Income & Employment</h2>
 
-                <div className="grid md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <Field>
                     <Select
                       value={employment.employmentStatus}
@@ -612,7 +612,7 @@ export default function ApplyPage() {
 
                 {(employment.employmentStatus === 'full_time' || employment.employmentStatus === 'part_time') && (
                   <>
-                    <div className="grid md:grid-cols-2 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <Field>
                         <FloatingLabelInput
                           label="Employer Name"
@@ -643,7 +643,7 @@ export default function ApplyPage() {
                         >
                           <div className="pt-6 border-t border-gray-200 space-y-5">
                             <h3 className="text-sm font-medium text-blue-600">Previous Employer</h3>
-                            <div className="grid md:grid-cols-2 gap-5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                               <Field>
                                 <FloatingLabelInput
                                   label="Previous Employer Name"
@@ -780,7 +780,7 @@ export default function ApplyPage() {
                         className="overflow-hidden"
                       >
                         <div className="mt-5 space-y-5">
-                          <div className="grid md:grid-cols-2 gap-5">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <Field>
                               <FloatingLabelInput label="First Name" value={coPersonal.firstName} onChange={v => setCoPersonal(p => ({ ...p, firstName: v }))} />
                             </Field>
@@ -788,7 +788,7 @@ export default function ApplyPage() {
                               <FloatingLabelInput label="Last Name" value={coPersonal.lastName} onChange={v => setCoPersonal(p => ({ ...p, lastName: v }))} />
                             </Field>
                           </div>
-                          <div className="grid md:grid-cols-2 gap-5">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <Field>
                               <FloatingLabelInput label="SSN" value={coPersonal.ssn} onChange={v => setCoPersonal(p => ({ ...p, ssn: formatSSN(v) }))} placeholder="XXX-XX-XXXX" maxLength={11} showEncrypted={true} />
                             </Field>
@@ -816,7 +816,7 @@ export default function ApplyPage() {
                         className="overflow-hidden"
                       >
                         <div className="mt-5 space-y-5">
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
                             <Field>
                               <FloatingLabelInput label="Year" type="number" value={String(vehicle.year || new Date().getFullYear())} onChange={v => setVehicle(ve => ({ ...ve, year: Number(v) }))} />
                             </Field>

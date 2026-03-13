@@ -539,10 +539,10 @@ function ResultsContent() {
         >
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600 font-medium">Sort by:</span>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setSortBy('best_rate')}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all ${
                   sortBy === 'best_rate'
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
@@ -552,7 +552,7 @@ function ResultsContent() {
               </button>
               <button
                 onClick={() => setSortBy('lowest_payment')}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all ${
                   sortBy === 'lowest_payment'
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
@@ -562,7 +562,7 @@ function ResultsContent() {
               </button>
               <button
                 onClick={() => setSortBy('highest_amount')}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all ${
                   sortBy === 'highest_amount'
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
@@ -574,7 +574,7 @@ function ResultsContent() {
           </div>
           <button
             onClick={() => setCompareMode(!compareMode)}
-            className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+            className={`px-4 py-2.5 min-h-[44px] text-sm font-medium rounded-lg border transition-all ${
               compareMode
                 ? 'bg-blue-50 border-blue-200 text-blue-700'
                 : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'

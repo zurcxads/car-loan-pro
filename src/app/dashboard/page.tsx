@@ -241,7 +241,7 @@ function DashboardContent() {
               <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200" />
               <div className="absolute top-5 left-0 h-0.5 bg-blue-600 transition-all duration-500" style={{ width: application.status === 'offer_selected' ? '75%' : '50%' }} />
 
-              <div className="grid grid-cols-4 gap-4 relative">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative">
                 {[
                   { label: 'Applied', completed: true },
                   { label: 'Matched', completed: true },
