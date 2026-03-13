@@ -22,13 +22,15 @@ export async function POST(req: NextRequest) {
     const creditScore = TEST_CREDIT_RESULT.ficoScore;
     const riskTier = creditScore >= 700 ? 'prime' : creditScore >= 640 ? 'near_prime' : 'subprime';
 
-    console.log('[DEV] Created test application:', {
-      applicationId,
-      sessionToken,
-      withVehicle,
-      creditScore,
-      riskTier,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[DEV] Created test application:', {
+        applicationId,
+        sessionToken,
+        withVehicle,
+        creditScore,
+        riskTier,
+      });
+    }
 
     return NextResponse.json({
       success: true,

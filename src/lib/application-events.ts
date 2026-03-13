@@ -33,7 +33,9 @@ export async function createApplicationEvent(
 ): Promise<ApplicationEvent | null> {
   if (!isSupabaseConfigured()) {
     // In dev mode, just log the event
-    console.log(`📌 Application Event: ${eventType} - ${description}`, metadata);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`📌 Application Event: ${eventType} - ${description}`, metadata);
+    }
     return {
       id: crypto.randomUUID(),
       application_id: applicationId,
