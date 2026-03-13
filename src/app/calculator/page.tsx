@@ -15,6 +15,29 @@ function calculatePayment(principal: number, annualRate: number, months: number)
   return (principal * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
 }
 
+function generateAmortizationSchedule(principal: number, annualRate: number, months: number) {
+  const schedule: { month: number; payment: number; principal: number; interest: number; balance: number }[] = [];
+  const monthlyRate = annualRate / 100 / 12;
+  const monthlyPayment = calculatePayment(principal, annualRate, months);
+  let balance = principal;
+
+  for (let month = 1; month <= months; month++) {
+    const interestPayment = balance * monthlyRate;
+    const principalPayment = monthlyPayment - interestPayment;
+    balance -= principalPayment;
+
+    schedule.push({
+      month,
+      payment: monthlyPayment,
+      principal: principalPayment,
+      interest: interestPayment,
+      balance: Math.max(0, balance),
+    });
+  }
+
+  return schedule;
+}
+
 function formatCurrency(val: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val);
 }
@@ -24,11 +47,26 @@ function formatCurrencyFull(val: number) {
 }
 
 export default function CalculatorPage() {
-  const [loanAmount, setLoanAmount] = useState(30000);
-  const [interestRate, setInterestRate] = useState(6.5);
+  const [vehiclePrice, setVehiclePrice] = useState(35000);
+  const [downPayment, setDownPayment] = useState(5000);
+  const [creditScore, setCreditScore] = useState(700);
   const [termMonths, setTermMonths] = useState(60);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [showAmortization, setShowAmortization] = useState(false);
+
+  const loanAmount = vehiclePrice - downPayment;
+
+  // Rate based on credit score (simplified model)
+  const getInterestRate = (score: number) => {
+    if (score >= 750) return 4.5;
+    if (score >= 700) return 6.5;
+    if (score >= 650) return 9.5;
+    if (score >= 600) return 12.5;
+    return 16.5;
+  };
+
+  const interestRate = getInterestRate(creditScore);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -40,8 +78,9 @@ export default function CalculatorPage() {
     const monthly = calculatePayment(loanAmount, interestRate, termMonths);
     const totalCost = monthly * termMonths;
     const totalInterest = totalCost - loanAmount;
-    return { monthly, totalCost, totalInterest };
-  }, [loanAmount, interestRate, termMonths]);
+    const totalWithDownPayment = totalCost + downPayment;
+    return { monthly, totalCost, totalInterest, totalWithDownPayment };
+  }, [loanAmount, interestRate, termMonths, downPayment]);
 
   // Comparison: dealer rate is typically 2-4% higher
   const dealerRate = interestRate + 3.0;
@@ -53,6 +92,18 @@ export default function CalculatorPage() {
   }, [loanAmount, dealerRate, termMonths]);
 
   const savings = dealerResults.totalCost - results.totalCost;
+
+  const amortizationSchedule = useMemo(() => {
+    return generateAmortizationSchedule(loanAmount, interestRate, termMonths);
+  }, [loanAmount, interestRate, termMonths]);
+
+  const creditScoreLabel = (score: number) => {
+    if (score >= 750) return 'Excellent';
+    if (score >= 700) return 'Good';
+    if (score >= 650) return 'Fair';
+    if (score >= 600) return 'Poor';
+    return 'Very Poor';
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -106,63 +157,92 @@ export default function CalculatorPage() {
             <motion.div variants={fadeUp} className="lg:col-span-3 rounded-2xl border border-gray-200 bg-white shadow-sm p-8">
               <h2 className="text-lg font-semibold text-gray-900 mb-8">Loan Details</h2>
 
-              {/* Loan Amount */}
+              {/* Vehicle Price */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm text-gray-600 font-medium">Loan Amount</label>
+                  <label className="text-sm text-gray-600 font-medium">Vehicle Price</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
                     <input
                       type="number"
-                      value={loanAmount}
-                      onChange={e => setLoanAmount(Math.max(0, Math.min(150000, Number(e.target.value))))}
+                      value={vehiclePrice}
+                      onChange={e => setVehiclePrice(Math.max(0, Math.min(200000, Number(e.target.value))))}
                       className="w-32 pl-7 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-right text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                 </div>
                 <input
                   type="range"
-                  min={5000}
-                  max={150000}
-                  step={500}
-                  value={loanAmount}
-                  onChange={e => setLoanAmount(Number(e.target.value))}
+                  min={10000}
+                  max={200000}
+                  step={1000}
+                  value={vehiclePrice}
+                  onChange={e => setVehiclePrice(Number(e.target.value))}
                   className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 mt-1.5">
-                  <span>$5,000</span>
-                  <span>$150,000</span>
+                  <span>$10k</span>
+                  <span>$200k</span>
                 </div>
               </div>
 
-              {/* Interest Rate */}
+              {/* Down Payment */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm text-gray-600 font-medium">Interest Rate (APR)</label>
+                  <label className="text-sm text-gray-600 font-medium">Down Payment</label>
                   <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
                     <input
                       type="number"
-                      value={interestRate}
-                      onChange={e => setInterestRate(Math.max(0, Math.min(30, Number(e.target.value))))}
-                      step={0.1}
-                      className="w-24 pr-7 pl-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-right text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      value={downPayment}
+                      onChange={e => setDownPayment(Math.max(0, Math.min(vehiclePrice, Number(e.target.value))))}
+                      className="w-32 pl-7 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-right text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
                   </div>
                 </div>
                 <input
                   type="range"
                   min={0}
-                  max={25}
-                  step={0.1}
-                  value={interestRate}
-                  onChange={e => setInterestRate(Number(e.target.value))}
+                  max={vehiclePrice}
+                  step={500}
+                  value={downPayment}
+                  onChange={e => setDownPayment(Number(e.target.value))}
                   className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 mt-1.5">
-                  <span>0%</span>
-                  <span>25%</span>
+                  <span>$0</span>
+                  <span>{((downPayment / vehiclePrice) * 100).toFixed(0)}% down</span>
                 </div>
+              </div>
+
+              {/* Credit Score */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm text-gray-600 font-medium">Credit Score</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={creditScore}
+                      onChange={e => setCreditScore(Math.max(300, Math.min(850, Number(e.target.value))))}
+                      className="w-20 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-right text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    />
+                    <span className="text-xs text-gray-500">({creditScoreLabel(creditScore)})</span>
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min={500}
+                  max={850}
+                  step={10}
+                  value={creditScore}
+                  onChange={e => setCreditScore(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
+                />
+                <div className="flex justify-between text-[10px] text-gray-400 mt-1.5">
+                  <span>500</span>
+                  <span>850</span>
+                </div>
+                <div className="mt-2 text-xs text-blue-600">Estimated APR: {interestRate.toFixed(2)}%</div>
               </div>
 
               {/* Loan Term */}
@@ -191,9 +271,17 @@ export default function CalculatorPage() {
               <div className="rounded-2xl border border-blue-200 bg-blue-50 p-8">
                 <div className="text-xs text-blue-600 uppercase tracking-wider font-medium mb-2">Estimated Monthly Payment</div>
                 <div className="text-4xl font-bold text-gray-900 mb-1">{formatCurrencyFull(results.monthly)}</div>
-                <div className="text-xs text-gray-500">{termMonths} months at {interestRate}% APR</div>
+                <div className="text-xs text-gray-500">{termMonths} months at {interestRate.toFixed(2)}% APR</div>
               </div>
               <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8 space-y-5">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Vehicle Price</span>
+                  <span className="font-medium text-gray-900">{formatCurrency(vehiclePrice)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">Down Payment</span>
+                  <span className="font-medium text-gray-900">-{formatCurrency(downPayment)}</span>
+                </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Loan Amount</span>
                   <span className="font-medium text-gray-900">{formatCurrency(loanAmount)}</span>
@@ -205,11 +293,11 @@ export default function CalculatorPage() {
                 <div className="h-px bg-gray-200" />
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600 font-medium">Total Cost</span>
-                  <span className="font-semibold text-gray-900">{formatCurrency(results.totalCost)}</span>
+                  <span className="font-semibold text-gray-900">{formatCurrency(results.totalWithDownPayment)}</span>
                 </div>
               </div>
               <Link href="/apply" className="block w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors duration-200 text-center">
-                Check Your Rate — Free
+                Get Your Real Rate
               </Link>
             </motion.div>
           </motion.div>
@@ -272,14 +360,65 @@ export default function CalculatorPage() {
         </div>
       </section>
 
+      {/* Amortization Schedule */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            <motion.div variants={fadeUp} className="text-center mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Amortization Schedule</h2>
+              <p className="text-gray-500 text-sm">See how your payments break down over time</p>
+            </motion.div>
+            <motion.div variants={fadeUp}>
+              <button
+                onClick={() => setShowAmortization(!showAmortization)}
+                className="w-full mb-4 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 text-sm font-medium rounded-xl transition-colors flex items-center justify-between"
+              >
+                <span>{showAmortization ? 'Hide' : 'Show'} Payment Schedule</span>
+                <svg className={`w-5 h-5 transition-transform ${showAmortization ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {showAmortization && (
+                <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+                  <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 sticky top-0">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Month</th>
+                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Payment</th>
+                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Principal</th>
+                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Interest</th>
+                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Balance</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {amortizationSchedule.map((row, idx) => (
+                          <tr key={row.month} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                            <td className="px-4 py-3 text-gray-900">{row.month}</td>
+                            <td className="px-4 py-3 text-right text-gray-900">{formatCurrencyFull(row.payment)}</td>
+                            <td className="px-4 py-3 text-right text-green-600">{formatCurrencyFull(row.principal)}</td>
+                            <td className="px-4 py-3 text-right text-red-500">{formatCurrencyFull(row.interest)}</td>
+                            <td className="px-4 py-3 text-right text-gray-900">{formatCurrency(row.balance)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* CTA */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 bg-gray-50">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-2xl mx-auto text-center">
           <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Ready to get your real rate?</motion.h2>
           <motion.p variants={fadeUp} className="text-gray-500 mb-10">These are estimates. Apply to see actual offers from competing lenders.</motion.p>
           <motion.div variants={fadeUp}>
             <Link href="/apply" className="inline-flex px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200">
-              Check Your Rate — Free
+              Get Your Real Rate
             </Link>
           </motion.div>
           <motion.p variants={fadeUp} className="mt-4 text-xs text-gray-400">No credit impact. No obligation.</motion.p>
