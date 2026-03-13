@@ -8,10 +8,38 @@ import { ApprovalLetterData } from '@/lib/approval-letter';
 function ApprovalLetterContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const isDev = searchParams.get('dev') === 'true';
   const [letterData, setLetterData] = useState<ApprovalLetterData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Dev mode: show mock approval letter
+    if (isDev) {
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 30);
+
+      setLetterData({
+        approvalCode: 'ALP-DEV-001-' + Date.now().toString(36).toUpperCase(),
+        lenderName: 'First National Auto Lending',
+        approvedAmount: 32000,
+        apr: 4.2,
+        termMonths: 60,
+        monthlyPayment: 465,
+        expiresAt: expiryDate.toISOString(),
+        borrowerName: 'John Smith',
+        applicationId: 'APP-DEV-001',
+        offerId: 'OFFER-DEV-001',
+        generatedAt: new Date().toISOString(),
+        conditions: [
+          'Proof of income required at closing',
+          'Final approval subject to vehicle inspection',
+          'Down payment of at least 10% recommended'
+        ],
+      });
+      setLoading(false);
+      return;
+    }
+
     if (!token) return;
 
     // Fetch application and selected offer data
@@ -50,7 +78,7 @@ function ApprovalLetterContent() {
       .finally(() => {
         setLoading(false);
       });
-  }, [token]);
+  }, [token, isDev]);
 
   const handleDownload = () => {
     window.print();
@@ -96,7 +124,7 @@ function ApprovalLetterContent() {
       <div className="bg-white border-b border-gray-200 print:hidden">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
-            href={`/dashboard?token=${token}`}
+            href={isDev ? '/dashboard?dev=true' : `/dashboard?token=${token}`}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

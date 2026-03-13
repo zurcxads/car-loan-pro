@@ -27,12 +27,31 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token');
-  
+  const isDev = searchParams.get('dev') === 'true';
+
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // Dev mode: show mock data
+    if (isDev) {
+      setApplication({
+        id: 'APP-DEV-001',
+        status: 'offer_selected',
+        borrower: {
+          firstName: 'John',
+          lastName: 'Smith',
+        },
+        loanAmount: 32000,
+        hasVehicle: false,
+        offersReceived: 3,
+        submittedAt: new Date().toISOString(),
+      });
+      setLoading(false);
+      return;
+    }
+
     if (!token) {
       router.push('/apply');
       return;
@@ -53,7 +72,7 @@ function DashboardContent() {
         setError('Failed to load dashboard');
         setLoading(false);
       });
-  }, [token, router]);
+  }, [token, router, isDev]);
 
   if (loading) {
     return (
@@ -163,7 +182,7 @@ function DashboardContent() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* View Offers */}
             <Link
-              href={`/dashboard/offers?token=${token}`}
+              href={isDev ? `/results?dev=true` : `/dashboard/offers?token=${token}`}
               className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
             >
               <div className="flex items-start justify-between mb-3">
@@ -220,7 +239,7 @@ function DashboardContent() {
 
             {/* Approval Letter */}
             <Link
-              href={`/dashboard/approval-letter?token=${token}`}
+              href={isDev ? `/dashboard/approval-letter?dev=true` : `/dashboard/approval-letter?token=${token}`}
               className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
             >
               <div className="flex items-start justify-between mb-3">
