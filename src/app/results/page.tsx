@@ -60,6 +60,40 @@ function Confetti() {
   );
 }
 
+function Tooltip({ content }: { content: string }) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="relative inline-block">
+      <button
+        type="button"
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+        onClick={() => setShow(!show)}
+        className="w-4 h-4 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors"
+      >
+        <span className="text-[10px] font-semibold text-gray-600">?</span>
+      </button>
+      <AnimatePresence>
+        {show && (
+          <motion.div
+            initial={{ opacity: 0, y: 4, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-gray-900 text-white text-xs rounded-lg p-2 shadow-lg z-50"
+          >
+            <div className="relative">
+              {content}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -73,8 +107,15 @@ function ResultsContent() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<AnonymizedOffer | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [sortBy, setSortBy] = useState<'best_rate' | 'lowest_payment' | 'highest_amount'>('best_rate');
+  const [compareMode, setCompareMode] = useState(false);
+  const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
 
   const isDev = searchParams.get('dev') === 'true';
+
+  // Calculate average dealer rate (for comparison)
+  const averageDealerRate = 8.5; // Average dealer APR (would be fetched from backend in production)
 
   useEffect(() => {
     // Dev mode: show mock offers without token
@@ -196,6 +237,66 @@ function ResultsContent() {
     const payment = calculatePayment(offer, termMonths, down);
     return payment * termMonths + down;
   };
+
+  const calculateSavings = (offer: AnonymizedOffer, termMonths: number, down: number): number => {
+    const principal = offer.approvedAmount - down;
+    const tier = offer.rateTiers.find(t => t.termMonths === termMonths);
+    const apr = tier ? (tier.rateMin + tier.rateMax) / 2 : offer.apr;
+
+    // Calculate cost with this offer
+    const monthlyRate = apr / 100 / 12;
+    const payment = principal > 0 && monthlyRate > 0
+      ? (principal * monthlyRate * Math.pow(1 + monthlyRate, termMonths)) / (Math.pow(1 + monthlyRate, termMonths) - 1)
+      : 0;
+    const totalCost = payment * termMonths;
+
+    // Calculate cost with average dealer rate
+    const dealerMonthlyRate = averageDealerRate / 100 / 12;
+    const dealerPayment = principal > 0
+      ? (principal * dealerMonthlyRate * Math.pow(1 + dealerMonthlyRate, termMonths)) / (Math.pow(1 + dealerMonthlyRate, termMonths) - 1)
+      : 0;
+    const dealerTotalCost = dealerPayment * termMonths;
+
+    return Math.round(dealerTotalCost - totalCost);
+  };
+
+  // Sort offers based on selected criteria
+  const getSortedOffers = () => {
+    const sorted = [...offers];
+    if (sortBy === 'best_rate') {
+      sorted.sort((a, b) => {
+        const aRate = a.rateTiers.find(t => t.termMonths === term);
+        const bRate = b.rateTiers.find(t => t.termMonths === term);
+        const aAPR = aRate ? (aRate.rateMin + aRate.rateMax) / 2 : a.apr;
+        const bAPR = bRate ? (bRate.rateMin + bRate.rateMax) / 2 : b.apr;
+        return aAPR - bAPR;
+      });
+    } else if (sortBy === 'lowest_payment') {
+      sorted.sort((a, b) => calculatePayment(a, term, downPayment) - calculatePayment(b, term, downPayment));
+    } else if (sortBy === 'highest_amount') {
+      sorted.sort((a, b) => (b.maxApprovedAmount || b.approvedAmount) - (a.maxApprovedAmount || a.approvedAmount));
+    }
+    return sorted;
+  };
+
+  const toggleCompareSelection = (offerId: string) => {
+    setSelectedForCompare(prev => {
+      if (prev.includes(offerId)) {
+        return prev.filter(id => id !== offerId);
+      } else if (prev.length < 2) {
+        const newSelection = [...prev, offerId];
+        if (newSelection.length === 2) {
+          setTimeout(() => setShowCompareModal(true), 300);
+        }
+        return newSelection;
+      }
+      return prev;
+    });
+  };
+
+  // Get expiration date (30 days from today)
+  const expirationDate = new Date();
+  expirationDate.setDate(expirationDate.getDate() + 30);
 
   const handleSelectClick = (offer: AnonymizedOffer) => {
     setSelectedOffer(offer);
@@ -398,13 +499,89 @@ function ResultsContent() {
           </div>
         </motion.div>
 
+        {/* Sort & Compare Controls */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 font-medium">Sort by:</span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSortBy('best_rate')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                  sortBy === 'best_rate'
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Best Rate
+              </button>
+              <button
+                onClick={() => setSortBy('lowest_payment')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                  sortBy === 'lowest_payment'
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Lowest Payment
+              </button>
+              <button
+                onClick={() => setSortBy('highest_amount')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-all ${
+                  sortBy === 'highest_amount'
+                    ? 'bg-blue-600 border-blue-600 text-white'
+                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Highest Amount
+              </button>
+            </div>
+          </div>
+          <button
+            onClick={() => setCompareMode(!compareMode)}
+            className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+              compareMode
+                ? 'bg-blue-50 border-blue-200 text-blue-700'
+                : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            {compareMode ? 'Exit Compare' : 'Compare Offers'}
+          </button>
+        </motion.div>
+
+        {/* Rate Lock Notice */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.85 }}
+          className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-start gap-3"
+        >
+          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-1">Rate Lock Guarantee</h4>
+            <p className="text-xs text-gray-600">
+              Your rates are locked until <strong>{expirationDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</strong> (30 days from today)
+            </p>
+          </div>
+        </motion.div>
+
         {/* Offers Grid - Single column on mobile */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {offers.slice(0, 3).map((offer, index) => {
+          {getSortedOffers().slice(0, 3).map((offer, index) => {
             const payment = calculatePayment(offer, term, downPayment);
             const totalCost = calculateTotalCost(offer, term, downPayment);
+            const savings = calculateSavings(offer, term, downPayment);
             const tier = offer.rateTiers.find(t => t.termMonths === term);
             const apr = tier ? (tier.rateMin + tier.rateMax) / 2 : offer.apr;
+            const isSelected = selectedForCompare.includes(offer.id);
 
             const tagLabels = {
               best_rate: 'Best Rate',
@@ -412,46 +589,96 @@ function ResultsContent() {
               highest_amount: 'Highest Amount'
             };
 
+            // Approval odds (would be calculated from credit profile in production)
+            const approvalOdds = apr < 6 ? 'High Approval Odds' : apr < 8 ? 'Good Approval Odds' : 'Fair Approval Odds';
+            const oddsColor = apr < 6 ? 'bg-green-100 text-green-700' : apr < 8 ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700';
+
             return (
               <motion.div
                 key={offer.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: calculating ? [0, -4, 0] : 0 }}
-                transition={{ delay: 0.8 + index * 0.1, duration: calculating ? 0.3 : 0.5 }}
-                className="bg-white rounded-2xl border-2 border-gray-200 p-6 hover:border-blue-300 hover:shadow-lg transition-all flex flex-col h-full"
+                transition={{ delay: 0.9 + index * 0.1, duration: calculating ? 0.3 : 0.5 }}
+                className={`bg-white rounded-2xl border-2 p-6 hover:shadow-lg transition-all flex flex-col h-full ${
+                  isSelected ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200 hover:border-blue-300'
+                }`}
               >
-                <div className="flex items-start justify-between mb-6">
-                  <h3 className="text-xl font-bold text-gray-900">{offer.label}</h3>
-                  {offer.tag && (
-                    <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                      offer.tag === 'best_rate' ? 'bg-green-100 text-green-700' :
-                      offer.tag === 'lowest_payment' ? 'bg-blue-100 text-blue-700' :
-                      'bg-purple-100 text-purple-700'
-                    }`}>
-                      {tagLabels[offer.tag]}
-                    </span>
-                  )}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    {compareMode && (
+                      <button
+                        onClick={() => toggleCompareSelection(offer.id)}
+                        className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                          isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-300 hover:border-blue-400'
+                        }`}
+                      >
+                        {isSelected && (
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </button>
+                    )}
+                    <h3 className="text-xl font-bold text-gray-900">{offer.label}</h3>
+                  </div>
+                  <div className="flex flex-col gap-1.5 items-end">
+                    {offer.tag && (
+                      <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
+                        offer.tag === 'best_rate' ? 'bg-green-100 text-green-700' :
+                        offer.tag === 'lowest_payment' ? 'bg-blue-100 text-blue-700' :
+                        'bg-purple-100 text-purple-700'
+                      }`}>
+                        {tagLabels[offer.tag]}
+                      </span>
+                    )}
+                    {index === 0 && (
+                      <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${oddsColor}`}>
+                        {approvalOdds}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-6 flex-1">
+                {/* Savings Badge */}
+                {savings > 0 && (
+                  <div className="mb-4 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                    <p className="text-xs text-green-800">
+                      <strong>Save ${savings.toLocaleString()}</strong> vs. average dealer rate ({averageDealerRate}%)
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-5 flex-1">
                   <div>
-                    <div className="text-xs text-gray-500 mb-2">APR</div>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="text-xs text-gray-500">APR</span>
+                      <Tooltip content="Annual Percentage Rate - the yearly cost of your loan including interest" />
+                    </div>
                     <div className="text-5xl font-bold text-gray-900">{apr.toFixed(2)}%</div>
                   </div>
 
                   <div>
-                    <div className="text-xs text-gray-500 mb-2">Monthly Payment</div>
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <span className="text-xs text-gray-500">Monthly Payment</span>
+                      <Tooltip content="Your estimated monthly payment including principal and interest" />
+                    </div>
                     <div className="text-3xl font-bold text-gray-900">${payment.toLocaleString()}</div>
                     <div className="text-xs text-gray-400 mt-1">for {term} months</div>
                   </div>
 
                   <div className="pt-4 border-t border-gray-200">
-                    <div className="text-xs text-gray-500 mb-1">Total Cost Over Life of Loan</div>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-xs text-gray-500">Total Cost</span>
+                      <Tooltip content="Total amount you'll pay over the life of the loan (principal + interest + down payment)" />
+                    </div>
                     <div className="text-lg font-semibold text-gray-700">${totalCost.toLocaleString()}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">over {term} months</div>
                   </div>
 
                   <div className="pt-4 border-t border-gray-200">
-                    <div className="text-xs text-gray-500 mb-1">Approved Amount</div>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <span className="text-xs text-gray-500">Approved Amount</span>
+                    </div>
                     <div className="text-lg font-semibold text-gray-900">
                       {offer.maxApprovedAmount
                         ? `Up to $${offer.maxApprovedAmount.toLocaleString()}`
@@ -497,6 +724,105 @@ function ResultsContent() {
           </div>
         </motion.div>
       </div>
+
+      {/* Comparison Modal */}
+      <AnimatePresence>
+        {showCompareModal && selectedForCompare.length === 2 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+            onClick={() => {
+              setShowCompareModal(false);
+              setSelectedForCompare([]);
+              setCompareMode(false);
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-2xl p-6 max-w-4xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Compare Offers</h2>
+                <button
+                  onClick={() => {
+                    setShowCompareModal(false);
+                    setSelectedForCompare([]);
+                    setCompareMode(false);
+                  }}
+                  className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                >
+                  <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {selectedForCompare.map(offerId => {
+                  const offer = offers.find(o => o.id === offerId);
+                  if (!offer) return null;
+
+                  const payment = calculatePayment(offer, term, downPayment);
+                  const totalCost = calculateTotalCost(offer, term, downPayment);
+                  const savings = calculateSavings(offer, term, downPayment);
+                  const tier = offer.rateTiers.find(t => t.termMonths === term);
+                  const apr = tier ? (tier.rateMin + tier.rateMax) / 2 : offer.apr;
+
+                  return (
+                    <div key={offer.id} className="bg-gray-50 rounded-xl p-6 border-2 border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 mb-6">{offer.label}</h3>
+
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center pb-3 border-b border-gray-300">
+                          <span className="text-sm text-gray-600">APR</span>
+                          <span className="text-2xl font-bold text-gray-900">{apr.toFixed(2)}%</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-3 border-b border-gray-300">
+                          <span className="text-sm text-gray-600">Monthly Payment</span>
+                          <span className="text-xl font-bold text-gray-900">${payment.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-3 border-b border-gray-300">
+                          <span className="text-sm text-gray-600">Total Cost</span>
+                          <span className="text-lg font-semibold text-gray-700">${totalCost.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-3 border-b border-gray-300">
+                          <span className="text-sm text-gray-600">Savings vs. Dealer</span>
+                          <span className="text-lg font-semibold text-green-600">${savings.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-3 border-b border-gray-300">
+                          <span className="text-sm text-gray-600">Approved Amount</span>
+                          <span className="text-lg font-semibold text-gray-900">
+                            ${(offer.maxApprovedAmount || offer.approvedAmount).toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Loan Term</span>
+                          <span className="text-sm font-semibold text-gray-900">{term} months</span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setShowCompareModal(false);
+                          handleSelectClick(offer);
+                        }}
+                        className="w-full mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors"
+                      >
+                        Select {offer.label}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Confirmation Modal */}
       <AnimatePresence>
