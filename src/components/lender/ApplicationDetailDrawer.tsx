@@ -70,7 +70,7 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
               <div className="grid grid-cols-2 gap-4">
                 <Field label="Full Name" value={`${app.borrower.firstName} ${app.borrower.lastName}`} />
                 <Field label="DOB" value={app.borrower.dob.split('-')[0] + '-XX-XX'} />
-                <Field label="SSN" value={app.borrower.ssn} />
+                <Field label="SSN" value={`***-**-${app.borrower.ssn.slice(-4)}`} />
                 <Field label="Phone" value={app.borrower.phone} />
                 <Field label="Email" value={app.borrower.email} />
                 <Field label="Address" value={`${app.borrower.city}, ${app.borrower.state} ${app.borrower.zip}`} />

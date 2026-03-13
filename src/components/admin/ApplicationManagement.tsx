@@ -39,11 +39,16 @@ export default function ApplicationManagement() {
     if (stateFilter !== 'all') filteredApps = filteredApps.filter(a => a.state === stateFilter);
     if (search) {
       const q = search.toLowerCase();
+
+      // SECURITY: Only allow searching by last 4 digits of SSN (not full SSN)
+      const isSSNSearch = /^\d{4}$/.test(q);
+      const ssnMatches = (a: MockApplication) => isSSNSearch && a.borrower.ssn.slice(-4) === q;
+
       filteredApps = filteredApps.filter(a =>
         a.id.toLowerCase().includes(q) ||
         `${a.borrower.firstName} ${a.borrower.lastName}`.toLowerCase().includes(q) ||
         a.borrower.email.toLowerCase().includes(q) ||
-        a.borrower.ssn.includes(q)
+        ssnMatches(a)
       );
     }
     return filteredApps;

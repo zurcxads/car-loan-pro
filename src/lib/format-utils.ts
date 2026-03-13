@@ -41,6 +41,11 @@ export function formatPhoneNumber(phone: string): string {
 }
 
 export function maskSSN(ssn: string): string {
+  // Handle ITIN separately
+  if (ssn === 'ITIN') return 'ITIN';
+  // Handle short or invalid SSNs
+  if (!ssn || ssn.length < 4) return '***';
+  // Return masked SSN showing only last 4 digits
   return `***-**-${ssn.slice(-4)}`;
 }
 
