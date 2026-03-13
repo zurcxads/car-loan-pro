@@ -5,6 +5,7 @@ import { DevModeProvider } from "@/contexts/DevModeContext";
 import DevModeBanner from "@/components/dev/DevModeBanner";
 import CookieConsent from "@/components/shared/CookieConsent";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import Header from "@/components/shared/Header";
 import "./globals.css";
 
 const ibmPlex = IBM_Plex_Sans({
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ErrorBoundary>
           <DevModeProvider>
             <DevModeBanner />
+            <Header />
             <Providers>{children}</Providers>
             <CookieConsent />
           </DevModeProvider>

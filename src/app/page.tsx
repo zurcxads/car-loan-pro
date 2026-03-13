@@ -185,19 +185,11 @@ function RateCalculator() {
 export default function LandingPage() {
   const router = useRouter();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [mobileMenu, setMobileMenu] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [returningVisitor, setReturningVisitor] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
 
   // Mini hero form state
   const [heroForm, setHeroForm] = useState({ name: '', creditRange: '', loanAmount: '' });
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handler, { passive: true });
-    return () => window.removeEventListener('scroll', handler);
-  }, []);
 
   // Check for returning visitor (has session token in localStorage)
   useEffect(() => {
@@ -222,39 +214,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Nav */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-sm' : 'bg-transparent'}`}>
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
-          <div className="hidden md:flex items-center gap-8 text-sm text-gray-500">
-            <Link href="/how-it-works" className="hover:text-gray-900 transition-colors duration-200">How It Works</Link>
-            <Link href="/calculator" className="hover:text-gray-900 transition-colors duration-200">Calculator</Link>
-            <Link href="/resources" className="hover:text-gray-900 transition-colors duration-200">Resources</Link>
-            <Link href="/login" className="hover:text-gray-900 transition-colors duration-200">Sign In</Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 min-h-[40px] items-center bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer">
-              Apply Now
-            </Link>
-            <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden p-2 text-gray-500 cursor-pointer">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm0 5.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" /></svg>
-            </button>
-          </div>
-        </div>
-        <AnimatePresence>
-          {mobileMenu && (
-            <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="md:hidden overflow-hidden border-t border-gray-200 bg-white/95 backdrop-blur-xl">
-              <div className="px-6 py-4 flex flex-col gap-4 text-sm">
-                {[['How It Works', '/how-it-works'], ['Calculator', '/calculator'], ['Resources', '/resources'], ['Sign In', '/login']].map(([label, href]) => (
-                  <Link key={label} href={href} className="text-gray-500 hover:text-gray-900 py-1 transition-colors duration-200" onClick={() => setMobileMenu(false)}>{label}</Link>
-                ))}
-                <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-white" onClick={() => setMobileMenu(false)}>Apply Now</Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+    <div className="min-h-screen pt-16">{/* Padding for fixed header */}
 
       {/* Return Visitor Banner */}
       <AnimatePresence>
