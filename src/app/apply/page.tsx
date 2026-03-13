@@ -46,7 +46,7 @@ function Select({ value, onChange, options, placeholder, error }: {
   );
 }
 
-function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string | React.ReactNode }) {
   return (
     <label className="flex items-start gap-3 cursor-pointer group" onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
       <div className={`mt-0.5 w-5 h-5 rounded-md border flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300 group-hover:border-gray-400'}`}>
@@ -182,10 +182,10 @@ export default function ApplyPage() {
       if (!vehicle.model.trim()) e.model = 'Required';
       if (!vehicle.askingPrice || vehicle.askingPrice <= 0) e.price = 'Required';
     } else if (step === 6) {
-      if (!consent.softPullConsent) e.soft = 'Required';
-      if (!consent.tcpaConsent) e.tcpa = 'Required';
       if (!consent.termsOfService) e.terms = 'Required';
-      if (!consent.privacyPolicy) e.privacy = 'Required';
+      if (!consent.softPullConsent) e.soft = 'Required';
+      if (!consent.hardPullConsent) e.creditCheck = 'Required';
+      if (!consent.tcpaConsent) e.tcpa = 'Required';
       if (!consent.eSignConsent) e.esign = 'Required';
     }
     setErrors(e);
@@ -487,16 +487,52 @@ export default function ApplyPage() {
               <div className="space-y-5">
                 <h2 className="text-lg font-semibold text-gray-900 mb-6">Consent & Authorization</h2>
                 <div className="space-y-5">
-                  <Checkbox checked={consent.softPullConsent} onChange={v => setConsent(c => ({ ...c, softPullConsent: v }))} label="I authorize Auto Loan Pro to obtain a soft credit inquiry to match me with lenders. This will not affect my credit score." />
-                  {errors.soft && <p className="text-xs text-red-500 -mt-3 ml-8">You must consent to proceed</p>}
-                  <Checkbox checked={consent.tcpaConsent} onChange={v => setConsent(c => ({ ...c, tcpaConsent: v }))} label="I consent to receive calls, texts, and emails from Auto Loan Pro and its lending partners regarding my application." />
-                  {errors.tcpa && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
-                  <Checkbox checked={consent.termsOfService} onChange={v => setConsent(c => ({ ...c, termsOfService: v }))} label="I have read and agree to the Terms of Service." />
+                  <Checkbox
+                    checked={consent.termsOfService}
+                    onChange={v => setConsent(c => ({ ...c, termsOfService: v }))}
+                    label={<>I agree to the <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-500 underline">Terms of Service</Link> and <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-500 underline">Privacy Policy</Link></>}
+                  />
                   {errors.terms && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
-                  <Checkbox checked={consent.privacyPolicy} onChange={v => setConsent(c => ({ ...c, privacyPolicy: v }))} label="I have read and agree to the Privacy Policy." />
-                  {errors.privacy && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
-                  <Checkbox checked={consent.eSignConsent} onChange={v => setConsent(c => ({ ...c, eSignConsent: v }))} label="I consent to use electronic signatures and receive documents electronically (E-Sign Act)." />
+
+                  <Checkbox
+                    checked={consent.softPullConsent}
+                    onChange={v => setConsent(c => ({ ...c, softPullConsent: v }))}
+                    label="I consent to Auto Loan Pro sharing my application with participating lenders for the purpose of obtaining pre-qualification offers."
+                  />
+                  {errors.soft && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+
+                  <Checkbox
+                    checked={consent.hardPullConsent}
+                    onChange={v => setConsent(c => ({ ...c, hardPullConsent: v }))}
+                    label="I authorize a soft credit inquiry that will NOT affect my credit score. I understand this allows Auto Loan Pro to check my credit for pre-qualification purposes."
+                  />
+                  {errors.creditCheck && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+
+                  <Checkbox
+                    checked={consent.tcpaConsent}
+                    onChange={v => setConsent(c => ({ ...c, tcpaConsent: v }))}
+                    label="I understand that selecting a lender offer may result in a hard credit inquiry by that lender, which may affect my credit score."
+                  />
+                  {errors.tcpa && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+
+                  <Checkbox
+                    checked={consent.eSignConsent}
+                    onChange={v => setConsent(c => ({ ...c, eSignConsent: v }))}
+                    label="I certify that the information I have provided in this application is true, accurate, and complete to the best of my knowledge."
+                  />
                   {errors.esign && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3">Equal Credit Opportunity Act Notice</h3>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      The federal Equal Credit Opportunity Act prohibits creditors from discriminating against credit applicants on the basis of race, color, religion, national origin, sex, marital status, age (provided the applicant has the capacity to enter into a binding contract), because all or part of the applicant&apos;s income derives from any public assistance program, or because the applicant has in good faith exercised any right under the Consumer Credit Protection Act. The federal agency that administers compliance with this law concerning this creditor is the Federal Trade Commission, Equal Credit Opportunity, Washington, DC 20580.
+                    </p>
+                    <p className="text-xs text-gray-600 leading-relaxed mt-3">
+                      For more information about your rights under the ECOA, visit our <Link href="/disclosures/ecoa" target="_blank" className="text-blue-600 hover:text-blue-500 underline">ECOA Notice page</Link>.
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import Footer from '@/components/shared/Footer';
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
@@ -346,43 +347,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-12 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 text-sm">
-          <div>
-            <div className="font-semibold text-gray-900 mb-4">Product</div>
-            <div className="space-y-3 text-gray-500">
-              <Link href="/how-it-works" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">How It Works</Link>
-              <Link href="/calculator" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Calculator</Link>
-              <Link href="/apply" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Apply Now</Link>
-            </div>
-          </div>
-          <div>
-            <div className="font-semibold text-gray-900 mb-4">Company</div>
-            <div className="space-y-3 text-gray-500">
-              <Link href="/about" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">About</Link>
-              <Link href="/contact" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Contact</Link>
-            </div>
-          </div>
-          <div>
-            <div className="font-semibold text-gray-900 mb-4">Legal</div>
-            <div className="space-y-3 text-gray-500">
-              <Link href="/privacy" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Privacy Policy</Link>
-              <Link href="/terms" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Terms of Service</Link>
-            </div>
-          </div>
-          <div>
-            <div className="font-semibold text-gray-900 mb-4">Support</div>
-            <div className="space-y-3 text-gray-500">
-              <Link href="/login" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Sign In</Link>
-              <Link href="/contact" className="block hover:text-gray-900 transition-colors duration-200 cursor-pointer">Help Center</Link>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-5xl mx-auto mt-10 pt-8 border-t border-gray-200 text-xs text-gray-400 text-center">
-          Auto Loan Pro is not a lender. Offers are subject to credit approval. NMLS #000000
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
