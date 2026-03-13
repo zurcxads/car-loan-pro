@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -69,11 +69,15 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
   );
 }
 
+const STORAGE_KEY = 'clp_saved_application';
+
 export default function ApplyPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [showResumeBanner, setShowResumeBanner] = useState(false);
+  const [hasSavedData, setHasSavedData] = useState(false);
 
   const [personal, setPersonal] = useState<BorrowerPersonalInfo>({ firstName: '', lastName: '', ssn: '', dob: '', email: '', phone: '', preferredLanguage: 'english' });
   const [address, setAddress] = useState<AddressInfo>({ currentAddressLine1: '', currentCity: '', currentState: '', currentZip: '', residenceType: 'rent', monthlyHousingPayment: 0, monthsAtCurrentAddress: 0 });
@@ -83,6 +87,79 @@ export default function ApplyPage() {
   const [hasCoBorrower, setHasCoBorrower] = useState(false);
   const [coPersonal, setCoPersonal] = useState<BorrowerPersonalInfo>({ firstName: '', lastName: '', ssn: '', dob: '', email: '', phone: '' });
   const [consent, setConsent] = useState<ConsentInfo>({ softPullConsent: false, hardPullConsent: false, tcpaConsent: false, termsOfService: false, privacyPolicy: false, eSignConsent: false });
+
+  // Load saved data on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          const savedTime = data.savedAt || 0;
+          const hoursSince = (Date.now() - savedTime) / (1000 * 60 * 60);
+
+          // Show resume banner if saved within last 7 days
+          if (hoursSince < 168 && data.step > 0) {
+            setHasSavedData(true);
+            setShowResumeBanner(true);
+          }
+        } catch (e) {
+          console.error('Failed to load saved application:', e);
+        }
+      }
+    }
+  }, []);
+
+  // Auto-save on step change
+  useEffect(() => {
+    if (typeof window !== 'undefined' && step > 0) {
+      const saveData = {
+        step,
+        personal,
+        address,
+        employment,
+        vehicle,
+        deal,
+        hasCoBorrower,
+        coPersonal,
+        consent,
+        savedAt: Date.now(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+    }
+  }, [step, personal, address, employment, vehicle, deal, hasCoBorrower, coPersonal, consent]);
+
+  const resumeApplication = () => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          setStep(data.step || 0);
+          setPersonal(data.personal || personal);
+          setAddress(data.address || address);
+          setEmployment(data.employment || employment);
+          setVehicle(data.vehicle || vehicle);
+          setDeal(data.deal || deal);
+          setHasCoBorrower(data.hasCoBorrower || false);
+          setCoPersonal(data.coPersonal || coPersonal);
+          setConsent(data.consent || consent);
+          setShowResumeBanner(false);
+          toast.success('Application resumed');
+        } catch (e) {
+          toast.error('Failed to resume application');
+        }
+      }
+    }
+  };
+
+  const startFresh = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(STORAGE_KEY);
+      setShowResumeBanner(false);
+      toast.success('Starting fresh application');
+    }
+  };
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
@@ -144,7 +221,8 @@ export default function ApplyPage() {
     if (data) {
       const appData = data as { id: string; sessionToken: string };
       localStorage.setItem('clp_current_app_id', appData.id);
-      
+      localStorage.removeItem(STORAGE_KEY); // Clear saved draft
+
       toast.success('Application submitted! Finding your best rates...');
       setTimeout(() => router.push(`/dashboard?token=${appData.sessionToken}`), 2500);
     }
@@ -185,6 +263,49 @@ export default function ApplyPage() {
             </div>
           ))}
         </div>
+
+        {/* Resume Banner */}
+        {showResumeBanner && hasSavedData && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start justify-between"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-1">Resume Your Application?</h3>
+                <p className="text-xs text-gray-600 mb-3">We found a saved application from your previous visit. Would you like to continue where you left off?</p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={resumeApplication}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors"
+                  >
+                    Resume Application
+                  </button>
+                  <button
+                    onClick={startFresh}
+                    className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-xs font-medium rounded-lg border border-gray-200 transition-colors"
+                  >
+                    Start Fresh
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowResumeBanner(false)}
+              className="text-gray-400 hover:text-gray-600 p-1"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </motion.div>
+        )}
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-8">
