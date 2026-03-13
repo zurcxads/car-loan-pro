@@ -11,27 +11,27 @@ const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } }
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
 
 const valueProps = [
-  { Icon: Lock, title: 'No Credit Impact', desc: 'Soft pull only — won\'t affect your score' },
-  { Icon: Zap, title: '2-Minute Application', desc: 'Quick and easy online process' },
-  { Icon: Building, title: 'Multiple Lenders', desc: 'Compare offers from our network' },
-  { Icon: CheckCircle, title: 'Pre-Approved in Minutes', desc: 'Get your answer fast' },
+  { Icon: Zap, title: '2-Minute Application', desc: 'Done from your couch, not a dealer lot' },
+  { Icon: CheckCircle, title: 'Instant Offers', desc: 'Multiple lenders in under 5 minutes' },
+  { Icon: Lock, title: 'One Soft Pull', desc: 'No credit score impact, unlike dealer shopping' },
+  { Icon: Building, title: 'Save 15+ Hours', desc: 'Skip dealership visits and bank appointments' },
 ];
 
 const steps = [
   {
     icon: <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
-    title: 'Apply Once',
-    desc: 'Fill out a single application in 4 steps. No dealer visits, no phone calls, no obligation.'
+    title: 'Apply Once (2 min)',
+    desc: 'One quick application. No dealer visits, no bank appointments, no running around town.'
   },
   {
     icon: <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
-    title: 'Lenders Compete',
-    desc: 'Your profile is matched to our network of lenders who compete for your loan.'
+    title: 'Get Matched (instant)',
+    desc: 'Lenders compete for your business in real-time. One soft pull, multiple instant offers.'
   },
   {
     icon: <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-    title: 'Get Pre-Approved',
-    desc: 'Review multiple offers side-by-side and walk into the dealership with financing locked in.'
+    title: 'Shop With Power',
+    desc: 'Walk into any dealership pre-approved with a blank check. Negotiate from a position of strength.'
   },
 ];
 
@@ -181,13 +181,13 @@ export default function LandingPage() {
             <div>
               <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-600 text-xs font-medium mb-6">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                No credit impact — check in under 5 minutes
+                Save 15+ hours — get pre-approved in 2 minutes
               </motion.div>
               <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.08] text-gray-900 mb-6">
-                Stop overpaying<br />at the dealer
+                Pre-Approved in 2 Minutes,<br />Not 2 Weeks
               </motion.h1>
               <motion.p variants={fadeUp} className="text-lg text-gray-500 leading-relaxed font-light mb-8">
-                One application. Multiple lenders competing for your auto loan. Get pre-approved in minutes with no impact to your credit score.
+                Skip the dealership runaround. One application, multiple competing lenders, instant offers. What takes weeks the traditional way takes minutes with us.
               </motion.p>
               <motion.div variants={fadeUp} className="flex flex-wrap gap-6 text-sm">
                 <div className="flex items-center gap-2 text-gray-600">
@@ -209,7 +209,7 @@ export default function LandingPage() {
             <motion.div variants={fadeUp}>
               <form onSubmit={handleHeroSubmit} className="bg-white rounded-2xl border border-gray-200 shadow-lg p-6 sm:p-8">
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">Get Your Rate</h3>
-                <p className="text-sm text-gray-500 mb-6">Takes less than 5 minutes. No credit impact.</p>
+                <p className="text-sm text-gray-500 mb-6">Takes about 2 minutes. No credit score impact.</p>
 
                 <div className="space-y-4">
                   <div>
@@ -305,12 +305,104 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Time Savings Comparison */}
+      <section className="py-16 md:py-24 px-6 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
+            <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900">The Old Way vs Auto Loan Pro</motion.h2>
+            <motion.p variants={fadeUp} className="mt-3 text-gray-500 text-sm">The average car buyer spends 15+ hours on financing. We cut that to under 5 minutes.</motion.p>
+          </motion.div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-2 gap-6">
+            <motion.div variants={fadeUp} className="bg-white rounded-2xl border border-gray-200 p-8">
+              <div className="text-xs text-red-600 mb-3 uppercase tracking-wider font-medium">Traditional Route</div>
+              <div className="space-y-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-600">Drive to 3-5 dealerships (10-20 hours)</div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-600">Visit bank or credit union (2-4 hours + wait days for appointment)</div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-600">Apply at multiple lenders (1-2 hours each)</div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-600">Multiple hard credit pulls (damages your score)</div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-600">Dealer F&I office negotiation (2-4 hours)</div>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-gray-200">
+                <div className="text-sm text-gray-500">Total Time:</div>
+                <div className="text-3xl font-bold text-red-600">15-30+ hours</div>
+                <div className="text-xs text-gray-400 mt-1">Spread over 1-3 weeks</div>
+              </div>
+            </motion.div>
+            <motion.div variants={fadeUp} className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 p-8">
+              <div className="text-xs text-blue-600 mb-3 uppercase tracking-wider font-medium">Auto Loan Pro</div>
+              <div className="space-y-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-900 font-medium">2-minute application from your couch</div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-900 font-medium">Instant offers from multiple lenders</div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-900 font-medium">One soft pull (no credit impact)</div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-900 font-medium">Pre-approved before visiting ANY dealer</div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  </div>
+                  <div className="text-sm text-gray-900 font-medium">Walk in with financing locked in</div>
+                </div>
+              </div>
+              <div className="pt-4 border-t border-blue-300">
+                <div className="text-sm text-gray-700">Total Time:</div>
+                <div className="text-3xl font-bold text-blue-600">Under 5 minutes</div>
+                <div className="text-xs text-gray-600 mt-1">Done from your couch</div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* How it Works */}
       <section id="how-it-works" className="py-16 md:py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900">How It Works</motion.h2>
-            <motion.p variants={fadeUp} className="mt-3 text-gray-500 text-sm">Three steps to a better auto loan</motion.p>
+            <motion.p variants={fadeUp} className="mt-3 text-gray-500 text-sm">At a dealership, this takes 3-5 visits. With us, it takes one coffee break.</motion.p>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-3 gap-6">
             {steps.map((s, i) => (

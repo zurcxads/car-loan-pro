@@ -103,7 +103,7 @@ export default function AboutPage() {
             About Auto Loan Pro
           </motion.h1>
           <motion.p variants={fadeUp} className="mt-6 text-lg text-gray-500 max-w-xl mx-auto leading-relaxed font-light">
-            We&apos;re an auto loan marketplace that connects consumers with competing lenders — empowering you with transparency, choice, and better rates.
+            We built Auto Loan Pro because buying a car should not feel like a second job. One 2-minute application saves you 15+ hours of dealership runaround.
           </motion.p>
         </motion.div>
       </section>
@@ -112,15 +112,15 @@ export default function AboutPage() {
       <section className="py-16 px-6">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="max-w-3xl mx-auto">
           <div className="rounded-2xl border border-gray-200 bg-gray-50 p-8 sm:p-10">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Our Mission: Transparency in Auto Lending</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Our Mission: Save You Time and Money</h2>
             <p className="text-gray-600 leading-relaxed">
-              The traditional auto financing process is broken. Dealers often mark up interest rates by 1-3%, earning thousands in profit while borrowers overpay. This lack of transparency costs consumers billions annually.
+              The traditional auto financing process is broken. The average car buyer spends 15-30 hours visiting dealerships, banks, and credit unions — only to end up with a dealer-marked-up rate that costs them thousands extra. Dealers often mark up interest rates by 1-3% for profit, and each lender application hits your credit score with a hard pull.
             </p>
             <p className="text-gray-600 leading-relaxed mt-4">
-              Auto Loan Pro was built to change that. We believe every borrower deserves access to competitive rates from multiple lenders — without dealer markups, pressure tactics, or hidden fees. Our marketplace lets lenders compete for your business, which drives rates down and puts you in control.
+              Auto Loan Pro was built to change that. We compress weeks of running around into 2 minutes from your couch. One application, one soft pull, multiple lenders competing for your business — instantly. You walk into any dealership pre-approved with a blank check, on your schedule, with zero dealer markup.
             </p>
             <p className="text-gray-600 leading-relaxed mt-4">
-              One application. Multiple offers. Zero dealer markup. That&apos;s the Auto Loan Pro difference.
+              Save 15+ hours. Save thousands in markup. Get pre-approved before you ever step foot in a dealership. That is the Auto Loan Pro difference.
             </p>
           </div>
         </motion.div>
@@ -210,8 +210,8 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="py-24 px-6">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-2xl mx-auto text-center">
-          <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Ready to save on your auto loan?</motion.h2>
-          <motion.p variants={fadeUp} className="text-gray-500 mb-10">Join thousands of borrowers who found better rates through Auto Loan Pro.</motion.p>
+          <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Ready to save 15+ hours and thousands in markup?</motion.h2>
+          <motion.p variants={fadeUp} className="text-gray-500 mb-10">Join thousands of borrowers who skipped the dealership runaround and got pre-approved in 2 minutes.</motion.p>
           <motion.div variants={fadeUp}>
             <Link href="/apply" className="inline-flex px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200">
               Check Your Rate — Free

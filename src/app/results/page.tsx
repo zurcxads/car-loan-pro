@@ -440,7 +440,7 @@ function ResultsContent() {
             transition={{ delay: 0.3 }}
             className="text-4xl md:text-5xl font-bold text-gray-900 mb-4"
           >
-            Congratulations!
+            Done. That Was Easy.
           </motion.h1>
 
           <motion.div
@@ -459,10 +459,18 @@ function ResultsContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-sm font-medium"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3"
           >
-            <div className="w-2 h-2 rounded-full bg-blue-500" />
-            Near-Prime · Based on your profile
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-sm font-medium">
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              Near-Prime · Based on your profile
+            </div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
+              You just saved ~15 hours
+            </div>
           </motion.div>
         </motion.div>
 
@@ -666,7 +674,7 @@ function ResultsContent() {
                 {savings > 0 && (
                   <div className="mb-4 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
                     <p className="text-xs text-green-800">
-                      <strong>Save ${savings.toLocaleString()}</strong> vs. average dealer rate ({averageDealerRate}%)
+                      <strong>Save ${savings.toLocaleString()}</strong> vs. average dealer markup
                     </p>
                   </div>
                 )}
