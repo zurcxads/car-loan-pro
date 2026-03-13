@@ -17,6 +17,17 @@
   --border-hover: #D1D5DB;
 }
 
+.dark {
+  --bg: #030712;
+  --surface: #111827;
+  --surface-hover: #1F2937;
+  --text: #F9FAFB;
+  --text-muted: #9CA3AF;
+  --text-dim: #6B7280;
+  --border: #374151;
+  --border-hover: #4B5563;
+}
+
 body {
   min-height: 100vh;
   font-family: var(--font-ibm-plex), 'IBM Plex Sans', sans-serif;

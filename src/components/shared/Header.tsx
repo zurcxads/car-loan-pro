@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeToggle } from './ThemeToggle';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -33,14 +34,14 @@ export default function Header() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-white/95 backdrop-blur-xl shadow-md py-3'
-            : 'bg-white/95 backdrop-blur-xl py-4'
+            ? 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl shadow-md py-3 border-b border-gray-200 dark:border-gray-800'
+            : 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 transition-colors">
               Auto Loan Pro
             </Link>
 
@@ -53,7 +54,7 @@ export default function Header() {
                   className={`text-sm font-medium transition-colors relative ${
                     isActive(link.href)
                       ? 'text-blue-600'
-                      : 'text-gray-600 hover:text-gray-900'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                   }`}
                 >
                   {link.label}
@@ -64,8 +65,9 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* CTA Button */}
+            {/* CTA Button and Theme Toggle */}
             <div className="hidden lg:flex items-center gap-4">
+              <ThemeToggle />
               <Link
                 href="/apply"
                 className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg transition-all duration-200 active:scale-[0.98]"
@@ -74,14 +76,17 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-gray-600 hover:text-gray-900 transition-colors"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            {/* Mobile Menu Button and Theme Toggle */}
+            <div className="flex lg:hidden items-center gap-2">
+              <ThemeToggle />
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -96,7 +101,7 @@ export default function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+              className="fixed inset-0 bg-black/30 dark:bg-black/60 z-40 lg:hidden"
               onClick={() => setMobileMenuOpen(false)}
             />
 
@@ -106,21 +111,21 @@ export default function Header() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white shadow-2xl z-50 lg:hidden"
+              className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-950 shadow-2xl z-50 lg:hidden"
             >
               <div className="flex flex-col h-full">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
                   <Link
                     href="/"
-                    className="text-xl font-bold text-gray-900"
+                    className="text-xl font-bold text-gray-900 dark:text-gray-100"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Auto Loan Pro
                   </Link>
                   <button
                     onClick={() => setMobileMenuOpen(false)}
-                    className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                    className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
                     aria-label="Close menu"
                   >
                     <X className="w-6 h-6" />
@@ -137,8 +142,8 @@ export default function Header() {
                         onClick={() => setMobileMenuOpen(false)}
                         className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                           isActive(link.href)
-                            ? 'bg-blue-50 text-blue-600'
-                            : 'text-gray-700 hover:bg-gray-50'
+                            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
                         }`}
                       >
                         {link.label}
@@ -148,7 +153,7 @@ export default function Header() {
                 </nav>
 
                 {/* Footer with CTA */}
-                <div className="p-6 border-t border-gray-200">
+                <div className="p-6 border-t border-gray-200 dark:border-gray-800">
                   <Link
                     href="/apply"
                     onClick={() => setMobileMenuOpen(false)}

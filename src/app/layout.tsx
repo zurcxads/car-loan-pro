@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans } from "next/font/google";
 import Providers from "@/components/providers/SessionProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { DevModeProvider } from "@/contexts/DevModeContext";
 import DevModeBanner from "@/components/dev/DevModeBanner";
 import CookieConsent from "@/components/shared/CookieConsent";
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/icon-192.png" type="image/png" />
@@ -33,14 +34,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#2563EB" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
-      <body className={`${ibmPlex.variable} font-sans bg-white text-gray-900 antialiased`}>
+      <body className={`${ibmPlex.variable} font-sans bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased transition-colors`}>
         <ErrorBoundary>
-          <DevModeProvider>
-            <DevModeBanner />
-            <Header />
-            <Providers>{children}</Providers>
-            <CookieConsent />
-          </DevModeProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <DevModeProvider>
+              <DevModeBanner />
+              <Header />
+              <Providers>{children}</Providers>
+              <CookieConsent />
+            </DevModeProvider>
+          </ThemeProvider>
         </ErrorBoundary>
       </body>
     </html>
