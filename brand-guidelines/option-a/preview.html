@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Loan Pro — Brand Guidelines Option A: Trust & Authority</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light mode colors */
+            --navy: #1E3A5F;
+            --gold: #D4A843;
+            --white: #FFFFFF;
+            --warm-gray: #F5F3F0;
+            --charcoal: #2D3142;
+            --slate: #6B7280;
+            --light-gray: #E5E7EB;
+            --success: #065F46;
+            --warning: #92400E;
+            --error: #991B1B;
+
+            /* Typography */
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+
+            /* Active theme */
+            --bg-primary: var(--white);
+            --bg-secondary: var(--warm-gray);
+            --bg-surface: var(--white);
+            --text-primary: var(--charcoal);
+            --text-secondary: var(--slate);
+            --border: var(--light-gray);
+        }
+
+        [data-theme="dark"] {
+            --navy-dark: #3B5998;
+            --gold-dark: #E6B952;
+            --bg-dark: #0F1419;
+            --surface-dark: #1A1F26;
+            --text-primary-dark: #E8EAED;
+            --text-secondary-dark: #9CA3AF;
+            --border-dark: #2D3748;
+
+            --bg-primary: var(--bg-dark);
+            --bg-secondary: var(--surface-dark);
+            --bg-surface: var(--surface-dark);
+            --text-primary: var(--text-primary-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --border: var(--border-dark);
+            --navy: var(--navy-dark);
+            --gold: var(--gold-dark);
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 24px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 64px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 36px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 8px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 35%;
+            right: 0;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 16px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: var(--navy);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.2);
+        }
+
+        /* Section */
+        .section {
+            margin-bottom: 64px;
+        }
+
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: 30px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 24px;
+        }
+
+        .section-subtitle {
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Colors */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .color-swatch {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg-surface);
+        }
+
+        .color-sample {
+            height: 120px;
+        }
+
+        .color-info {
+            padding: 16px;
+        }
+
+        .color-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .color-hex {
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            color: var(--text-secondary);
+        }
+
+        /* Typography */
+        .type-sample {
+            margin-bottom: 32px;
+            padding: 24px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .type-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .display {
+            font-family: var(--font-serif);
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .h1 {
+            font-family: var(--font-serif);
+            font-size: 36px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .h2 {
+            font-family: var(--font-serif);
+            font-size: 30px;
+            font-weight: 500;
+            line-height: 1.25;
+        }
+
+        .h3 {
+            font-family: var(--font-sans);
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .h4 {
+            font-family: var(--font-sans);
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .body-large {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .body {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .caption {
+            font-size: 12px;
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.2);
+        }
+
+        .btn-secondary {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
+        .btn-secondary:hover {
+            filter: brightness(0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(212, 168, 67, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--navy);
+            border: 1px solid var(--navy);
+        }
+
+        .btn-outline:hover {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--navy);
+        }
+
+        .btn-ghost:hover {
+            background: var(--warm-gray);
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            transition: all 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .card-premium {
+            border: 2px solid var(--gold);
+            box-shadow: 0 4px 12px rgba(212, 168, 67, 0.15);
+        }
+
+        .card-title {
+            font-family: var(--font-serif);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--navy);
+        }
+
+        .card-text {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .badge-featured {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
+        /* Form Inputs */
+        .form-grid {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--navy);
+            box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 64px 48px;
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .hero-title {
+            font-family: var(--font-serif);
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: var(--navy);
+            margin-bottom: 24px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px 16px;
+            }
+
+            .logo {
+                font-size: 28px;
+            }
+
+            .hero {
+                padding: 48px 24px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .display {
+                font-size: 36px;
+            }
+
+            .h1 {
+                font-size: 30px;
+            }
+
+            .button-grid,
+            .color-grid,
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-toggle {
+                top: 16px;
+                right: 16px;
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">Toggle Dark Mode</button>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">Auto Loan Pro</div>
+            <p class="tagline">Option A: Trust & Authority — Conservative Fintech</p>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1 class="hero-title">Get your money first, then go shopping</h1>
+            <p class="hero-subtitle">Compare top lenders in minutes. Get pre-approved for your auto loan and walk into the dealership with purchasing power.</p>
+            <div class="hero-cta">
+                <button class="btn btn-secondary">Get Pre-Approved</button>
+                <button class="btn btn-outline">See How It Works</button>
+            </div>
+        </div>
+
+        <!-- Colors -->
+        <section class="section">
+            <h2 class="section-title">Color Palette</h2>
+
+            <h3 class="section-subtitle">Primary Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #1E3A5F;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Navy Blue</div>
+                        <div class="color-hex">#1E3A5F</div>
+                        <div class="color-hex">RGB 30, 58, 95</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #FFFFFF; border-bottom: 1px solid #E5E7EB;"></div>
+                    <div class="color-info">
+                        <div class="color-name">White</div>
+                        <div class="color-hex">#FFFFFF</div>
+                        <div class="color-hex">RGB 255, 255, 255</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">Secondary Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #D4A843;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Gold Accent</div>
+                        <div class="color-hex">#D4A843</div>
+                        <div class="color-hex">RGB 212, 168, 67</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #F5F3F0;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Warm Gray</div>
+                        <div class="color-hex">#F5F3F0</div>
+                        <div class="color-hex">RGB 245, 243, 240</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">Neutral Scale</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #2D3142;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Charcoal</div>
+                        <div class="color-hex">#2D3142</div>
+                        <div class="color-hex">RGB 45, 49, 66</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #6B7280;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Slate Gray</div>
+                        <div class="color-hex">#6B7280</div>
+                        <div class="color-hex">RGB 107, 114, 128</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #E5E7EB;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Light Gray</div>
+                        <div class="color-hex">#E5E7EB</div>
+                        <div class="color-hex">RGB 229, 231, 235</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="section-subtitle">Semantic Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #065F46;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Success Green</div>
+                        <div class="color-hex">#065F46</div>
+                        <div class="color-hex">RGB 6, 95, 70</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #92400E;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Warning Amber</div>
+                        <div class="color-hex">#92400E</div>
+                        <div class="color-hex">RGB 146, 64, 14</div>
+                    </div>
+                </div>
+                <div class="color-swatch">
+                    <div class="color-sample" style="background: #991B1B;"></div>
+                    <div class="color-info">
+                        <div class="color-name">Error Red</div>
+                        <div class="color-hex">#991B1B</div>
+                        <div class="color-hex">RGB 153, 27, 27</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Typography -->
+        <section class="section">
+            <h2 class="section-title">Typography</h2>
+
+            <div class="type-sample">
+                <div class="type-label">Display (Playfair Display Bold, 48px)</div>
+                <div class="display">Premium Automotive Financing</div>
+            </div>
+
+            <div class="type-sample">
+                <div class="type-label">H1 (Playfair Display Semibold, 36px)</div>
+                <div class="h1">Get Pre-Approved in Minutes</div>
+            </div>
+
+            <div class="type-sample">
+                <div class="type-label">H2 (Playfair Display Medium, 30px)</div>
+                <div class="h2">Compare Multiple Lenders at Once</div>
+            </div>
+
+            <div class="type-sample">
+                <div class="type-label">H3 (Inter Semibold, 24px)</div>
+                <div class="h3">Why Choose Auto Loan Pro?</div>
+            </div>
+
+            <div class="type-sample">
+                <div class="type-label">H4 (Inter Medium, 20px)</div>
+                <div class="h4">Fast, Simple, Secure</div>
+            </div>
+
+            <div class="type-sample">
+                <div class="type-label">Body Large (Inter Regular, 18px)</div>
+                <div class="body-large">Our platform connects you with trusted lenders nationwide, giving you the purchasing power to negotiate with confidence.</div>
+            </div>
+
+            <div class="type-sample">
+                <div class="type-label">Body (Inter Regular, 16px)</div>
+                <div class="body">Complete one simple application and receive multiple pre-approval offers. No impact to your credit score until you choose a lender.</div>
+            </div>
+
+            <div class="type-sample">
+                <div class="type-label">Caption (Inter Regular, 12px)</div>
+                <div class="caption">Rates and terms subject to lender approval. APR ranges from 3.99% to 29.99%.</div>
+            </div>
+        </section>
+
+        <!-- Buttons -->
+        <section class="section">
+            <h2 class="section-title">Buttons</h2>
+
+            <div class="button-grid">
+                <button class="btn btn-primary">Primary Button</button>
+                <button class="btn btn-secondary">Secondary (Gold CTA)</button>
+                <button class="btn btn-outline">Outline Button</button>
+                <button class="btn btn-ghost">Ghost Button</button>
+            </div>
+        </section>
+
+        <!-- Cards -->
+        <section class="section">
+            <h2 class="section-title">Cards</h2>
+
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-title">Standard Card</div>
+                    <p class="card-text">Clean, professional card design with subtle border and shadow on hover.</p>
+                    <span class="badge badge-success">Approved</span>
+                </div>
+
+                <div class="card card-premium">
+                    <div class="card-title">Premium Card</div>
+                    <p class="card-text">Featured card with gold border for highlighting special offers or featured lenders.</p>
+                    <span class="badge badge-featured">Featured</span>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Lender Offer</div>
+                    <p class="card-text">Up to $35,000 at 5.49% APR for 60 months. Pre-approved with no impact to your credit.</p>
+                    <button class="btn btn-secondary" style="width: 100%; margin-top: 8px;">View Details</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Form Inputs -->
+        <section class="section">
+            <h2 class="section-title">Form Inputs</h2>
+
+            <div class="form-grid">
+                <input type="text" class="input" placeholder="Full Name">
+                <input type="email" class="input" placeholder="Email Address">
+                <select class="input">
+                    <option>Select Credit Tier</option>
+                    <option>Excellent (720+)</option>
+                    <option>Good (680-719)</option>
+                    <option>Fair (640-679)</option>
+                    <option>Building (Below 640)</option>
+                </select>
+                <input type="text" class="input" placeholder="Loan Amount" value="$25,000">
+            </div>
+        </section>
+
+        <!-- Mini Landing Section -->
+        <section class="section">
+            <h2 class="section-title">Landing Page Example</h2>
+
+            <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 48px; text-align: center;">
+                <div class="logo" style="margin-bottom: 32px;">Auto Loan Pro</div>
+                <h1 class="display" style="margin-bottom: 24px;">Get your money first,<br>then go shopping</h1>
+                <p class="body-large" style="max-width: 600px; margin: 0 auto 32px; color: var(--text-secondary);">
+                    Compare top auto lenders in one place. Get pre-approved in minutes and walk into the dealership with confidence.
+                </p>
+                <button class="btn btn-secondary" style="font-size: 18px; padding: 16px 32px;">Get Pre-Approved Now</button>
+                <p class="caption" style="margin-top: 16px;">No impact to credit score • Soft pull only • Takes 2 minutes</p>
+
+                <div class="card-grid" style="margin-top: 64px; text-align: left;">
+                    <div class="card">
+                        <div class="h3" style="margin-bottom: 16px;">🎯 One Application</div>
+                        <p class="body">Complete one simple form and get matched with multiple lenders at once.</p>
+                    </div>
+                    <div class="card">
+                        <div class="h3" style="margin-bottom: 16px;">💰 Better Rates</div>
+                        <p class="body">Lenders compete for your business, giving you access to competitive rates.</p>
+                    </div>
+                    <div class="card">
+                        <div class="h3" style="margin-bottom: 16px;">✅ Pre-Approved</div>
+                        <p class="body">Get your blank check before you shop. Walk in knowing your buying power.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+</body>
+</html>
