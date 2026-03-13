@@ -31,6 +31,11 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
+  // Dev mode bypass — skip ALL auth redirects
+  if (request.nextUrl.searchParams.get('dev') === 'true') {
+    return supabaseResponse;
+  }
+
   // Get user role from metadata
   const userRole = user?.user_metadata?.role || '';
 
