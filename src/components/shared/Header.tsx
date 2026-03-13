@@ -20,6 +20,11 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
+  // Hide global header on portal pages — they have their own nav
+  const portalRoutes = ['/admin', '/lender', '/dealer', '/dashboard'];
+  const isPortal = portalRoutes.some(route => pathname.startsWith(route));
+  if (isPortal) return null;
+
   const isActive = (path: string) => pathname === path;
 
   const navLinks = [
