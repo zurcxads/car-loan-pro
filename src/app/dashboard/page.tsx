@@ -142,7 +142,7 @@ function DashboardContent() {
           {/* Quick Actions Grid */}
           <div className="grid md:grid-cols-2 gap-6">
             {/* View Offers */}
-            <Link 
+            <Link
               href={`/dashboard/offers?token=${token}`}
               className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
             >
@@ -160,14 +160,14 @@ function DashboardContent() {
               </div>
               <h3 className="text-base font-semibold text-gray-900 mb-1">View Offers</h3>
               <p className="text-sm text-gray-500">
-                {application.offersReceived > 0 
+                {application.offersReceived > 0
                   ? 'Compare loan offers from multiple lenders'
                   : 'Offers will appear here once lenders review your application'}
               </p>
             </Link>
 
             {/* Application Status */}
-            <Link 
+            <Link
               href={`/dashboard/status?token=${token}`}
               className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
             >
@@ -180,6 +180,38 @@ function DashboardContent() {
               </div>
               <h3 className="text-base font-semibold text-gray-900 mb-1">Application Status</h3>
               <p className="text-sm text-gray-500">Track your application progress and next steps</p>
+            </Link>
+
+            {/* Documents */}
+            <Link
+              href={`/dashboard/documents?token=${token}`}
+              className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center group-hover:bg-green-100 transition-colors">
+                  <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 mb-1">Upload Documents</h3>
+              <p className="text-sm text-gray-500">Upload required documents to complete your application</p>
+            </Link>
+
+            {/* Approval Letter */}
+            <Link
+              href={`/dashboard/approval-letter?token=${token}`}
+              className="block bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all group"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center group-hover:bg-orange-100 transition-colors">
+                  <svg className="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="text-base font-semibold text-gray-900 mb-1">Approval Letter</h3>
+              <p className="text-sm text-gray-500">Download your pre-approval letter</p>
             </Link>
           </div>
 

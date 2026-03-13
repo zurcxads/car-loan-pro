@@ -1,0 +1,102 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
+const DOCUMENT_TYPES = ['drivers_license', 'proof_of_income', 'proof_of_insurance', 'proof_of_address'];
+
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const formData = await req.formData();
+
+    const file = formData.get('file') as File | null;
+    const type = formData.get('type') as string;
+    const userId = formData.get('userId') as string;
+    const applicationId = formData.get('applicationId') as string | null;
+
+    if (!file || !type || !userId) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    if (!DOCUMENT_TYPES.includes(type)) {
+      return NextResponse.json(
+        { error: 'Invalid document type' },
+        { status: 400 }
+      );
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: 'File size exceeds 10MB limit' },
+        { status: 400 }
+      );
+    }
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return NextResponse.json(
+        { error: 'File type not allowed. Please upload PDF, JPG, or PNG' },
+        { status: 400 }
+      );
+    }
+
+    // Generate unique file path
+    const timestamp = Date.now();
+    const fileExt = file.name.split('.').pop();
+    const storagePath = `${userId}/${type}_${timestamp}.${fileExt}`;
+
+    // Upload to Supabase Storage
+    const fileBuffer = await file.arrayBuffer();
+    const { error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(storagePath, fileBuffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error('Storage upload error:', uploadError);
+      return NextResponse.json(
+        { error: 'Failed to upload file to storage' },
+        { status: 500 }
+      );
+    }
+
+    // Insert document record
+    const { data: document, error: dbError } = await supabase
+      .from('documents')
+      .insert({
+        user_id: userId,
+        application_id: applicationId,
+        type,
+        file_name: file.name,
+        file_size: file.size,
+        file_type: file.type,
+        storage_path: storagePath,
+        status: 'uploaded',
+      })
+      .select()
+      .single();
+
+    if (dbError) {
+      // Cleanup storage if DB insert fails
+      await supabase.storage.from('documents').remove([storagePath]);
+      console.error('Database insert error:', dbError);
+      return NextResponse.json(
+        { error: 'Failed to save document record' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ document });
+  } catch (error) {
+    console.error('Upload error:', error);
+    return NextResponse.json(
+      { error: 'Upload failed' },
+      { status: 500 }
+    );
+  }
+}
