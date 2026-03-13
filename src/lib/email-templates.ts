@@ -174,6 +174,140 @@ export function approvalLetterEmail(
   };
 }
 
+export function documentRequestEmail(
+  email: string,
+  firstName: string,
+  documentsNeeded: string[],
+  dashboardLink: string
+): EmailData {
+  const docList = documentsNeeded.map(doc => `<li>${doc.replace(/_/g, ' ')}</li>`).join('');
+
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Documents Requested</h2>
+      <p style="color: #374151; line-height: 1.6;">Hi ${firstName},</p>
+      <p style="color: #374151; line-height: 1.6;">
+        To finalize your pre-approval, we need the following documents:
+      </p>
+      <ul style="color: #374151; line-height: 1.8; padding-left: 24px;">
+        ${docList}
+      </ul>
+      <p style="text-align: center;">
+        <a href="${dashboardLink}" class="button">Upload Documents</a>
+      </p>
+      <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
+        You can upload PDFs, JPGs, or PNGs up to 10MB each. All documents are encrypted and securely stored.
+      </p>
+    </div>
+  `;
+
+  return {
+    to: email,
+    subject: 'Documents Needed for Your Auto Loan Pre-Approval',
+    html: emailWrapper(content),
+  };
+}
+
+export function documentApprovedEmail(
+  email: string,
+  firstName: string,
+  documentType: string,
+  dashboardLink: string
+): EmailData {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Document Approved</h2>
+      <p style="color: #374151; line-height: 1.6;">Hi ${firstName},</p>
+      <p style="color: #374151; line-height: 1.6;">
+        Great news! Your <strong>${documentType.replace(/_/g, ' ')}</strong> has been reviewed and approved.
+      </p>
+      <p style="color: #374151; line-height: 1.6;">
+        We're one step closer to finalizing your pre-approval. Check your dashboard for the latest status.
+      </p>
+      <p style="text-align: center;">
+        <a href="${dashboardLink}" class="button">View Status</a>
+      </p>
+    </div>
+  `;
+
+  return {
+    to: email,
+    subject: `Your ${documentType.replace(/_/g, ' ')} Has Been Approved`,
+    html: emailWrapper(content),
+  };
+}
+
+export function approvalCompleteEmail(
+  email: string,
+  firstName: string,
+  lenderName: string,
+  approvedAmount: number,
+  apr: number,
+  dashboardLink: string
+): EmailData {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Final Approval Complete!</h2>
+      <p style="color: #374151; line-height: 1.6;">Hi ${firstName},</p>
+      <p style="color: #374151; line-height: 1.6;">
+        Congratulations! Your pre-approval with <strong>${lenderName}</strong> is now complete.
+      </p>
+      <div style="background: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px; margin: 20px 0;">
+        <p style="margin: 0 0 8px 0; color: #1e40af; font-size: 14px; font-weight: 600;">Final Approved Amount</p>
+        <p style="margin: 0 0 16px 0; color: #1e3a8a; font-size: 32px; font-weight: 700;">$${approvedAmount.toLocaleString()}</p>
+        <p style="margin: 0; color: #1e40af; font-size: 14px;">at ${apr}% APR</p>
+      </div>
+      <p style="color: #374151; line-height: 1.6;">
+        Your pre-approval letter is ready to download. Present it at any participating dealer to shop with confidence.
+      </p>
+      <p style="text-align: center;">
+        <a href="${dashboardLink}" class="button">Download Approval Letter</a>
+      </p>
+      <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
+        <strong>Next Steps:</strong> Take your approval letter to the dealer. They'll submit the final application to the lender with vehicle details.
+      </p>
+    </div>
+  `;
+
+  return {
+    to: email,
+    subject: 'Your Pre-Approval is Complete — Download Your Letter',
+    html: emailWrapper(content),
+  };
+}
+
+export function rateExpiringEmail(
+  email: string,
+  firstName: string,
+  daysRemaining: number,
+  dashboardLink: string
+): EmailData {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Your Pre-Approval Rate Expires Soon</h2>
+      <p style="color: #374151; line-height: 1.6;">Hi ${firstName},</p>
+      <p style="color: #374151; line-height: 1.6;">
+        This is a friendly reminder that your pre-approval rate expires in <strong>${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}</strong>.
+      </p>
+      <p style="color: #374151; line-height: 1.6;">
+        If you haven't found a vehicle yet, you can reapply after expiration. Your rate may change based on current market conditions.
+      </p>
+      <p style="text-align: center;">
+        <a href="${dashboardLink}" class="button">View Pre-Approval</a>
+      </p>
+      <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
+        <strong>Tip:</strong> Lock in your rate by finding a vehicle before expiration. Dealers can help you complete the purchase quickly.
+      </p>
+    </div>
+  `;
+
+  return {
+    to: email,
+    subject: `Your Pre-Approval Rate Expires in ${daysRemaining} Day${daysRemaining !== 1 ? 's' : ''}`,
+    html: emailWrapper(content),
+  };
+}
+
 /**
  * Send email via Resend or log to console in dev mode
  */
