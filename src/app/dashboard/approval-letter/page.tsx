@@ -3,7 +3,9 @@
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ApprovalLetterData } from '@/lib/approval-letter';
+import { useQRCode } from '@/hooks/useQRCode';
 
 function ApprovalLetterContent() {
   const searchParams = useSearchParams();
@@ -19,21 +21,21 @@ function ApprovalLetterContent() {
       expiryDate.setDate(expiryDate.getDate() + 30);
 
       setLetterData({
-        approvalCode: 'ALP-DEV-001-' + Date.now().toString(36).toUpperCase(),
-        lenderName: 'First National Auto Lending',
-        approvedAmount: 32000,
+        approvalCode: 'ALP-DEMO-1234',
+        lenderName: 'Capital Auto Finance',
+        approvedAmount: 42000,
         apr: 4.2,
         termMonths: 60,
-        monthlyPayment: 465,
+        monthlyPayment: 779,
         expiresAt: expiryDate.toISOString(),
-        borrowerName: 'John Smith',
-        applicationId: 'APP-DEV-001',
-        offerId: 'OFFER-DEV-001',
+        borrowerName: 'Maria Rodriguez',
+        applicationId: 'APP-DEMO-001',
+        offerId: 'OFFER-DEMO-001',
         generatedAt: new Date().toISOString(),
         conditions: [
           'Proof of income required at closing',
-          'Final approval subject to vehicle inspection',
-          'Down payment of at least 10% recommended'
+          'Final approval subject to vehicle inspection and appraisal',
+          'Down payment of at least 10% recommended for optimal terms'
         ],
       });
       setLoading(false);
@@ -80,8 +82,40 @@ function ApprovalLetterContent() {
       });
   }, [token, isDev]);
 
-  const handleDownload = () => {
+  const verifyUrl = letterData ? `https://autoloanpro.co/verify/${letterData.approvalCode}` : '';
+  const { qrCodeUrl } = useQRCode(verifyUrl);
+
+  const handleDownload = async () => {
+    try {
+      const url = isDev
+        ? '/api/approval-letter/pdf?dev=true'
+        : `/api/approval-letter/pdf?token=${token}`;
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to generate PDF');
+
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = `AutoLoanPro-PreApproval-${letterData?.approvalCode}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(downloadUrl);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Download failed:', error);
+      alert('Failed to download PDF. Please try again.');
+    }
+  };
+
+  const handlePrint = () => {
     window.print();
+  };
+
+  const handleShare = () => {
+    // Placeholder for email share functionality
+    alert('Email sharing feature coming soon! For now, please download the PDF and send it manually.');
   };
 
   if (loading) {
@@ -118,29 +152,71 @@ function ApprovalLetterContent() {
     day: 'numeric',
   });
 
+  const now = new Date();
+  const expiry = new Date(letterData.expiresAt);
+  const isExpired = expiry < now;
+  const isActive = !isExpired;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with actions - hidden on print */}
       <div className="bg-white border-b border-gray-200 print:hidden">
-        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link
-            href={isDev ? '/dashboard?dev=true' : `/dashboard?token=${token}`}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Dashboard
-          </Link>
-          <button
-            onClick={handleDownload}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            Download PDF
-          </button>
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <Link
+              href={isDev ? '/dashboard?dev=true' : `/dashboard?token=${token}`}
+              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Dashboard
+            </Link>
+
+            {/* Status Badge */}
+            {isActive ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                Active
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                Expired
+              </span>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleDownload}
+              className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download PDF
+            </button>
+            <button
+              onClick={handlePrint}
+              className="flex-1 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              Print
+            </button>
+            <button
+              onClick={handleShare}
+              className="flex-1 px-4 py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors flex items-center justify-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Share via Email
+            </button>
+          </div>
         </div>
       </div>
 
@@ -265,14 +341,29 @@ function ApprovalLetterContent() {
             </p>
           </div>
 
-          {/* QR Code Placeholder */}
+          {/* QR Code */}
           <div className="flex justify-center mt-8 print:block">
-            <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+            {qrCodeUrl ? (
               <div className="text-center">
-                <div className="text-xs text-gray-400 mb-1">QR Code</div>
-                <div className="text-xs text-gray-400">Verification</div>
+                <Image
+                  src={qrCodeUrl}
+                  alt="Verification QR Code"
+                  width={128}
+                  height={128}
+                  className="rounded-lg border-2 border-gray-200"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Scan to verify approval
+                </p>
               </div>
-            </div>
+            ) : (
+              <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                <div className="text-center">
+                  <div className="text-xs text-gray-400 mb-1">QR Code</div>
+                  <div className="text-xs text-gray-400">Loading...</div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
