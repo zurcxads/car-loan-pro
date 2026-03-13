@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useState, useEffect, Suspense } from 'react';
@@ -415,7 +416,7 @@ function ResultsContent() {
               <motion.div
                 key={offer.id}
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: calculating ? [1, 0.7, 1] : 1, y: 0 }}
+                animate={{ opacity: 1, y: calculating ? [0, -4, 0] : 0 }}
                 transition={{ delay: 0.8 + index * 0.1, duration: calculating ? 0.3 : 0.5 }}
                 className="bg-white rounded-2xl border-2 border-gray-200 p-6 hover:border-blue-300 hover:shadow-lg transition-all flex flex-col h-full"
               >

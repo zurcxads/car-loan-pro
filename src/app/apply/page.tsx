@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -5,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { US_STATES, POPULAR_MAKES, TERM_OPTIONS } from '@/lib/constants';
+import { US_STATES, POPULAR_MAKES } from '@/lib/constants';
 import { apiPost } from '@/lib/hooks';
 import type {
   BorrowerPersonalInfo, AddressInfo, EmploymentInfo, VehicleInfo,
@@ -535,7 +536,7 @@ export default function ApplyPage() {
               <div className="space-y-5">
                 <h2 className="text-lg font-semibold text-gray-900 mb-2">Credit Consent</h2>
                 <p className="text-sm text-gray-600 mb-6">
-                  We'll use a soft credit pull to match you with lenders. This won't affect your credit score.
+                  We&apos;ll use a soft credit pull to match you with lenders. This won&apos;t affect your credit score.
                 </p>
 
                 <div className="space-y-5 bg-gray-50 rounded-xl p-5 border border-gray-200">
@@ -590,9 +591,9 @@ export default function ApplyPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-900 mb-2">What You're Agreeing To</h3>
+                      <h3 className="text-sm font-semibold text-gray-900 mb-2">What You&apos;re Agreeing To</h3>
                       <p className="text-xs text-gray-600 leading-relaxed">
-                        We'll perform a soft credit check to show you personalized offers. This does NOT impact your credit score. Only when you select a specific lender and proceed will there be a hard inquiry.
+                        We&apos;ll perform a soft credit check to show you personalized offers. This does NOT impact your credit score. Only when you select a specific lender and proceed will there be a hard inquiry.
                       </p>
                     </div>
                   </div>
