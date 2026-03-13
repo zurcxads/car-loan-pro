@@ -11,7 +11,15 @@ interface Props {
 
 export default function DealFinalization({ selectedBuyer }: Props) {
   const [vin, setVin] = useState('');
-  const [vinDecoded, setVinDecoded] = useState<{ year: string; make: string; model: string } | null>(null);
+  const [vinDecoded, setVinDecoded] = useState<{
+    year: string;
+    make: string;
+    model: string;
+    trim?: string;
+    vehicleType?: string;
+    bodyClass?: string;
+    engine?: string;
+  } | null>(null);
   const [vinLoading, setVinLoading] = useState(false);
   const [odometer, setOdometer] = useState('');
   const [condition, setCondition] = useState('used');
@@ -48,13 +56,13 @@ export default function DealFinalization({ selectedBuyer }: Props) {
     if (vin.length !== 17) return;
     setVinLoading(true);
     try {
-      const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${vin}?format=json`);
+      const res = await fetch(`/api/vin/decode?vin=${vin}`);
       const data = await res.json();
-      const results = data.Results as { Variable: string; Value: string | null }[];
-      const year = results.find(r => r.Variable === 'Model Year')?.Value || '';
-      const make = results.find(r => r.Variable === 'Make')?.Value || '';
-      const model = results.find(r => r.Variable === 'Model')?.Value || '';
-      setVinDecoded({ year, make, model });
+      if (data.decoded) {
+        setVinDecoded(data.decoded);
+      } else {
+        setVinDecoded(null);
+      }
     } catch {
       setVinDecoded(null);
     }
@@ -120,8 +128,16 @@ export default function DealFinalization({ selectedBuyer }: Props) {
                 </button>
               </div>
               {vinDecoded && (
-                <div className="text-xs text-green-600 bg-green-50 border border-green-200 rounded-lg p-2">
-                  Decoded: {vinDecoded.year} {vinDecoded.make} {vinDecoded.model}
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4 space-y-2">
+                  <div className="text-sm font-semibold text-green-700">
+                    {vinDecoded.year} {vinDecoded.make} {vinDecoded.model}
+                    {vinDecoded.trim && ` ${vinDecoded.trim}`}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                    {vinDecoded.bodyClass && <div>Body: {vinDecoded.bodyClass}</div>}
+                    {vinDecoded.vehicleType && <div>Type: {vinDecoded.vehicleType}</div>}
+                    {vinDecoded.engine && <div className="col-span-2">Engine: {vinDecoded.engine}</div>}
+                  </div>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-3">
