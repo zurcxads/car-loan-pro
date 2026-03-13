@@ -29,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Auto Loan Pro" />
         <meta name="theme-color" content="#2563EB" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
       <body className={`${ibmPlex.variable} font-sans bg-white text-gray-900 antialiased`}>
         <DevModeProvider>
