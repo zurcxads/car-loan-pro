@@ -1,6 +1,32 @@
-# Next Build — Stipulation Engine + Admin Controls + Doc Workflow
+# Next Build — Refined Flow + Stipulation Engine + Admin Controls
 
 ## Launch this IMMEDIATELY after current build finishes
+
+### 0. CRITICAL FLOW REFINEMENTS (override current build if needed)
+
+**Results Page (Step 5) — Anonymized + Interactive:**
+- Show top 3 offers ANONYMIZED — no lender names. Just "Offer A, B, C"
+- Each shows: APR, monthly payment, down payment required
+- ALL displayed at 60-month term by default
+- Interactive controls: term slider (24/36/48/60/72/84 months) + down payment slider
+- Payments recalculate in REAL-TIME based on each lender's actual rate tiers from backend
+- Consumer picks the numbers, not the brand
+
+**Offer Selection → Lender Reveal:**
+- Consumer selects an offer → THEN lender name is revealed
+- Pre-approval letter generated immediately
+- This is the blank check moment
+
+**Dealer Network = OPTIONAL, SOFT:**
+- After pre-approval: "Browse dealers near you" as a suggestion card, NOT a required step
+- Consumer has freedom — shop anywhere with their blank check
+- Primary revenue: lender referral fee when loan funds
+- Secondary revenue: dealer lead fee IF consumer chooses to use our network
+- NEVER lock them into choosing a car through us
+
+**Employment threshold:**
+- If current employer < 24 months → expand form to ask previous employer details
+- Need stable employment history
 
 ### 1. STIPULATION ENGINE (src/lib/stipulation-engine.ts)
 Auto-generate required documents/actions based on application profile:

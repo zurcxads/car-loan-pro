@@ -263,7 +263,8 @@ export default function ApplyPage() {
 
       const successMsg = hasVehicle ? 'Application submitted! Finding your best rates...' : 'Pre-approval submitted! Finding your best rates...';
       toast.success(successMsg);
-      setTimeout(() => router.push(`/dashboard?token=${appData.sessionToken}`), 2500);
+      // Redirect to results page instead of dashboard
+      setTimeout(() => router.push(`/results?token=${appData.sessionToken}`), 2500);
     }
   };
 
@@ -466,9 +467,19 @@ export default function ApplyPage() {
                   </>
                 )}
                 <div className="grid sm:grid-cols-2 gap-5">
-                  <Field label="Months at Employer"><Input type="number" value={employment.monthsAtEmployer ? String(employment.monthsAtEmployer) : ''} onChange={v => setEmployment(e => ({ ...e, monthsAtEmployer: Number(v) }))} /></Field>
+                  <Field label="Months at Current Employer"><Input type="number" value={employment.monthsAtEmployer ? String(employment.monthsAtEmployer) : ''} onChange={v => setEmployment(e => ({ ...e, monthsAtEmployer: Number(v) }))} /></Field>
                   <Field label="Gross Monthly Income *" error={errors.income}><Input type="number" value={employment.grossMonthlyIncome ? String(employment.grossMonthlyIncome) : ''} onChange={v => setEmployment(e => ({ ...e, grossMonthlyIncome: Number(v) }))} placeholder="5000" error={!!errors.income} /></Field>
                 </div>
+                {employment.monthsAtEmployer > 0 && employment.monthsAtEmployer < 24 && (employment.employmentStatus === 'full_time' || employment.employmentStatus === 'part_time') && (
+                  <div className="pt-6 border-t border-gray-200 space-y-5">
+                    <h3 className="text-sm font-medium text-blue-600">Previous Employer (Required for employment &lt; 24 months)</h3>
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <Field label="Previous Employer Name"><Input value={employment.prevEmployerName || ''} onChange={v => setEmployment(e => ({ ...e, prevEmployerName: v }))} /></Field>
+                      <Field label="Previous Job Title"><Input value={employment.prevJobTitle || ''} onChange={v => setEmployment(e => ({ ...e, prevJobTitle: v }))} /></Field>
+                    </div>
+                    <Field label="Months at Previous Employer"><Input type="number" value={employment.prevMonthsAtEmployer ? String(employment.prevMonthsAtEmployer) : ''} onChange={v => setEmployment(e => ({ ...e, prevMonthsAtEmployer: Number(v) }))} /></Field>
+                  </div>
+                )}
                 <div className="grid sm:grid-cols-2 gap-5">
                   <Field label="Other Income Source"><Input value={employment.otherIncomeSource || ''} onChange={v => setEmployment(e => ({ ...e, otherIncomeSource: v }))} placeholder="e.g. Rental income" /></Field>
                   <Field label="Other Monthly Income ($)"><Input type="number" value={employment.otherIncomeMonthly ? String(employment.otherIncomeMonthly) : ''} onChange={v => setEmployment(e => ({ ...e, otherIncomeMonthly: Number(v) }))} /></Field>

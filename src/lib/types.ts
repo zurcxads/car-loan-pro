@@ -56,6 +56,10 @@ export interface EmploymentInfo {
   otherIncomeSource?: string;
   otherIncomeMonthly?: number;
   incomeVerificationMethod?: string;
+  // Previous employer (if current < 24 months)
+  prevEmployerName?: string;
+  prevJobTitle?: string;
+  prevMonthsAtEmployer?: number;
 }
 
 // Step 4: Vehicle (OPTIONAL - for pre-approval with vehicle)

@@ -64,6 +64,24 @@ export async function dbUpdateApplication(id: string, updates: Partial<MockAppli
   return mapDbToApp(data);
 }
 
+export async function dbGetApplicationByToken(token: string): Promise<MockApplication | null> {
+  if (!isSupabaseConfigured()) {
+    return MOCK_APPLICATIONS.find(a => (a as unknown as { sessionToken?: string }).sessionToken === token) || null;
+  }
+  const { data, error} = await supabase
+    .from('applications')
+    .select('*')
+    .eq('session_token', token)
+    .single();
+  if (error || !data) return null;
+
+  // Check if token is expired
+  const expiresAt = new Date(data.session_expires_at as string);
+  if (expiresAt < new Date()) return null;
+
+  return mapDbToApp(data);
+}
+
 // ---------- Offers ----------
 
 export async function dbGetOffers(applicationId?: string): Promise<MockOffer[]> {
@@ -75,6 +93,10 @@ export async function dbGetOffers(applicationId?: string): Promise<MockOffer[]> 
   const { data, error } = await query.order('apr', { ascending: true });
   if (error || !data) return applicationId ? MOCK_OFFERS.filter(o => o.applicationId === applicationId) : MOCK_OFFERS;
   return data.map(mapDbToOffer);
+}
+
+export async function dbGetOffersByApplication(applicationId: string): Promise<MockOffer[]> {
+  return dbGetOffers(applicationId);
 }
 
 export async function dbGetOffer(id: string): Promise<MockOffer | null> {
