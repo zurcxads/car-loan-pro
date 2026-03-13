@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const updateDealSchema = z.object({
   dealId: z.string(),
-  status: z.enum(['submitted', 'pending_stipulations', 'funded', 'cancelled', 'declined']).optional(),
+  status: z.enum(['submitted', 'lender_review', 'approved_for_funding', 'wire_sent', 'funded', 'declined']).optional(),
   amount: z.number().positive().optional(),
   rate: z.number().min(0).max(99.99).optional(),
   term: z.number().int().positive().optional(),
@@ -17,7 +17,7 @@ const updateDealSchema = z.object({
 
 // GET /api/deals?dealerId=DLR-001
 export async function GET(req: NextRequest) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   try {
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/deals — submit a new deal
 export async function POST(req: NextRequest) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, dealSubmitSchema);
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
 // PATCH /api/deals — update deal status
 export async function PATCH(req: NextRequest) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, updateDealSchema);

@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/api-helpers';
 
 export async function GET(req: NextRequest) {
   // Require admin authentication
-  const { session, error: authError } = await requireAuth('admin');
+  const { error: authError } = await requireAuth('admin');
   if (authError) return authError;
 
   try {

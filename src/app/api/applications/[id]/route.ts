@@ -4,14 +4,14 @@ import { dbGetApplication, dbUpdateApplication } from '@/lib/db';
 import { z } from 'zod';
 
 const updateApplicationSchema = z.object({
-  status: z.enum(['draft', 'submitted', 'reviewing', 'decisioned', 'conditional', 'docs_pending', 'funded', 'declined', 'cancelled']).optional(),
+  status: z.enum(['pending_decision', 'offers_available', 'conditional', 'funded', 'declined']).optional(),
   notes: z.string().max(1000).optional(),
   offersReceived: z.number().int().min(0).optional(),
 });
 
 // GET /api/applications/[id]
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   try {
@@ -32,7 +32,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
 // PATCH /api/applications/[id] — update application status
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, updateApplicationSchema);

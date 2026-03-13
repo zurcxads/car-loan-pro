@@ -11,7 +11,7 @@ export async function POST() {
   }
 
   // Require admin authentication even in development
-  const { session, error: authError } = await requireAuth('admin');
+  const { error: authError } = await requireAuth('admin');
   if (authError) return authError;
 
   try {

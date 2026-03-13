@@ -5,7 +5,7 @@ import { dbGetPlatformStats, dbGetActivityEvents, dbGetComplianceAlerts } from '
 // GET /api/admin/stats
 export async function GET(req: NextRequest) {
   // Require admin authentication
-  const { session, error: authError } = await requireAuth('admin');
+  const { error: authError } = await requireAuth('admin');
   if (authError) return authError;
 
   try {

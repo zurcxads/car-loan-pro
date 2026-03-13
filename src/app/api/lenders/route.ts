@@ -14,7 +14,7 @@ const updateLenderSchema = z.object({
 
 // GET /api/lenders
 export async function GET() {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   try {
@@ -29,7 +29,7 @@ export async function GET() {
 
 // PATCH /api/lenders — update a lender
 export async function PATCH(req: NextRequest) {
-  const { session, error: authError } = await requireAuth('admin');
+  const { error: authError } = await requireAuth('admin');
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, updateLenderSchema);

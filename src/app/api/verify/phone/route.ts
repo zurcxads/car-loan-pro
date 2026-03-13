@@ -13,7 +13,7 @@ const verifyPhoneCodeSchema = z.object({
 
 // POST /api/verify/phone — send verification code via SMS
 export async function POST(req: NextRequest) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, sendPhoneCodeSchema);
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
 // PUT /api/verify/phone — verify phone with code
 export async function PUT(req: NextRequest) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, verifyPhoneCodeSchema);

@@ -13,7 +13,7 @@ const verifyEmailCodeSchema = z.object({
 
 // POST /api/verify/email — send verification code to email
 export async function POST(req: NextRequest) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, sendEmailCodeSchema);
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
 // PUT /api/verify/email — verify email with code
 export async function PUT(req: NextRequest) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, verifyEmailCodeSchema);

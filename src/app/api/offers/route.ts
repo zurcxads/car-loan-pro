@@ -5,7 +5,7 @@ import { dbGetOffers, dbUpdateOffer, dbUpdateApplication, dbGetApplication } fro
 
 // GET /api/offers?applicationId=APP-001
 export async function GET(req: NextRequest) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   try {
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
 
 // POST /api/offers/select — select an offer (hard pull consent)
 export async function POST(req: NextRequest) {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, selectOfferSchema);

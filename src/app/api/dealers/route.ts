@@ -13,7 +13,7 @@ const updateDealerSchema = z.object({
 
 // GET /api/dealers
 export async function GET() {
-  const { session, error: authError } = await requireAuth();
+  const { error: authError } = await requireAuth();
   if (authError) return authError;
 
   try {
@@ -28,7 +28,7 @@ export async function GET() {
 
 // PATCH /api/dealers — update a dealer
 export async function PATCH(req: NextRequest) {
-  const { session, error: authError } = await requireAuth('admin');
+  const { error: authError } = await requireAuth('admin');
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, updateDealerSchema);
