@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
-import { MOCK_APPLICATIONS, type MockApplication } from '@/lib/mock-data';
+import { type MockApplication } from '@/lib/mock-data';
 import { formatCurrency, formatRelativeTime, ficoColor, ltvColor, dtiColor, ptiColor, truncate } from '@/lib/format-utils';
 import DataTable from '@/components/shared/DataTable';
 import KPICard from '@/components/shared/KPICard';
 import StatusBadge from '@/components/shared/StatusBadge';
 import ApplicationDetailDrawer from './ApplicationDetailDrawer';
 import DecisionModal from './DecisionModal';
+import { dbGetApplications } from '@/lib/db';
 
 const columnHelper = createColumnHelper<MockApplication>();
 
@@ -22,21 +23,36 @@ export default function ApplicationQueue() {
   const [decisionApp, setDecisionApp] = useState<MockApplication | null>(null);
   const [decisionAction, setDecisionAction] = useState<DecisionAction>('approve');
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [apps, setApps] = useState<MockApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadApps() {
+      setLoading(true);
+      try {
+        const data = await dbGetApplications();
+        setApps(data);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadApps();
+  }, []);
 
   const filtered = useMemo(() => {
-    let apps = [...MOCK_APPLICATIONS];
+    let filteredApps = [...apps];
     if (!statusFilter.includes('all')) {
-      apps = apps.filter(a => statusFilter.includes(a.status as StatusFilter));
+      filteredApps = filteredApps.filter(a => statusFilter.includes(a.status as StatusFilter));
     }
     if (search) {
       const q = search.toLowerCase();
-      apps = apps.filter(a =>
+      filteredApps = filteredApps.filter(a =>
         a.id.toLowerCase().includes(q) ||
         `${a.borrower.firstName} ${a.borrower.lastName}`.toLowerCase().includes(q)
       );
     }
-    return apps;
-  }, [statusFilter, search]);
+    return filteredApps;
+  }, [apps, statusFilter, search]);
 
   const toggleStatus = (s: StatusFilter) => {
     if (s === 'all') {
@@ -57,11 +73,6 @@ export default function ApplicationQueue() {
     setDecisionAction(action);
     setSelectedApp(null);
   };
-
-  // KPIs
-  const newToday = MOCK_APPLICATIONS.filter(a => new Date(a.submittedAt).toDateString() === new Date().toDateString()).length || 3;
-  const pendingReview = MOCK_APPLICATIONS.filter(a => a.status === 'pending_decision').length;
-  const approvedWeek = MOCK_APPLICATIONS.filter(a => a.status === 'offers_available' || a.status === 'funded').length;
 
   const columns = useMemo(() => [
     columnHelper.accessor('id', {
@@ -122,13 +133,28 @@ export default function ApplicationQueue() {
     { key: 'declined', label: 'Declined' },
   ];
 
+  // KPIs
+  const newToday = apps.filter(a => new Date(a.submittedAt).toDateString() === new Date().toDateString()).length;
+  const pendingReview = apps.filter(a => a.status === 'pending_decision').length;
+  const approvedWeek = apps.filter(a => a.status === 'offers_available' || a.status === 'funded').length;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <KPICard label="New Today" value={newToday} delta="+2 vs yesterday" deltaType="up" delay={0} />
+        <KPICard label="New Today" value={newToday} delay={0} />
         <KPICard label="Pending Review" value={pendingReview} delay={0.06} />
-        <KPICard label="Approved This Week" value={approvedWeek} delta="+3" deltaType="up" delay={0.12} />
+        <KPICard label="Approved This Week" value={approvedWeek} delay={0.12} />
         <KPICard label="Avg Decision Time" value="14 min" delay={0.18} />
       </div>
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
-import { MOCK_APPLICATIONS, type MockApplication } from '@/lib/mock-data';
+import { type MockApplication } from '@/lib/mock-data';
 import { formatCurrency, formatRelativeTime, ficoColor, ltvColor, dtiColor } from '@/lib/format-utils';
 import DataTable from '@/components/shared/DataTable';
 import StatusBadge from '@/components/shared/StatusBadge';
 import ApplicationDetailDrawer from '@/components/lender/ApplicationDetailDrawer';
+import { dbGetApplications, dbUpdateApplication } from '@/lib/db';
 
 const columnHelper = createColumnHelper<MockApplication>();
 
@@ -15,22 +16,38 @@ export default function ApplicationManagement() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [stateFilter, setStateFilter] = useState('all');
   const [selectedApp, setSelectedApp] = useState<MockApplication | null>(null);
+  const [apps, setApps] = useState<MockApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedApps, setSelectedApps] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    async function loadApps() {
+      setLoading(true);
+      try {
+        const data = await dbGetApplications();
+        setApps(data);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadApps();
+  }, []);
 
   const filtered = useMemo(() => {
-    let apps = [...MOCK_APPLICATIONS];
-    if (statusFilter !== 'all') apps = apps.filter(a => a.status === statusFilter);
-    if (stateFilter !== 'all') apps = apps.filter(a => a.state === stateFilter);
+    let filteredApps = [...apps];
+    if (statusFilter !== 'all') filteredApps = filteredApps.filter(a => a.status === statusFilter);
+    if (stateFilter !== 'all') filteredApps = filteredApps.filter(a => a.state === stateFilter);
     if (search) {
       const q = search.toLowerCase();
-      apps = apps.filter(a =>
+      filteredApps = filteredApps.filter(a =>
         a.id.toLowerCase().includes(q) ||
         `${a.borrower.firstName} ${a.borrower.lastName}`.toLowerCase().includes(q) ||
         a.borrower.email.toLowerCase().includes(q) ||
         a.borrower.ssn.includes(q)
       );
     }
-    return apps;
-  }, [search, statusFilter, stateFilter]);
+    return filteredApps;
+  }, [apps, search, statusFilter, stateFilter]);
 
   const columns = useMemo(() => [
     columnHelper.accessor('id', { header: 'App ID', cell: info => <span className="font-mono text-xs text-gray-500">{info.getValue()}</span>, enableSorting: false }),
@@ -56,8 +73,43 @@ export default function ApplicationManagement() {
     }),
   ], []);
 
-  const states = Array.from(new Set(MOCK_APPLICATIONS.map(a => a.state))).sort();
-  const statuses = Array.from(new Set(MOCK_APPLICATIONS.map(a => a.status)));
+  const states = Array.from(new Set(apps.map(a => a.state))).sort();
+  const statuses = Array.from(new Set(apps.map(a => a.status)));
+
+  const handleBulkApprove = async () => {
+    if (selectedApps.size === 0) return;
+    const ids = Array.from(selectedApps);
+    for (const id of ids) {
+      await dbUpdateApplication(id, { status: 'offers_available' });
+    }
+    const updated = await dbGetApplications();
+    setApps(updated);
+    setSelectedApps(new Set());
+  };
+
+  const handleBulkFlag = async () => {
+    if (selectedApps.size === 0) return;
+    const ids = Array.from(selectedApps);
+    for (const id of ids) {
+      const app = apps.find(a => a.id === id);
+      if (app) {
+        await dbUpdateApplication(id, { flags: [...app.flags, 'Flagged for Review'] });
+      }
+    }
+    const updated = await dbGetApplications();
+    setApps(updated);
+    setSelectedApps(new Set());
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -79,6 +131,24 @@ export default function ApplicationManagement() {
           {states.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
+
+      {/* Bulk Actions */}
+      {selectedApps.size > 0 && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between">
+          <span className="text-sm text-blue-900 font-medium">{selectedApps.size} selected</span>
+          <div className="flex gap-2">
+            <button onClick={handleBulkApprove} className="px-3 py-1.5 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              Approve Selected
+            </button>
+            <button onClick={handleBulkFlag} className="px-3 py-1.5 text-xs bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors">
+              Flag Selected
+            </button>
+            <button onClick={() => setSelectedApps(new Set())} className="px-3 py-1.5 text-xs border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
 
       <DataTable
         data={filtered}
