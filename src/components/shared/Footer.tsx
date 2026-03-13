@@ -45,7 +45,7 @@ export default function Footer() {
               <strong>Auto Loan Pro is a marketplace connecting consumers with auto lenders.</strong> Auto Loan Pro is not a lender, broker, or loan servicer. All loan products, terms, rates, and approval decisions are made by participating lenders. Not all applicants will qualify. Rates and terms are subject to change.
             </p>
             <p className="text-xs text-gray-700 leading-relaxed">
-              <strong>NMLS Consumer Access:</strong> N/A (marketplace, not a licensed lender)
+              <strong>NMLS ID:</strong> [Pending] — Auto Loan Pro is a marketplace connecting consumers with lenders. We are not a lender, broker, or loan servicer.
             </p>
           </div>
 

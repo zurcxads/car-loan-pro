@@ -9,17 +9,29 @@ import Footer from '@/components/shared/Footer';
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
 
-const stats = [
-  { value: '15,000+', label: 'Pre-Approvals' },
-  { value: '$2.1B', label: 'Funded' },
-  { value: '4.1%', label: 'Avg Rate' },
-  { value: '< 5 min', label: 'to Apply' },
+const valueProps = [
+  { icon: '🔒', title: 'No Credit Impact', desc: 'Soft pull only — won\'t affect your score' },
+  { icon: '⚡', title: '2-Minute Application', desc: 'Quick and easy online process' },
+  { icon: '🏦', title: 'Multiple Lenders', desc: 'Compare offers from our network' },
+  { icon: '✓', title: 'Pre-Approved in Minutes', desc: 'Get your answer fast' },
 ];
 
 const steps = [
-  { num: '01', title: 'Apply Once', desc: 'Fill out a single application in under 5 minutes. No dealer visits, no phone calls, no obligation.' },
-  { num: '02', title: 'Lenders Compete', desc: 'Your profile is matched to our network of lenders who bid for your loan. More competition means better rates.' },
-  { num: '03', title: 'Get Pre-Approved', desc: 'Review multiple offers side-by-side, pick the best one, and walk into the dealership with financing locked in.' },
+  {
+    icon: <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
+    title: 'Apply Once',
+    desc: 'Fill out a single application in 4 steps. No dealer visits, no phone calls, no obligation.'
+  },
+  {
+    icon: <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /></svg>,
+    title: 'Lenders Compete',
+    desc: 'Your profile is matched to our network of lenders who compete for your loan.'
+  },
+  {
+    icon: <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+    title: 'Get Pre-Approved',
+    desc: 'Review multiple offers side-by-side and walk into the dealership with financing locked in.'
+  },
 ];
 
 const tiers = [
@@ -29,10 +41,11 @@ const tiers = [
   { name: 'Specialty', range: 'All scores', rate: '6.99 - 12.99%', color: 'bg-gray-400' },
 ];
 
-const testimonials = [
-  { name: 'David M.', location: 'Houston, TX', text: 'Saved $3,200 over the life of my loan compared to what the dealer offered. The process took 4 minutes.', rating: 5 },
-  { name: 'Sarah L.', location: 'Phoenix, AZ', text: 'I had a 640 credit score and still got 3 offers. Ended up with a rate 2% lower than my bank quoted.', rating: 5 },
-  { name: 'Carlos R.', location: 'Miami, FL', text: 'First-time buyer with no credit history. Auto Loan Pro matched me with a lender that specializes in thin-file borrowers.', rating: 4 },
+const trustSignals = [
+  '256-bit SSL Encryption',
+  'Soft Pull Only',
+  'FCRA Compliant',
+  'Free for Consumers'
 ];
 
 const faqs = [
@@ -42,14 +55,6 @@ const faqs = [
   { q: 'What credit score do I need?', a: 'We work with lenders across the full credit spectrum, from prime (700+) to specialty lenders that accept all credit types. There is no minimum score to apply.' },
   { q: 'How long does the process take?', a: 'Most applicants receive their first offers within 2 minutes of submitting. The entire process from application to pre-approval takes under 5 minutes.' },
 ];
-
-function StarIcon({ filled }: { filled: boolean }) {
-  return (
-    <svg className={`w-4 h-4 ${filled ? 'text-amber-400' : 'text-gray-300'}`} fill="currentColor" viewBox="0 0 20 20">
-      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-    </svg>
-  );
-}
 
 export default function LandingPage() {
   const router = useRouter();
@@ -212,16 +217,33 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* Stats */}
-      <section className="py-12 border-y border-gray-200">
-        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((s, i) => (
+      {/* Value Props */}
+      <section className="py-12 border-y border-gray-200 bg-white">
+        <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+          {valueProps.map((prop, i) => (
             <motion.div key={i} variants={fadeUp} className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-gray-900">{s.value}</div>
-              <div className="text-xs text-gray-500 mt-1.5 uppercase tracking-wider font-medium">{s.label}</div>
+              <div className="text-3xl mb-3">{prop.icon}</div>
+              <div className="text-sm font-semibold text-gray-900 mb-1">{prop.title}</div>
+              <div className="text-xs text-gray-500 leading-relaxed">{prop.desc}</div>
             </motion.div>
           ))}
         </motion.div>
+      </section>
+
+      {/* Trust Bar */}
+      <section className="py-6 bg-blue-50 border-y border-blue-100">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-blue-700 font-medium">
+            {trustSignals.map((signal, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                {signal}
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* How it Works */}
@@ -233,10 +255,15 @@ export default function LandingPage() {
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-3 gap-6">
             {steps.map((s, i) => (
-              <motion.div key={i} variants={fadeUp} className="p-7 rounded-2xl surface surface-hover">
-                <div className="text-3xl font-bold text-gray-300 mb-4">{s.num}</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{s.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
+              <motion.div key={i} variants={fadeUp} className="relative p-7 rounded-2xl surface surface-hover">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-4">
+                  {s.icon}
+                </div>
+                <div className="absolute top-7 right-7 text-5xl font-bold text-gray-100">
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 relative z-10">{s.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed relative z-10">{s.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -284,27 +311,12 @@ export default function LandingPage() {
               <div className="text-xs text-green-600 mt-2 font-medium">Save $3,180 over the life of the loan</div>
             </motion.div>
           </motion.div>
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-xs text-gray-400 mt-8">
+            * Illustrative example only. Actual rates vary based on credit profile, vehicle, and lender. Rates shown are for comparison purposes.
+          </motion.p>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-16 md:py-24 px-6">
-        <div className="max-w-5xl mx-auto">
-          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-12">What Borrowers Say</motion.h2>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <motion.div key={i} variants={fadeUp} className="p-6 rounded-2xl surface">
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: 5 }).map((_, j) => <StarIcon key={j} filled={j < t.rating} />)}
-                </div>
-                <p className="text-sm text-gray-600 leading-relaxed mb-5">&ldquo;{t.text}&rdquo;</p>
-                <div className="text-sm font-medium text-gray-900">{t.name}</div>
-                <div className="text-xs text-gray-500">{t.location}</div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
 
       {/* FAQ */}
       <section id="faq" className="py-16 md:py-24 px-6">
@@ -336,7 +348,7 @@ export default function LandingPage() {
         <div className="max-w-2xl mx-auto text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Ready to save on your auto loan?</motion.h2>
-            <motion.p variants={fadeUp} className="text-gray-500 mb-10">Join 15,000+ borrowers who found better rates through Auto Loan Pro.</motion.p>
+            <motion.p variants={fadeUp} className="text-gray-500 mb-10">Get pre-approved in minutes with no impact to your credit score.</motion.p>
             <motion.div variants={fadeUp}>
               <Link href="/apply" className="inline-flex px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200 cursor-pointer">
                 Check Your Rate — Free
