@@ -137,6 +137,8 @@ export async function POST(req: NextRequest) {
       return apiError('Failed to create application. Check server logs for DB error details.', 500);
     }
 
+    const sessionToken = (app as MockApplication & { sessionToken?: string }).sessionToken;
+
     let userId: string | null = null;
 
     // Silent account creation is optional. Skip it unless Supabase admin access
@@ -196,12 +198,12 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({
       success: true,
       data: {
-      id: app.id,
-      userId,
+        id: app.id,
+        userId,
+        sessionToken,
       },
     }, { status: 201 });
 
-    const sessionToken = (app as MockApplication & { sessionToken?: string }).sessionToken;
     if (sessionToken) {
       response.cookies.set(
         CONSUMER_SESSION_COOKIE,
