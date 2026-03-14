@@ -99,8 +99,11 @@ export default function ContactPage() {
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="min-h-screen bg-white dark:bg-zinc-950">
       <section className="pt-28 pb-16 px-6">
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-2xl mx-auto">
+          <div className="sr-only" aria-live="polite">
+            {submitted ? 'Message sent successfully.' : submitting ? 'Sending your message.' : 'Contact form ready.'}
+          </div>
           <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-zinc-100 text-center">Contact Us</motion.h1>
-          <motion.p variants={fadeUp} className="mt-4 text-lg text-gray-500 dark:text-zinc-400 text-center font-light">
+          <motion.p variants={fadeUp} className="mt-4 text-lg text-gray-600 dark:text-zinc-300 text-center font-light">
             Have a question? We&apos;re here to help.
           </motion.p>
 
@@ -112,7 +115,7 @@ export default function ContactPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-1">Email</h3>
-              <a href="mailto:hello@autoloanpro.co" className="text-sm text-blue-600 hover:text-blue-500 transition-colors">hello@autoloanpro.co</a>
+              <a href="mailto:hello@autoloanpro.co" className="text-sm text-blue-600 hover:text-blue-500 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm">hello@autoloanpro.co</a>
             </div>
             <div className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50 p-6 text-center hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-3">
@@ -131,7 +134,7 @@ export default function ContactPage() {
                 </svg>
               </div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-1">FAQ</h3>
-              <a href="#faq" className="text-sm text-blue-600 hover:text-blue-500 transition-colors">View Common Questions</a>
+              <a href="#faq" className="text-sm text-blue-600 hover:text-blue-500 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm">View Common Questions</a>
             </div>
           </motion.div>
 
@@ -141,39 +144,42 @@ export default function ContactPage() {
                 <Check className="h-7 w-7 text-blue-600 dark:text-blue-300" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-zinc-100 mb-2">Message Sent</h2>
-              <p className="text-sm text-gray-500 dark:text-zinc-400">{submitMessage}</p>
+              <p className="text-sm text-gray-600 dark:text-zinc-300">{submitMessage}</p>
             </motion.div>
           ) : (
             <motion.form variants={fadeUp} onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 shadow-sm p-8 space-y-5">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-2">Send us a message</h2>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-zinc-400 mb-2 font-medium">Name</label>
+                <label htmlFor="contact-name" className="block text-xs text-gray-600 dark:text-zinc-300 mb-2 font-medium">Name</label>
                 <input
+                  id="contact-name"
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors duration-200"
                   placeholder="Your name"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-zinc-400 mb-2 font-medium">Email</label>
+                <label htmlFor="contact-email" className="block text-xs text-gray-600 dark:text-zinc-300 mb-2 font-medium">Email</label>
                 <input
+                  id="contact-email"
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors duration-200"
                   placeholder="you@example.com"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-zinc-400 mb-2 font-medium">Subject</label>
+                <label htmlFor="contact-subject" className="block text-xs text-gray-600 dark:text-zinc-300 mb-2 font-medium">Subject</label>
                 <select
+                  id="contact-subject"
                   value={subject}
                   onChange={e => setSubject(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200 cursor-pointer"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors duration-200 cursor-pointer"
                 >
                   <option>General</option>
                   <option>Support</option>
@@ -183,25 +189,26 @@ export default function ContactPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs text-gray-500 dark:text-zinc-400 mb-2 font-medium">Message</label>
+                <label htmlFor="contact-message" className="block text-xs text-gray-600 dark:text-zinc-300 mb-2 font-medium">Message</label>
                 <textarea
+                  id="contact-message"
                   value={message}
                   onChange={e => setMessage(e.target.value)}
                   required
                   rows={5}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200 resize-none"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors duration-200 resize-none"
                   placeholder="How can we help?"
                 />
               </div>
               {submitError && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" aria-live="assertive">
                   {submitError}
                 </div>
               )}
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer active:scale-[0.98] transition-transform"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer active:scale-[0.98] transition-transform focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 {submitting ? 'Sending...' : 'Send Message'}
               </button>
@@ -220,8 +227,11 @@ export default function ContactPage() {
             {faqs.map((faq, i) => (
               <motion.div key={i} variants={fadeUp} className="rounded-xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
                 <button
+                  type="button"
                   onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
-                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
+                  aria-expanded={expandedFaq === i}
+                  aria-controls={`contact-faq-panel-${i}`}
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset"
                 >
                   <span className="text-sm font-semibold text-gray-900 dark:text-zinc-100 pr-4">{faq.question}</span>
                   <svg
@@ -235,6 +245,7 @@ export default function ContactPage() {
                 </button>
                 {expandedFaq === i && (
                   <motion.div
+                    id={`contact-faq-panel-${i}`}
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}

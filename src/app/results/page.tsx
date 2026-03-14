@@ -1,13 +1,14 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useId, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Check, Clock3 } from 'lucide-react';
 import { SkeletonOfferCards } from '@/components/shared/Skeleton';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface AnonymizedOffer {
   id: string;
@@ -75,6 +76,7 @@ function Confetti() {
 
 function Tooltip({ content }: { content: string }) {
   const [show, setShow] = useState(false);
+  const tooltipId = useId();
 
   return (
     <div className="relative inline-block">
@@ -82,14 +84,20 @@ function Tooltip({ content }: { content: string }) {
         type="button"
         onMouseEnter={() => setShow(true)}
         onMouseLeave={() => setShow(false)}
+        onFocus={() => setShow(true)}
+        onBlur={() => setShow(false)}
         onClick={() => setShow(!show)}
-        className="w-4 h-4 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors"
+        aria-label={content}
+        aria-describedby={show ? tooltipId : undefined}
+        className="w-4 h-4 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
       >
         <span className="text-[10px] font-semibold text-gray-600">?</span>
       </button>
       <AnimatePresence>
         {show && (
           <motion.div
+            id={tooltipId}
+            role="tooltip"
             initial={{ opacity: 0, y: 4, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 4, scale: 0.95 }}
@@ -110,6 +118,9 @@ function Tooltip({ content }: { content: string }) {
 function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const compareDialogRef = useRef<HTMLDivElement>(null);
+  const confirmDialogRef = useRef<HTMLDivElement>(null);
+  const downPaymentInputId = 'results-down-payment';
 
   const [offers, setOffers] = useState<AnonymizedOffer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,6 +135,13 @@ function ResultsContent() {
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
+
+  useFocusTrap(showCompareModal, compareDialogRef, () => {
+    setShowCompareModal(false);
+    setSelectedForCompare([]);
+    setCompareMode(false);
+  });
+  useFocusTrap(showConfirmModal, confirmDialogRef, () => setShowConfirmModal(false));
 
   const isDev = searchParams.get('dev') === 'true';
 
@@ -390,11 +408,11 @@ function ResultsContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50" aria-live="polite">
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-            <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
-            <div className="text-sm text-gray-500">Finding your rates...</div>
+            <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg">Auto Loan Pro</Link>
+            <div className="text-sm text-gray-600">Finding your rates...</div>
           </div>
         </div>
 
@@ -411,7 +429,7 @@ function ResultsContent() {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Finding Your Best Rates
             </h1>
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-600 text-lg">
               Matching you with lenders in our network
             </p>
           </motion.div>
@@ -440,12 +458,12 @@ function ResultsContent() {
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
             {applicationStatus === 'pending_decision' ? 'Still Matching Lenders' : 'No Offers Available'}
           </h2>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-gray-600 mb-6">
             {applicationStatus === 'pending_decision'
               ? 'Your application was submitted successfully. We are still finalizing your offers.'
               : 'We could not find matching offers at this time. Our team will review your application manually.'}
           </p>
-          <Link href="/" className="inline-flex px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors">
+          <Link href="/" className="inline-flex px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
             {applicationStatus === 'pending_decision' ? 'Return to Home' : 'Return Home'}
           </Link>
         </div>
@@ -461,12 +479,15 @@ function ResultsContent() {
 
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
-          <div className="text-sm text-gray-500">Your Pre-Approval Offers</div>
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg">Auto Loan Pro</Link>
+          <div className="text-sm text-gray-600">Your Pre-Approval Offers</div>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="sr-only" aria-live="polite">
+          {calculating ? 'Updating offer estimates' : `${offers.length} offers available`}
+        </div>
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -498,7 +519,7 @@ function ResultsContent() {
             transition={{ delay: 0.4 }}
             className="mb-4"
           >
-            <p className="text-gray-500 text-lg mb-3">You qualify for up to</p>
+            <p className="text-gray-600 text-lg mb-3">You qualify for up to</p>
             <div className="text-6xl md:text-7xl font-bold text-blue-600">
               ${maxAmount.toLocaleString()}
             </div>
@@ -528,14 +549,15 @@ function ResultsContent() {
           transition={{ delay: 0.7 }}
           className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
         >
-          <h3 className="text-sm font-semibold text-gray-900 mb-4">Customize Your Terms</h3>
+          <h2 className="text-sm font-semibold text-gray-900 mb-4">Customize Your Terms</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-xs text-gray-500 mb-3 font-medium">Loan Term</label>
+              <div className="block text-xs text-gray-600 mb-3 font-medium">Loan Term</div>
               <div className="flex overflow-x-auto gap-2 pb-1 -mx-1 px-1 scrollbar-hide">
                 {TERM_OPTIONS.map(t => (
                   <button
                     key={t}
+                    type="button"
                     onClick={() => {
                       setTerm(t);
                       setCalculating(true);
@@ -546,6 +568,7 @@ function ResultsContent() {
                         ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
                         : 'bg-gray-50 border-gray-200 text-gray-700 hover:border-gray-300'
                     }`}
+                    aria-pressed={term === t}
                   >
                     {t}
                   </button>
@@ -553,10 +576,11 @@ function ResultsContent() {
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-3 font-medium">
+              <label htmlFor={downPaymentInputId} className="block text-xs text-gray-600 mb-3 font-medium">
                 Down Payment: <span className="text-gray-900 font-semibold">${downPayment.toLocaleString()}</span>
               </label>
               <input
+                id={downPaymentInputId}
                 type="range"
                 min="0"
                 max={maxAmount}
@@ -569,7 +593,7 @@ function ResultsContent() {
                 }}
                 className="w-full cursor-pointer"
               />
-              <div className="flex justify-between text-xs text-gray-400 mt-2">
+              <div className="flex justify-between text-xs text-gray-500 mt-2">
                 <span>$0</span>
                 <span>${maxAmount.toLocaleString()}</span>
               </div>
@@ -585,47 +609,52 @@ function ResultsContent() {
           className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6"
         >
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 dark:text-zinc-300 font-medium">Sort by:</span>
+            <span className="text-sm text-gray-700 dark:text-zinc-200 font-medium">Sort by:</span>
             <div className="flex gap-2 flex-wrap">
               <button
+                type="button"
                 onClick={() => setSortBy('best_rate')}
                 className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
                   sortBy === 'best_rate'
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700'
                 }`}
-              >
+                aria-pressed={sortBy === 'best_rate'}>
                 Best Rate
               </button>
               <button
+                type="button"
                 onClick={() => setSortBy('lowest_payment')}
                 className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
                   sortBy === 'lowest_payment'
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700'
                 }`}
-              >
+                aria-pressed={sortBy === 'lowest_payment'}>
                 Lowest Payment
               </button>
               <button
+                type="button"
                 onClick={() => setSortBy('highest_amount')}
                 className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
                   sortBy === 'highest_amount'
                     ? 'bg-blue-600 border-blue-600 text-white'
                     : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700'
                 }`}
-              >
+                aria-pressed={sortBy === 'highest_amount'}>
                 Highest Amount
               </button>
             </div>
           </div>
           <button
+            type="button"
             onClick={() => setCompareMode(!compareMode)}
             className={`px-4 py-2.5 min-h-[44px] text-sm font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
               compareMode
                 ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300'
                 : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700'
             }`}
+            aria-pressed={compareMode}
           >
             {compareMode ? 'Exit Compare' : 'Compare Offers'}
           </button>
@@ -685,10 +714,13 @@ function ResultsContent() {
                   <div className="flex items-center gap-2">
                     {compareMode && (
                       <button
+                        type="button"
                         onClick={() => toggleCompareSelection(offer.id)}
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
                           isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-300 dark:border-zinc-600 hover:border-blue-400'
                         }`}
+                        aria-label={`Compare ${offer.label}`}
+                        aria-pressed={isSelected}
                       >
                         {isSelected && (
                           <Check className="h-3 w-3 text-white" />
@@ -739,7 +771,7 @@ function ResultsContent() {
                       <Tooltip content="Your estimated monthly payment including principal and interest" />
                     </div>
                     <div className="text-3xl font-bold text-gray-900 dark:text-zinc-100">${payment.toLocaleString()}</div>
-                    <div className="text-xs text-gray-400 dark:text-zinc-500 mt-1">for {term} months</div>
+                    <div className="text-xs text-gray-500 dark:text-zinc-400 mt-1">for {term} months</div>
                   </div>
 
                   <div className="pt-4 border-t border-gray-200 dark:border-zinc-800">
@@ -748,7 +780,7 @@ function ResultsContent() {
                       <Tooltip content="Total amount you'll pay over the life of the loan (principal + interest + down payment)" />
                     </div>
                     <div className="text-lg font-semibold text-gray-700 dark:text-zinc-300">${totalCost.toLocaleString()}</div>
-                    <div className="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">over {term} months</div>
+                    <div className="text-xs text-gray-500 dark:text-zinc-400 mt-0.5">over {term} months</div>
                   </div>
 
                   <div className="pt-4 border-t border-gray-200 dark:border-zinc-800">
@@ -764,9 +796,10 @@ function ResultsContent() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => handleSelectClick(offer)}
                   disabled={calculating}
-                  className="w-full mt-6 px-6 py-4 min-h-[48px] bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all hover:shadow-lg active:scale-[0.98]"
+                  className="w-full mt-6 px-6 py-4 min-h-[48px] bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all hover:shadow-lg active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   Select This Offer
                 </button>
@@ -789,11 +822,11 @@ function ResultsContent() {
               </svg>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-2">About These Offers</h3>
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-2">About These Offers</h2>
               <p className="text-sm text-gray-600 dark:text-zinc-300 leading-relaxed mb-3">
                 Offers are anonymized to help you focus on the numbers, not the brand. When you select an offer, the lender will be revealed and you'll receive your pre-approval letter.
               </p>
-              <p className="text-xs text-gray-500 dark:text-zinc-400">
+              <p className="text-xs text-gray-600 dark:text-zinc-300">
                 <strong>Important:</strong> Rates shown are estimates. A hard credit inquiry will be performed by the lender to finalize your offer. This may affect your credit score.
               </p>
             </div>
@@ -808,6 +841,7 @@ function ResultsContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            role="presentation"
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
             onClick={() => {
               setShowCompareModal(false);
@@ -816,6 +850,11 @@ function ResultsContent() {
             }}
           >
             <motion.div
+              ref={compareDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="compare-offers-title"
+              tabIndex={-1}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -823,14 +862,16 @@ function ResultsContent() {
               className="bg-white rounded-2xl p-6 max-w-4xl w-full shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Compare Offers</h2>
+                <h2 id="compare-offers-title" className="text-2xl font-bold text-gray-900">Compare Offers</h2>
                 <button
+                  type="button"
                   onClick={() => {
                     setShowCompareModal(false);
                     setSelectedForCompare([]);
                     setCompareMode(false);
                   }}
-                  className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                  className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  aria-label="Close compare offers dialog"
                 >
                   <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -883,11 +924,12 @@ function ResultsContent() {
                       </div>
 
                       <button
+                        type="button"
                         onClick={() => {
                           setShowCompareModal(false);
                           handleSelectClick(offer);
                         }}
-                        className="w-full mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.98] transition-transform"
+                        className="w-full mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.98] transition-transform focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                       >
                         Select {offer.label}
                       </button>
@@ -907,10 +949,16 @@ function ResultsContent() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            role="presentation"
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
             onClick={() => setShowConfirmModal(false)}
           >
             <motion.div
+              ref={confirmDialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="confirm-offer-title"
+              tabIndex={-1}
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -923,7 +971,7 @@ function ResultsContent() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Confirm Your Selection</h2>
+                <h2 id="confirm-offer-title" className="text-2xl font-bold text-gray-900 mb-2">Confirm Your Selection</h2>
                 <p className="text-sm text-gray-600">
                   Proceeding with <strong>{selectedOffer.label}</strong> at <strong>{calculatePayment(selectedOffer, term, downPayment) > 0 ?
                     `${((selectedOffer.rateTiers.find(t => t.termMonths === term)?.rateMin || 0) + (selectedOffer.rateTiers.find(t => t.termMonths === term)?.rateMax || 0)) / 2}` :
@@ -946,20 +994,22 @@ function ResultsContent() {
                 </div>
               </div>
 
-              <p className="text-xs text-gray-500 mb-6 text-center">
+              <p className="text-xs text-gray-600 mb-6 text-center">
                 This will reveal the lender and generate your pre-approval letter. You can review it before proceeding to finalize.
               </p>
 
               <div className="flex gap-3">
                 <button
+                  type="button"
                   onClick={() => setShowConfirmModal(false)}
-                  className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors active:scale-[0.98] transition-transform"
+                  className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors active:scale-[0.98] transition-transform focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   Go Back
                 </button>
                 <button
+                  type="button"
                   onClick={handleConfirmSelection}
-                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.98] transition-transform"
+                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.98] transition-transform focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   Confirm
                 </button>
@@ -974,7 +1024,7 @@ function ResultsContent() {
 
 export default function ResultsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-gray-500">Loading...</div></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center" aria-live="polite"><div className="text-gray-600">Loading...</div></div>}>
       <ResultsContent />
     </Suspense>
   );

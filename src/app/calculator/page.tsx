@@ -47,6 +47,9 @@ function formatCurrencyFull(val: number) {
 }
 
 export default function CalculatorPage() {
+  const vehiclePriceId = 'vehicle-price';
+  const downPaymentId = 'down-payment';
+  const creditScoreId = 'credit-score';
   const [vehiclePrice, setVehiclePrice] = useState(35000);
   const [downPayment, setDownPayment] = useState(5000);
   const [creditScore, setCreditScore] = useState(700);
@@ -272,7 +275,7 @@ export default function CalculatorPage() {
                   <span className="font-semibold text-gray-900 dark:text-zinc-100">{formatCurrency(results.totalWithDownPayment)}</span>
                 </div>
               </div>
-              <Link href="/apply" className="block w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors duration-200 text-center">
+              <Link href="/apply" className="block w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors duration-200 text-center focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
                 Get Your Real Rate
               </Link>
             </motion.div>
@@ -342,12 +345,15 @@ export default function CalculatorPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.div variants={fadeUp} className="text-center mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-zinc-100 mb-3">Amortization Schedule</h2>
-              <p className="text-gray-500 dark:text-zinc-400 text-sm">See how your payments break down over time</p>
+              <p className="text-gray-600 dark:text-zinc-300 text-sm">See how your payments break down over time</p>
             </motion.div>
             <motion.div variants={fadeUp}>
               <button
+                type="button"
                 onClick={() => setShowAmortization(!showAmortization)}
-                className="w-full mb-4 px-6 py-3 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-zinc-100 text-sm font-medium rounded-xl transition-colors flex items-center justify-between"
+                className="w-full mb-4 px-6 py-3 bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-900 dark:text-zinc-100 text-sm font-medium rounded-xl transition-colors flex items-center justify-between focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                aria-expanded={showAmortization}
+                aria-controls="amortization-schedule"
               >
                 <span>{showAmortization ? 'Hide' : 'Show'} Payment Schedule</span>
                 <svg className={`w-5 h-5 transition-transform ${showAmortization ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -355,7 +361,7 @@ export default function CalculatorPage() {
                 </svg>
               </button>
               {showAmortization && (
-                <div className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 overflow-hidden">
+                <div id="amortization-schedule" className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 overflow-hidden">
                   <div className="overflow-x-auto max-h-96 overflow-y-auto">
                     <table className="w-full text-sm">
                       <thead className="bg-gray-50 dark:bg-zinc-900 sticky top-0">
@@ -391,9 +397,9 @@ export default function CalculatorPage() {
       <section className="py-24 px-6 bg-gray-50 dark:bg-zinc-900/50">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="max-w-2xl mx-auto text-center">
           <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-zinc-100 mb-4">Ready to get your real rate?</motion.h2>
-          <motion.p variants={fadeUp} className="text-gray-500 dark:text-zinc-400 mb-10">These are estimates. Apply to see actual offers from competing lenders.</motion.p>
+          <motion.p variants={fadeUp} className="text-gray-600 dark:text-zinc-300 mb-10">These are estimates. Apply to see actual offers from competing lenders.</motion.p>
           <motion.div variants={fadeUp}>
-            <Link href="/apply" className="inline-flex px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200">
+            <Link href="/apply" className="inline-flex px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
               Get Your Real Rate
             </Link>
           </motion.div>
