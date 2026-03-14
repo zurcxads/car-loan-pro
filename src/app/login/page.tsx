@@ -3,27 +3,32 @@
 import { useState, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Mail } from 'lucide-react';
+
+const PORTAL_REDIRECTS = new Set(['/admin', '/lender', '/dealer']);
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const errorParam = searchParams.get('error');
   const redirect = searchParams.get('redirect');
+  const safeRedirect = redirect && redirect.startsWith('/') ? redirect : '/dashboard';
+  const isPortalLogin = PORTAL_REDIRECTS.has(safeRedirect);
+  const isDevMode = searchParams.get('dev') === 'true';
 
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
   // Dev mode: skip login entirely, redirect to the portal with dev=true
   useEffect(() => {
-    if (searchParams.get('dev') === 'true' || (typeof window !== 'undefined' && window.location.search.includes('dev=true'))) {
-      // Validate redirect is a relative path to prevent open redirect attacks
-      const safeRedirect = redirect && redirect.startsWith('/') ? redirect : '/dashboard';
+    if (isDevMode) {
       window.location.href = safeRedirect + (safeRedirect.includes('?') ? '&' : '?') + 'dev=true';
     }
-  }, [searchParams, redirect]);
+  }, [isDevMode, safeRedirect]);
 
   useEffect(() => {
     if (errorParam === 'invalid_token') {
@@ -32,6 +37,8 @@ function LoginForm() {
       toast.error('This link has expired. Please request a new one.');
     } else if (errorParam === 'verification_failed') {
       toast.error('Verification failed. Please try again.');
+    } else if (errorParam === 'CredentialsSignin') {
+      toast.error('Invalid email or password.');
     }
   }, [errorParam]);
 
@@ -40,6 +47,23 @@ function LoginForm() {
     setLoading(true);
 
     try {
+      if (isPortalLogin) {
+        const result = await signIn('credentials', {
+          email,
+          password,
+          redirect: false,
+          callbackUrl: isDevMode ? `${safeRedirect}?dev=true` : safeRedirect,
+        });
+
+        if (!result || result.error) {
+          toast.error('Invalid email or password.');
+          return;
+        }
+
+        window.location.href = result.url || safeRedirect;
+        return;
+      }
+
       // In a real app, we'd look up the application ID by email
       // For now, we'll show a message that the link will be sent
       // The actual implementation would call /api/auth/magic-link/send
@@ -70,8 +94,14 @@ function LoginForm() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-1">Access Your Dashboard</h2>
-                <p className="text-xs text-gray-500 dark:text-zinc-400 mb-6">Enter your email and we&apos;ll send you a secure login link. No password needed.</p>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-1">
+                  {isPortalLogin ? 'Portal Sign In' : 'Access Your Dashboard'}
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-zinc-400 mb-6">
+                  {isPortalLogin
+                    ? 'Sign in with your portal credentials.'
+                    : 'Enter your email and we&apos;ll send you a secure login link. No password needed.'}
+                </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
@@ -86,6 +116,20 @@ function LoginForm() {
                     />
                   </div>
 
+                  {isPortalLogin && (
+                    <div>
+                      <label className="block text-xs text-gray-500 dark:text-zinc-400 mb-2 font-medium">Password</label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        required
+                        className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
+                      />
+                    </div>
+                  )}
+
                   <button
                     type="submit"
                     disabled={loading}
@@ -94,20 +138,22 @@ function LoginForm() {
                     {loading ? (
                       <span className="flex items-center justify-center gap-2">
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Sending link...
+                        {isPortalLogin ? 'Signing in...' : 'Sending link...'}
                       </span>
                     ) : (
-                      'Send Me a Link'
+                      isPortalLogin ? 'Sign In' : 'Send Me a Link'
                     )}
                   </button>
                 </form>
 
-                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-zinc-800">
-                  <p className="text-xs text-gray-500 dark:text-zinc-400 text-center">
-                    First time here?{' '}
-                    <Link href="/apply" className="text-blue-600 hover:text-blue-500 font-medium">Apply for pre-approval</Link>
-                  </p>
-                </div>
+                {!isPortalLogin && (
+                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-zinc-800">
+                    <p className="text-xs text-gray-500 dark:text-zinc-400 text-center">
+                      First time here?{' '}
+                      <Link href="/apply" className="text-blue-600 hover:text-blue-500 font-medium">Apply for pre-approval</Link>
+                    </p>
+                  </div>
+                )}
               </motion.div>
             ) : (
               <motion.div
@@ -149,9 +195,13 @@ function LoginForm() {
               </svg>
             </div>
             <div>
-              <h3 className="text-xs font-semibold text-gray-900 dark:text-zinc-100 mb-1">Passwordless & Secure</h3>
+              <h3 className="text-xs font-semibold text-gray-900 dark:text-zinc-100 mb-1">
+                {isPortalLogin ? 'Portal Access' : 'Passwordless & Secure'}
+              </h3>
               <p className="text-xs text-gray-600 dark:text-zinc-300 leading-relaxed">
-                We use magic links instead of passwords. It&apos;s faster, more secure, and one less password to remember.
+                {isPortalLogin
+                  ? 'Production portal access is validated against Supabase auth. Demo credentials are accepted only in dev mode.'
+                  : 'We use magic links instead of passwords. It&apos;s faster, more secure, and one less password to remember.'}
               </p>
             </div>
           </div>

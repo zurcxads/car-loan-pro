@@ -1,7 +1,8 @@
 import { type AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
 // Demo users for when Supabase is not configured
 // Pre-computed bcrypt hashes for security (avoid runtime hashing)
@@ -50,41 +51,63 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
+        const requestData = req as {
+          query?: Record<string, string | string[] | undefined>;
+          headers?: Record<string, string | undefined>;
+          body?: Record<string, string | undefined>;
+        };
+        const callbackUrl = requestData.body?.callbackUrl || '';
+        const devParam = requestData.query?.dev;
+        const isDevQuery = Array.isArray(devParam) ? devParam.includes('true') : devParam === 'true';
         const isDevLogin =
-          process.env.NODE_ENV !== 'production' ||
-          req.query?.dev === 'true' ||
-          req.query?.callbackUrl?.includes('dev=true') ||
-          req.headers?.referer?.includes('dev=true');
+          process.env.NODE_ENV !== 'production' &&
+          (
+            isDevQuery ||
+            callbackUrl.includes('dev=true') ||
+            requestData.headers?.referer?.includes('dev=true')
+          );
 
-        // Try Supabase first
         if (isSupabaseConfigured()) {
-          const { data: user, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', credentials.email)
-            .single();
+          const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+          );
+          const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+            email: credentials.email,
+            password: credentials.password,
+          });
 
-          // Handle database errors (PGRST116 = not found is OK, others are errors)
-          if (error && error.code !== 'PGRST116') {
-            console.error('Supabase auth error:', error);
-            if (!isDevLogin) {
+          if (!authError && authData.user) {
+            const serviceClient = getServiceClient();
+            const { data: userRecord, error: userError } = await serviceClient
+              .from('users')
+              .select('id, email, name, role, entity_id')
+              .eq('email', credentials.email)
+              .single();
+
+            await supabase.auth.signOut();
+
+            if (userError) {
+              console.error('Supabase user lookup error:', userError);
               return null;
             }
-          } else if (user && await bcrypt.compare(credentials.password, user.password_hash)) {
+
             return {
-              id: String(user.id),
-              email: user.email,
-              name: user.name,
-              role: user.role,
-              entityId: user.entity_id,
+              id: String(userRecord.id),
+              email: userRecord.email,
+              name: userRecord.name,
+              role: userRecord.role,
+              entityId: userRecord.entity_id,
             };
           }
-          if (!isDevLogin) {
+
+          if (process.env.NODE_ENV === 'production' || !isDevLogin) {
             return null;
           }
+        } else if (process.env.NODE_ENV === 'production') {
+          return null;
         }
 
-        // Allow demo users only in non-production or when explicitly enabled with ?dev=true
         const user = DEMO_USERS.find(u => u.email === credentials.email);
         if (user && await bcrypt.compare(credentials.password, user.passwordHash)) {
           return {
