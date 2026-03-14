@@ -1,52 +1,58 @@
 import { NextResponse } from 'next/server';
-import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
+import { dbCreateApplication } from '@/lib/db';
 
 export async function GET() {
-  if (!isSupabaseConfigured()) {
-    return NextResponse.json({ error: 'Supabase not configured', configured: false });
-  }
-
   try {
-    const db = getServiceClient();
-    
-    const testData = {
-      borrower: { firstName: 'Debug', lastName: 'Test' },
-      employment: { status: 'full_time', grossMonthlyIncome: 5000 },
-      credit: { ficoScore: 700, scoreTier: 'prime' },
-      status: 'pending_decision',
+    // Replicate exact data shape from the apply form
+    const appData = {
+      borrower: {
+        firstName: 'Debug', lastName: 'FormTest',
+        email: 'debug@test.com', phone: '5551234567',
+        ssn: '***-**-6789', dob: '1990-01-01',
+        address: '123 Main', city: 'Austin', state: 'TX', zip: '78701',
+        residenceType: 'rent', monthlyHousingPayment: 1500, monthsAtAddress: 24,
+      },
+      employment: {
+        status: 'full_time', employer: 'Acme', title: 'QA',
+        monthsAtEmployer: 36, grossMonthlyIncome: 7500, incomeType: 'employment',
+      },
+      credit: {
+        ficoScore: 720, scoreTier: 'prime' as const,
+        totalMonthlyObligations: 1200, openAutoTradelines: 0,
+        derogatoryMarks: 0, hasRepo: false, hasBankruptcy: false,
+      },
+      dealStructure: {
+        salePrice: undefined,
+        downPayment: 0,
+        tradeInValue: 0,
+        tradeInPayoff: 0,
+        docFee: undefined,
+        taxAndFees: undefined,
+        totalAmountFinanced: 25000,
+        requestedTerm: 60,
+      },
+      loanAmount: 25000,
+      ltvPercent: undefined,
+      dtiPercent: 16,
+      ptiPercent: undefined,
+      hasVehicle: false,
+      status: 'pending_decision' as const,
       state: 'TX',
-      has_vehicle: false,
-      dti_percent: 20,
-      lenders_submitted: 0,
-      offers_received: 0,
-      session_token: 'debug-' + Date.now(),
-      session_expires_at: new Date(Date.now() + 86400000).toISOString(),
+      submittedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      lendersSubmitted: 0,
+      offersReceived: 0,
+      flags: [] as string[],
     };
 
-    const { data, error } = await db.from('applications').insert(testData).select().single();
-
-    if (error) {
-      return NextResponse.json({ 
-        error: error.message, 
-        details: error.details, 
-        hint: error.hint, 
-        code: error.code,
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL?.slice(0, 30),
-        hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      });
+    const app = await dbCreateApplication(appData);
+    
+    if (!app) {
+      return NextResponse.json({ error: 'dbCreateApplication returned null — check server console for DB error' });
     }
 
-    // Clean up test record
-    if (data?.id) {
-      await db.from('applications').delete().eq('id', data.id);
-    }
-
-    return NextResponse.json({ success: true, id: data?.id, cleaned: true });
+    return NextResponse.json({ success: true, appId: app.id });
   } catch (err) {
-    return NextResponse.json({ 
-      error: String(err),
-      hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL?.slice(0, 30),
-    });
+    return NextResponse.json({ error: String(err) });
   }
 }
