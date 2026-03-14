@@ -316,13 +316,6 @@ export async function sendEmail(emailData: EmailData): Promise<{ success: boolea
   const resendApiKey = process.env.RESEND_API_KEY;
 
   if (!resendApiKey) {
-    // Dev mode: just log the email
-    if (process.env.NODE_ENV === 'development') {
-      console.log('\nEMAIL (DEV MODE - NOT SENT)');
-      console.log('To:', emailData.to);
-      console.log('Subject:', emailData.subject);
-      console.log('HTML:', emailData.html.substring(0, 200) + '...\n');
-    }
     return { success: true };
   }
 
