@@ -60,6 +60,8 @@ export async function dbCreateApplication(app: Partial<MockApplication>): Promis
     return mapDbToApp(data);
   }
 
+  console.error('[db] Primary insert failed:', error?.message, error?.details, error?.hint);
+
   // Support older database setups that predate `has_vehicle` and still require
   // non-null `vehicle` and `loan_amount` fields for pre-approval submissions.
   const legacyAppWithToken = buildLegacyApplicationInsert(appWithToken);
@@ -69,7 +71,10 @@ export async function dbCreateApplication(app: Partial<MockApplication>): Promis
     .select()
     .single();
 
-  if (legacyError || !legacyData) return null;
+  if (legacyError || !legacyData) {
+    console.error('[db] Legacy insert also failed:', legacyError?.message, legacyError?.details);
+    return null;
+  }
   return mapDbToApp(legacyData);
 }
 
