@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import Logo from '@/components/shared/Logo';
 
 const tabs = [
   { key: 'overview', label: 'Overview', icon: (
@@ -34,7 +35,7 @@ export default function DashboardLayout({ children, activeTab }: { children: Rea
       {/* Top bar */}
       <div className="border-b border-gray-200 bg-white sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
+          <Link href="/" className="hover:opacity-90 transition-opacity"><Logo size="sm" /></Link>
           <div className="flex items-center gap-4">
             <span className="text-xs text-gray-500">{user?.email}</span>
             <button

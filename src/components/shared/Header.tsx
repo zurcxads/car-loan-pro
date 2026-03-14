@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeToggle } from './ThemeToggle';
+import Logo from './Logo';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -46,8 +47,8 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 transition-colors">
-              Auto Loan Pro
+            <Link href="/" className="hover:opacity-90 transition-opacity">
+              <Logo size="md" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -123,10 +124,10 @@ export default function Header() {
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
                   <Link
                     href="/"
-                    className="text-xl font-bold text-gray-900 dark:text-gray-100"
+                    className="hover:opacity-90 transition-opacity"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    Auto Loan Pro
+                    <Logo size="md" />
                   </Link>
                   <button
                     onClick={() => setMobileMenuOpen(false)}

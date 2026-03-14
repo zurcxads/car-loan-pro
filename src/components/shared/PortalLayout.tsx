@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Logo from './Logo';
 
 interface NavItem {
   key: string;
@@ -50,7 +51,7 @@ export default function PortalLayout({
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="p-6 border-b border-gray-200">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 block">Auto Loan Pro</Link>
+          <Link href="/" className="block"><Logo size="sm" /></Link>
           <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium uppercase tracking-wider mt-2 inline-block ${badgeStyles[badgeColor] || badgeStyles.blue}`}>
             {portalBadge}
           </span>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Logo from '@/components/shared/Logo';
 
 interface VerificationStatus {
   valid: boolean;
@@ -89,8 +90,8 @@ export default function VerifyApprovalPage() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center">
-          <Link href="/" className="text-xl font-bold text-gray-900">
-            Auto Loan Pro
+          <Link href="/" className="hover:opacity-90 transition-opacity">
+            <Logo size="md" />
           </Link>
         </div>
       </header>
