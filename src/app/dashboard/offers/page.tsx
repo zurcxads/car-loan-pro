@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { MockOffer } from '@/lib/mock-data';
 
@@ -13,6 +13,8 @@ const OfferSelectionModal = dynamic(() => import('@/components/offers/OfferSelec
 
 function OffersContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isDev = searchParams.get('dev') === 'true';
   const [offers, setOffers] = useState<MockOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<MockOffer | null>(null);
@@ -20,26 +22,54 @@ function OffersContent() {
   const [isSelecting, setIsSelecting] = useState(false);
 
   useEffect(() => {
-    // First, get application ID from dashboard API
-    fetch('/api/dashboard')
+    if (isDev) {
+      const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      setOffers([
+        {
+          id: 'demo-1',
+          applicationId: 'APP-DEV-001',
+          lenderId: 'LND-001',
+          lenderName: 'Capital Auto Finance',
+          apr: 4.2,
+          termMonths: 60,
+          monthlyPayment: 589,
+          approvedAmount: 32000,
+          status: 'approved',
+          conditions: ['Proof of income at closing'],
+          decisionAt: new Date().toISOString(),
+          expiresAt,
+        },
+        {
+          id: 'demo-2',
+          applicationId: 'APP-DEV-001',
+          lenderId: 'LND-002',
+          lenderName: 'Pioneer Credit Union',
+          apr: 5.1,
+          termMonths: 72,
+          monthlyPayment: 515,
+          approvedAmount: 31500,
+          status: 'conditional',
+          conditions: ['Recent paystub', 'Proof of residence'],
+          decisionAt: new Date().toISOString(),
+          expiresAt,
+        },
+      ]);
+      setLoading(false);
+      return;
+    }
+
+    fetch('/api/results')
       .then(res => res.json())
       .then(data => {
-        if (data.application) {
-          // Then fetch offers for this application
-          return fetch(`/api/offers?applicationId=${data.application.id}`);
-        }
-      })
-      .then(res => res?.json())
-      .then(data => {
-        if (data?.offers) {
-          setOffers(data.offers);
+        if (data.success) {
+          setOffers(data.data?.offers || []);
         }
         setLoading(false);
       })
       .catch(() => {
         setLoading(false);
       });
-  }, []);
+  }, [isDev]);
 
   const handleSelectOffer = (offer: MockOffer) => {
     setSelectedOffer(offer);
@@ -50,10 +80,25 @@ function OffersContent() {
     if (!selectedOffer) return;
 
     setIsSelecting(true);
+
+    if (isDev) {
+      setTimeout(() => {
+        toast.success('Offer selected successfully!');
+        setIsModalOpen(false);
+        router.push('/dashboard?dev=true');
+      }, 500);
+      return;
+    }
+
     try {
-      const response = await fetch(`/api/offers/${selectedOffer.id}/select`, {
+      const response = await fetch('/api/offers/select', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          offerId: selectedOffer.id,
+          selectedTerm: selectedOffer.termMonths,
+          selectedDownPayment: 0,
+        }),
       });
 
       const data = await response.json();
@@ -62,9 +107,8 @@ function OffersContent() {
         toast.success('Offer selected successfully!');
         setIsModalOpen(false);
 
-        // Redirect to approval letter page
         setTimeout(() => {
-          router.push('/dashboard/approval-letter');
+          router.push('/dashboard');
         }, 500);
       } else {
         toast.error(data.error || 'Failed to select offer');
@@ -92,7 +136,7 @@ function OffersContent() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
+          <Link href={isDev ? '/dashboard?dev=true' : '/dashboard'} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>

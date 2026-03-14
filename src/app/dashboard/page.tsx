@@ -450,7 +450,7 @@ function DashboardContent() {
 
               {/* Documents */}
               <Link
-                href="/dashboard/documents"
+                href={isDev ? '/dashboard/documents?dev=true' : '/dashboard/documents'}
                 className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-purple-400 hover:shadow-lg transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">

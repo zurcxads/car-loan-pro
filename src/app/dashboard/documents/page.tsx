@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { CreditCard, DollarSign, ShieldCheck, Home } from 'lucide-react';
@@ -25,6 +25,8 @@ const DOCUMENT_TYPES = [
 
 function DocumentsContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isDev = searchParams.get('dev') === 'true';
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -33,31 +35,66 @@ function DocumentsContent() {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isDev) {
+      setUserId('USER-DEV-001');
+      setDocuments([
+        {
+          id: 'doc-1',
+          type: 'drivers_license',
+          file_name: 'drivers-license.pdf',
+          file_size: 240000,
+          file_type: 'application/pdf',
+          status: 'verified',
+          uploaded_at: new Date().toISOString(),
+        },
+        {
+          id: 'doc-2',
+          type: 'proof_of_income',
+          file_name: 'paystub-march.pdf',
+          file_size: 180000,
+          file_type: 'application/pdf',
+          status: 'uploaded',
+          uploaded_at: new Date().toISOString(),
+        },
+      ]);
+      setLoading(false);
+      return;
+    }
+
     // Fetch user and documents
     fetch('/api/dashboard')
       .then(res => res.json())
       .then(data => {
-        if (data.error || !data.application) {
+        if (!data.success || !data.data?.application) {
           router.push('/apply');
           return;
         }
-        setUserId(data.application.user_id);
-        return fetch(`/api/documents?userId=${data.application.user_id}`);
-      })
-      .then(res => res?.json())
-      .then(data => {
-        if (data?.documents) {
-          setDocuments(data.documents);
-        }
+        setUserId(data.data.application.id);
         setLoading(false);
       })
       .catch(() => {
         setLoading(false);
       });
-  }, [router]);
+  }, [router, isDev]);
 
   const handleFileSelect = async (type: string, file: File | null) => {
     if (!file || !userId) return;
+
+    if (isDev) {
+      setDocuments(prev => [
+        {
+          id: `doc-${Date.now()}`,
+          type,
+          file_name: file.name,
+          file_size: file.size,
+          file_type: file.type,
+          status: 'uploaded',
+          uploaded_at: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+      return;
+    }
 
     setUploading(type);
     const formData = new FormData();
@@ -87,6 +124,11 @@ function DocumentsContent() {
 
   const handleDelete = async (docId: string) => {
     if (!confirm('Are you sure you want to delete this document?')) return;
+
+    if (isDev) {
+      setDocuments(prev => prev.filter(d => d.id !== docId));
+      return;
+    }
 
     try {
       const res = await fetch(`/api/documents?id=${docId}`, {
@@ -132,10 +174,10 @@ function DocumentsContent() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/dashboard" className="text-lg font-semibold tracking-tight text-gray-900">
+          <Link href={isDev ? '/dashboard?dev=true' : '/dashboard'} className="text-lg font-semibold tracking-tight text-gray-900">
             Auto Loan Pro
           </Link>
-          <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900">
+          <Link href={isDev ? '/dashboard?dev=true' : '/dashboard'} className="text-sm text-gray-500 hover:text-gray-900">
             ← Back to Dashboard
           </Link>
         </div>

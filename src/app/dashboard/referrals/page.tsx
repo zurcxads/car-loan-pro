@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -26,6 +26,8 @@ interface Referral {
 
 function ReferralsContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isDev = searchParams.get('dev') === 'true';
 
   const [referralUrl, setReferralUrl] = useState('');
   const [stats, setStats] = useState<ReferralStats>({
@@ -39,14 +41,46 @@ function ReferralsContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isDev) {
+      setReferralUrl(`${window.location.origin}/apply?ref=ALP-DEV-001`);
+      setStats({
+        totalInvites: 8,
+        applied: 5,
+        funded: 3,
+        totalRewards: 150,
+        paidRewards: 100,
+      });
+      setReferrals([
+        {
+          id: 1,
+          referee_email: 'alex@example.com',
+          status: 'funded',
+          reward_amount: 50,
+          reward_paid: true,
+          created_at: new Date().toISOString(),
+          funded_at: new Date().toISOString(),
+        },
+        {
+          id: 2,
+          referee_email: 'jamie@example.com',
+          status: 'applied',
+          reward_amount: 50,
+          reward_paid: false,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      setLoading(false);
+      return;
+    }
+
     fetch('/api/dashboard')
       .then(res => res.json())
       .then(data => {
-        if (data.error || !data.application) {
+        if (!data.success || !data.data?.application) {
           router.push('/apply');
           return;
         }
-        return fetch(`/api/referrals?userId=${data.application.user_id}`);
+        return fetch(`/api/referrals?userId=${data.data.application.id}`);
       })
       .then(res => res?.json())
       .then(data => {
@@ -60,7 +94,7 @@ function ReferralsContent() {
       .catch(() => {
         setLoading(false);
       });
-  }, [router]);
+  }, [router, isDev]);
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralUrl);
@@ -93,10 +127,10 @@ function ReferralsContent() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/dashboard" className="text-lg font-semibold tracking-tight text-gray-900">
+          <Link href={isDev ? '/dashboard?dev=true' : '/dashboard'} className="text-lg font-semibold tracking-tight text-gray-900">
             Auto Loan Pro
           </Link>
-          <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900">
+          <Link href={isDev ? '/dashboard?dev=true' : '/dashboard'} className="text-sm text-gray-500 hover:text-gray-900">
             ← Back to Dashboard
           </Link>
         </div>
