@@ -10,8 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const token = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value || searchParams.get('token');
+    const token = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value;
     const devEnvironment = isDev();
 
     let letterData: ApprovalLetterData;

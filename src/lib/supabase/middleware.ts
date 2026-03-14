@@ -59,13 +59,9 @@ export async function updateSession(request: NextRequest) {
 
   // Protected routes — allow token-based access for consumers, otherwise redirect
   if (pathname.startsWith('/dashboard')) {
-    // Check for session token or magic token in URL
-    const sessionToken = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value
-      || request.nextUrl.searchParams.get('token');
-    const magicToken = request.nextUrl.searchParams.get('magic');
+    const sessionToken = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value;
 
-    // Allow access if user is authenticated OR has a valid token
-    if (!user && !sessionToken && !magicToken) {
+    if (!user && !sessionToken) {
       const url = request.nextUrl.clone();
       url.pathname = '/login';
       url.searchParams.set('redirectTo', pathname);

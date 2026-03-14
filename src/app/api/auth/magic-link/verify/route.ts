@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyMagicToken } from '@/lib/magic-link';
+import { dbGetApplication } from '@/lib/db';
+import {
+  CONSUMER_SESSION_COOKIE,
+  getConsumerSessionCookieOptions,
+} from '@/lib/consumer-session';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,13 +29,21 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(`${BASE_URL}/login?error=expired_token`);
     }
 
-    // Generate a new session token for this magic link access
-    const sessionToken = crypto.randomUUID();
+    const application = await dbGetApplication(result.applicationId);
+    const sessionToken = (application as { sessionToken?: string } | null)?.sessionToken;
 
-    // Store the session in localStorage via URL param (the dashboard will handle it)
-    const dashboardUrl = `${BASE_URL}/dashboard?magic=${sessionToken}&app_id=${result.applicationId}`;
+    if (!sessionToken) {
+      return NextResponse.redirect(`${BASE_URL}/login?error=session_unavailable`);
+    }
 
-    return NextResponse.redirect(dashboardUrl);
+    const response = NextResponse.redirect(`${BASE_URL}/dashboard`);
+    response.cookies.set(
+      CONSUMER_SESSION_COOKIE,
+      sessionToken,
+      getConsumerSessionCookieOptions()
+    );
+
+    return response;
   } catch (err) {
     console.error('Magic link verification error:', err);
     return NextResponse.redirect(`${BASE_URL}/login?error=verification_failed`);

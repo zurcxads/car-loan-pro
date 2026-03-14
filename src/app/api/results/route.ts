@@ -5,8 +5,7 @@ import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 
 // GET /api/results — get anonymized offers for results page
 export async function GET(req: NextRequest) {
-  const token = req.cookies.get(CONSUMER_SESSION_COOKIE)?.value
-    || req.nextUrl.searchParams.get('token');
+  const token = req.cookies.get(CONSUMER_SESSION_COOKIE)?.value;
 
   if (!token) {
     return apiError('Token required', 401);

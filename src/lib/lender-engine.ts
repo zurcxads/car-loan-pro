@@ -85,7 +85,7 @@ export async function matchLendersAndGenerateOffers(application: MockApplication
     });
 
     // Send email
-    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?token=${(application as unknown as { sessionToken?: string }).sessionToken}`;
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`;
     const emailData = offersReadyEmail(
       application.borrower.email,
       application.borrower.firstName,

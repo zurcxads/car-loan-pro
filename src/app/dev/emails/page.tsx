@@ -20,7 +20,7 @@ export default function EmailPreviewPage() {
     firstName: 'John',
     applicationId: 'APP-001',
     offerCount: 3,
-    magicLink: 'https://autoloanpro.co/dashboard?token=abc123',
+    magicLink: 'https://autoloanpro.co/dashboard',
     dashboardLink: 'https://autoloanpro.co/dashboard',
     lenderName: 'Premier Auto Lending',
     approvedAmount: 35000,
