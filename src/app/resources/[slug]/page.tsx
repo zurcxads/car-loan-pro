@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { articles, getArticleBySlug, getRelatedArticles } from '@/data/articles';
+import DOMPurify from 'isomorphic-dompurify';
 
 export function generateStaticParams() {
   return articles.map((article) => ({ slug: article.slug }));
@@ -165,7 +166,7 @@ export default function ArticlePage({ params }: Props) {
                         <div key={i} className="flex gap-3 ml-1 mb-2">
                           <span className="text-blue-600 font-semibold text-sm mt-0.5">{num}.</span>
                           <p className="text-gray-600 leading-relaxed text-[15px]">
-                            <span dangerouslySetInnerHTML={{ __html: text.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-gray-900">$1</strong>') }} />
+                            <span dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(text.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-gray-900">$1</strong>')) }} />
                           </p>
                         </div>
                       );
@@ -178,7 +179,7 @@ export default function ArticlePage({ params }: Props) {
                       .replace(/&mdash;/g, '\u2014');
 
                     return (
-                      <p key={i} className="text-gray-600 leading-relaxed text-[15px] mb-4" dangerouslySetInnerHTML={{ __html: html }} />
+                      <p key={i} className="text-gray-600 leading-relaxed text-[15px] mb-4" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />
                     );
                   })}
                 </div>

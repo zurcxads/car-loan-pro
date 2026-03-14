@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 
 const templates = [
   {
@@ -158,7 +159,7 @@ export default function EmailTemplatesPage() {
 
               <div className="p-6 bg-gray-50">
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <div dangerouslySetInnerHTML={{ __html: selectedTemplate.preview }} />
+                  <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedTemplate.preview) }} />
                 </div>
               </div>
 
