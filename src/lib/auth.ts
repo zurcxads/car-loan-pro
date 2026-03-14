@@ -102,8 +102,8 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as { role: string }).role;
-        token.entityId = (user as { entityId: string | null }).entityId;
+        token.role = (user as unknown as { role: string }).role;
+        token.entityId = (user as unknown as { entityId: string | null }).entityId;
       }
       return token;
     },
