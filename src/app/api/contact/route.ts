@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
 
   try {
     if (!isSupabaseConfigured()) {
-      console.log('contact_submission_fallback', JSON.stringify(submission));
       return apiSuccess({
         message: `Thanks, ${data.name}. Your message has been received and we'll get back to you within 24 hours.`,
       }, 201);
@@ -45,7 +44,6 @@ export async function POST(request: NextRequest) {
       console.warn('Contact submission fallback:', supabaseError, submission);
     }
 
-    console.log('contact_submission_fallback', JSON.stringify(submission));
     return apiSuccess({
       message: `Thanks, ${data.name}. Your message has been received and we'll get back to you within 24 hours.`,
     }, 201);
