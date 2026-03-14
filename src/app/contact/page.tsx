@@ -51,6 +51,17 @@ const faqs = [
   }
 ];
 
+type ContactSubmissionPayload = {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+};
+
+type ContactApiResponse =
+  | { success: true; data?: { message?: string } }
+  | { success: false; error?: string };
+
 export default function ContactPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -64,8 +75,18 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
+
     setSubmitting(true);
     setSubmitError('');
+    setSubmitMessage('');
+
+    const payload: ContactSubmissionPayload = {
+      name: name.trim(),
+      email: email.trim(),
+      subject: subject.trim(),
+      message: message.trim(),
+    };
 
     try {
       const response = await fetch('/api/contact', {
@@ -73,16 +94,17 @@ export default function ContactPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, subject, message }),
+        body: JSON.stringify(payload),
       });
 
-      const payload = await response.json();
+      const result: ContactApiResponse = await response.json();
 
-      if (!response.ok || !payload.success) {
-        throw new Error(payload.error || 'Failed to send your message.');
+      if (!response.ok || !result.success) {
+        const errorMessage = 'error' in result ? result.error : undefined;
+        throw new Error(errorMessage || 'Failed to send your message.');
       }
 
-      setSubmitMessage(payload.data?.message || 'Your message has been sent successfully.');
+      setSubmitMessage(result.data?.message || 'Your message has been sent successfully.');
       setSubmitted(true);
       setName('');
       setEmail('');
