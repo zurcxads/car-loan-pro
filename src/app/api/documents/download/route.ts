@@ -1,8 +1,14 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireAuth } from '@/lib/api-helpers';
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/documents/download?id=xxx — download a document
 export async function GET(req: NextRequest) {
+  const { error: authError } = await requireAuth();
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(req.url);
     const documentId = searchParams.get('id');

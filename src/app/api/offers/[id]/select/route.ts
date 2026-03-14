@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { apiSuccess, apiError } from '@/lib/api-helpers';
+import { apiSuccess, apiError, requireAuth } from '@/lib/api-helpers';
 import { dbGetOffer, dbUpdateOffer, dbUpdateApplication, dbGetOffers, dbGetApplication, dbCreateNotification } from '@/lib/db';
 import { createApplicationEvent } from '@/lib/application-events';
 import { sendEmail } from '@/lib/email-templates';
@@ -9,6 +9,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { error: authError } = await requireAuth();
+  if (authError) return authError;
+
   const { id } = await params;
 
   try {

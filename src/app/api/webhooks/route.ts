@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import crypto from 'crypto';
+import { requireAuth } from '@/lib/api-helpers';
 
 export async function GET(req: NextRequest) {
+  const { error: authError } = await requireAuth('lender');
+  if (authError) return authError;
+
   try {
     const supabase = await createClient();
     const { searchParams } = new URL(req.url);
@@ -40,6 +44,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const { error: postAuthError } = await requireAuth('lender');
+  if (postAuthError) return postAuthError;
+
   try {
     const supabase = await createClient();
     const body = await req.json();
@@ -86,6 +93,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const { error: putAuthError } = await requireAuth('lender');
+  if (putAuthError) return putAuthError;
+
   try {
     const supabase = await createClient();
     const body = await req.json();
@@ -129,6 +139,9 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const { error: deleteAuthError } = await requireAuth('lender');
+  if (deleteAuthError) return deleteAuthError;
+
   try {
     const supabase = await createClient();
     const { searchParams } = new URL(req.url);

@@ -1,9 +1,14 @@
 import { NextRequest } from 'next/server';
-import { apiSuccess, apiError } from '@/lib/api-helpers';
+import { apiSuccess, apiError, requireAuth } from '@/lib/api-helpers';
 import { dbGetUnreadNotificationCount } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
 
 // GET /api/notifications/unread-count?userId=xxx
 export async function GET(req: NextRequest) {
+  const { error: authError } = await requireAuth();
+  if (authError) return authError;
+
   try {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');

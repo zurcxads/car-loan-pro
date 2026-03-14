@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createApplicationEvent } from '@/lib/application-events';
 import { dbCreateNotification } from '@/lib/db';
+import { requireAuth } from '@/lib/api-helpers';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 const DOCUMENT_TYPES = ['paystub', 'bank_statement', 'proof_of_residence', 'tax_return', 'drivers_license', 'proof_of_insurance', 'proof_of_income', 'proof_of_address', 'other'];
 
 export async function POST(req: NextRequest) {
+  const { error: authError } = await requireAuth();
+  if (authError) return authError;
+
   try {
     const supabase = await createClient();
     const formData = await req.formData();

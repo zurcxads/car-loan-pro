@@ -1,10 +1,13 @@
 import { NextRequest } from 'next/server';
-import { apiSuccess, apiError, parseBody } from '@/lib/api-helpers';
+import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
 import { lenderDecisionSchema } from '@/lib/validations';
 import { dbCreateOffer, dbUpdateApplication, dbGetApplication, dbCreateActivityEvent } from '@/lib/db';
 
 // POST /api/lenders/decisions — lender submits decision on an application
 export async function POST(req: NextRequest) {
+  const { error: authError } = await requireAuth('lender');
+  if (authError) return authError;
+
   const { data, error } = await parseBody(req, lenderDecisionSchema);
   if (error) return error;
   if (!data) return apiError('Invalid data');

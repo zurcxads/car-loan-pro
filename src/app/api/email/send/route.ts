@@ -6,8 +6,12 @@ import {
   approvalLetterEmail,
   sendEmail,
 } from '@/lib/email-templates';
+import { requireAuth } from '@/lib/api-helpers';
 
 export async function POST(req: NextRequest) {
+  const { error: authError } = await requireAuth('admin');
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     const { type, to, data } = body;

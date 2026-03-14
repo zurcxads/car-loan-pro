@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } from 'plaid';
+import { requireAuth } from '@/lib/api-helpers';
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[process.env.PLAID_ENV as keyof typeof PlaidEnvironments] || PlaidEnvironments.sandbox,
@@ -14,6 +15,9 @@ const configuration = new Configuration({
 const plaidClient = new PlaidApi(configuration);
 
 export async function POST() {
+  const { error: authError } = await requireAuth();
+  if (authError) return authError;
+
   try {
     const configs = {
       user: {

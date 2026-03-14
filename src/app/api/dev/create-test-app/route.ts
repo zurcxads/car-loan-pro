@@ -7,6 +7,10 @@ function generateSessionToken(): string {
 }
 
 export async function POST(req: NextRequest) {
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json({ error: 'Not available in production' }, { status: 404 });
+  }
+
   try {
     const body = await req.json();
     const { withVehicle = false } = body;
