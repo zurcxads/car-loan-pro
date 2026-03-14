@@ -57,7 +57,7 @@ export default function LenderOnboardPage() {
   };
 
   const handleSubmit = () => {
-    console.log('Submitting lender onboarding:', formData);
+    // TODO: implement lender onboarding submission
   };
 
   const progress = (step / 4) * 100;

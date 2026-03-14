@@ -70,7 +70,7 @@ export default function DealerOnboardPage() {
   };
 
   const handleSubmit = () => {
-    console.log('Submitting dealer onboarding:', formData);
+    // TODO: implement dealer onboarding submission
   };
 
   const progress = (step / 4) * 100;

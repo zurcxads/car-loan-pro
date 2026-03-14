@@ -20,18 +20,13 @@ export async function setupDatabase() {
     },
   });
 
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Setting up database schema and seed data...');
-  }
+
 
   try {
     // Check if lenders table already has data
     const { data: existingLenders } = await supabase.from('lenders').select('id').limit(1);
 
     if (existingLenders && existingLenders.length > 0) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Database already initialized. Skipping setup.');
-      }
       return { success: true, message: 'Database already initialized' };
     }
 
@@ -196,10 +191,6 @@ export async function setupDatabase() {
     if (lendersError) {
       console.error('Error inserting lenders:', lendersError);
       throw lendersError;
-    }
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Successfully seeded 6 lenders with rate tiers');
     }
 
     return {
