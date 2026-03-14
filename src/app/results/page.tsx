@@ -41,6 +41,10 @@ interface ResultsPayload {
   suggestedDownPayment: number;
 }
 
+type ResultsApiResponse =
+  | { success: true; data: ResultsPayload }
+  | { success: false; error?: string };
+
 const TERM_OPTIONS = [24, 36, 48, 60, 72, 84];
 
 function Confetti() {
@@ -224,15 +228,15 @@ function ResultsContent() {
     const loadResults = async () => {
       try {
         const res = await fetch('/api/results', { cache: 'no-store' });
-        const data = await res.json();
+        const response: ResultsApiResponse = await res.json();
 
-        if (!data.success) {
-          toast.error(data.error || 'Failed to load offers');
+        if (!response.success) {
+          toast.error(response.error || 'Failed to load offers');
           router.push('/apply');
           return;
         }
 
-        const payload = (data.data || {}) as ResultsPayload;
+        const payload = response.data;
         const nextOffers = payload.offers || [];
         const nextStatus = payload.application?.status || 'pending_decision';
 

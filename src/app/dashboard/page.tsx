@@ -34,6 +34,14 @@ interface Application {
   } | null;
 }
 
+type DashboardPayload = {
+  application: Application | null;
+};
+
+type DashboardApiResponse =
+  | { success: true; data: DashboardPayload }
+  | { success: false; error?: string };
+
 function DashboardContent() {
   const router = useRouter();
   const isDev = isDevEnvironment();
@@ -84,11 +92,11 @@ function DashboardContent() {
     // Fetch application data
     fetch('/api/dashboard')
       .then(res => res.json())
-      .then(data => {
-        if (!data.success) {
-          setError(data.error || 'Failed to load dashboard');
+      .then((response: DashboardApiResponse) => {
+        if (!response.success) {
+          setError(response.error || 'Failed to load dashboard');
         } else {
-          setApplication(data.data?.application || null);
+          setApplication(response.data.application);
         }
         setLoading(false);
       })
