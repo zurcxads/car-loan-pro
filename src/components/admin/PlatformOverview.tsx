@@ -3,7 +3,7 @@
 import { formatRelativeTime } from '@/lib/format-utils';
 import { useState, useEffect, useMemo } from 'react';
 import { dbGetApplications, dbGetOffers, dbGetActivityEvents, dbGetComplianceAlerts } from '@/lib/db';
-import type { MockApplication, MockOffer, ActivityEvent, ComplianceAlert } from '@/lib/mock-data';
+import type { MockApplication, ActivityEvent, ComplianceAlert } from '@/lib/mock-data';
 import { LineChart, DonutChart, DistributionBars, TrendIndicator } from '@/components/shared/charts';
 
 const eventColors: Record<string, string> = {
@@ -33,7 +33,6 @@ interface AdminSummary {
 export default function PlatformOverview() {
   const [alerts, setAlerts] = useState<ComplianceAlert[]>([]);
   const [apps, setApps] = useState<MockApplication[]>([]);
-  const [offers, setOffers] = useState<MockOffer[]>([]);
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [summary, setSummary] = useState<AdminSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,12 +66,10 @@ export default function PlatformOverview() {
 
         const isDevMode = typeof window !== 'undefined' && window.location.search.includes('dev=true');
         if (isDevMode) {
-          const [appsData, offersData] = await Promise.all([dbGetApplications(), dbGetOffers()]);
+          const [appsData] = await Promise.all([dbGetApplications(), dbGetOffers()]);
           setApps(appsData);
-          setOffers(offersData);
         } else {
           setApps([]);
-          setOffers([]);
         }
       } catch (fetchError) {
         const isDevMode = typeof window !== 'undefined' && window.location.search.includes('dev=true');
@@ -86,7 +83,6 @@ export default function PlatformOverview() {
             dbGetComplianceAlerts(),
           ]);
           setApps(appsData);
-          setOffers(offersData);
           setEvents(eventsData);
           setAlerts(alertsData);
           setSummary({
