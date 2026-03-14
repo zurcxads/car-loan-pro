@@ -18,8 +18,9 @@ function LoginForm() {
   // Dev mode: skip login entirely, redirect to the portal with dev=true
   useEffect(() => {
     if (searchParams.get('dev') === 'true' || (typeof window !== 'undefined' && window.location.search.includes('dev=true'))) {
-      const target = redirect || '/dashboard';
-      window.location.href = target + (target.includes('?') ? '&' : '?') + 'dev=true';
+      // Validate redirect is a relative path to prevent open redirect attacks
+      const safeRedirect = redirect && redirect.startsWith('/') ? redirect : '/dashboard';
+      window.location.href = safeRedirect + (safeRedirect.includes('?') ? '&' : '?') + 'dev=true';
     }
   }, [searchParams, redirect]);
 
