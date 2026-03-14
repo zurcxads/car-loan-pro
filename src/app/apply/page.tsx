@@ -2,7 +2,7 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,12 +24,17 @@ const CREDIT_RANGE_OPTIONS = [
   { value: 'excellent', label: 'Excellent (800+)' },
 ];
 
-function Field({ label, error, children }: { label?: string; error?: string; children: React.ReactNode }) {
+function Field({ error, children }: { error?: string; children: React.ReactNode }) {
   return (
     <div>
       {children}
       {error && (
-        <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-1.5 mt-1.5">
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-1.5 mt-1.5"
+          aria-live="assertive"
+        >
           <svg className="w-3 h-3 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
           </svg>
@@ -44,12 +49,14 @@ function FloatingLabelInput({ label, value, onChange, placeholder, type = 'text'
   label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; error?: string; maxLength?: number; isValid?: boolean; showEncrypted?: boolean; datalistId?: string;
 }) {
   const [isFocused, setIsFocused] = useState(false);
+  const inputId = useId();
   const hasValue = value && value.length > 0;
   const shouldFloat = isFocused || hasValue;
 
   return (
     <div className="relative">
       <input
+        id={inputId}
         type={type}
         value={value}
         onChange={e => onChange(e.target.value)}
@@ -58,9 +65,12 @@ function FloatingLabelInput({ label, value, onChange, placeholder, type = 'text'
         placeholder={shouldFloat ? placeholder : ''}
         maxLength={maxLength}
         list={datalistId}
-        className={`w-full px-4 pt-6 pb-2 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200 peer`}
+        aria-label={label.replace(/\s*\*$/, '')}
+        aria-invalid={!!error}
+        className={`w-full px-4 pt-6 pb-2 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-200 peer`}
       />
       <motion.label
+        htmlFor={inputId}
         initial={false}
         animate={{
           top: shouldFloat ? '8px' : '50%',
@@ -95,10 +105,14 @@ function FloatingLabelInput({ label, value, onChange, placeholder, type = 'text'
 function Input({ value, onChange, placeholder, type = 'text', error, maxLength, isValid }: {
   value: string; onChange: (v: string) => void; placeholder?: string; type?: string; error?: boolean; maxLength?: number; isValid?: boolean;
 }) {
+  const inputId = useId();
+
   return (
     <div className="relative">
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength}
-        className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200`} />
+      <input id={inputId} type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength}
+        aria-label={placeholder || type}
+        aria-invalid={!!error}
+        className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors duration-200`} />
       {isValid && value && !error && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
@@ -110,9 +124,11 @@ function Input({ value, onChange, placeholder, type = 'text', error, maxLength, 
   );
 }
 
-function Select({ value, onChange, options, placeholder, error, autoFocusNext }: {
-  value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; placeholder?: string; error?: boolean; autoFocusNext?: boolean;
+function Select({ value, onChange, options, placeholder, error, autoFocusNext, label }: {
+  value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; placeholder?: string; error?: boolean; autoFocusNext?: boolean; label: string;
 }) {
+  const selectId = useId();
+
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     onChange(e.target.value);
 
@@ -134,34 +150,59 @@ function Select({ value, onChange, options, placeholder, error, autoFocusNext }:
   };
 
   return (
-    <select value={value} onChange={handleChange}
-      className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200 cursor-pointer ${!value ? 'text-gray-400 dark:text-zinc-500' : ''}`}>
-      {placeholder && <option value="">{placeholder}</option>}
-      {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-    </select>
+    <>
+      <label htmlFor={selectId} className="sr-only">{label}</label>
+      <select
+        id={selectId}
+        value={value}
+        onChange={handleChange}
+        aria-label={label}
+        aria-invalid={!!error}
+        className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors duration-200 cursor-pointer ${!value ? 'text-gray-500 dark:text-zinc-400' : ''}`}
+      >
+        {placeholder && <option value="">{placeholder}</option>}
+        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    </>
   );
 }
 
 function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string | React.ReactNode }) {
+  const checkboxId = useId();
+
   return (
-    <label className="flex items-start gap-3 cursor-pointer group min-h-[44px]" onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
-      <div className={`mt-0.5 w-6 h-6 min-w-[24px] rounded-md border flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300 group-hover:border-gray-400'}`}>
-        {checked && <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-      </div>
-      <span className="text-sm text-gray-600 dark:text-zinc-300 leading-relaxed py-1">{label}</span>
-    </label>
+    <div className="flex items-start gap-3 min-h-[44px]">
+      <input
+        id={checkboxId}
+        type="checkbox"
+        checked={checked}
+        onChange={e => onChange(e.target.checked)}
+        className="mt-1 h-5 w-5 rounded border-gray-300 text-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+      />
+      <label htmlFor={checkboxId} className="cursor-pointer text-sm text-gray-700 dark:text-zinc-200 leading-relaxed py-0.5">
+        {label}
+      </label>
+    </div>
   );
 }
 
 function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+  const labelId = useId();
+
   return (
-    <label className="flex items-center gap-3 cursor-pointer">
-      <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 ${checked ? 'bg-blue-600' : 'bg-gray-300'}`}
-        onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
+    <div className="flex items-center gap-3">
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-labelledby={labelId}
+        onClick={() => onChange(!checked)}
+        className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${checked ? 'bg-blue-600' : 'bg-gray-400'}`}
+      >
         <div className={`absolute top-[3px] w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
-      </div>
-      <span className="text-sm text-gray-600 dark:text-zinc-300">{label}</span>
-    </label>
+      </button>
+      <span id={labelId} className="text-sm text-gray-700 dark:text-zinc-200">{label}</span>
+    </div>
   );
 }
 
@@ -394,14 +435,14 @@ export default function ApplyPage() {
 
   if (submitting) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" aria-live="polite">
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
           <div className="relative w-16 h-16 mx-auto mb-8">
             <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
             <div className="absolute inset-2 rounded-full border-2 border-blue-400 border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
           </div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-zinc-100 mb-2">Analyzing your application...</h2>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">Matching you with lenders in our network</p>
+          <p className="text-sm text-gray-600 dark:text-zinc-300">Matching you with lenders in our network</p>
         </motion.div>
       </div>
     );
@@ -411,7 +452,7 @@ export default function ApplyPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-zinc-950">
       <div className="border-b border-gray-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 dark:text-zinc-100">Auto Loan Pro</Link>
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 dark:text-zinc-100 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg">Auto Loan Pro</Link>
           <div className="flex items-center gap-2 sm:gap-3">
             {isDevMode && (
               <span className="text-xs text-yellow-600 bg-yellow-50 px-2.5 py-0.5 rounded-full font-medium border border-yellow-200">
@@ -425,14 +466,18 @@ export default function ApplyPage() {
               Takes about 2 minutes. No credit score impact.
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 dark:text-zinc-400 font-medium hidden sm:inline">~{timeEstimate} min left</span>
-              <span className="text-xs text-gray-500 dark:text-zinc-400 font-medium">Step {step + 1}/4</span>
+              <span className="text-xs text-gray-600 dark:text-zinc-300 font-medium hidden sm:inline">~{timeEstimate} min left</span>
+              <span className="text-xs text-gray-600 dark:text-zinc-300 font-medium">Step {step + 1}/4</span>
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-4 sm:pt-8">
+        <h1 className="sr-only">Auto Loan Application</h1>
+        <div className="sr-only" aria-live="polite">
+          {`Application step ${step + 1} of 4: ${STEP_NAMES[step]}`}
+        </div>
         <div className="flex gap-1.5 sm:gap-2 mb-2">
           {STEP_NAMES.map((_, i) => (
             <div key={i} className="h-1 flex-1 rounded-full overflow-hidden bg-gray-200 dark:bg-zinc-800">
@@ -544,6 +589,7 @@ export default function ApplyPage() {
                       onChange={setEstimatedCreditRange}
                       options={CREDIT_RANGE_OPTIONS}
                       placeholder="Estimated Credit Range"
+                      label="Estimated credit range"
                     />
                   </Field>
                   <Field>
@@ -601,6 +647,7 @@ export default function ApplyPage() {
                           options={US_STATES}
                           placeholder="Select"
                           error={!!errors.state}
+                          label="State"
                         />
                       </Field>
                       <Field error={errors.zip}>
@@ -621,6 +668,7 @@ export default function ApplyPage() {
                           value={address.residenceType}
                           onChange={v => setAddress(a => ({ ...a, residenceType: v as ResidenceType }))}
                           options={[{ value: 'own', label: 'Own' }, { value: 'rent', label: 'Rent' }, { value: 'other', label: 'Other' }]}
+                          label="Residence type"
                         />
                       </Field>
                       <Field>
@@ -664,6 +712,7 @@ export default function ApplyPage() {
                         { value: 'retired', label: 'Retired' },
                         { value: 'other', label: 'Other' }
                       ]}
+                      label="Employment status"
                     />
                   </Field>
                   <Field error={errors.income}>
@@ -752,42 +801,42 @@ export default function ApplyPage() {
                     onChange={v => setConsent(c => ({ ...c, softPullConsent: v }))}
                     label="I consent to a soft credit inquiry to check my credit for pre-qualification."
                   />
-                  {errors.soft && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+                  {errors.soft && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
 
                   <Checkbox
                     checked={consent.hardPullConsent}
                     onChange={v => setConsent(c => ({ ...c, hardPullConsent: v }))}
                     label="I understand that selecting a lender may result in a hard credit inquiry by that lender."
                   />
-                  {errors.creditCheck && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+                  {errors.creditCheck && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
 
                   <Checkbox
                     checked={consent.tcpaConsent}
                     onChange={v => setConsent(c => ({ ...c, tcpaConsent: v }))}
                     label="I consent to receive communications via phone, email, or SMS regarding my application."
                   />
-                  {errors.tcpa && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+                  {errors.tcpa && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
 
                   <Checkbox
                     checked={consent.termsOfService}
                     onChange={v => setConsent(c => ({ ...c, termsOfService: v }))}
-                    label={<>I agree to the <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-500 underline">Terms of Service</Link></>}
+                    label={<>I agree to the <Link href="/terms" target="_blank" onClick={(event) => event.stopPropagation()} className="text-blue-600 hover:text-blue-500 underline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm">Terms of Service</Link></>}
                   />
-                  {errors.terms && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+                  {errors.terms && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
 
                   <Checkbox
                     checked={consent.privacyPolicy}
                     onChange={v => setConsent(c => ({ ...c, privacyPolicy: v }))}
-                    label={<>I agree to the <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-500 underline">Privacy Policy</Link></>}
+                    label={<>I agree to the <Link href="/privacy" target="_blank" onClick={(event) => event.stopPropagation()} className="text-blue-600 hover:text-blue-500 underline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm">Privacy Policy</Link></>}
                   />
-                  {errors.privacy && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+                  {errors.privacy && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
 
                   <Checkbox
                     checked={consent.eSignConsent}
                     onChange={v => setConsent(c => ({ ...c, eSignConsent: v }))}
                     label="I certify that the information I provided is true and accurate."
                   />
-                  {errors.esign && <p className="text-xs text-red-500 -mt-3 ml-8">Required</p>}
+                  {errors.esign && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
                 </div>
 
                 <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-5">
@@ -904,7 +953,7 @@ export default function ApplyPage() {
                               <FloatingLabelInput label="Year" type="number" value={String(vehicle.year || new Date().getFullYear())} onChange={v => setVehicle(ve => ({ ...ve, year: Number(v) }))} />
                             </Field>
                             <Field error={errors.make}>
-                              <Select value={vehicle.make || ''} onChange={v => setVehicle(ve => ({ ...ve, make: v }))} options={POPULAR_MAKES.map(m => ({ value: m, label: m }))} placeholder="Select" error={!!errors.make} autoFocusNext={true} />
+                              <Select value={vehicle.make || ''} onChange={v => setVehicle(ve => ({ ...ve, make: v }))} options={POPULAR_MAKES.map(m => ({ value: m, label: m }))} placeholder="Select" error={!!errors.make} autoFocusNext={true} label="Vehicle make" />
                             </Field>
                             <Field error={errors.model}>
                               <FloatingLabelInput label="Model *" value={vehicle.model || ''} onChange={v => setVehicle(ve => ({ ...ve, model: v }))} placeholder="Camry" error={errors.model} />
@@ -927,7 +976,7 @@ export default function ApplyPage() {
         <div className="fixed md:static bottom-0 left-0 right-0 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-t border-gray-200 dark:border-zinc-800 md:border-0 md:bg-transparent md:dark:bg-transparent md:backdrop-blur-none shadow-lg md:shadow-none safe-bottom z-30">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-0 md:mt-8 md:pb-12 flex justify-between items-center gap-3">
             {step > 0 ? (
-              <button onClick={back} className="px-4 sm:px-6 py-3 min-h-[44px] text-sm text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 rounded-xl transition-colors duration-200 cursor-pointer">
+              <button onClick={back} className="px-4 sm:px-6 py-3 min-h-[44px] text-sm text-gray-700 dark:text-zinc-200 hover:text-gray-900 dark:hover:text-zinc-100 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 rounded-xl transition-colors duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
                 Back
               </button>
             ) : <div />}
@@ -936,14 +985,14 @@ export default function ApplyPage() {
               <button
                 onClick={submitApplication}
                 disabled={submitting}
-                className="flex-1 sm:flex-none px-6 sm:px-8 py-3 min-h-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm"
+                className="flex-1 sm:flex-none px-6 sm:px-8 py-3 min-h-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 Submit Application
               </button>
             ) : (
               <button
                 onClick={next}
-                className="flex-1 sm:flex-none px-6 sm:px-8 py-3 min-h-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm"
+                className="flex-1 sm:flex-none px-6 sm:px-8 py-3 min-h-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 Next Step
               </button>

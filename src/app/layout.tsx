@@ -60,12 +60,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
       <body className={`${inter.variable} font-sans bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased transition-colors`}>
+        <a
+          href="#main-content"
+          className="skip-link focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        >
+          Skip to main content
+        </a>
         <ErrorBoundary>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <DevModeProvider>
               <DevModeBanner />
               <Header />
-              <Providers>{children}</Providers>
+              <Providers>
+                <main id="main-content" tabIndex={-1}>
+                  {children}
+                </main>
+              </Providers>
               <CookieConsent />
             </DevModeProvider>
           </ThemeProvider>

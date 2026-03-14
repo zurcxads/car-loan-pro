@@ -25,6 +25,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         toastOptions={{
           duration: 4000,
           className: 'touch-pan-y',
+          ariaProps: {
+            role: 'status',
+            'aria-live': 'polite',
+          },
           style: {
             background: '#ffffff',
             color: '#111827',

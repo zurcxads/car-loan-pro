@@ -68,6 +68,8 @@ function RateCalculator() {
   const router = useRouter();
   const [loanAmount, setLoanAmount] = useState(25000);
   const [creditRange, setCreditRange] = useState('good');
+  const loanAmountInputId = 'homepage-rate-loan-amount';
+  const paymentEstimateId = 'homepage-rate-payment-estimate';
 
   const selectedCredit = creditScoreRanges.find(c => c.value === creditRange) || creditScoreRanges[1];
   const termMonths = 60;
@@ -88,7 +90,7 @@ function RateCalculator() {
       <div className="max-w-4xl mx-auto">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-8">
           <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Estimate Your Rate</motion.h2>
-          <motion.p variants={fadeUp} className="mt-3 text-gray-500 dark:text-gray-400 text-sm">See what you might qualify for without applying</motion.p>
+          <motion.p variants={fadeUp} className="mt-3 text-gray-600 dark:text-gray-300 text-sm">See what you might qualify for without applying</motion.p>
         </motion.div>
 
         <motion.div
@@ -101,22 +103,24 @@ function RateCalculator() {
           {/* Loan Amount Slider */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-400">Loan Amount</label>
+              <label htmlFor={loanAmountInputId} className="text-sm font-medium text-gray-700 dark:text-gray-300">Loan Amount</label>
               <span className="text-2xl font-bold text-blue-600">${loanAmount.toLocaleString()}</span>
             </div>
             <input
+              id={loanAmountInputId}
               type="range"
               min="10000"
               max="75000"
               step="1000"
               value={loanAmount}
               onChange={e => setLoanAmount(Number(e.target.value))}
+              aria-describedby={paymentEstimateId}
               className="w-full h-2 bg-gray-200 dark:bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-600"
               style={{
                 background: `linear-gradient(to right, #2563eb 0%, #2563eb ${((loanAmount - 10000) / (75000 - 10000)) * 100}%, #e5e7eb ${((loanAmount - 10000) / (75000 - 10000)) * 100}%, #e5e7eb 100%)`
               }}
             />
-            <div className="flex justify-between text-xs text-gray-400 mt-2">
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
               <span>$10,000</span>
               <span>$75,000</span>
             </div>
@@ -124,47 +128,51 @@ function RateCalculator() {
 
           {/* Credit Score Range */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-3">Estimated Credit Score</label>
+            <fieldset>
+              <legend className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Estimated Credit Score</legend>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {creditScoreRanges.map(range => (
                 <button
                   key={range.value}
+                  type="button"
                   onClick={() => setCreditRange(range.value)}
                   className={`px-3 py-3 min-h-[44px] text-xs font-medium rounded-lg border transition-all ${
                     creditRange === range.value
                       ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
-                      : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-700'
+                      : 'bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-800 dark:text-gray-200 hover:border-gray-300 dark:hover:border-gray-700 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2'
                   }`}
+                  aria-pressed={creditRange === range.value}
                 >
                   {range.label}
                 </button>
               ))}
             </div>
+            </fieldset>
           </div>
 
           {/* Results */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl p-6 mb-6">
+          <div id={paymentEstimateId} aria-live="polite" className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-xl p-6 mb-6">
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
                 <div className="text-xs text-blue-700 dark:text-blue-400 font-medium mb-2">Estimated APR Range</div>
                 <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {selectedCredit.rateRange[0].toFixed(2)}% - {selectedCredit.rateRange[1].toFixed(2)}%
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">Based on {selectedCredit.label.split(' ')[0]} credit</div>
+                <div className="text-xs text-gray-700 dark:text-gray-300 mt-1">Based on {selectedCredit.label.split(' ')[0]} credit</div>
               </div>
               <div>
                 <div className="text-xs text-blue-700 dark:text-blue-400 font-medium mb-2">Estimated Monthly Payment</div>
                 <div className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                   ${avgPayment.toLocaleString()}
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">Range: ${minPayment.toLocaleString()} - ${maxPayment.toLocaleString()}/mo for 60 months</div>
+                <div className="text-xs text-gray-700 dark:text-gray-300 mt-1">Range: ${minPayment.toLocaleString()} - ${maxPayment.toLocaleString()}/mo for 60 months</div>
               </div>
             </div>
           </div>
 
           {/* Disclaimer */}
           <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-4 mb-6">
-            <p className="text-xs text-gray-600 dark:text-gray-400 text-center">
+            <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
               <strong>Estimates only.</strong> Apply to see your actual offers. Rates shown are illustrative and based on market averages. Your actual rate will depend on your credit profile, vehicle, and lender.
             </p>
           </div>
@@ -172,7 +180,7 @@ function RateCalculator() {
           {/* CTA */}
           <button
             onClick={() => router.push('/apply')}
-            className="w-full px-8 py-4 min-h-[48px] bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors shadow-sm"
+            className="w-full px-8 py-4 min-h-[48px] bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             See Your Real Offers — Takes 2 Minutes
           </button>
@@ -271,19 +279,19 @@ export default function LandingPage() {
               <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.08] text-gray-900 dark:text-gray-100 mb-6">
                 Pre-Approved in 2 Minutes,<br />Not 2 Weeks
               </motion.h1>
-              <motion.p variants={fadeUp} className="text-lg text-gray-500 dark:text-gray-400 leading-relaxed font-light mb-8">
+              <motion.p variants={fadeUp} className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed font-light mb-8">
                 Skip the dealership runaround. One application, multiple competing lenders, instant offers. What takes weeks the traditional way takes minutes with us.
               </motion.p>
               <motion.div variants={fadeUp} className="flex flex-wrap gap-6 text-sm">
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <Check className="h-5 w-5 text-blue-500" />
                   No dealer visits
                 </div>
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <Check className="h-5 w-5 text-blue-500" />
                   Soft credit pull only
                 </div>
-                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <Check className="h-5 w-5 text-blue-500" />
                   Free for consumers
                 </div>
@@ -293,43 +301,44 @@ export default function LandingPage() {
             {/* Right: Mini Form */}
             <motion.div variants={fadeUp}>
               <form onSubmit={handleHeroSubmit} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg p-6 sm:p-8">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">Get Your Rate</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Takes about 2 minutes. No credit score impact.</p>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">Get Your Rate</h2>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-6">Takes about 2 minutes. No credit score impact.</p>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Your Name</label>
+                    <label htmlFor="hero-name" className="block text-xs text-gray-600 dark:text-gray-300 mb-2 font-medium">Your Name</label>
                     <input
+                      id="hero-name"
                       type="text"
                       value={heroForm.name}
                       onChange={e => setHeroForm(f => ({ ...f, name: e.target.value }))}
                       placeholder="John Smith"
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Estimated Credit Score</label>
+                    <label htmlFor="hero-credit-range" className="block text-xs text-gray-600 dark:text-gray-300 mb-2 font-medium">Estimated Credit Score</label>
                     <select
+                      id="hero-credit-range"
                       value={heroForm.creditRange}
                       onChange={e => setHeroForm(f => ({ ...f, creditRange: e.target.value }))}
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors cursor-pointer"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors cursor-pointer"
                     >
                       <option value="">Select range</option>
-                      <option value="750+">Excellent (750+)</option>
-                      <option value="700-749">Good (700-749)</option>
-                      <option value="650-699">Fair (650-699)</option>
-                      <option value="600-649">Poor (600-649)</option>
-                      <option value="<600">Very Poor (&lt;600)</option>
-                      <option value="unsure">Not sure</option>
+                      <option value="excellent">Excellent (800+)</option>
+                      <option value="very_good">Very Good (740-799)</option>
+                      <option value="good">Good (670-739)</option>
+                      <option value="fair">Fair (580-669)</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium">Desired Loan Amount</label>
+                    <label htmlFor="hero-loan-amount" className="block text-xs text-gray-600 dark:text-gray-300 mb-2 font-medium">Desired Loan Amount</label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
                       <input
+                        id="hero-loan-amount"
                         type="text"
                         value={heroForm.loanAmount}
                         onChange={e => {
@@ -337,20 +346,20 @@ export default function LandingPage() {
                           setHeroForm(f => ({ ...f, loanAmount: val }));
                         }}
                         placeholder="30,000"
-                        className="w-full pl-8 pr-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                        className="w-full pl-8 pr-4 py-3 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors"
                       />
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full px-8 py-4 min-h-[48px] bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors cursor-pointer"
+                    className="w-full px-8 py-4 min-h-[48px] bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
                     Check My Rate — Free
                   </button>
 
-                  <p className="text-xs text-gray-400 text-center">
-                    By continuing, you agree to our <Link href="/terms" className="underline">Terms</Link> and <Link href="/privacy" className="underline">Privacy Policy</Link>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 text-center">
+                    By continuing, you agree to our <Link href="/terms" className="underline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm">Terms</Link> and <Link href="/privacy" className="underline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm">Privacy Policy</Link>
                   </p>
                 </div>
               </form>
@@ -368,7 +377,7 @@ export default function LandingPage() {
                 <prop.Icon className="w-8 h-8 text-blue-600" />
               </div>
               <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{prop.title}</div>
-              <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{prop.desc}</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{prop.desc}</div>
             </motion.div>
           ))}
         </motion.div>
@@ -395,7 +404,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">The Old Way vs Auto Loan Pro</motion.h2>
-            <motion.p variants={fadeUp} className="mt-3 text-gray-500 dark:text-gray-400 text-sm">The average car buyer spends 15+ hours on financing. We cut that to under 5 minutes.</motion.p>
+            <motion.p variants={fadeUp} className="mt-3 text-gray-600 dark:text-gray-300 text-sm">The average car buyer spends 15+ hours on financing. We cut that to under 5 minutes.</motion.p>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <motion.div variants={fadeUp} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-8">
@@ -405,37 +414,37 @@ export default function LandingPage() {
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <X className="h-3 w-3 text-red-600" />
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Drive to 3-5 dealerships (10-20 hours)</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">Drive to 3-5 dealerships (10-20 hours)</div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <X className="h-3 w-3 text-red-600" />
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Visit bank or credit union (2-4 hours + wait days for appointment)</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">Visit bank or credit union (2-4 hours + wait days for appointment)</div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <X className="h-3 w-3 text-red-600" />
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Apply at multiple lenders (1-2 hours each)</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">Apply at multiple lenders (1-2 hours each)</div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <X className="h-3 w-3 text-red-600" />
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Multiple hard credit pulls (damages your score)</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">Multiple hard credit pulls (damages your score)</div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <X className="h-3 w-3 text-red-600" />
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">Dealer F&I office negotiation (2-4 hours)</div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">Dealer F&I office negotiation (2-4 hours)</div>
                 </div>
               </div>
               <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
-                <div className="text-sm text-gray-500 dark:text-gray-400">Total Time:</div>
+                <div className="text-sm text-gray-700 dark:text-gray-300">Total Time:</div>
                 <div className="text-3xl font-bold text-red-600">15-30+ hours</div>
-                <div className="text-xs text-gray-400 mt-1">Spread over 1-3 weeks</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Spread over 1-3 weeks</div>
               </div>
             </motion.div>
             <motion.div variants={fadeUp} className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950 dark:to-blue-900 rounded-2xl border-2 border-blue-200 dark:border-blue-800 p-8">
@@ -473,9 +482,9 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="pt-4 border-t border-blue-300 dark:border-blue-800">
-                <div className="text-sm text-gray-700 dark:text-gray-400">Total Time:</div>
+                <div className="text-sm text-gray-700 dark:text-gray-300">Total Time:</div>
                 <div className="text-3xl font-bold text-blue-600">Under 5 minutes</div>
-                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">Done from your couch</div>
+                <div className="text-xs text-gray-700 dark:text-gray-300 mt-1">Done from your couch</div>
               </div>
             </motion.div>
           </motion.div>
@@ -487,7 +496,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-16">
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900">How It Works</motion.h2>
-            <motion.p variants={fadeUp} className="mt-3 text-gray-500 text-sm">At a dealership, this takes 3-5 visits. With us, it takes one coffee break.</motion.p>
+            <motion.p variants={fadeUp} className="mt-3 text-gray-600 text-sm">At a dealership, this takes 3-5 visits. With us, it takes one coffee break.</motion.p>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {steps.map((s, i) => (
@@ -499,7 +508,7 @@ export default function LandingPage() {
                   {String(i + 1).padStart(2, '0')}
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2 relative z-10">{s.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed relative z-10">{s.desc}</p>
+                <p className="text-sm text-gray-600 leading-relaxed relative z-10">{s.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -511,7 +520,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="text-center mb-12">
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900">Lenders For Every Credit Profile</motion.h2>
-            <motion.p variants={fadeUp} className="mt-3 text-gray-500 text-sm">Our network covers the full credit spectrum</motion.p>
+            <motion.p variants={fadeUp} className="mt-3 text-gray-600 text-sm">Our network covers the full credit spectrum</motion.p>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {tiers.map((t, i) => (
@@ -519,7 +528,7 @@ export default function LandingPage() {
                 <div className={`w-1.5 h-14 rounded-full ${t.color}`} />
                 <div className="flex-1">
                   <div className="font-semibold text-gray-900">{t.name}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">FICO {t.range}</div>
+                  <div className="text-xs text-gray-600 mt-0.5">FICO {t.range}</div>
                 </div>
                 <div className="text-sm text-gray-600 font-mono tracking-tight">{t.rate}</div>
               </motion.div>
@@ -536,18 +545,18 @@ export default function LandingPage() {
             <motion.div variants={fadeUp} className="p-8 rounded-2xl surface">
               <div className="text-xs text-gray-500 mb-3 uppercase tracking-wider font-medium">Average Dealer Rate</div>
               <div className="text-5xl font-bold text-red-500">7.9%</div>
-              <div className="text-xs text-gray-400 mt-3">On a $30,000 / 60-month loan</div>
+              <div className="text-xs text-gray-500 mt-3">On a $30,000 / 60-month loan</div>
               <div className="text-xl font-semibold mt-4 text-gray-600">$607/mo</div>
             </motion.div>
             <motion.div variants={fadeUp} className="p-8 rounded-2xl border border-blue-200 bg-blue-50">
               <div className="text-xs text-blue-600 mb-3 uppercase tracking-wider font-medium">Auto Loan Pro Avg Rate</div>
               <div className="text-5xl font-bold text-blue-600">4.1%</div>
-              <div className="text-xs text-gray-400 mt-3">On a $30,000 / 60-month loan</div>
+              <div className="text-xs text-gray-500 mt-3">On a $30,000 / 60-month loan</div>
               <div className="text-xl font-semibold mt-4 text-gray-900">$554/mo</div>
               <div className="mt-2 text-xs font-medium text-blue-600">Save $3,180 over the life of the loan</div>
             </motion.div>
           </motion.div>
-          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-xs text-gray-400 mt-8">
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-xs text-gray-500 mt-8">
             * Illustrative example only. Actual rates vary based on credit profile, vehicle, and lender. Rates shown are for comparison purposes.
           </motion.p>
         </div>
@@ -565,14 +574,16 @@ export default function LandingPage() {
             {faqs.map((faq, i) => (
               <div key={i} className="border border-gray-200 rounded-xl overflow-hidden">
                 <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full flex items-center justify-between p-5 text-left text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors duration-200 cursor-pointer">
+                  aria-expanded={openFaq === i}
+                  aria-controls={`homepage-faq-panel-${i}`}
+                  className="w-full flex items-center justify-between p-5 text-left text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-inset">
                   {faq.q}
                   <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0 ml-4 ${openFaq === i ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                 </button>
                 <AnimatePresence>
                   {openFaq === i && (
-                    <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-                      <p className="px-5 pb-5 text-sm text-gray-500 leading-relaxed">{faq.a}</p>
+                    <motion.div id={`homepage-faq-panel-${i}`} initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
+                      <p className="px-5 pb-5 text-sm text-gray-600 leading-relaxed">{faq.a}</p>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -587,13 +598,13 @@ export default function LandingPage() {
         <div className="max-w-2xl mx-auto text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.h2 variants={fadeUp} className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Ready to save on your auto loan?</motion.h2>
-            <motion.p variants={fadeUp} className="text-gray-500 mb-10">Get pre-approved in minutes with no impact to your credit score.</motion.p>
+            <motion.p variants={fadeUp} className="text-gray-600 mb-10">Get pre-approved in minutes with no impact to your credit score.</motion.p>
             <motion.div variants={fadeUp} className="w-full sm:w-auto">
-              <Link href="/apply" className="inline-flex w-full sm:w-auto justify-center px-8 py-4 min-h-[48px] items-center bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200 cursor-pointer">
+              <Link href="/apply" className="inline-flex w-full sm:w-auto justify-center px-8 py-4 min-h-[48px] items-center bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
                 Check Your Rate — Free
               </Link>
             </motion.div>
-            <motion.p variants={fadeUp} className="mt-4 text-xs text-gray-400">No credit impact. No obligation.</motion.p>
+            <motion.p variants={fadeUp} className="mt-4 text-xs text-gray-500">No credit impact. No obligation.</motion.p>
           </motion.div>
         </div>
       </section>
