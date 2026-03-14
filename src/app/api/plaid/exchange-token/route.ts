@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
+import { dbGetApplication } from '@/lib/db';
+import { requireAuth } from '@/lib/api-helpers';
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[process.env.PLAID_ENV as keyof typeof PlaidEnvironments] || PlaidEnvironments.sandbox,
@@ -14,13 +16,35 @@ const configuration = new Configuration({
 const plaidClient = new PlaidApi(configuration);
 
 export async function POST(request: NextRequest) {
-  try {
-    const { public_token } = await request.json();
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
 
-    if (!public_token) {
+  try {
+    const { public_token, applicationId } = await request.json();
+
+    if (!public_token || !applicationId) {
       return NextResponse.json(
-        { error: 'Missing public_token' },
+        { error: 'Missing public_token or applicationId' },
         { status: 400 }
+      );
+    }
+
+    const application = await dbGetApplication(applicationId);
+    if (!application) {
+      return NextResponse.json(
+        { error: 'Application not found' },
+        { status: 404 }
+      );
+    }
+
+    const userRole = session?.user.role;
+    const userEmail = session?.user.email;
+    const isElevatedUser = userRole === 'admin' || userRole === 'lender';
+
+    if (!isElevatedUser && (!userEmail || application.borrower.email !== userEmail)) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
       );
     }
 
