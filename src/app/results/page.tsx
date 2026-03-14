@@ -532,14 +532,14 @@ function ResultsContent() {
           className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6"
         >
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 font-medium">Sort by:</span>
+            <span className="text-sm text-gray-600 dark:text-zinc-300 font-medium">Sort by:</span>
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setSortBy('best_rate')}
                 className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
                   sortBy === 'best_rate'
                     ? 'bg-blue-600 border-blue-600 text-white'
-                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                    : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700'
                 }`}
               >
                 Best Rate
@@ -549,7 +549,7 @@ function ResultsContent() {
                 className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
                   sortBy === 'lowest_payment'
                     ? 'bg-blue-600 border-blue-600 text-white'
-                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                    : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700'
                 }`}
               >
                 Lowest Payment
@@ -559,7 +559,7 @@ function ResultsContent() {
                 className={`px-3 py-2.5 min-h-[44px] text-xs font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
                   sortBy === 'highest_amount'
                     ? 'bg-blue-600 border-blue-600 text-white'
-                    : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                    : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700'
                 }`}
               >
                 Highest Amount
@@ -570,8 +570,8 @@ function ResultsContent() {
             onClick={() => setCompareMode(!compareMode)}
             className={`px-4 py-2.5 min-h-[44px] text-sm font-medium rounded-lg border transition-all active:scale-[0.98] transition-transform ${
               compareMode
-                ? 'bg-blue-50 border-blue-200 text-blue-700'
-                : 'bg-white border-gray-200 text-gray-700 hover:border-gray-300'
+                ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300'
+                : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 text-gray-700 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700'
             }`}
           >
             {compareMode ? 'Exit Compare' : 'Compare Offers'}
@@ -583,16 +583,16 @@ function ResultsContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.85 }}
-          className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-start gap-3"
+          className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-xl p-4 mb-6 flex items-start gap-3"
         >
-          <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-950/40 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
             </svg>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-1">Rate Lock Guarantee</h4>
-            <p className="text-xs text-gray-600">
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-1">Rate Lock Guarantee</h4>
+            <p className="text-xs text-gray-600 dark:text-zinc-300">
               Your rates are locked until <strong>{expirationDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</strong> (30 days from today)
             </p>
           </div>
@@ -616,7 +616,7 @@ function ResultsContent() {
 
             // Approval odds (would be calculated from credit profile in production)
             const approvalOdds = apr < 6 ? 'High Approval Odds' : apr < 8 ? 'Good Approval Odds' : 'Fair Approval Odds';
-            const oddsColor = apr < 6 ? 'bg-green-100 text-green-700' : apr < 8 ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700';
+            const oddsColor = apr < 6 ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300' : apr < 8 ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300';
 
             return (
               <motion.div
@@ -624,8 +624,8 @@ function ResultsContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: calculating ? [0, -4, 0] : 0 }}
                 transition={{ delay: 0.9 + index * 0.1, duration: calculating ? 0.3 : 0.5 }}
-                className={`bg-white rounded-2xl border-2 p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col h-full ${
-                  isSelected ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200 hover:border-blue-300'
+                className={`bg-white dark:bg-zinc-900/50 rounded-2xl border-2 p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col h-full ${
+                  isSelected ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/20' : 'border-gray-200 dark:border-zinc-800 hover:border-blue-300'
                 }`}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -634,7 +634,7 @@ function ResultsContent() {
                       <button
                         onClick={() => toggleCompareSelection(offer.id)}
                         className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                          isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-300 hover:border-blue-400'
+                          isSelected ? 'bg-blue-600 border-blue-600' : 'border-gray-300 dark:border-zinc-600 hover:border-blue-400'
                         }`}
                       >
                         {isSelected && (
@@ -644,14 +644,14 @@ function ResultsContent() {
                         )}
                       </button>
                     )}
-                    <h3 className="text-xl font-bold text-gray-900">{offer.label}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-zinc-100">{offer.label}</h3>
                   </div>
                   <div className="flex flex-col gap-1.5 items-end">
                     {offer.tag && (
                       <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${
-                        offer.tag === 'best_rate' ? 'bg-green-100 text-green-700' :
+                        offer.tag === 'best_rate' ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300' :
                         offer.tag === 'lowest_payment' ? 'bg-blue-100 text-blue-700' :
-                        'bg-purple-100 text-purple-700'
+                        'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
                       }`}>
                         {tagLabels[offer.tag]}
                       </span>
@@ -666,8 +666,8 @@ function ResultsContent() {
 
                 {/* Savings Badge */}
                 {savings > 0 && (
-                  <div className="mb-4 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
-                    <p className="text-xs text-green-800">
+                  <div className="mb-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-lg px-3 py-2">
+                    <p className="text-xs text-blue-800 dark:text-blue-200">
                       <strong>Save ${savings.toLocaleString()}</strong> vs. average dealer markup
                     </p>
                   </div>
@@ -676,35 +676,35 @@ function ResultsContent() {
                 <div className="space-y-5 flex-1">
                   <div>
                     <div className="flex items-center gap-1.5 mb-2">
-                      <span className="text-xs text-gray-500">APR</span>
+                      <span className="text-xs text-gray-500 dark:text-zinc-400">APR</span>
                       <Tooltip content="Annual Percentage Rate - the yearly cost of your loan including interest" />
                     </div>
-                    <div className="text-5xl font-bold text-gray-900">{apr.toFixed(2)}%</div>
+                    <div className="text-5xl font-bold text-gray-900 dark:text-zinc-100">{apr.toFixed(2)}%</div>
                   </div>
 
                   <div>
                     <div className="flex items-center gap-1.5 mb-2">
-                      <span className="text-xs text-gray-500">Monthly Payment</span>
+                      <span className="text-xs text-gray-500 dark:text-zinc-400">Monthly Payment</span>
                       <Tooltip content="Your estimated monthly payment including principal and interest" />
                     </div>
-                    <div className="text-3xl font-bold text-gray-900">${payment.toLocaleString()}</div>
-                    <div className="text-xs text-gray-400 mt-1">for {term} months</div>
+                    <div className="text-3xl font-bold text-gray-900 dark:text-zinc-100">${payment.toLocaleString()}</div>
+                    <div className="text-xs text-gray-400 dark:text-zinc-500 mt-1">for {term} months</div>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-200">
+                  <div className="pt-4 border-t border-gray-200 dark:border-zinc-800">
                     <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-xs text-gray-500">Total Cost</span>
+                      <span className="text-xs text-gray-500 dark:text-zinc-400">Total Cost</span>
                       <Tooltip content="Total amount you'll pay over the life of the loan (principal + interest + down payment)" />
                     </div>
-                    <div className="text-lg font-semibold text-gray-700">${totalCost.toLocaleString()}</div>
-                    <div className="text-xs text-gray-400 mt-0.5">over {term} months</div>
+                    <div className="text-lg font-semibold text-gray-700 dark:text-zinc-300">${totalCost.toLocaleString()}</div>
+                    <div className="text-xs text-gray-400 dark:text-zinc-500 mt-0.5">over {term} months</div>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-200">
+                  <div className="pt-4 border-t border-gray-200 dark:border-zinc-800">
                     <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-xs text-gray-500">Approved Amount</span>
+                      <span className="text-xs text-gray-500 dark:text-zinc-400">Approved Amount</span>
                     </div>
-                    <div className="text-lg font-semibold text-gray-900">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-zinc-100">
                       {offer.maxApprovedAmount
                         ? `Up to $${offer.maxApprovedAmount.toLocaleString()}`
                         : `$${offer.approvedAmount.toLocaleString()}`}
@@ -729,7 +729,7 @@ function ResultsContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2 }}
-          className="bg-blue-50 border border-blue-200 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+          className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
         >
           <div className="flex items-start gap-4">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -738,11 +738,11 @@ function ResultsContent() {
               </svg>
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">About These Offers</h3>
-              <p className="text-sm text-gray-600 leading-relaxed mb-3">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-2">About These Offers</h3>
+              <p className="text-sm text-gray-600 dark:text-zinc-300 leading-relaxed mb-3">
                 Offers are anonymized to help you focus on the numbers, not the brand. When you select an offer, the lender will be revealed and you'll receive your pre-approval letter.
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-zinc-400">
                 <strong>Important:</strong> Rates shown are estimates. A hard credit inquiry will be performed by the lender to finalize your offer. This may affect your credit score.
               </p>
             </div>

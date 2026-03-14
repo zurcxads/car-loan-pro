@@ -57,7 +57,7 @@ function FloatingLabelInput({ label, value, onChange, placeholder, type = 'text'
         placeholder={shouldFloat ? placeholder : ''}
         maxLength={maxLength}
         list={datalistId}
-        className={`w-full px-4 pt-6 pb-2 min-h-[44px] bg-gray-50 border ${error ? 'border-red-400' : 'border-gray-200'} rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200 peer`}
+        className={`w-full px-4 pt-6 pb-2 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200 peer`}
       />
       <motion.label
         initial={false}
@@ -73,7 +73,7 @@ function FloatingLabelInput({ label, value, onChange, placeholder, type = 'text'
         {label}
       </motion.label>
       {showEncrypted && (
-        <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-gray-500">
+        <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-zinc-400">
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
           </svg>
@@ -99,7 +99,7 @@ function Input({ value, onChange, placeholder, type = 'text', error, maxLength, 
   return (
     <div className="relative">
       <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength}
-        className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 border ${error ? 'border-red-400' : 'border-gray-200'} rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200`} />
+        className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200`} />
       {isValid && value && !error && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
@@ -138,7 +138,7 @@ function Select({ value, onChange, options, placeholder, error, autoFocusNext }:
 
   return (
     <select value={value} onChange={handleChange}
-      className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 border ${error ? 'border-red-400' : 'border-gray-200'} rounded-xl text-sm text-gray-900 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200 cursor-pointer ${!value ? 'text-gray-400' : ''}`}>
+      className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200 cursor-pointer ${!value ? 'text-gray-400 dark:text-zinc-500' : ''}`}>
       {placeholder && <option value="">{placeholder}</option>}
       {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
@@ -151,7 +151,7 @@ function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v
       <div className={`mt-0.5 w-6 h-6 min-w-[24px] rounded-md border flex-shrink-0 flex items-center justify-center transition-colors duration-200 ${checked ? 'bg-blue-600 border-blue-600' : 'border-gray-300 group-hover:border-gray-400'}`}>
         {checked && <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
       </div>
-      <span className="text-sm text-gray-600 leading-relaxed py-1">{label}</span>
+      <span className="text-sm text-gray-600 dark:text-zinc-300 leading-relaxed py-1">{label}</span>
     </label>
   );
 }
@@ -163,7 +163,7 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
         onClick={(e) => { e.preventDefault(); onChange(!checked); }}>
         <div className={`absolute top-[3px] w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
       </div>
-      <span className="text-sm text-gray-600">{label}</span>
+      <span className="text-sm text-gray-600 dark:text-zinc-300">{label}</span>
     </label>
   );
 }
@@ -403,18 +403,18 @@ export default function ApplyPage() {
             <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
             <div className="absolute inset-2 rounded-full border-2 border-blue-400 border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Analyzing your application...</h2>
-          <p className="text-sm text-gray-500">Matching you with lenders in our network</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-zinc-100 mb-2">Analyzing your application...</h2>
+          <p className="text-sm text-gray-500 dark:text-zinc-400">Matching you with lenders in our network</p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="border-b border-gray-200 bg-white/95 backdrop-blur-xl sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950">
+      <div className="border-b border-gray-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl sticky top-0 z-40">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 dark:text-zinc-100">Auto Loan Pro</Link>
           <div className="flex items-center gap-2 sm:gap-3">
             {isDevMode && (
               <span className="text-xs text-yellow-600 bg-yellow-50 px-2.5 py-0.5 rounded-full font-medium border border-yellow-200">
@@ -428,8 +428,8 @@ export default function ApplyPage() {
               Takes about 2 minutes. No credit score impact.
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 font-medium hidden sm:inline">~{timeEstimate} min left</span>
-              <span className="text-xs text-gray-500 font-medium">Step {step + 1}/4</span>
+              <span className="text-xs text-gray-500 dark:text-zinc-400 font-medium hidden sm:inline">~{timeEstimate} min left</span>
+              <span className="text-xs text-gray-500 dark:text-zinc-400 font-medium">Step {step + 1}/4</span>
             </div>
           </div>
         </div>
@@ -438,7 +438,7 @@ export default function ApplyPage() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-4 sm:pt-8">
         <div className="flex gap-1.5 sm:gap-2 mb-2">
           {STEP_NAMES.map((_, i) => (
-            <div key={i} className="h-1 flex-1 rounded-full overflow-hidden bg-gray-200">
+            <div key={i} className="h-1 flex-1 rounded-full overflow-hidden bg-gray-200 dark:bg-zinc-800">
               <motion.div
                 initial={false}
                 animate={{
@@ -462,12 +462,12 @@ export default function ApplyPage() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-24 sm:pb-8">
         <AnimatePresence mode="wait">
           <motion.div key={step} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.25 }}
-            className="rounded-2xl bg-white border border-gray-200 shadow-sm p-4 sm:p-8">
+            className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-4 sm:p-8">
 
             {/* STEP 1: About You (Personal + Address) */}
             {step === 0 && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">About You</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-6">About You</h2>
 
                 {/* Personal Info */}
                 <div className="grid md:grid-cols-2 gap-5">
@@ -565,8 +565,8 @@ export default function ApplyPage() {
                 </div>
 
                 {/* Address */}
-                <div className="pt-6 mt-6 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-900 mb-5">Current Address</h3>
+                <div className="pt-6 mt-6 border-t border-gray-200 dark:border-zinc-800">
+                  <h3 className="text-sm font-medium text-gray-900 dark:text-zinc-100 mb-5">Current Address</h3>
 
                   <div className="space-y-5">
                     <Field error={errors.address1}>
@@ -653,7 +653,7 @@ export default function ApplyPage() {
             {/* STEP 2: Income & Employment */}
             {step === 1 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Income & Employment</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-6">Income & Employment</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <Field>
@@ -713,7 +713,7 @@ export default function ApplyPage() {
                           transition={{ duration: 0.3 }}
                           className="overflow-hidden"
                         >
-                          <div className="pt-6 border-t border-gray-200 space-y-5">
+                          <div className="pt-6 border-t border-gray-200 dark:border-zinc-800 space-y-5">
                             <h3 className="text-sm font-medium text-blue-600">Previous Employer</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                               <Field>
@@ -744,12 +744,12 @@ export default function ApplyPage() {
             {/* STEP 3: Credit Consent */}
             {step === 2 && (
               <div className="space-y-5">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">Credit Consent</h2>
-                <p className="text-sm text-gray-600 mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-2">Credit Consent</h2>
+                <p className="text-sm text-gray-600 dark:text-zinc-300 mb-6">
                   We&apos;ll use a soft credit pull to match you with lenders. This won&apos;t affect your credit score.
                 </p>
 
-                <div className="space-y-5 bg-gray-50 rounded-xl p-5 border border-gray-200">
+                <div className="space-y-5 bg-gray-50 dark:bg-zinc-900 rounded-xl p-5 border border-gray-200 dark:border-zinc-800">
                   <Checkbox
                     checked={consent.softPullConsent}
                     onChange={v => setConsent(c => ({ ...c, softPullConsent: v }))}
@@ -801,8 +801,8 @@ export default function ApplyPage() {
                       </svg>
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-900 mb-2">What You&apos;re Agreeing To</h3>
-                      <p className="text-xs text-gray-600 leading-relaxed">
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-2">What You&apos;re Agreeing To</h3>
+                      <p className="text-xs text-gray-600 dark:text-zinc-300 leading-relaxed">
                         We&apos;ll perform a soft credit check to show you personalized offers. This does NOT impact your credit score. Only when you select a specific lender and proceed will there be a hard inquiry.
                       </p>
                     </div>
@@ -814,46 +814,46 @@ export default function ApplyPage() {
             {/* STEP 4: Review & Submit */}
             {step === 3 && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6">Review & Submit</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-6">Review & Submit</h2>
 
                 {/* Summary Cards */}
                 <div className="space-y-4">
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
-                    <h3 className="text-xs font-medium text-gray-500 mb-3">Personal Information</h3>
-                    <p className="text-sm text-gray-900 font-medium">{personal.firstName} {personal.lastName}</p>
-                    <p className="text-sm text-gray-600">{personal.email}</p>
-                    <p className="text-sm text-gray-600">{personal.phone}</p>
+                  <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-5">
+                    <h3 className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-3">Personal Information</h3>
+                    <p className="text-sm text-gray-900 dark:text-zinc-100 font-medium">{personal.firstName} {personal.lastName}</p>
+                    <p className="text-sm text-gray-600 dark:text-zinc-300">{personal.email}</p>
+                    <p className="text-sm text-gray-600 dark:text-zinc-300">{personal.phone}</p>
                   </div>
 
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
-                    <h3 className="text-xs font-medium text-gray-500 mb-3">Address</h3>
-                    <p className="text-sm text-gray-900">{address.currentAddressLine1}</p>
-                    <p className="text-sm text-gray-600">{address.currentCity}, {address.currentState} {address.currentZip}</p>
+                  <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-5">
+                    <h3 className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-3">Address</h3>
+                    <p className="text-sm text-gray-900 dark:text-zinc-100">{address.currentAddressLine1}</p>
+                    <p className="text-sm text-gray-600 dark:text-zinc-300">{address.currentCity}, {address.currentState} {address.currentZip}</p>
                   </div>
 
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
-                    <h3 className="text-xs font-medium text-gray-500 mb-3">Income</h3>
-                    <p className="text-sm text-gray-900 font-medium">${employment.grossMonthlyIncome.toLocaleString()} / month</p>
-                    {employment.employerName && <p className="text-sm text-gray-600">{employment.employerName}</p>}
+                  <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-5">
+                    <h3 className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-3">Income</h3>
+                    <p className="text-sm text-gray-900 dark:text-zinc-100 font-medium">${employment.grossMonthlyIncome.toLocaleString()} / month</p>
+                    {employment.employerName && <p className="text-sm text-gray-600 dark:text-zinc-300">{employment.employerName}</p>}
                   </div>
 
                   {(estimatedCreditRange || targetVehiclePrice) && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
-                      <h3 className="text-xs font-medium text-gray-500 mb-3">Loan Preferences</h3>
+                    <div className="bg-gray-50 dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 p-5">
+                      <h3 className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-3">Loan Preferences</h3>
                       {estimatedCreditRange && (
-                        <p className="text-sm text-gray-900">
+                        <p className="text-sm text-gray-900 dark:text-zinc-100">
                           Estimated Credit Range: {CREDIT_RANGE_OPTIONS.find((option) => option.value === estimatedCreditRange)?.label || estimatedCreditRange}
                         </p>
                       )}
                       {targetVehiclePrice > 0 && (
-                        <p className="text-sm text-gray-600">Target Vehicle Price: ${targetVehiclePrice.toLocaleString()}</p>
+                        <p className="text-sm text-gray-600 dark:text-zinc-300">Target Vehicle Price: ${targetVehiclePrice.toLocaleString()}</p>
                       )}
                     </div>
                   )}
                 </div>
 
                 {/* Co-Borrower Toggle */}
-                <div className="pt-6 border-t border-gray-200">
+                <div className="pt-6 border-t border-gray-200 dark:border-zinc-800">
                   <Toggle checked={hasCoBorrower} onChange={v => setHasCoBorrower(v)} label="Add a co-borrower" />
 
                   <AnimatePresence>
@@ -889,7 +889,7 @@ export default function ApplyPage() {
                 </div>
 
                 {/* Vehicle Toggle */}
-                <div className="pt-6 border-t border-gray-200">
+                <div className="pt-6 border-t border-gray-200 dark:border-zinc-800">
                   <Toggle checked={hasVehicle} onChange={v => setHasVehicle(v)} label="I have a specific vehicle in mind" />
 
                   <AnimatePresence>
@@ -927,10 +927,10 @@ export default function ApplyPage() {
         </AnimatePresence>
 
         {/* Bottom Navigation - Sticky on Mobile with Backdrop Blur */}
-        <div className="fixed md:static bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200 md:border-0 md:bg-transparent md:backdrop-blur-none shadow-lg md:shadow-none safe-bottom z-30">
+        <div className="fixed md:static bottom-0 left-0 right-0 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-t border-gray-200 dark:border-zinc-800 md:border-0 md:bg-transparent md:dark:bg-transparent md:backdrop-blur-none shadow-lg md:shadow-none safe-bottom z-30">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-0 md:mt-8 md:pb-12 flex justify-between items-center gap-3">
             {step > 0 ? (
-              <button onClick={back} className="px-4 sm:px-6 py-3 min-h-[44px] text-sm text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-300 rounded-xl transition-colors duration-200 cursor-pointer">
+              <button onClick={back} className="px-4 sm:px-6 py-3 min-h-[44px] text-sm text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 rounded-xl transition-colors duration-200 cursor-pointer">
                 Back
               </button>
             ) : <div />}

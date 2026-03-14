@@ -165,11 +165,9 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950">
-          <div className="relative w-12 h-12">
-            <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950">
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
         </div>
       </div>
     }>
