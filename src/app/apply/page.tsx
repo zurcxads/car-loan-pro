@@ -204,6 +204,7 @@ export default function ApplyPage() {
   const [consent, setConsent] = useState<ConsentInfo>({ softPullConsent: false, hardPullConsent: false, tcpaConsent: false, termsOfService: false, privacyPolicy: false, eSignConsent: false });
   const [hasVehicle, setHasVehicle] = useState(false);
   const [estimatedCreditRange, setEstimatedCreditRange] = useState('');
+  const targetVehiclePrice = vehicle.askingPrice ?? 0;
 
   useEffect(() => {
     if (hasAppliedSearchPrefill.current) return;
@@ -836,7 +837,7 @@ export default function ApplyPage() {
                     {employment.employerName && <p className="text-sm text-gray-600">{employment.employerName}</p>}
                   </div>
 
-                  {(estimatedCreditRange || vehicle.askingPrice) && (
+                  {(estimatedCreditRange || targetVehiclePrice) && (
                     <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
                       <h3 className="text-xs font-medium text-gray-500 mb-3">Loan Preferences</h3>
                       {estimatedCreditRange && (
@@ -844,8 +845,8 @@ export default function ApplyPage() {
                           Estimated Credit Range: {CREDIT_RANGE_OPTIONS.find((option) => option.value === estimatedCreditRange)?.label || estimatedCreditRange}
                         </p>
                       )}
-                      {vehicle.askingPrice > 0 && (
-                        <p className="text-sm text-gray-600">Target Vehicle Price: ${vehicle.askingPrice.toLocaleString()}</p>
+                      {targetVehiclePrice > 0 && (
+                        <p className="text-sm text-gray-600">Target Vehicle Price: ${targetVehiclePrice.toLocaleString()}</p>
                       )}
                     </div>
                   )}
