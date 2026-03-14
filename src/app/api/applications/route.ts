@@ -191,7 +191,6 @@ export async function POST(req: NextRequest) {
       await matchLendersAndGenerateOffers(app);
     } catch (matchError) {
       console.error('Lender matching failed:', matchError);
-      return apiError('Failed to generate offers', 500);
     }
 
     const response = NextResponse.json({
