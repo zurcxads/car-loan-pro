@@ -2,8 +2,8 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -16,6 +16,12 @@ import type {
 } from '@/lib/types';
 
 const STEP_NAMES = ['About You', 'Income & Employment', 'Credit Consent', 'Review & Submit'];
+const CREDIT_RANGE_OPTIONS = [
+  { value: 'fair', label: 'Fair (580-669)' },
+  { value: 'good', label: 'Good (670-739)' },
+  { value: 'very_good', label: 'Very Good (740-799)' },
+  { value: 'excellent', label: 'Excellent (800+)' },
+];
 
 function Field({ label, error, children }: { label?: string; error?: string; children: React.ReactNode }) {
   return (
@@ -164,6 +170,8 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
 
 export default function ApplyPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const hasAppliedSearchPrefill = useRef(false);
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -195,10 +203,49 @@ export default function ApplyPage() {
   const [coPersonal, setCoPersonal] = useState<BorrowerPersonalInfo>({ firstName: '', lastName: '', ssn: '', dob: '', email: '', phone: '' });
   const [consent, setConsent] = useState<ConsentInfo>({ softPullConsent: false, hardPullConsent: false, tcpaConsent: false, termsOfService: false, privacyPolicy: false, eSignConsent: false });
   const [hasVehicle, setHasVehicle] = useState(false);
+  const [estimatedCreditRange, setEstimatedCreditRange] = useState('');
+
+  useEffect(() => {
+    if (hasAppliedSearchPrefill.current) return;
+
+    const name = searchParams.get('name')?.trim() || '';
+    const creditRange = searchParams.get('creditRange')?.trim() || '';
+    const loanAmountParam = searchParams.get('loanAmount')?.trim() || '';
+    const loanAmount = Number(loanAmountParam.replace(/[^\d.]/g, ''));
+    const hasValidCreditRange = CREDIT_RANGE_OPTIONS.some((option) => option.value === creditRange);
+    const hasValidLoanAmount = Number.isFinite(loanAmount) && loanAmount > 0;
+
+    if (!name && !hasValidCreditRange && !hasValidLoanAmount) {
+      return;
+    }
+
+    if (name) {
+      const [firstName = '', ...lastNameParts] = name.split(/\s+/);
+      setPersonal((current) => ({
+        ...current,
+        firstName: current.firstName || firstName,
+        lastName: current.lastName || lastNameParts.join(' '),
+      }));
+    }
+
+    if (hasValidCreditRange) {
+      setEstimatedCreditRange(creditRange);
+    }
+
+    if (hasValidLoanAmount) {
+      setHasVehicle(true);
+      setVehicle((current) => ({
+        ...current,
+        askingPrice: current.askingPrice || loanAmount,
+      }));
+    }
+
+    hasAppliedSearchPrefill.current = true;
+  }, [searchParams]);
 
   // Auto-fill with test data in dev mode
   useEffect(() => {
-    if (isDevMode && step === 0 && !personal.firstName) {
+    if (isDevMode && step === 0 && !personal.firstName && !hasAppliedSearchPrefill.current) {
       import('@/lib/test-data').then(({ TEST_PERSONAL_INFO, TEST_ADDRESS_INFO, TEST_EMPLOYMENT_INFO, TEST_VEHICLE_INFO, TEST_DEAL_STRUCTURE, TEST_CONSENT }) => {
         setPersonal(TEST_PERSONAL_INFO);
         setAddress(TEST_ADDRESS_INFO);
@@ -492,6 +539,30 @@ export default function ApplyPage() {
                   </Field>
                 </div>
 
+                <div className="grid md:grid-cols-2 gap-5">
+                  <Field>
+                    <Select
+                      value={estimatedCreditRange}
+                      onChange={setEstimatedCreditRange}
+                      options={CREDIT_RANGE_OPTIONS}
+                      placeholder="Estimated Credit Range"
+                    />
+                  </Field>
+                  <Field>
+                    <FloatingLabelInput
+                      label="Target Vehicle Price ($)"
+                      type="number"
+                      value={vehicle.askingPrice ? String(vehicle.askingPrice) : ''}
+                      onChange={v => {
+                        const askingPrice = Number(v);
+                        setHasVehicle(askingPrice > 0);
+                        setVehicle(ve => ({ ...ve, askingPrice }));
+                      }}
+                      placeholder="25000"
+                    />
+                  </Field>
+                </div>
+
                 {/* Address */}
                 <div className="pt-6 mt-6 border-t border-gray-200">
                   <h3 className="text-sm font-medium text-gray-900 mb-5">Current Address</h3>
@@ -764,6 +835,20 @@ export default function ApplyPage() {
                     <p className="text-sm text-gray-900 font-medium">${employment.grossMonthlyIncome.toLocaleString()} / month</p>
                     {employment.employerName && <p className="text-sm text-gray-600">{employment.employerName}</p>}
                   </div>
+
+                  {(estimatedCreditRange || vehicle.askingPrice) && (
+                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                      <h3 className="text-xs font-medium text-gray-500 mb-3">Loan Preferences</h3>
+                      {estimatedCreditRange && (
+                        <p className="text-sm text-gray-900">
+                          Estimated Credit Range: {CREDIT_RANGE_OPTIONS.find((option) => option.value === estimatedCreditRange)?.label || estimatedCreditRange}
+                        </p>
+                      )}
+                      {vehicle.askingPrice > 0 && (
+                        <p className="text-sm text-gray-600">Target Vehicle Price: ${vehicle.askingPrice.toLocaleString()}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Co-Borrower Toggle */}
