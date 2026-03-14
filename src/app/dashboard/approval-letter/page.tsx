@@ -45,30 +45,24 @@ function ApprovalLetterContent() {
     fetch('/api/dashboard')
       .then(res => res.json())
       .then(data => {
-        if (data.application) {
-          // Get offers for this application
-          return fetch(`/api/offers?applicationId=${data.application.id}`)
-            .then(offersRes => offersRes.json())
-            .then(offersData => {
-              const selectedOffer = offersData.offers?.find((o: { status: string }) => o.status === 'selected');
-              if (selectedOffer) {
-                const approvalCode = `ALP-${selectedOffer.id}-${Date.now().toString(36).toUpperCase()}`;
-                setLetterData({
-                  approvalCode,
-                  lenderName: selectedOffer.lenderName,
-                  approvedAmount: selectedOffer.approvedAmount,
-                  apr: selectedOffer.apr,
-                  termMonths: selectedOffer.termMonths,
-                  monthlyPayment: selectedOffer.monthlyPayment,
-                  expiresAt: selectedOffer.expiresAt,
-                  borrowerName: `${data.application.borrower.firstName} ${data.application.borrower.lastName}`,
-                  applicationId: data.application.id,
-                  offerId: selectedOffer.id,
-                  generatedAt: new Date().toISOString(),
-                  conditions: selectedOffer.conditions || [],
-                });
-              }
-            });
+        if (data.success && data.data?.application?.selectedOffer) {
+          const application = data.data.application;
+          const selectedOffer = application.selectedOffer;
+          const approvalCode = `ALP-${selectedOffer.id}-${Date.now().toString(36).toUpperCase()}`;
+          setLetterData({
+            approvalCode,
+            lenderName: selectedOffer.lenderName,
+            approvedAmount: selectedOffer.approvedAmount,
+            apr: selectedOffer.apr,
+            termMonths: selectedOffer.termMonths,
+            monthlyPayment: selectedOffer.monthlyPayment,
+            expiresAt: selectedOffer.expiresAt,
+            borrowerName: `${application.borrower.firstName} ${application.borrower.lastName}`,
+            applicationId: application.id,
+            offerId: selectedOffer.id,
+            generatedAt: new Date().toISOString(),
+            conditions: selectedOffer.conditions || [],
+          });
         }
       })
       .catch(err => {
@@ -133,7 +127,7 @@ function ApprovalLetterContent() {
           <h2 className="text-xl font-semibold text-gray-900 mb-2">No Approval Letter Found</h2>
           <p className="text-gray-500 mb-4">Please select an offer first.</p>
           <Link
-            href="/dashboard/offers"
+            href={isDev ? '/results?dev=true' : '/results'}
             className="text-blue-600 hover:text-blue-500 text-sm font-medium"
           >
             View Offers

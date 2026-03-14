@@ -13,6 +13,8 @@ interface Application {
   borrower: {
     firstName: string;
     lastName: string;
+    email?: string;
+    phone?: string;
   };
   loanAmount?: number;
   hasVehicle: boolean;
@@ -23,6 +25,12 @@ interface Application {
     make: string;
     model: string;
   };
+  selectedOffer?: {
+    id: string;
+    lenderName: string;
+    apr: number;
+    approvedAmount: number;
+  } | null;
 }
 
 function DashboardContent() {
@@ -53,7 +61,7 @@ function DashboardContent() {
     if (isDev) {
       setApplication({
         id: 'APP-DEV-001',
-        status: 'offer_selected',
+        status: 'conditional',
         borrower: {
           firstName: 'John',
           lastName: 'Smith',
@@ -62,6 +70,12 @@ function DashboardContent() {
         hasVehicle: false,
         offersReceived: 3,
         submittedAt: new Date().toISOString(),
+        selectedOffer: {
+          id: 'demo-1',
+          lenderName: 'Capital Auto Finance',
+          apr: 4.2,
+          approvedAmount: 32000,
+        },
       });
       setLoading(false);
       return;
@@ -71,10 +85,10 @@ function DashboardContent() {
     fetch('/api/dashboard')
       .then(res => res.json())
       .then(data => {
-        if (data.error) {
-          setError(data.error);
+        if (!data.success) {
+          setError(data.error || 'Failed to load dashboard');
         } else {
-          setApplication(data.application);
+          setApplication(data.data?.application || null);
         }
         setLoading(false);
       })
@@ -121,19 +135,29 @@ function DashboardContent() {
 
   const statusColors: Record<string, string> = {
     'pending_decision': 'bg-yellow-100 text-yellow-700',
-    'offers_ready': 'bg-green-100 text-green-700',
-    'offer_selected': 'bg-blue-100 text-blue-700',
-    'approved': 'bg-green-100 text-green-700',
+    'offers_available': 'bg-green-100 text-green-700',
+    'conditional': 'bg-blue-100 text-blue-700',
+    'funded': 'bg-green-100 text-green-700',
     'declined': 'bg-red-100 text-red-700',
   };
 
   const statusLabels: Record<string, string> = {
     'pending_decision': 'Under Review',
-    'offers_ready': 'Offers Ready',
-    'offer_selected': 'Offer Selected',
-    'approved': 'Approved',
+    'offers_available': 'Offers Ready',
+    'conditional': 'Offer Selected',
+    'funded': 'Funded',
     'declined': 'Declined',
   };
+
+  const progressWidth = application.status === 'funded'
+    ? '100%'
+    : application.status === 'conditional'
+      ? '75%'
+      : application.status === 'offers_available'
+        ? '50%'
+        : application.status === 'declined'
+          ? '25%'
+          : '25%';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -233,14 +257,14 @@ function DashboardContent() {
             <div className="relative">
               {/* Progress bar background */}
               <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200" />
-              <div className="absolute top-5 left-0 h-0.5 bg-blue-600 transition-all duration-500" style={{ width: application.status === 'offer_selected' ? '75%' : '50%' }} />
+              <div className="absolute top-5 left-0 h-0.5 bg-blue-600 transition-all duration-500" style={{ width: progressWidth }} />
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative">
                 {[
                   { label: 'Applied', completed: true },
-                  { label: 'Matched', completed: true },
-                  { label: 'Pre-Approved', completed: application.status === 'offer_selected' || application.status === 'approved' },
-                  { label: 'Documents', completed: application.status === 'approved' },
+                  { label: 'Matched', completed: application.status !== 'pending_decision' && application.status !== 'declined' },
+                  { label: 'Pre-Approved', completed: application.status === 'conditional' || application.status === 'funded' },
+                  { label: 'Documents', completed: application.status === 'funded' },
                 ].map((step, i) => (
                   <div key={i} className="flex flex-col items-center text-center">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg mb-2 border-2 transition-all ${
@@ -297,7 +321,7 @@ function DashboardContent() {
                       </li>
                     </>
                   )}
-                  {application.hasVehicle && (
+                  {application.hasVehicle && application.status !== 'funded' && (
                     <>
                       <li className="flex items-start gap-2">
                         <span className="text-green-600 mt-0.5">→</span>
@@ -330,8 +354,14 @@ function DashboardContent() {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900 mb-0.5">Offer Selected</div>
-                  <div className="text-xs text-gray-500">You selected Offer A at 4.2% APR</div>
+                  <div className="text-sm font-medium text-gray-900 mb-0.5">
+                    {application.selectedOffer ? 'Offer Selected' : 'Application Update'}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {application.selectedOffer
+                      ? `You selected ${application.selectedOffer.lenderName} at ${application.selectedOffer.apr}% APR`
+                      : 'Your dashboard is connected to your active application session'}
+                  </div>
                   <div className="text-xs text-gray-400 mt-1">2 hours ago</div>
                 </div>
               </div>
@@ -344,7 +374,7 @@ function DashboardContent() {
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-medium text-gray-900 mb-0.5">Offers Ready</div>
-                  <div className="text-xs text-gray-500">3 personalized offers available to review</div>
+                  <div className="text-xs text-gray-500">{application.offersReceived} personalized offers available to review</div>
                   <div className="text-xs text-gray-400 mt-1">1 day ago</div>
                 </div>
               </div>
@@ -373,7 +403,7 @@ function DashboardContent() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* View Offers */}
               <Link
-                href={isDev ? '/results?dev=true' : '/dashboard/offers'}
+                href={isDev ? '/results?dev=true' : '/results'}
                 className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-blue-400 hover:shadow-lg transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -391,7 +421,9 @@ function DashboardContent() {
                 <h3 className="text-base font-semibold text-gray-900 mb-1.5">View Offers</h3>
                 <p className="text-xs text-gray-500 leading-relaxed">
                   {application.offersReceived > 0
-                    ? 'Compare rates and terms from multiple lenders'
+                    ? application.selectedOffer
+                      ? 'Review the offers tied to your current pre-approval'
+                      : 'Compare rates and terms from multiple lenders'
                     : 'Check back soon for personalized offers'}
                 </p>
               </Link>
