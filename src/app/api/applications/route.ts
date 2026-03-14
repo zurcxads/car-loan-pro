@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
 import { applicationSubmitSchema } from '@/lib/validations';
 import { dbGetApplications, dbCreateApplication } from '@/lib/db';
-import { generateCreditProfile } from '@/lib/store';
+import { generateCreditProfile } from '@/lib/credit-profile';
 import { matchLendersAndGenerateOffers } from '@/lib/lender-engine';
 import type { MockApplication } from '@/lib/mock-data';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
