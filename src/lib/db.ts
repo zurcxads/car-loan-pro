@@ -54,10 +54,23 @@ export async function dbCreateApplication(app: Partial<MockApplication>): Promis
     session_token: sessionToken,
     session_expires_at: sessionExpiresAt.toISOString(),
   };
-  
+
   const { data, error } = await db().from('applications').insert(appWithToken).select().single();
-  if (error || !data) return null;
-  return mapDbToApp(data);
+  if (!error && data) {
+    return mapDbToApp(data);
+  }
+
+  // Support older database setups that predate `has_vehicle` and still require
+  // non-null `vehicle` and `loan_amount` fields for pre-approval submissions.
+  const legacyAppWithToken = buildLegacyApplicationInsert(appWithToken);
+  const { data: legacyData, error: legacyError } = await db()
+    .from('applications')
+    .insert(legacyAppWithToken)
+    .select()
+    .single();
+
+  if (legacyError || !legacyData) return null;
+  return mapDbToApp(legacyData);
 }
 
 export async function dbUpdateApplication(id: string, updates: Partial<MockApplication>): Promise<MockApplication | null> {
@@ -388,6 +401,22 @@ function mapAppToDb(app: Partial<MockApplication>): Record<string, unknown> {
   if (app.offersReceived !== undefined) dbRow.offers_received = app.offersReceived;
   if (app.flags !== undefined) dbRow.flags = app.flags;
   return dbRow;
+}
+
+function buildLegacyApplicationInsert(appRow: Record<string, unknown>): Record<string, unknown> {
+  const legacyRow = { ...appRow };
+
+  delete legacyRow.has_vehicle;
+
+  if (legacyRow.vehicle === undefined) {
+    legacyRow.vehicle = {};
+  }
+
+  if (legacyRow.loan_amount === undefined) {
+    legacyRow.loan_amount = 0;
+  }
+
+  return legacyRow;
 }
 
 // --- Offers ---
