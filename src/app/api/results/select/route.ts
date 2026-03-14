@@ -1,3 +1,3 @@
-import { POST as selectOffer } from '@/app/api/offers/select/route';
+import { handleOfferSelection } from '@/lib/select-offer';
 
-export const POST = selectOffer;
+export const POST = handleOfferSelection;
