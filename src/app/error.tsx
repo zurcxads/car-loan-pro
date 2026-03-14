@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 
 export default function Error({
   error,
@@ -18,32 +17,18 @@ export default function Error({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50 dark:from-zinc-950 dark:to-zinc-900 flex items-center justify-center px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center max-w-2xl"
-      >
+      <div className="text-center max-w-2xl animate-fade-in-up">
         {/* Error Illustration */}
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-8"
-        >
+        <div className="mb-8 animate-fade-in">
           <div className="w-24 h-24 mx-auto rounded-full bg-red-100 flex items-center justify-center">
             <svg className="w-12 h-12 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-        </motion.div>
+        </div>
 
         {/* Content */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
+        <div className="animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-zinc-100 mb-4">
             Something Went Wrong
           </h1>
@@ -91,8 +76,8 @@ export default function Error({
               </a>
             </p>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

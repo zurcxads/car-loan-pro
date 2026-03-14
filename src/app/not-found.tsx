@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 
 export default function NotFound() {
   const router = useRouter();
@@ -25,39 +24,21 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-zinc-950 dark:to-zinc-900 flex items-center justify-center px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center max-w-2xl w-full"
-      >
+      <div className="text-center max-w-2xl w-full animate-fade-in-up">
         {/* 404 Illustration */}
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-8"
-        >
+        <div className="mb-8 animate-fade-in">
           <div className="relative">
             <div className="text-9xl font-bold text-gray-200 dark:text-zinc-800 select-none">404</div>
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              className="absolute inset-0 flex items-center justify-center"
-            >
+            <div className="absolute inset-0 flex items-center justify-center">
               <svg className="w-24 h-24 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Content */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
+        <div className="animate-fade-in">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-zinc-100 mb-4">
             Page Not Found
           </h1>
@@ -114,8 +95,8 @@ export default function NotFound() {
               </a>
             </p>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }
