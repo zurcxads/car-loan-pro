@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ThemeToggle } from './ThemeToggle';
+
 import Logo from './Logo';
 
 export default function Header() {
@@ -71,9 +71,8 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* CTA Button and Theme Toggle */}
+            {/* CTA Button */}
             <div className="hidden lg:flex items-center gap-4">
-              <ThemeToggle />
               <Link
                 href="/apply"
                 className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-lg transition-all duration-200 active:scale-[0.98]"
@@ -82,9 +81,8 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Mobile Menu Button and Theme Toggle */}
+            {/* Mobile Menu Button */}
             <div className="flex lg:hidden items-center gap-2">
-              <ThemeToggle />
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
