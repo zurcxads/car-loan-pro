@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
 import { dbGetLenders, dbUpdateLender } from '@/lib/db';
-import { z } from 'zod';
+import { updateLenderSchema } from '@/lib/validations';
 
 // GET /api/admin/lenders — get all lenders (admin only)
 export async function GET() {
@@ -16,19 +16,12 @@ export async function GET() {
   }
 }
 
-const lenderUpdateSchema = z.object({
-  lenderId: z.string(),
-  isActive: z.boolean().optional(),
-  name: z.string().optional(),
-  referralFee: z.number().optional(),
-});
-
 // PATCH /api/admin/lenders — update a lender (admin only)
 export async function PATCH(req: NextRequest) {
   const { error: authError } = await requireAuth('admin');
   if (authError) return authError;
 
-  const { data, error } = await parseBody(req, lenderUpdateSchema);
+  const { data, error } = await parseBody(req, updateLenderSchema);
   if (error) return error;
   if (!data) return apiError('Invalid data');
 

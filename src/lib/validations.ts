@@ -133,7 +133,7 @@ export const lenderDecisionSchema = z.object({
   termMonths: z.number().min(12).max(84).optional(),
   conditions: z.array(z.string()).optional(),
   declineReason: z.string().optional(),
-});
+}).strict();
 
 // ---------- Deal Submission ----------
 
@@ -152,18 +152,19 @@ export const dealSubmitSchema = z.object({
 export const updateLenderSchema = z.object({
   lenderId: z.string().min(1),
   isActive: z.boolean().optional(),
+  name: z.string().min(1).optional(),
   minFico: z.number().min(0).max(850).optional(),
   maxLtv: z.number().min(0).max(200).optional(),
   maxDti: z.number().min(0).max(100).optional(),
   referralFee: z.number().min(0).optional(),
-});
+}).strict();
 
 export const updateDealerSchema = z.object({
   dealerId: z.string().min(1),
   status: z.enum(['active', 'suspended', 'pending']).optional(),
-  plan: z.string().optional(),
+  plan: z.string().min(1).optional(),
   planPrice: z.number().min(0).optional(),
-});
+}).strict();
 
 // Types derived from schemas
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -172,3 +173,5 @@ export type ApplicationSubmitInput = z.infer<typeof applicationSubmitSchema>;
 export type SelectOfferInput = z.infer<typeof selectOfferSchema>;
 export type LenderDecisionInput = z.infer<typeof lenderDecisionSchema>;
 export type DealSubmitInput = z.infer<typeof dealSubmitSchema>;
+export type UpdateLenderInput = z.infer<typeof updateLenderSchema>;
+export type UpdateDealerInput = z.infer<typeof updateDealerSchema>;

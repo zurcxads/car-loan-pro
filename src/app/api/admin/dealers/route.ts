@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
 import { dbGetDealers, dbUpdateDealer } from '@/lib/db';
-import { z } from 'zod';
+import { updateDealerSchema } from '@/lib/validations';
 
 // GET /api/admin/dealers — get all dealers (admin only)
 export async function GET() {
@@ -16,19 +16,12 @@ export async function GET() {
   }
 }
 
-const dealerUpdateSchema = z.object({
-  dealerId: z.string(),
-  status: z.string().optional(),
-  plan: z.string().optional(),
-  planPrice: z.number().optional(),
-});
-
 // PATCH /api/admin/dealers — update a dealer (admin only)
 export async function PATCH(req: NextRequest) {
   const { error: authError } = await requireAuth('admin');
   if (authError) return authError;
 
-  const { data, error } = await parseBody(req, dealerUpdateSchema);
+  const { data, error } = await parseBody(req, updateDealerSchema);
   if (error) return error;
   if (!data) return apiError('Invalid data');
 
