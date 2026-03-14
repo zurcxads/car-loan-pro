@@ -2,6 +2,7 @@ import { type AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
+import { isDev } from '@/lib/env';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
 // Demo users for when Supabase is not configured
@@ -51,21 +52,7 @@ export const authOptions: AuthOptions = {
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
-        const requestData = req as {
-          query?: Record<string, string | string[] | undefined>;
-          headers?: Record<string, string | undefined>;
-          body?: Record<string, string | undefined>;
-        };
-        const callbackUrl = requestData.body?.callbackUrl || '';
-        const devParam = requestData.query?.dev;
-        const isDevQuery = Array.isArray(devParam) ? devParam.includes('true') : devParam === 'true';
-        const isDevLogin =
-          process.env.NODE_ENV !== 'production' &&
-          (
-            isDevQuery ||
-            callbackUrl.includes('dev=true') ||
-            requestData.headers?.referer?.includes('dev=true')
-          );
+        void req;
 
         if (isSupabaseConfigured()) {
           const supabase = createClient(
@@ -101,10 +88,10 @@ export const authOptions: AuthOptions = {
             };
           }
 
-          if (process.env.NODE_ENV === 'production' || !isDevLogin) {
+          if (!isDev()) {
             return null;
           }
-        } else if (process.env.NODE_ENV === 'production') {
+        } else if (!isDev()) {
           return null;
         }
 
@@ -147,7 +134,7 @@ export const authOptions: AuthOptions = {
     maxAge: 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET || (() => {
-    if (process.env.NODE_ENV === 'production') {
+    if (!isDev()) {
       throw new Error('NEXTAUTH_SECRET must be set in production');
     }
     // In development, generate a random secret

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTestApplicationData, TEST_CREDIT_RESULT } from '@/lib/test-data';
 import { CONSUMER_SESSION_COOKIE, getConsumerSessionCookieOptions } from '@/lib/consumer-session';
+import { isDev } from '@/lib/env';
 
 // Helper to generate a simple session token
 function generateSessionToken(): string {
@@ -8,7 +9,7 @@ function generateSessionToken(): string {
 }
 
 export async function POST(req: NextRequest) {
-  if (process.env.NODE_ENV !== 'development') {
+  if (!isDev()) {
     return NextResponse.json({ error: 'Not available in production' }, { status: 404 });
   }
 

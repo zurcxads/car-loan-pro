@@ -1,10 +1,15 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { isDev } from '@/lib/env';
 import { updateSession } from '@/lib/supabase/middleware';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limiter';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const ip = getClientIp(request);
+
+  if ((pathname === '/dev' || pathname.startsWith('/dev/') || pathname.startsWith('/api/dev/')) && !isDev()) {
+    return new NextResponse('Not Found', { status: 404 });
+  }
 
   // Rate limiting for application submissions (10 per hour per IP)
   if (pathname.startsWith('/api/applications') && request.method === 'POST') {
