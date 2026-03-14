@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 type Step = 1 | 2 | 3 | 4;
@@ -89,18 +88,14 @@ export default function DealerOnboardPage() {
 
       <div className="max-w-3xl mx-auto px-6 py-16">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12 animate-fade-in-up">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-3">
             Dealer Partner Registration
           </h1>
           <p className="text-gray-600">
             Join our network and connect with pre-approved buyers
           </p>
-        </motion.div>
+        </div>
 
         {/* Progress Bar */}
         <div className="mb-12">
@@ -131,12 +126,7 @@ export default function DealerOnboardPage() {
             ))}
           </div>
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-blue-600"
-              initial={{ width: '0%' }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-            />
+            <div className="h-full bg-blue-600 transition-[width] duration-300" style={{ width: `${progress}%` }} />
           </div>
           <div className="flex justify-between text-xs text-gray-500 mt-2">
             <span>Dealership Info</span>
@@ -147,16 +137,9 @@ export default function DealerOnboardPage() {
         </div>
 
         {/* Form Steps */}
-        <motion.div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
-          <AnimatePresence mode="wait">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
             {step === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
+              <div key="step1" className="animate-fade-in-up">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Dealership Information</h2>
                 <div className="space-y-4">
                   <div>
@@ -243,17 +226,11 @@ export default function DealerOnboardPage() {
                     />
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {step === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
+              <div key="step2" className="animate-fade-in-up">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Primary Contact</h2>
                 <div className="space-y-4">
                   <div>
@@ -302,17 +279,11 @@ export default function DealerOnboardPage() {
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {step === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
+              <div key="step3" className="animate-fade-in-up">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Service Area & Preferences</h2>
                 <div className="space-y-4">
                   <div>
@@ -384,17 +355,11 @@ export default function DealerOnboardPage() {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
 
             {step === 4 && (
-              <motion.div
-                key="step4"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-              >
+              <div key="step4" className="animate-fade-in-up">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Review & Submit</h2>
                 <div className="space-y-6">
                   <div>
@@ -471,9 +436,8 @@ export default function DealerOnboardPage() {
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
 
           {/* Navigation Buttons */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
@@ -503,7 +467,7 @@ export default function DealerOnboardPage() {
               </button>
             )}
           </div>
-        </motion.div>
+        </div>
 
         {/* Save Draft */}
         <div className="mt-6 text-center">

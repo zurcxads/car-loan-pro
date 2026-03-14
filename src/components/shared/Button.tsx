@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
@@ -81,50 +80,36 @@ export default function Button({
     }
   };
 
-  const baseStyles = 'font-semibold rounded-xl transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100';
+  const baseStyles = 'font-semibold rounded-xl transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2';
   const widthStyles = fullWidth ? 'w-full' : 'inline-flex';
 
   return (
-    <motion.button
+    <button
       type={type}
       onClick={handleClick}
       disabled={disabled || isLoading || showSuccess}
       className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles} items-center justify-center gap-2 ${className}`}
-      whileHover={!disabled && !isLoading && !showSuccess ? { scale: 1.02 } : {}}
-      whileTap={!disabled && !isLoading && !showSuccess ? { scale: 0.98 } : {}}
     >
       {isLoading && !showSuccess && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0 }}
-          className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"
-        />
+        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
       )}
 
       {showSuccess && (
-        <motion.svg
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 10 }}
-          className="w-5 h-5"
+        <svg
+          className="w-5 h-5 animate-fade-in"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-        </motion.svg>
+        </svg>
       )}
 
       {!showSuccess && (
-        <motion.span
-          initial={false}
-          animate={{ opacity: isLoading ? 0 : 1 }}
-          className="flex items-center gap-2"
-        >
+        <span className={`flex items-center gap-2 transition-opacity ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
           {children}
-        </motion.span>
+        </span>
       )}
-    </motion.button>
+    </button>
   );
 }

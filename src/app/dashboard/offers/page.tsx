@@ -1,12 +1,15 @@
 "use client";
 
 import { Suspense, useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import OfferSelectionModal from '@/components/offers/OfferSelectionModal';
 import { MockOffer } from '@/lib/mock-data';
+
+const OfferSelectionModal = dynamic(() => import('@/components/offers/OfferSelectionModal'), {
+  ssr: false,
+});
 
 function OffersContent() {
   const router = useRouter();
@@ -113,12 +116,10 @@ function OffersContent() {
         ) : (
           <div className="space-y-4">
             {offers.map((offer, index) => (
-              <motion.div
+              <div
                 key={offer.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all"
+                className="bg-white rounded-2xl border border-gray-200 p-6 hover:border-blue-300 hover:shadow-sm transition-all animate-fade-in-up"
+                style={{ animationDelay: `${index * 80}ms` }}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -179,7 +180,7 @@ function OffersContent() {
                     Select This Offer
                   </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}

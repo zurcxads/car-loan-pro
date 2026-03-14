@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { type MockApplication } from '@/lib/mock-data';
 import { formatCurrency, ficoColor } from '@/lib/format-utils';
 import StatusBadge from '@/components/shared/StatusBadge';
 import ApplicationDetailDrawer from './ApplicationDetailDrawer';
-import DecisionModal from './DecisionModal';
 import { dbGetApplications } from '@/lib/db';
+
+const DecisionModal = dynamic(() => import('./DecisionModal'), { ssr: false });
 
 type StatusFilter = 'all' | 'pending_decision' | 'offers_available' | 'conditional' | 'declined' | 'funded';
 type DecisionAction = 'approve' | 'decline' | 'counter' | 'request_docs';
