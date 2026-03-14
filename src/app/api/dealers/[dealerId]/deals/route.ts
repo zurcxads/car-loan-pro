@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
-import { dbGetDeals, dbCreateDeal } from '@/lib/db';
+import { dbCreateDeal } from '@/lib/db';
+import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { z } from 'zod';
 
 const dealSchema = z.object({
@@ -18,22 +19,33 @@ const dealSchema = z.object({
 
 // GET /api/dealers/[dealerId]/deals — get dealer's deals
 export async function GET(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: Promise<{ dealerId: string }> }
 ) {
   const { session, error } = await requireAuth('dealer');
   if (error) return error;
 
   const { dealerId } = await params;
-
-  // AUTHORIZATION: Verify dealer owns this resource
   if (dealerId !== session?.user.entityId) {
     return apiError('You can only view deals for your own dealership', 403);
   }
 
   try {
-    const deals = await dbGetDeals(dealerId);
-    return apiSuccess({ deals });
+    if (!isSupabaseConfigured()) {
+      return apiError('Supabase is not configured', 503);
+    }
+
+    const supabase = getServiceClient();
+    const { data: deals, error: dealsError } = await supabase
+      .from('deals')
+      .select('*')
+      .eq('dealer_id', dealerId)
+      .order('submitted_at', { ascending: false });
+    if (dealsError) {
+      return apiError('Failed to fetch deals', 500);
+    }
+
+    return apiSuccess({ deals: deals || [] });
   } catch {
     return apiError('Failed to fetch deals', 500);
   }
@@ -48,8 +60,6 @@ export async function POST(
   if (authError) return authError;
 
   const { dealerId } = await params;
-
-  // AUTHORIZATION: Verify dealer owns this resource
   if (dealerId !== session?.user.entityId) {
     return apiError('You can only create deals for your own dealership', 403);
   }

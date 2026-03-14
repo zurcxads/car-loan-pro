@@ -1,22 +1,94 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import KPICard from '@/components/shared/KPICard';
 import { MOCK_APPLICATIONS } from '@/lib/mock-data';
 
-export default function DealerDashboard() {
+interface BuyerRecord {
+  application: { id: string };
+}
+
+interface DealRecord {
+  amount?: number;
+  status?: string;
+}
+
+export default function DealerDashboard({ dealerId }: { dealerId: string | null }) {
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const [buyers, setBuyers] = useState<BuyerRecord[]>([]);
+  const [deals, setDeals] = useState<DealRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const activeShoppersInArea = MOCK_APPLICATIONS.filter(a =>
-    (a.status === 'offers_available' || a.status === 'conditional') &&
-    a.borrower.city === 'Houston'
-  ).length;
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      setError('');
 
-  const leadsToday = 3;
-  const conversionsThisWeek = 2;
-  const avgDealSize = 27500;
-  const monthlyFunded = 8;
-  const monthlyRevenue = 218000;
+      try {
+        if (!dealerId) {
+          setBuyers([]);
+          setDeals([]);
+          return;
+        }
+
+        const [buyersRes, dealsRes] = await Promise.all([
+          fetch(`/api/dealers/${dealerId}/buyers`, { cache: 'no-store' }),
+          fetch(`/api/dealers/${dealerId}/deals`, { cache: 'no-store' }),
+        ]);
+
+        if (!buyersRes.ok || !dealsRes.ok) {
+          throw new Error('Failed to load dealer dashboard');
+        }
+
+        const [buyersJson, dealsJson] = await Promise.all([buyersRes.json(), dealsRes.json()]);
+        setBuyers(buyersJson.data?.buyers || []);
+        setDeals(dealsJson.data?.deals || []);
+      } catch (fetchError) {
+        const isDevMode = typeof window !== 'undefined' && window.location.search.includes('dev=true');
+        if (!isDevMode) {
+          setError(fetchError instanceof Error ? fetchError.message : 'Failed to load dealer dashboard');
+        } else {
+          setBuyers(MOCK_APPLICATIONS.filter((app) => app.status === 'offers_available' || app.status === 'conditional').map((application) => ({ application })));
+          setDeals([]);
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [dealerId]);
+
+  const activeShoppersInArea = buyers.length;
+  const leadsToday = buyers.length;
+  const conversionsThisWeek = deals.filter((deal) => deal.status === 'funded').length;
+  const avgDealSize = deals.length ? Math.round(deals.reduce((sum, deal) => sum + Number(deal.amount || 0), 0) / deals.length) : 0;
+  const monthlyFunded = deals.filter((deal) => deal.status === 'funded').length;
+  const monthlyRevenue = deals.filter((deal) => deal.status === 'funded').reduce((sum, deal) => sum + Number(deal.amount || 0), 0);
+
+  if (loading) {
+    return <div className="py-12 text-sm text-gray-500 dark:text-zinc-400">Loading dashboard...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 p-8 text-center">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-2">Dealer dashboard unavailable</h3>
+        <p className="text-sm text-gray-500 dark:text-zinc-400">{error}</p>
+      </div>
+    );
+  }
+
+  if (buyers.length === 0 && deals.length === 0) {
+    return (
+      <div className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 p-8 text-center">
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-2">No dealer activity yet</h3>
+        <p className="text-sm text-gray-500 dark:text-zinc-400">Selected consumers and funded deals will appear here once real data exists in Supabase.</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -29,9 +101,9 @@ export default function DealerDashboard() {
         <KPICard label="Leads Today" value={leadsToday.toString()} delta="+1" deltaType="up" delay={0} />
         <KPICard label="Active Shoppers" value={activeShoppersInArea.toString()} delta="+4" deltaType="up" delay={0.05} />
         <KPICard label="Conversions (7d)" value={conversionsThisWeek.toString()} delta="+1" deltaType="up" delay={0.1} />
-        <KPICard label="Avg Deal Size" value={`$${(avgDealSize / 1000).toFixed(0)}K`} delta="+5%" deltaType="up" delay={0.15} />
+        <KPICard label="Avg Deal Size" value={avgDealSize ? `$${(avgDealSize / 1000).toFixed(0)}K` : '$0'} delta="+5%" deltaType="up" delay={0.15} />
         <KPICard label="Funded (MTD)" value={monthlyFunded.toString()} delta="+2" deltaType="up" delay={0.2} />
-        <KPICard label="Revenue (MTD)" value={`$${(monthlyRevenue / 1000).toFixed(0)}K`} delta="+22%" deltaType="up" delay={0.25} />
+        <KPICard label="Revenue (MTD)" value={monthlyRevenue ? `$${(monthlyRevenue / 1000).toFixed(0)}K` : '$0'} delta="+22%" deltaType="up" delay={0.25} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -43,34 +115,24 @@ export default function DealerDashboard() {
         >
           <h3 className="text-sm font-semibold mb-4">Recent Activity</h3>
           <div className="space-y-3">
-            <div className="flex items-start gap-3 pb-3 border-b border-gray-100">
-              <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900 dark:text-zinc-100">New pre-approved buyer in your area</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">Sarah Johnson - $32K approval - 8 min ago</p>
+            {buyers.slice(0, 3).map((buyer) => (
+              <div key={buyer.application.id} className="flex items-start gap-3 pb-3 border-b border-gray-100">
+                <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900 dark:text-zinc-100">New pre-approved buyer available</p>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400">Application {buyer.application.id}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-3 pb-3 border-b border-gray-100">
-              <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900 dark:text-zinc-100">Deal funded</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">Mike Rodriguez - 2019 Honda Accord - 2 hours ago</p>
+            ))}
+            {deals.slice(0, 1).map((deal, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900 dark:text-zinc-100">Deal activity</p>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400">{deal.status || 'submitted'} {deal.amount ? `• $${Number(deal.amount).toLocaleString()}` : ''}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-3 pb-3 border-b border-gray-100">
-              <div className="w-2 h-2 rounded-full bg-yellow-500 mt-1.5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900 dark:text-zinc-100">Approval expiring soon</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">Lisa Chen - $28K approval - Expires in 3 days</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900 dark:text-zinc-100">Lead contacted</p>
-                <p className="text-xs text-gray-500 dark:text-zinc-400">James Wilson - Marked contacted - 5 hours ago</p>
-              </div>
-            </div>
+            ))}
           </div>
         </motion.div>
 
@@ -83,50 +145,17 @@ export default function DealerDashboard() {
           <h3 className="text-sm font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-2">
             <button className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl transition-colors text-sm font-medium cursor-pointer">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
               View All Pre-Approved Shoppers
             </button>
             <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl transition-colors text-sm font-medium cursor-pointer">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
               Manage Leads
             </button>
             <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl transition-colors text-sm font-medium cursor-pointer">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
               View Performance
             </button>
           </div>
         </motion.div>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-          className="rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/40 dark:to-blue-900/20 border border-blue-200 dark:border-blue-900 p-6 mt-6"
-      >
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-white dark:bg-zinc-900 rounded-xl">
-            <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
-          <div className="flex-1">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-1">New pre-approved shoppers available</h3>
-            <p className="text-xs text-gray-600 dark:text-zinc-300 mb-3">
-              {activeShoppersInArea} buyers in the Houston area are actively shopping with pre-approval in hand. Reach out now to close more deals.
-            </p>
-            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors cursor-pointer">
-              Contact Shoppers
-            </button>
-          </div>
-        </div>
-      </motion.div>
     </div>
   );
 }

@@ -49,8 +49,8 @@ export default function DealerPortalClient({ user }: { user: PortalUser }) {
       userName={user.name || user.email || 'Dealer'}
     >
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-        {tab === 'dashboard' && <DealerDashboard />}
-        {tab === 'shoppers' && <BuyerInbox onStartDeal={() => {}} />}
+        {tab === 'dashboard' && <DealerDashboard dealerId={user.entityId || null} />}
+        {tab === 'shoppers' && <BuyerInbox dealerId={user.entityId || null} onStartDeal={() => {}} />}
         {tab === 'leads' && <LeadManagement />}
         {tab === 'performance' && <PerformanceDashboard />}
         {tab === 'settings' && <DealerSettings />}

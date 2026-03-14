@@ -28,6 +28,7 @@ const navItems = [
 export interface PortalUser {
   name?: string | null;
   email?: string | null;
+  entityId?: string | null;
 }
 
 export default function AdminPortalClient({ user }: { user: PortalUser }) {

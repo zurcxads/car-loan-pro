@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, requireAuth } from '@/lib/api-helpers';
-import { dbGetApplications, dbGetOffers } from '@/lib/db';
+import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
-// GET /api/dealers/[dealerId]/buyers — get pre-approved consumers in dealer's area
+// GET /api/dealers/[dealerId]/buyers — get selected consumers visible to this dealer
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ dealerId: string }> }
@@ -11,46 +11,95 @@ export async function GET(
   if (error) return error;
 
   const { dealerId } = await params;
-
-  // AUTHORIZATION: Verify dealer owns this resource
   if (dealerId !== session?.user.entityId) {
     return apiError('You can only view buyers for your own dealership', 403);
   }
 
   try {
-    // Get all applications with offers
-    const allApplications = await dbGetApplications();
-    const preApprovedApps = allApplications.filter(app => app.status === 'offers_available');
+    if (!isSupabaseConfigured()) {
+      return apiError('Supabase is not configured', 503);
+    }
 
-    // Get selected offers for each application
-    const buyersWithOffers = await Promise.all(
-      preApprovedApps.map(async (app) => {
-        const offers = await dbGetOffers(app.id);
-        const selectedOffer = offers.find(o => o.status === 'selected');
+    const supabase = getServiceClient();
+    const { data: selectedOffers, error: offersError } = await supabase
+      .from('offers')
+      .select('*')
+      .eq('status', 'selected')
+      .order('decision_at', { ascending: false });
+    if (offersError) {
+      return apiError('Failed to fetch buyers', 500);
+    }
+
+    const applicationIds = Array.from(new Set((selectedOffers || []).map((offer) => offer.application_id).filter(Boolean)));
+    if (applicationIds.length === 0) {
+      return apiSuccess({ buyers: [] });
+    }
+
+    const { data: applications, error: applicationsError } = await supabase
+      .from('applications')
+      .select('*')
+      .in('id', applicationIds);
+    if (applicationsError) {
+      return apiError('Failed to fetch buyers', 500);
+    }
+
+    const applicationsById = new Map((applications || []).map((application) => [application.id, application]));
+    const buyers = (selectedOffers || [])
+      .map((offer) => {
+        const application = applicationsById.get(offer.application_id);
+        if (!application) return null;
 
         return {
-          application: app,
-          selectedOffer,
+          application: {
+            id: application.id,
+            borrower: application.borrower,
+            employment: application.employment,
+            credit: application.credit,
+            vehicle: application.vehicle,
+            dealStructure: application.deal_structure,
+            loanAmount: application.loan_amount ? Number(application.loan_amount) : undefined,
+            ltvPercent: application.ltv_percent ? Number(application.ltv_percent) : undefined,
+            dtiPercent: Number(application.dti_percent || 0),
+            ptiPercent: application.pti_percent ? Number(application.pti_percent) : undefined,
+            hasVehicle: Boolean(application.has_vehicle),
+            status: application.status,
+            state: application.state,
+            submittedAt: application.submitted_at,
+            updatedAt: application.updated_at,
+            lendersSubmitted: Number(application.lenders_submitted || 0),
+            offersReceived: Number(application.offers_received || 0),
+            flags: application.flags || [],
+          },
+          selectedOffer: {
+            id: offer.id,
+            applicationId: offer.application_id,
+            lenderId: offer.lender_id,
+            lenderName: offer.lender_name,
+            apr: Number(offer.apr || 0),
+            termMonths: Number(offer.term_months || 0),
+            monthlyPayment: Number(offer.monthly_payment || 0),
+            approvedAmount: Number(offer.approved_amount || 0),
+            status: offer.status,
+            conditions: offer.conditions || [],
+            decisionAt: offer.decision_at,
+            expiresAt: offer.expires_at,
+          },
           buyer: {
-            firstName: app.borrower.firstName,
-            lastInitial: app.borrower.lastName[0],
-            city: app.borrower.city,
-            state: app.borrower.state,
-            zip: app.borrower.zip,
-            approvedAmount: selectedOffer?.approvedAmount || 0,
-            lenderName: selectedOffer?.lenderName || '',
-            status: selectedOffer ? 'selected' : 'reviewing',
+            firstName: application.borrower.firstName,
+            lastInitial: application.borrower.lastName[0],
+            city: application.borrower.city,
+            state: application.borrower.state,
+            zip: application.borrower.zip,
+            approvedAmount: Number(offer.approved_amount || 0),
+            lenderName: offer.lender_name || '',
+            status: 'selected',
           },
         };
       })
-    );
+      .filter(Boolean)
+      .sort((a, b) => (b?.selectedOffer?.approvedAmount || 0) - (a?.selectedOffer?.approvedAmount || 0));
 
-    // Filter out buyers without selected offers and sort by approved amount
-    const qualifiedBuyers = buyersWithOffers
-      .filter(b => b.selectedOffer)
-      .sort((a, b) => (b.selectedOffer?.approvedAmount || 0) - (a.selectedOffer?.approvedAmount || 0));
-
-    return apiSuccess({ buyers: qualifiedBuyers });
+    return apiSuccess({ buyers });
   } catch {
     return apiError('Failed to fetch buyers', 500);
   }

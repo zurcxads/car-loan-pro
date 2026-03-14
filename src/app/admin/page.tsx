@@ -21,7 +21,7 @@ export default async function AdminPage({
   const isDevMode = process.env.NODE_ENV !== 'production' && params.dev === 'true';
 
   if (isDevMode) {
-    return <AdminPortalClient user={{ name: 'Admin (Dev)', email: 'admin@autoloanpro.co' }} />;
+    return <AdminPortalClient user={{ name: 'Admin (Dev)', email: 'admin@autoloanpro.co', entityId: null }} />;
   }
 
   const session = await getServerSession(authOptions);
@@ -35,5 +35,5 @@ export default async function AdminPage({
     redirect(getRoleRedirect(user.role));
   }
 
-  return <AdminPortalClient user={{ name: user.name, email: user.email }} />;
+  return <AdminPortalClient user={{ name: user.name, email: user.email, entityId: null }} />;
 }

@@ -49,7 +49,7 @@ export default function LenderPortalClient({ user }: { user: PortalUser }) {
       userName={user.name || user.email || 'Lender'}
     >
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-        {tab === 'applications' && <ApplicationQueue />}
+        {tab === 'applications' && <ApplicationQueue lenderId={user.entityId || null} />}
         {tab === 'underwriting' && <UnderwritingRules />}
         {tab === 'pipeline' && <Pipeline />}
         {tab === 'reporting' && <Reporting />}

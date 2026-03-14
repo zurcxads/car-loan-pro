@@ -21,11 +21,11 @@ export default async function DealerPage({
   const isDevMode = process.env.NODE_ENV !== 'production' && params.dev === 'true';
 
   if (isDevMode) {
-    return <DealerPortalClient user={{ name: 'Demo Dealer', email: 'dealer@demo.com' }} />;
+    return <DealerPortalClient user={{ name: 'Demo Dealer', email: 'dealer@demo.com', entityId: 'DLR-001' }} />;
   }
 
   const session = await getServerSession(authOptions);
-  const user = session?.user as { role?: string; name?: string | null; email?: string | null } | undefined;
+  const user = session?.user as { role?: string; name?: string | null; email?: string | null; entityId?: string | null } | undefined;
 
   if (!session || !user) {
     redirect('/login?redirect=/dealer');
@@ -35,5 +35,5 @@ export default async function DealerPage({
     redirect(getRoleRedirect(user.role));
   }
 
-  return <DealerPortalClient user={{ name: user.name, email: user.email }} />;
+  return <DealerPortalClient user={{ name: user.name, email: user.email, entityId: user.entityId || null }} />;
 }

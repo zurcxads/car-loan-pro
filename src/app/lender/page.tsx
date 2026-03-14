@@ -21,11 +21,11 @@ export default async function LenderPage({
   const isDevMode = process.env.NODE_ENV !== 'production' && params.dev === 'true';
 
   if (isDevMode) {
-    return <LenderPortalClient user={{ name: 'Demo Lender', email: 'lender@demo.com' }} />;
+    return <LenderPortalClient user={{ name: 'Demo Lender', email: 'lender@demo.com', entityId: 'LND-001' }} />;
   }
 
   const session = await getServerSession(authOptions);
-  const user = session?.user as { role?: string; name?: string | null; email?: string | null } | undefined;
+  const user = session?.user as { role?: string; name?: string | null; email?: string | null; entityId?: string | null } | undefined;
 
   if (!session || !user) {
     redirect('/login?redirect=/lender');
@@ -35,5 +35,5 @@ export default async function LenderPage({
     redirect(getRoleRedirect(user.role));
   }
 
-  return <LenderPortalClient user={{ name: user.name, email: user.email }} />;
+  return <LenderPortalClient user={{ name: user.name, email: user.email, entityId: user.entityId || null }} />;
 }
