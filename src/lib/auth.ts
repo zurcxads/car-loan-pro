@@ -48,8 +48,13 @@ export const authOptions: AuthOptions = {
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
+        const isDevLogin =
+          process.env.NODE_ENV !== 'production' ||
+          req.query?.dev === 'true' ||
+          req.query?.callbackUrl?.includes('dev=true') ||
+          req.headers?.referer?.includes('dev=true');
 
         // Try Supabase first
         if (isSupabaseConfigured()) {
@@ -62,7 +67,9 @@ export const authOptions: AuthOptions = {
           // Handle database errors (PGRST116 = not found is OK, others are errors)
           if (error && error.code !== 'PGRST116') {
             console.error('Supabase auth error:', error);
-            // Fall through to demo users
+            if (!isDevLogin) {
+              return null;
+            }
           } else if (user && await bcrypt.compare(credentials.password, user.password_hash)) {
             return {
               id: String(user.id),
@@ -72,10 +79,12 @@ export const authOptions: AuthOptions = {
               entityId: user.entity_id,
             };
           }
-          // Fall through to demo users if Supabase lookup fails
+          if (!isDevLogin) {
+            return null;
+          }
         }
 
-        // Fallback to demo users
+        // Allow demo users only in non-production or when explicitly enabled with ?dev=true
         const user = DEMO_USERS.find(u => u.email === credentials.email);
         if (user && await bcrypt.compare(credentials.password, user.passwordHash)) {
           return {
