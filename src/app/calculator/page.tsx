@@ -51,8 +51,6 @@ export default function CalculatorPage() {
   const [downPayment, setDownPayment] = useState(5000);
   const [creditScore, setCreditScore] = useState(700);
   const [termMonths, setTermMonths] = useState(60);
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState(false);
   const [showAmortization, setShowAmortization] = useState(false);
 
   const loanAmount = Math.max(0, vehiclePrice - downPayment);
@@ -67,12 +65,6 @@ export default function CalculatorPage() {
   };
 
   const interestRate = getInterestRate(creditScore);
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handler, { passive: true });
-    return () => window.removeEventListener('scroll', handler);
-  }, []);
 
   useEffect(() => {
     if (downPayment > vehiclePrice) {
@@ -113,38 +105,8 @@ export default function CalculatorPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
-      {/* Nav */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800 shadow-sm' : 'bg-white dark:bg-zinc-950 border-b border-gray-100 dark:border-zinc-800'}`}>
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 dark:text-zinc-100">Auto Loan Pro</Link>
-          <div className="hidden md:flex items-center gap-8 text-sm text-gray-500 dark:text-zinc-400">
-            <Link href="/how-it-works" className="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors duration-200">How It Works</Link>
-            <Link href="/calculator" className="text-gray-900 dark:text-zinc-100 font-medium">Calculator</Link>
-            <Link href="/resources" className="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors duration-200">Resources</Link>
-            <Link href="/login" className="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors duration-200">Sign In</Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200">
-              Apply Now
-            </Link>
-            <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden p-2 text-gray-500 dark:text-zinc-400 cursor-pointer">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm0 5.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" /></svg>
-            </button>
-          </div>
-        </div>
-        {mobileMenu && (
-          <div className="md:hidden border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-6 py-4 flex flex-col gap-4 text-sm">
-            <Link href="/how-it-works" className="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100" onClick={() => setMobileMenu(false)}>How It Works</Link>
-            <Link href="/calculator" className="text-gray-900 dark:text-zinc-100 font-medium" onClick={() => setMobileMenu(false)}>Calculator</Link>
-            <Link href="/resources" className="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100" onClick={() => setMobileMenu(false)}>Resources</Link>
-            <Link href="/login" className="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100" onClick={() => setMobileMenu(false)}>Sign In</Link>
-            <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-white" onClick={() => setMobileMenu(false)}>Apply Now</Link>
-          </div>
-        )}
-      </nav>
-
       {/* Hero */}
-      <section className="pt-32 pb-12 px-6">
+      <section className="pt-28 pb-12 px-6">
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-3xl mx-auto text-center">
           <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-zinc-100">
             Auto Loan Calculator
@@ -158,6 +120,9 @@ export default function CalculatorPage() {
       {/* Calculator */}
       <section className="pb-16 px-6">
         <div className="max-w-5xl mx-auto">
+          <div className="sr-only" aria-live="polite">
+            Estimated monthly payment {formatCurrencyFull(results.monthly)} at {interestRate.toFixed(2)} percent APR.
+          </div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid lg:grid-cols-5 gap-8">
             {/* Inputs */}
             <motion.div variants={fadeUp} className="lg:col-span-3 rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 shadow-sm p-8">
@@ -166,14 +131,15 @@ export default function CalculatorPage() {
               {/* Vehicle Price */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm text-gray-600 dark:text-zinc-300 font-medium">Vehicle Price</label>
+                  <label htmlFor={vehiclePriceId} className="text-sm text-gray-700 dark:text-zinc-200 font-medium">Vehicle Price</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
                     <input
+                      id={vehiclePriceId}
                       type="number"
                       value={vehiclePrice}
                       onChange={e => setVehiclePrice(Math.max(0, Math.min(200000, Number(e.target.value))))}
-                      className="w-32 pl-7 pr-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm text-right text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-32 pl-7 pr-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm text-right text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     />
                   </div>
                 </div>
@@ -186,7 +152,7 @@ export default function CalculatorPage() {
                   onChange={e => setVehiclePrice(Number(e.target.value))}
                   className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
                 />
-                <div className="flex justify-between text-[10px] text-gray-400 mt-1.5">
+                <div className="flex justify-between text-[10px] text-gray-500 mt-1.5">
                   <span>$10k</span>
                   <span>$200k</span>
                 </div>
@@ -195,14 +161,15 @@ export default function CalculatorPage() {
               {/* Down Payment */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm text-gray-600 dark:text-zinc-300 font-medium">Down Payment</label>
+                  <label htmlFor={downPaymentId} className="text-sm text-gray-700 dark:text-zinc-200 font-medium">Down Payment</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
                     <input
+                      id={downPaymentId}
                       type="number"
                       value={downPayment}
                       onChange={e => setDownPayment(Math.max(0, Math.min(vehiclePrice, Number(e.target.value))))}
-                      className="w-32 pl-7 pr-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm text-right text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-32 pl-7 pr-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm text-right text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     />
                   </div>
                 </div>
@@ -215,7 +182,7 @@ export default function CalculatorPage() {
                   onChange={e => setDownPayment(Number(e.target.value))}
                   className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
                 />
-                <div className="flex justify-between text-[10px] text-gray-400 mt-1.5">
+                <div className="flex justify-between text-[10px] text-gray-500 mt-1.5">
                   <span>$0</span>
                   <span>{vehiclePrice > 0 ? ((downPayment / vehiclePrice) * 100).toFixed(0) : 0}% down</span>
                 </div>
@@ -224,15 +191,16 @@ export default function CalculatorPage() {
               {/* Credit Score */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm text-gray-600 dark:text-zinc-300 font-medium">Credit Score</label>
+                  <label htmlFor={creditScoreId} className="text-sm text-gray-700 dark:text-zinc-200 font-medium">Credit Score</label>
                   <div className="flex items-center gap-2">
                     <input
+                      id={creditScoreId}
                       type="number"
                       value={creditScore}
                       onChange={e => setCreditScore(Math.max(300, Math.min(850, Number(e.target.value))))}
-                      className="w-20 px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm text-right text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      className="w-20 px-3 py-2 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-lg text-sm text-right text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     />
-                    <span className="text-xs text-gray-500 dark:text-zinc-400">({creditScoreLabel(creditScore)})</span>
+                    <span className="text-xs text-gray-600 dark:text-zinc-300">({creditScoreLabel(creditScore)})</span>
                   </div>
                 </div>
                 <input
@@ -244,26 +212,28 @@ export default function CalculatorPage() {
                   onChange={e => setCreditScore(Number(e.target.value))}
                   className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-blue-600"
                 />
-                <div className="flex justify-between text-[10px] text-gray-400 mt-1.5">
+                <div className="flex justify-between text-[10px] text-gray-500 mt-1.5">
                   <span>500</span>
                   <span>850</span>
                 </div>
-                <div className="mt-2 text-xs text-blue-600">Estimated APR: {interestRate.toFixed(2)}%</div>
+                <div className="mt-2 text-xs text-blue-700">Estimated APR: {interestRate.toFixed(2)}%</div>
               </div>
 
               {/* Loan Term */}
               <div>
-                <label className="text-sm text-gray-600 dark:text-zinc-300 font-medium block mb-3">Loan Term</label>
+                <div className="text-sm text-gray-700 dark:text-zinc-200 font-medium block mb-3">Loan Term</div>
                 <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                   {TERMS.map(t => (
                     <button
                       key={t}
+                      type="button"
                       onClick={() => setTermMonths(t)}
-                      className={`py-3 text-sm rounded-xl border transition-colors duration-200 cursor-pointer ${
+                      className={`py-3 text-sm rounded-xl border transition-colors duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
                         termMonths === t
                           ? 'bg-blue-600 border-blue-600 text-white font-medium'
                           : 'border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-zinc-300 hover:border-gray-300 dark:hover:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-900'
                       }`}
+                      aria-pressed={termMonths === t}
                     >
                       {t} mo
                     </button>
