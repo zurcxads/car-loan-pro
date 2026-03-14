@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { articles, getArticleBySlug, getRelatedArticles } from '@/data/articles';
 import DOMPurify from 'isomorphic-dompurify';
+import { createPageMetadata } from '@/lib/metadata';
 
 export function generateStaticParams() {
   return articles.map((article) => ({ slug: article.slug }));
@@ -15,12 +16,21 @@ export function generateMetadata({ params }: Props): Metadata {
   if (!article) return {};
 
   return {
-    title: `${article.title} | Auto Loan Pro`,
-    description: article.description,
+    ...createPageMetadata({
+      title: article.title,
+      description: article.description,
+      path: `/resources/${article.slug}`,
+      type: 'article',
+    }),
     keywords: `auto loan, car loan, ${article.category.toLowerCase()}, financing, interest rates`,
     authors: [{ name: article.author || 'Auto Loan Pro' }],
     openGraph: {
-      title: `${article.title} | Auto Loan Pro`,
+      ...createPageMetadata({
+        title: article.title,
+        description: article.description,
+        path: `/resources/${article.slug}`,
+        type: 'article',
+      }).openGraph,
       description: article.description,
       type: 'article',
       publishedTime: article.publishedAt,

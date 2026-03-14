@@ -1,11 +1,13 @@
 /* eslint-disable react/no-unescaped-entities */
 import { Shield, Lock, Eye, FileCheck, Trash2, UserCheck, Clock, AlertTriangle, Check, X } from 'lucide-react';
 import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: 'Security & Data Protection | Auto Loan Pro',
-  description: 'Learn how Auto Loan Pro protects your personal and financial information with industry-leading security practices.',
-};
+export const metadata: Metadata = createPageMetadata({
+  title: 'Security and Data Protection',
+  description: 'Learn how Auto Loan Pro protects personal and financial information with layered security and compliance controls.',
+  path: '/security',
+});
 
 export default function SecurityPage() {
   const securityFeatures = [

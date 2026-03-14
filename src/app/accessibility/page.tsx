@@ -1,11 +1,13 @@
 /* eslint-disable react/no-unescaped-entities */
 import { CheckCircle, AlertCircle, Mail } from 'lucide-react';
 import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: 'Accessibility Statement | Auto Loan Pro',
-  description: 'Our commitment to making Auto Loan Pro accessible to everyone, including people with disabilities.',
-};
+export const metadata: Metadata = createPageMetadata({
+  title: 'Accessibility Statement',
+  description: 'Read Auto Loan Pro accessibility commitments, standards, and support options for users with disabilities.',
+  path: '/accessibility',
+});
 
 export default function AccessibilityPage() {
   return (

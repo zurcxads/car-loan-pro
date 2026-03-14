@@ -2,11 +2,13 @@
 import { Database, Eye, Share2, Clock, UserX, FileText } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: 'Privacy Summary (Plain English) | Auto Loan Pro',
-  description: 'A clear, human-readable explanation of how Auto Loan Pro collects, uses, and protects your personal information.',
-};
+export const metadata: Metadata = createPageMetadata({
+  title: 'Privacy Summary',
+  description: 'Read a plain-English summary of how Auto Loan Pro collects, uses, shares, and protects personal information.',
+  path: '/privacy-summary',
+});
 
 export default function PrivacySummaryPage() {
   const sections = [

@@ -2,16 +2,13 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import { articles } from '@/data/articles';
+import { createPageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: 'Auto Loan Resources | Auto Loan Pro',
-  description: 'Everything you need to know about getting the best auto loan. Guides on prequalification, credit scores, dealer financing, and more.',
-  openGraph: {
-    title: 'Auto Loan Resources | Auto Loan Pro',
-    description: 'Everything you need to know about getting the best auto loan. Guides on prequalification, credit scores, dealer financing, and more.',
-    type: 'website',
-  },
-};
+export const metadata: Metadata = createPageMetadata({
+  title: 'Auto Loan Resources',
+  description: 'Explore guides on prequalification, credit scores, dealer financing, and other topics that help borrowers make smarter auto loan decisions.',
+  path: '/resources',
+});
 
 export default function ResourcesPage() {
   return (
