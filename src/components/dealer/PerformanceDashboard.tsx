@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import KPICard from '@/components/shared/KPICard';
 
 const weeklyFunded = [
@@ -25,9 +24,80 @@ const funnelData = [
   { stage: 'Funded', count: 8, pct: 20 },
 ];
 
-const tooltipStyle = {
-  contentStyle: { backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '12px', fontSize: '12px' },
-};
+function SimpleBarChart({ data, dataKey, labelKey }: { data: { [key: string]: string | number }[]; dataKey: string; labelKey: string }) {
+  const maxVal = Math.max(...data.map(d => Number(d[dataKey])));
+  const chartH = 180;
+  const barW = 40;
+  const gap = 20;
+  const totalW = data.length * (barW + gap) - gap;
+
+  return (
+    <svg viewBox={`0 0 ${totalW + 40} ${chartH + 30}`} className="w-full h-56">
+      {data.map((d, i) => {
+        const val = Number(d[dataKey]);
+        const barH = maxVal > 0 ? (val / maxVal) * chartH : 0;
+        const x = 20 + i * (barW + gap);
+        const y = chartH - barH;
+        return (
+          <g key={i}>
+            <rect x={x} y={y} width={barW} height={barH} rx={4} fill="#3B82F6" />
+            <text x={x + barW / 2} y={chartH + 18} textAnchor="middle" className="text-[11px] fill-gray-500">{String(d[labelKey])}</text>
+            <text x={x + barW / 2} y={y - 6} textAnchor="middle" className="text-[11px] fill-gray-700 font-medium">{val}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function SimpleDonutChart({ data }: { data: { name: string; value: number; color: string }[] }) {
+  const total = data.reduce((sum, d) => sum + d.value, 0);
+  const cx = 100;
+  const cy = 100;
+  const outerR = 85;
+  const innerR = 55;
+  let cumAngle = -Math.PI / 2;
+
+  const arcs = data.map((d) => {
+    const angle = (d.value / total) * 2 * Math.PI;
+    const startAngle = cumAngle;
+    cumAngle += angle;
+    const endAngle = cumAngle;
+
+    const x1 = cx + outerR * Math.cos(startAngle);
+    const y1 = cy + outerR * Math.sin(startAngle);
+    const x2 = cx + outerR * Math.cos(endAngle);
+    const y2 = cy + outerR * Math.sin(endAngle);
+    const x3 = cx + innerR * Math.cos(endAngle);
+    const y3 = cy + innerR * Math.sin(endAngle);
+    const x4 = cx + innerR * Math.cos(startAngle);
+    const y4 = cy + innerR * Math.sin(startAngle);
+
+    const largeArc = angle > Math.PI ? 1 : 0;
+
+    const path = `M ${x1} ${y1} A ${outerR} ${outerR} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${innerR} ${innerR} 0 ${largeArc} 0 ${x4} ${y4} Z`;
+
+    return { ...d, path, pct: Math.round((d.value / total) * 100) };
+  });
+
+  return (
+    <div className="flex items-center gap-6">
+      <svg viewBox="0 0 200 200" className="w-44 h-44 flex-shrink-0">
+        {arcs.map((arc, i) => (
+          <path key={i} d={arc.path} fill={arc.color} />
+        ))}
+      </svg>
+      <div className="space-y-2 text-sm">
+        {arcs.map((arc, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: arc.color }} />
+            <span className="text-gray-700">{arc.name} {arc.pct}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function PerformanceDashboard() {
   const [range, setRange] = useState('month');
@@ -75,32 +145,13 @@ export default function PerformanceDashboard() {
         {/* Bar chart */}
         <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-6">Funded Deals by Week</h3>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyFunded}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.06)" />
-                <XAxis dataKey="week" tick={{ fill: '#6B7280', fontSize: 11 }} axisLine={false} />
-                <YAxis tick={{ fill: '#6B7280', fontSize: 11 }} axisLine={false} />
-                <Tooltip {...tooltipStyle} />
-                <Bar dataKey="deals" fill="#3B82F6" name="Funded" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <SimpleBarChart data={weeklyFunded} dataKey="deals" labelKey="week" />
         </div>
 
         {/* Donut chart */}
         <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-6">Funding by Lender</h3>
-          <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={lenderBreakdown} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={4} dataKey="value" label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}>
-                  {lenderBreakdown.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                </Pie>
-                <Tooltip {...tooltipStyle} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+          <SimpleDonutChart data={lenderBreakdown} />
         </div>
       </div>
     </div>
