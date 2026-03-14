@@ -5,7 +5,7 @@ import { dbGetApplications, dbCreateApplication } from '@/lib/db';
 import { generateCreditProfile } from '@/lib/store';
 import { matchLendersAndGenerateOffers } from '@/lib/lender-engine';
 import type { MockApplication } from '@/lib/mock-data';
-import { createClient } from '@/lib/supabase/server';
+import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { applicationReceivedEmail, sendEmail } from '@/lib/email-templates';
 import { CONSUMER_SESSION_COOKIE, getConsumerSessionCookieOptions } from '@/lib/consumer-session';
 
@@ -134,38 +134,44 @@ export async function POST(req: NextRequest) {
     const app = await dbCreateApplication(appData);
     if (!app) return apiError('Failed to create application', 500);
 
-    // Silent account creation: create Supabase auth user with consumer's email
-    const supabase = await createClient();
     let userId: string | null = null;
 
-    try {
-      // Check if user already exists
-      const { data: existingUsers } = await supabase.auth.admin.listUsers();
-      const existingUser = existingUsers?.users?.find(u => u.email === data.personalInfo.email);
+    // Silent account creation is optional. Skip it unless Supabase admin access
+    // is fully configured so submissions do not fail in mock/local environments.
+    if (isSupabaseConfigured() && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const supabase = getServiceClient();
+        const { data: existingUsers, error: listUsersError } = await supabase.auth.admin.listUsers();
 
-      if (existingUser) {
-        userId = existingUser.id;
-      } else {
-        // Create new user with auto-generated password they'll never use
-        const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
-          email: data.personalInfo.email,
-          email_confirm: true,
-          user_metadata: {
-            role: 'consumer',
-            full_name: `${data.personalInfo.firstName} ${data.personalInfo.lastName}`,
-            application_id: app.id,
-          },
-        });
+        if (listUsersError) {
+          console.error('Failed to list Supabase users:', listUsersError);
+        } else {
+          const existingUser = existingUsers.users.find(u => u.email === data.personalInfo.email);
 
-        if (signUpError) {
-          console.error('Failed to create Supabase user:', signUpError);
-        } else if (newUser?.user) {
-          userId = newUser.user.id;
+          if (existingUser) {
+            userId = existingUser.id;
+          } else {
+            const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
+              email: data.personalInfo.email,
+              email_confirm: true,
+              user_metadata: {
+                role: 'consumer',
+                full_name: `${data.personalInfo.firstName} ${data.personalInfo.lastName}`,
+                application_id: app.id,
+              },
+            });
+
+            if (signUpError) {
+              console.error('Failed to create Supabase user:', signUpError);
+            } else if (newUser?.user) {
+              userId = newUser.user.id;
+            }
+          }
         }
+      } catch (err) {
+        console.error('Supabase user creation error:', err);
+        // Continue anyway - user can still access via session token
       }
-    } catch (err) {
-      console.error('Supabase user creation error:', err);
-      // Continue anyway - user can still access via session token
     }
 
     // Send application received email
