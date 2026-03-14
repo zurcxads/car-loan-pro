@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { US_STATES, POPULAR_MAKES } from '@/lib/constants';
-import { apiPost } from '@/lib/hooks';
+import { apiPost } from '@/lib/api-client';
 import type {
   BorrowerPersonalInfo, AddressInfo, EmploymentInfo, VehicleInfo,
   DealStructure, ConsentInfo, ApplicationType, VehicleCondition,
