@@ -399,10 +399,10 @@ function ResultsContent() {
         return;
       }
 
-      // Reveal lender and redirect to dashboard with pre-approval letter
+      // Use the refreshed consumer-session cookie for dashboard access.
       toast.success(`Pre-approved with ${data.data?.lenderName || 'your lender'}!`);
       setTimeout(() => {
-        router.push(data.data?.redirectTo || '/dashboard');
+        router.push('/dashboard');
       }, 1500);
     } catch {
       toast.error('Failed to select offer');

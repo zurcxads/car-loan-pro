@@ -102,7 +102,6 @@ export async function handleOfferSelection(req: NextRequest) {
         offerId: offer.id,
         selectedTerm: data.selectedTerm,
         selectedDownPayment: data.selectedDownPayment,
-        redirectTo: '/dashboard',
       },
     });
 
