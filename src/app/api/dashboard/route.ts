@@ -1,6 +1,5 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError } from '@/lib/api-helpers';
-import { dbGetOffersByApplication } from '@/lib/db';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { MOCK_APPLICATIONS } from '@/lib/mock-data';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
@@ -15,15 +14,10 @@ export async function GET(request: NextRequest) {
 
   try {
     if (!isSupabaseConfigured()) {
-      // Fallback to mock data - find by session token
-      const app = MOCK_APPLICATIONS.find(a => (a as unknown as { sessionToken?: string }).sessionToken === token);
-
+      const app = MOCK_APPLICATIONS.find((application) => (application as unknown as { sessionToken?: string }).sessionToken === token);
       if (!app) {
         return apiError('Session expired or invalid', 401);
       }
-
-      const selectedOffer = await dbGetOffersByApplication(app.id)
-        .then((offers) => offers.find((offer) => offer.status === 'selected') || null);
 
       return apiSuccess({
         application: {
@@ -35,40 +29,53 @@ export async function GET(request: NextRequest) {
           vehicle: app.vehicle,
           offersReceived: app.offersReceived || 0,
           submittedAt: app.submittedAt,
-          selectedOffer,
-        }
+          selectedOffer: null,
+        },
       });
     }
 
-    // Query application by session token using service role client
     const supabase = getServiceClient();
-    const { data, error } = await supabase
+    const { data: application, error: applicationError } = await supabase
       .from('applications')
       .select('*')
       .eq('session_token', token)
       .gt('session_expires_at', new Date().toISOString())
       .single();
 
-    if (error || !data) {
+    if (applicationError || !application) {
       return apiError('Session expired or invalid', 401);
     }
 
-    // Return application data for dashboard
-    const selectedOffer = await dbGetOffersByApplication(data.id)
-      .then((offers) => offers.find((offer) => offer.status === 'selected') || null);
+    const { data: selectedOffer, error: offerError } = await supabase
+      .from('offers')
+      .select('*')
+      .eq('application_id', application.id)
+      .eq('status', 'selected')
+      .maybeSingle();
+
+    if (offerError) {
+      return apiError('Failed to load dashboard', 500);
+    }
 
     return apiSuccess({
       application: {
-        id: data.id,
-        status: data.status,
-        borrower: data.borrower,
-        loanAmount: data.loan_amount,
-        hasVehicle: data.has_vehicle ?? false,
-        vehicle: data.vehicle,
-        offersReceived: data.offers_received || 0,
-        submittedAt: data.submitted_at,
-        selectedOffer,
-      }
+        id: application.id,
+        status: application.status,
+        borrower: application.borrower,
+        loanAmount: application.loan_amount,
+        hasVehicle: application.has_vehicle ?? false,
+        vehicle: application.vehicle,
+        offersReceived: application.offers_received || 0,
+        submittedAt: application.submitted_at,
+        selectedOffer: selectedOffer
+          ? {
+              id: selectedOffer.id,
+              lenderName: selectedOffer.lender_name,
+              apr: Number(selectedOffer.apr || 0),
+              approvedAmount: Number(selectedOffer.approved_amount || 0),
+            }
+          : null,
+      },
     });
   } catch (err) {
     console.error('Dashboard API error:', err);

@@ -127,6 +127,18 @@ CREATE TABLE IF NOT EXISTS deals (
   events JSONB DEFAULT '[]'
 );
 
+CREATE TABLE IF NOT EXISTS application_lender_links (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  application_id TEXT NOT NULL UNIQUE REFERENCES applications(id) ON DELETE CASCADE,
+  lender_id TEXT NOT NULL REFERENCES lenders(id),
+  offer_id TEXT NOT NULL REFERENCES offers(id),
+  consumer_email TEXT NOT NULL,
+  selected_term_months INT,
+  selected_down_payment NUMERIC DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
 -- Activity events
 CREATE TABLE IF NOT EXISTS activity_events (
   id TEXT PRIMARY KEY DEFAULT ('EVT-' || lpad(nextval('evt_seq')::TEXT, 3, '0')),
@@ -175,6 +187,8 @@ CREATE INDEX IF NOT EXISTS idx_applications_state ON applications(state);
 CREATE INDEX IF NOT EXISTS idx_offers_application_id ON offers(application_id);
 CREATE INDEX IF NOT EXISTS idx_deals_dealer_id ON deals(dealer_id);
 CREATE INDEX IF NOT EXISTS idx_deals_application_id ON deals(application_id);
+CREATE INDEX IF NOT EXISTS idx_application_lender_links_lender_id ON application_lender_links(lender_id);
+CREATE INDEX IF NOT EXISTS idx_application_lender_links_consumer_email ON application_lender_links(consumer_email);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(read);
 CREATE INDEX IF NOT EXISTS idx_verification_codes_lookup ON verification_codes(channel, recipient, created_at DESC);
@@ -184,6 +198,7 @@ CREATE INDEX IF NOT EXISTS idx_verification_codes_expires_at ON verification_cod
 ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE offers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE deals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE application_lender_links ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE lenders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dealers ENABLE ROW LEVEL SECURITY;
@@ -194,6 +209,7 @@ ALTER TABLE verification_codes ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Service role full access" ON applications FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access" ON offers FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access" ON deals FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access" ON application_lender_links FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access" ON users FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access" ON lenders FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access" ON dealers FOR ALL USING (true) WITH CHECK (true);
