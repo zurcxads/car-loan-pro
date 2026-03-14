@@ -195,12 +195,12 @@ function ResultsContent() {
     fetch(`/api/results?token=${token}`)
       .then(res => res.json())
       .then(data => {
-        if (data.error) {
-          toast.error(data.error);
+        if (!data.success) {
+          toast.error(data.error || 'Failed to load offers');
           router.push('/apply');
         } else {
-          setOffers(data.offers || []);
-          setDownPayment(data.suggestedDownPayment || 0);
+          setOffers(data.data?.offers || []);
+          setDownPayment(data.data?.suggestedDownPayment || 0);
           setLoading(false);
           setShowConfetti(true);
           setTimeout(() => setShowConfetti(false), 4000);
@@ -332,14 +332,14 @@ function ResultsContent() {
 
       const data = await res.json();
 
-      if (data.error) {
-        toast.error(data.error);
+      if (!data.success) {
+        toast.error(data.error || 'Failed to select offer');
         setCalculating(false);
         return;
       }
 
       // Reveal lender and redirect to dashboard with pre-approval letter
-      toast.success(`Pre-approved with ${data.lenderName}!`);
+      toast.success(`Pre-approved with ${data.data?.lenderName || 'your lender'}!`);
       setTimeout(() => {
         router.push(`/dashboard?token=${token}`);
       }, 1500);
