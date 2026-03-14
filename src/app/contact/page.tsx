@@ -57,6 +57,9 @@ export default function ContactPage() {
   const [subject, setSubject] = useState('General');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
+  const [submitError, setSubmitError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
@@ -67,10 +70,37 @@ export default function ContactPage() {
     return () => window.removeEventListener('scroll', handler);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // UI only for now — no backend
-    setSubmitted(true);
+    setSubmitting(true);
+    setSubmitError('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, subject, message }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok || !payload.success) {
+        throw new Error(payload.error || 'Failed to send your message.');
+      }
+
+      setSubmitMessage(payload.data?.message || 'Your message has been sent successfully.');
+      setSubmitted(true);
+      setName('');
+      setEmail('');
+      setSubject('General');
+      setMessage('');
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to send your message.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -151,7 +181,7 @@ export default function ContactPage() {
                 </svg>
               </div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Message Sent</h2>
-              <p className="text-sm text-gray-500">We&apos;ll get back to you within 24 hours.</p>
+              <p className="text-sm text-gray-500">{submitMessage}</p>
             </motion.div>
           ) : (
             <motion.form variants={fadeUp} onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8 space-y-5">
@@ -203,8 +233,17 @@ export default function ContactPage() {
                   placeholder="How can we help?"
                 />
               </div>
-              <button type="submit" className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer active:scale-[0.98] transition-transform">
-                Send Message
+              {submitError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {submitError}
+                </div>
+              )}
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors duration-200 cursor-pointer active:scale-[0.98] transition-transform"
+              >
+                {submitting ? 'Sending...' : 'Send Message'}
               </button>
             </motion.form>
           )}
