@@ -157,8 +157,8 @@ export default function SecurityPage() {
                 <li>We will confirm your identity and process your request within 30 days</li>
                 <li>You will receive confirmation once your data has been deleted</li>
               </ol>
-              <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                <p className="text-xs text-amber-900">
+              <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/40">
+                <p className="text-xs text-blue-900 dark:text-blue-100">
                   <strong>Note:</strong> Some data may be retained for legal compliance (e.g., FCRA requires 7-year retention of credit inquiries). We will inform you of any data that cannot be deleted and why.
                 </p>
               </div>

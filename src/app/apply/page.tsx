@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { Check } from 'lucide-react';
 import { US_STATES, POPULAR_MAKES } from '@/lib/constants';
 import { apiPost } from '@/lib/api-client';
 import type {
@@ -82,10 +83,8 @@ function FloatingLabelInput({ label, value, onChange, placeholder, type = 'text'
       )}
       {isValid && hasValue && !error && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-            </svg>
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
+            <Check className="h-3 w-3 text-white" />
           </motion.div>
         </div>
       )}
@@ -102,10 +101,8 @@ function Input({ value, onChange, placeholder, type = 'text', error, maxLength, 
         className={`w-full px-4 py-3.5 min-h-[44px] bg-gray-50 dark:bg-zinc-800 border ${error ? 'border-red-400' : 'border-gray-200 dark:border-zinc-700'} rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200`} />
       {isValid && value && !error && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
-            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-            </svg>
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
+            <Check className="h-3 w-3 text-white" />
           </motion.div>
         </div>
       )}

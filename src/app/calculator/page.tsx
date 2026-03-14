@@ -350,7 +350,7 @@ export default function CalculatorPage() {
                 </div>
                 {savings > 0 && (
                   <div className="mt-6 pt-4 border-t border-blue-200">
-                    <div className="text-green-600 font-semibold text-lg">You save {formatCurrency(savings)}</div>
+                    <div className="text-lg font-semibold text-blue-600">You save {formatCurrency(savings)}</div>
                     <div className="text-xs text-gray-500 dark:text-zinc-400">over the life of the loan</div>
                   </div>
                 )}
@@ -396,7 +396,7 @@ export default function CalculatorPage() {
                           <tr key={row.month} className={idx % 2 === 0 ? 'bg-white dark:bg-zinc-900/50' : 'bg-gray-50 dark:bg-zinc-900'}>
                             <td className="px-4 py-3 text-gray-900 dark:text-zinc-100">{row.month}</td>
                             <td className="px-4 py-3 text-right text-gray-900 dark:text-zinc-100">{formatCurrencyFull(row.payment)}</td>
-                            <td className="px-4 py-3 text-right text-green-600">{formatCurrencyFull(row.principal)}</td>
+                            <td className="px-4 py-3 text-right text-blue-600">{formatCurrencyFull(row.principal)}</td>
                             <td className="px-4 py-3 text-right text-red-500">{formatCurrencyFull(row.interest)}</td>
                             <td className="px-4 py-3 text-right text-gray-900 dark:text-zinc-100">{formatCurrency(row.balance)}</td>
                           </tr>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Zap, Building, CheckCircle } from 'lucide-react';
+import { Lock, Zap, Building, CheckCircle, Check, X } from 'lucide-react';
 import Footer from '@/components/shared/Footer';
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
@@ -36,9 +36,9 @@ const steps = [
 ];
 
 const tiers = [
-  { name: 'Prime', range: '700+', rate: '3.49 - 5.99%', color: 'bg-green-500' },
+  { name: 'Prime', range: '700+', rate: '3.49 - 5.99%', color: 'bg-blue-500' },
   { name: 'Near-Prime', range: '620 - 699', rate: '5.99 - 8.49%', color: 'bg-blue-500' },
-  { name: 'Subprime', range: '520 - 619', rate: '8.99 - 14.99%', color: 'bg-amber-500' },
+  { name: 'Subprime', range: '520 - 619', rate: '8.99 - 14.99%', color: 'bg-blue-400' },
   { name: 'Specialty', range: 'All scores', rate: '6.99 - 12.99%', color: 'bg-gray-400' },
 ];
 
@@ -276,15 +276,15 @@ export default function LandingPage() {
               </motion.p>
               <motion.div variants={fadeUp} className="flex flex-wrap gap-6 text-sm">
                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  <Check className="h-5 w-5 text-blue-500" />
                   No dealer visits
                 </div>
                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  <Check className="h-5 w-5 text-blue-500" />
                   Soft credit pull only
                 </div>
                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                  <Check className="h-5 w-5 text-blue-500" />
                   Free for consumers
                 </div>
               </motion.div>
@@ -403,31 +403,31 @@ export default function LandingPage() {
               <div className="space-y-4 mb-6">
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    <X className="h-3 w-3 text-red-600" />
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Drive to 3-5 dealerships (10-20 hours)</div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    <X className="h-3 w-3 text-red-600" />
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Visit bank or credit union (2-4 hours + wait days for appointment)</div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    <X className="h-3 w-3 text-red-600" />
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Apply at multiple lenders (1-2 hours each)</div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    <X className="h-3 w-3 text-red-600" />
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Multiple hard credit pulls (damages your score)</div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    <X className="h-3 w-3 text-red-600" />
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">Dealer F&I office negotiation (2-4 hours)</div>
                 </div>
@@ -442,32 +442,32 @@ export default function LandingPage() {
               <div className="text-xs text-blue-600 dark:text-blue-400 mb-3 uppercase tracking-wider font-medium">Auto Loan Pro</div>
               <div className="space-y-4 mb-6">
                 <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="h-3 w-3 text-blue-600" />
                   </div>
                   <div className="text-sm text-gray-900 dark:text-gray-100 font-medium">2-minute application from your couch</div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="h-3 w-3 text-blue-600" />
                   </div>
                   <div className="text-sm text-gray-900 dark:text-gray-100 font-medium">Instant offers from multiple lenders</div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="h-3 w-3 text-blue-600" />
                   </div>
                   <div className="text-sm text-gray-900 dark:text-gray-100 font-medium">One soft pull (no credit impact)</div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="h-3 w-3 text-blue-600" />
                   </div>
                   <div className="text-sm text-gray-900 dark:text-gray-100 font-medium">Pre-approved before visiting ANY dealer</div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                  <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="h-3 w-3 text-blue-600" />
                   </div>
                   <div className="text-sm text-gray-900 dark:text-gray-100 font-medium">Walk in with financing locked in</div>
                 </div>
@@ -544,7 +544,7 @@ export default function LandingPage() {
               <div className="text-5xl font-bold text-blue-600">4.1%</div>
               <div className="text-xs text-gray-400 mt-3">On a $30,000 / 60-month loan</div>
               <div className="text-xl font-semibold mt-4 text-gray-900">$554/mo</div>
-              <div className="text-xs text-green-600 mt-2 font-medium">Save $3,180 over the life of the loan</div>
+              <div className="mt-2 text-xs font-medium text-blue-600">Save $3,180 over the life of the loan</div>
             </motion.div>
           </motion.div>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-xs text-gray-400 mt-8">

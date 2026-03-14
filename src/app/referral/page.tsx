@@ -189,9 +189,9 @@ export default function ReferralPage() {
               <div className="text-sm text-blue-600 font-medium mb-1">Total Referrals</div>
               <div className="text-3xl font-bold text-blue-600">0</div>
             </div>
-            <div className="p-6 rounded-xl bg-green-50 dark:bg-zinc-900/50 border border-green-200 dark:border-zinc-800">
-              <div className="text-sm text-green-600 font-medium mb-1">Approved</div>
-              <div className="text-3xl font-bold text-green-600">0</div>
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-6 dark:border-blue-900 dark:bg-blue-950/40">
+              <div className="mb-1 text-sm font-medium text-blue-600">Approved</div>
+              <div className="text-3xl font-bold text-blue-600">0</div>
             </div>
             <div className="p-6 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900">
               <div className="text-sm text-blue-600 font-medium mb-1">Earnings</div>

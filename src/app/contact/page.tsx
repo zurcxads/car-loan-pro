@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { Check } from 'lucide-react';
 import Footer from '@/components/shared/Footer';
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
@@ -174,11 +175,9 @@ export default function ContactPage() {
           </motion.div>
 
           {submitted ? (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="rounded-2xl border border-green-200 dark:border-zinc-800 bg-green-50 dark:bg-zinc-900/50 p-10 text-center">
-              <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="rounded-2xl border border-blue-200 dark:border-zinc-800 bg-blue-50 dark:bg-zinc-900/50 p-10 text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950/40">
+                <Check className="h-7 w-7 text-blue-600 dark:text-blue-300" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-zinc-100 mb-2">Message Sent</h2>
               <p className="text-sm text-gray-500 dark:text-zinc-400">{submitMessage}</p>
@@ -308,27 +307,19 @@ export default function ContactPage() {
             </p>
             <ul className="space-y-2 mb-6">
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-zinc-300">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-300" />
                 Pre-qualified, high-intent applicants
               </li>
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-zinc-300">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-300" />
                 API integration for seamless decisioning
               </li>
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-zinc-300">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-300" />
                 Flexible underwriting criteria
               </li>
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-zinc-300">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-300" />
                 Real-time application delivery
               </li>
             </ul>
@@ -350,27 +341,19 @@ export default function ContactPage() {
             </p>
             <ul className="space-y-2 mb-6">
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-zinc-300">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-300" />
                 Pre-approved, ready-to-buy customers
               </li>
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-zinc-300">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-300" />
                 Faster deal closures
               </li>
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-zinc-300">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-300" />
                 No cost to list or participate
               </li>
               <li className="flex items-start gap-2 text-sm text-gray-600 dark:text-zinc-300">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-300" />
                 Lead management dashboard
               </li>
             </ul>
