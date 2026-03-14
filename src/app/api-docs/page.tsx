@@ -33,8 +33,7 @@ const endpoints: { category: string; endpoints: ApiEndpoint[] }[] = [
         response: `{
   "success": true,
   "data": {
-    "id": "APP-001",
-    "sessionToken": "uuid-token"
+    "id": "APP-001"
   }
 }`,
       },

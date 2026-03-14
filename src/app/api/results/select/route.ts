@@ -2,9 +2,10 @@ import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, parseBody } from '@/lib/api-helpers';
 import { dbGetApplicationByToken, dbGetOffer, dbUpdateOffer, dbUpdateApplication } from '@/lib/db';
 import { z } from 'zod';
+import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 
 const selectOfferSchema = z.object({
-  token: z.string(),
+  token: z.string().optional(),
   offerId: z.string(),
   selectedTerm: z.number(),
   selectedDownPayment: z.number(),
@@ -17,7 +18,12 @@ export async function POST(req: NextRequest) {
   if (!data) return apiError('Invalid data');
 
   try {
-    const application = await dbGetApplicationByToken(data.token);
+    const token = req.cookies.get(CONSUMER_SESSION_COOKIE)?.value || data.token;
+    if (!token) {
+      return apiError('Missing session token', 401);
+    }
+
+    const application = await dbGetApplicationByToken(token);
     if (!application) {
       return apiError('Invalid or expired token', 401);
     }

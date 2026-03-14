@@ -387,11 +387,11 @@ export default function ApplyPage() {
     }
 
     if (data) {
-      const appData = data as { id: string; sessionToken: string };
+      const appData = data as { id: string };
       localStorage.setItem('clp_current_app_id', appData.id);
 
       toast.success('Application submitted! Finding your best rates...');
-      setTimeout(() => router.push(`/results?token=${appData.sessionToken}`), 2500);
+      setTimeout(() => router.push('/results'), 2500);
     }
   };
 

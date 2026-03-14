@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { CreditCard, DollarSign, ShieldCheck, Home } from 'lucide-react';
@@ -24,9 +24,7 @@ const DOCUMENT_TYPES = [
 ];
 
 function DocumentsContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get('token');
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -35,13 +33,8 @@ function DocumentsContent() {
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      router.push('/apply');
-      return;
-    }
-
     // Fetch user and documents
-    fetch(`/api/dashboard?token=${token}`)
+    fetch('/api/dashboard')
       .then(res => res.json())
       .then(data => {
         if (data.error || !data.application) {
@@ -61,7 +54,7 @@ function DocumentsContent() {
       .catch(() => {
         setLoading(false);
       });
-  }, [token, router]);
+  }, [router]);
 
   const handleFileSelect = async (type: string, file: File | null) => {
     if (!file || !userId) return;
@@ -139,10 +132,10 @@ function DocumentsContent() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href={`/dashboard?token=${token}`} className="text-lg font-semibold tracking-tight text-gray-900">
+          <Link href="/dashboard" className="text-lg font-semibold tracking-tight text-gray-900">
             Auto Loan Pro
           </Link>
-          <Link href={`/dashboard?token=${token}`} className="text-sm text-gray-500 hover:text-gray-900">
+          <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900">
             ← Back to Dashboard
           </Link>
         </div>

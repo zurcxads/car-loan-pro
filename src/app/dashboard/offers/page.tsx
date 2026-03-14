@@ -2,16 +2,14 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import OfferSelectionModal from '@/components/offers/OfferSelectionModal';
 import { MockOffer } from '@/lib/mock-data';
 
 function OffersContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get('token');
   const [offers, setOffers] = useState<MockOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<MockOffer | null>(null);
@@ -19,10 +17,8 @@ function OffersContent() {
   const [isSelecting, setIsSelecting] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
-
     // First, get application ID from dashboard API
-    fetch(`/api/dashboard?token=${token}`)
+    fetch('/api/dashboard')
       .then(res => res.json())
       .then(data => {
         if (data.application) {
@@ -40,7 +36,7 @@ function OffersContent() {
       .catch(() => {
         setLoading(false);
       });
-  }, [token]);
+  }, []);
 
   const handleSelectOffer = (offer: MockOffer) => {
     setSelectedOffer(offer);
@@ -65,7 +61,7 @@ function OffersContent() {
 
         // Redirect to approval letter page
         setTimeout(() => {
-          router.push(`/dashboard/approval-letter?token=${token}`);
+          router.push('/dashboard/approval-letter');
         }, 500);
       } else {
         toast.error(data.error || 'Failed to select offer');
@@ -93,7 +89,7 @@ function OffersContent() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href={`/dashboard?token=${token}`} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
+          <Link href="/dashboard" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>

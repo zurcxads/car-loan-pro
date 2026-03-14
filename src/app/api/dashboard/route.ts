@@ -2,10 +2,11 @@ import { NextRequest } from 'next/server';
 import { apiSuccess, apiError } from '@/lib/api-helpers';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { MOCK_APPLICATIONS } from '@/lib/mock-data';
+import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const token = searchParams.get('token');
+  const token = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value || searchParams.get('token');
 
   if (!token) {
     return apiError('Missing session token', 401);

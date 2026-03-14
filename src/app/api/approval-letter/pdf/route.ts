@@ -3,13 +3,14 @@ import { renderToStream } from '@react-pdf/renderer';
 import QRCode from 'qrcode';
 import { createApprovalLetterPDF } from '@/lib/pdf-template';
 import { ApprovalLetterData } from '@/lib/approval-letter';
+import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const token = searchParams.get('token');
+    const token = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value || searchParams.get('token');
     const isDev = searchParams.get('dev') === 'true';
 
     let letterData: ApprovalLetterData;

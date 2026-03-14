@@ -1,13 +1,15 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError } from '@/lib/api-helpers';
 import { dbGetApplicationByToken, dbGetOffersByApplication } from '@/lib/db';
+import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 
-// GET /api/results?token=XXX — get anonymized offers for results page
+// GET /api/results — get anonymized offers for results page
 export async function GET(req: NextRequest) {
-  const token = req.nextUrl.searchParams.get('token');
+  const token = req.cookies.get(CONSUMER_SESSION_COOKIE)?.value
+    || req.nextUrl.searchParams.get('token');
 
   if (!token) {
-    return apiError('Token required', 400);
+    return apiError('Token required', 401);
   }
 
   try {

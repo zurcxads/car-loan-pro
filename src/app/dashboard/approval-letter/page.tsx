@@ -9,7 +9,6 @@ import { useQRCode } from '@/hooks/useQRCode';
 
 function ApprovalLetterContent() {
   const searchParams = useSearchParams();
-  const token = searchParams.get('token');
   const isDev = searchParams.get('dev') === 'true';
   const [letterData, setLetterData] = useState<ApprovalLetterData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,10 +41,8 @@ function ApprovalLetterContent() {
       return;
     }
 
-    if (!token) return;
-
     // Fetch application and selected offer data
-    fetch(`/api/dashboard?token=${token}`)
+    fetch('/api/dashboard')
       .then(res => res.json())
       .then(data => {
         if (data.application) {
@@ -80,7 +77,7 @@ function ApprovalLetterContent() {
       .finally(() => {
         setLoading(false);
       });
-  }, [token, isDev]);
+  }, [isDev]);
 
   const verifyUrl = letterData ? `https://autoloanpro.co/verify/${letterData.approvalCode}` : '';
   const { qrCodeUrl } = useQRCode(verifyUrl);
@@ -89,7 +86,7 @@ function ApprovalLetterContent() {
     try {
       const url = isDev
         ? '/api/approval-letter/pdf?dev=true'
-        : `/api/approval-letter/pdf?token=${token}`;
+        : '/api/approval-letter/pdf';
 
       const response = await fetch(url);
       if (!response.ok) throw new Error('Failed to generate PDF');
@@ -136,7 +133,7 @@ function ApprovalLetterContent() {
           <h2 className="text-xl font-semibold text-gray-900 mb-2">No Approval Letter Found</h2>
           <p className="text-gray-500 mb-4">Please select an offer first.</p>
           <Link
-            href={`/dashboard/offers?token=${token}`}
+            href="/dashboard/offers"
             className="text-blue-600 hover:text-blue-500 text-sm font-medium"
           >
             View Offers
@@ -164,7 +161,7 @@ function ApprovalLetterContent() {
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <Link
-              href={isDev ? '/dashboard?dev=true' : `/dashboard?token=${token}`}
+              href={isDev ? '/dashboard?dev=true' : '/dashboard'}
               className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

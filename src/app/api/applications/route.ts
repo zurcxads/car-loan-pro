@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
 import { applicationSubmitSchema } from '@/lib/validations';
 import { dbGetApplications, dbCreateApplication } from '@/lib/db';
@@ -7,6 +7,7 @@ import { matchLendersAndGenerateOffers } from '@/lib/lender-engine';
 import type { MockApplication } from '@/lib/mock-data';
 import { createClient } from '@/lib/supabase/server';
 import { applicationReceivedEmail, sendEmail } from '@/lib/email-templates';
+import { CONSUMER_SESSION_COOKIE, getConsumerSessionCookieOptions } from '@/lib/consumer-session';
 
 // GET /api/applications — list all applications
 export async function GET(req: NextRequest) {
@@ -183,11 +184,24 @@ export async function POST(req: NextRequest) {
       console.error('Lender matching failed:', err);
     });
 
-    return apiSuccess({
+    const response = NextResponse.json({
+      success: true,
+      data: {
       id: app.id,
-      sessionToken: (app as MockApplication & { sessionToken?: string }).sessionToken,
       userId,
-    }, 201);
+      },
+    }, { status: 201 });
+
+    const sessionToken = (app as MockApplication & { sessionToken?: string }).sessionToken;
+    if (sessionToken) {
+      response.cookies.set(
+        CONSUMER_SESSION_COOKIE,
+        sessionToken,
+        getConsumerSessionCookieOptions()
+      );
+    }
+
+    return response;
   } catch (err) {
     console.error('Application creation error:', err);
     return apiError('Failed to create application', 500);

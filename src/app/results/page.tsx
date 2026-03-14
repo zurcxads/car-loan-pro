@@ -98,7 +98,6 @@ function Tooltip({ content }: { content: string }) {
 function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get('token');
 
   const [offers, setOffers] = useState<AnonymizedOffer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -119,12 +118,8 @@ function ResultsContent() {
   const averageDealerRate = 8.5; // Average dealer APR (would be fetched from backend in production)
 
   useEffect(() => {
-    // Dev mode: show mock offers without token
-    if (isDev || !token) {
-      if (!token && !isDev) {
-        router.push('/apply');
-        return;
-      }
+    // Dev mode: show mock offers without a session cookie
+    if (isDev) {
       // Mock offers for dev/preview mode with tags
       setOffers([
         {
@@ -192,7 +187,7 @@ function ResultsContent() {
     }
 
     // Fetch offers from backend
-    fetch(`/api/results?token=${token}`)
+    fetch('/api/results')
       .then(res => res.json())
       .then(data => {
         if (!data.success) {
@@ -210,7 +205,7 @@ function ResultsContent() {
         toast.error('Failed to load offers');
         router.push('/apply');
       });
-  }, [token, router, isDev]);
+  }, [router, isDev]);
 
   // Recalculate payment based on term and down payment
   const calculatePayment = (offer: AnonymizedOffer, termMonths: number, down: number): number => {
@@ -323,7 +318,6 @@ function ResultsContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          token,
           offerId: selectedOffer.id,
           selectedTerm: term,
           selectedDownPayment: downPayment,
@@ -341,7 +335,7 @@ function ResultsContent() {
       // Reveal lender and redirect to dashboard with pre-approval letter
       toast.success(`Pre-approved with ${data.data?.lenderName || 'your lender'}!`);
       setTimeout(() => {
-        router.push(`/dashboard?token=${token}`);
+        router.push('/dashboard');
       }, 1500);
     } catch {
       toast.error('Failed to select offer');

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTestApplicationData, TEST_CREDIT_RESULT } from '@/lib/test-data';
+import { CONSUMER_SESSION_COOKIE, getConsumerSessionCookieOptions } from '@/lib/consumer-session';
 
 // Helper to generate a simple session token
 function generateSessionToken(): string {
@@ -25,16 +26,20 @@ export async function POST(req: NextRequest) {
     // Simulate test application creation
     const creditScore = TEST_CREDIT_RESULT.ficoScore;
     const riskTier = creditScore >= 700 ? 'prime' : creditScore >= 640 ? 'near_prime' : 'subprime';
-
-
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       id: applicationId,
-      sessionToken,
       creditScore,
       riskTier,
     });
+
+    response.cookies.set(
+      CONSUMER_SESSION_COOKIE,
+      sessionToken,
+      getConsumerSessionCookieOptions()
+    );
+
+    return response;
   } catch (error) {
     console.error('[DEV] Error creating test application:', error);
     return NextResponse.json(

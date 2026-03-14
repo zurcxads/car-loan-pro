@@ -10,7 +10,7 @@ const pages = [
   { section: 'Consumer Flow', links: [
     { name: 'Homepage', path: '/' },
     { name: 'Apply (7-step form)', path: '/apply' },
-    { name: 'Results (needs token)', path: '/results?token=demo' },
+    { name: 'Results (dev preview)', path: '/results?dev=true' },
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Dashboard — Offers', path: '/dashboard/offers' },
     { name: 'Dashboard — Status', path: '/dashboard/status' },
@@ -71,7 +71,7 @@ export default function DevPage() {
       toast.success(`Test application created!`);
 
       setTimeout(() => {
-        router.push(`/results?token=${data.sessionToken}`);
+        router.push('/results');
       }, 1000);
     } catch (error) {
       toast.error('Failed to create test application');

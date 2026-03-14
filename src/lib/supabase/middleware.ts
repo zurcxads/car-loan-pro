@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -59,7 +60,8 @@ export async function updateSession(request: NextRequest) {
   // Protected routes — allow token-based access for consumers, otherwise redirect
   if (pathname.startsWith('/dashboard')) {
     // Check for session token or magic token in URL
-    const sessionToken = request.nextUrl.searchParams.get('token');
+    const sessionToken = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value
+      || request.nextUrl.searchParams.get('token');
     const magicToken = request.nextUrl.searchParams.get('magic');
 
     // Allow access if user is authenticated OR has a valid token

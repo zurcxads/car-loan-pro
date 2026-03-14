@@ -28,7 +28,6 @@ interface Application {
 function DashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const token = searchParams.get('token');
   const isDev = searchParams.get('dev') === 'true';
 
   const [application, setApplication] = useState<Application | null>(null);
@@ -68,13 +67,8 @@ function DashboardContent() {
       return;
     }
 
-    if (!token) {
-      router.push('/apply');
-      return;
-    }
-
     // Fetch application data
-    fetch(`/api/dashboard?token=${token}`)
+    fetch('/api/dashboard')
       .then(res => res.json())
       .then(data => {
         if (data.error) {
@@ -88,7 +82,7 @@ function DashboardContent() {
         setError('Failed to load dashboard');
         setLoading(false);
       });
-  }, [token, router, isDev]);
+  }, [router, isDev]);
 
   if (loading) {
     return (
@@ -379,7 +373,7 @@ function DashboardContent() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* View Offers */}
               <Link
-                href={isDev ? `/results?dev=true` : `/dashboard/offers?token=${token}`}
+                href={isDev ? '/results?dev=true' : '/dashboard/offers'}
                 className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-blue-400 hover:shadow-lg transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -404,7 +398,7 @@ function DashboardContent() {
 
               {/* Approval Letter */}
               <Link
-                href={isDev ? `/dashboard/approval-letter?dev=true` : `/dashboard/approval-letter?token=${token}`}
+                href={isDev ? '/dashboard/approval-letter?dev=true' : '/dashboard/approval-letter'}
                 className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-green-400 hover:shadow-lg transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -424,7 +418,7 @@ function DashboardContent() {
 
               {/* Documents */}
               <Link
-                href={`/dashboard/documents?token=${token}`}
+                href="/dashboard/documents"
                 className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-purple-400 hover:shadow-lg transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -446,7 +440,7 @@ function DashboardContent() {
               {/* Add Vehicle (if pre-approval without vehicle) */}
               {!application.hasVehicle && (
                 <Link
-                  href={`/dashboard/add-vehicle?token=${token}`}
+                  href="/dashboard/add-vehicle"
                   className="block bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl border-2 border-blue-600 p-5 hover:from-blue-500 hover:to-blue-600 hover:shadow-xl transition-all group md:col-span-2 lg:col-span-1"
                 >
                   <div className="flex items-start justify-between mb-3">
