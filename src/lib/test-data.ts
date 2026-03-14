@@ -9,6 +9,8 @@ import type {
   CreditPullResult,
 } from './types';
 
+
+
 // Test Consumer Data
 export const TEST_PERSONAL_INFO: BorrowerPersonalInfo = {
   firstName: 'Maria',
@@ -143,29 +145,41 @@ export const TEST_OFFERS: LenderOffer[] = [
   },
 ];
 
-// Test Accounts
-export const TEST_ACCOUNTS = {
-  consumer: {
-    email: 'maria.rodriguez.test@autoloanpro.co',
-    password: 'AutoLoanPro2026!',
-    name: 'Maria Rodriguez',
+// Test Accounts — only accessible in development
+function getTestAccounts() {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Test credentials are not available in production');
+  }
+  return {
+    consumer: {
+      email: 'maria.rodriguez.test@autoloanpro.co',
+      password: 'AutoLoanPro2026!',
+      name: 'Maria Rodriguez',
+    },
+    lender: {
+      email: 'demo@ally.com',
+      password: 'AutoLoanPro2026!',
+      name: 'Ally Financial Rep',
+    },
+    dealer: {
+      email: 'demo@dealer.com',
+      password: 'AutoLoanPro2026!',
+      name: 'Houston Toyota',
+    },
+    admin: {
+      email: 'admin@autoloanpro.co',
+      password: 'AutoLoanPro2026!',
+      name: 'Admin User',
+    },
+  };
+}
+
+// Lazy getter - only throws when actually accessed in production
+export const TEST_ACCOUNTS = new Proxy({} as ReturnType<typeof getTestAccounts>, {
+  get(_target, prop) {
+    return getTestAccounts()[prop as keyof ReturnType<typeof getTestAccounts>];
   },
-  lender: {
-    email: 'demo@ally.com',
-    password: 'AutoLoanPro2026!',
-    name: 'Ally Financial Rep',
-  },
-  dealer: {
-    email: 'demo@dealer.com',
-    password: 'AutoLoanPro2026!',
-    name: 'Houston Toyota',
-  },
-  admin: {
-    email: 'admin@autoloanpro.co',
-    password: 'AutoLoanPro2026!',
-    name: 'Admin User',
-  },
-};
+});
 
 // Helper to get complete test application data
 export function getTestApplicationData(includeVehicle: boolean = true) {
