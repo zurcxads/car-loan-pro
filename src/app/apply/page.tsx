@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { useState, useEffect, useRef, useId } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, type ReadonlyURLSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -24,6 +24,34 @@ const CREDIT_RANGE_OPTIONS = [
   { value: 'very_good', label: 'Very Good (740-799)' },
   { value: 'excellent', label: 'Excellent (800+)' },
 ];
+
+type ApplyPrefill = {
+  name: string;
+  creditRange: string;
+  loanAmount: number | null;
+};
+
+function normalizeCreditRangeParam(value: string): string {
+  const normalizedValue = value.trim().toLowerCase().replace(/[\s-]+/g, '_');
+  return CREDIT_RANGE_OPTIONS.some((option) => option.value === normalizedValue) ? normalizedValue : '';
+}
+
+function parseLoanAmountParam(value: string): number | null {
+  const loanAmount = Number(value.replace(/[^\d.]/g, ''));
+  return Number.isFinite(loanAmount) && loanAmount > 0 ? loanAmount : null;
+}
+
+function getApplyPrefill(searchParams: ReadonlyURLSearchParams): ApplyPrefill | null {
+  const name = searchParams.get('name')?.trim() || '';
+  const creditRange = normalizeCreditRangeParam(searchParams.get('creditRange') || '');
+  const loanAmount = parseLoanAmountParam(searchParams.get('loanAmount') || '');
+
+  if (!name && !creditRange && loanAmount === null) {
+    return null;
+  }
+
+  return { name, creditRange, loanAmount };
+}
 
 function Field({ error, children }: { error?: string; children: React.ReactNode }) {
   return (
@@ -242,19 +270,13 @@ export default function ApplyPage() {
   useEffect(() => {
     if (hasAppliedSearchPrefill.current) return;
 
-    const name = searchParams.get('name')?.trim() || '';
-    const creditRange = searchParams.get('creditRange')?.trim() || '';
-    const loanAmountParam = searchParams.get('loanAmount')?.trim() || '';
-    const loanAmount = Number(loanAmountParam.replace(/[^\d.]/g, ''));
-    const hasValidCreditRange = CREDIT_RANGE_OPTIONS.some((option) => option.value === creditRange);
-    const hasValidLoanAmount = Number.isFinite(loanAmount) && loanAmount > 0;
-
-    if (!name && !hasValidCreditRange && !hasValidLoanAmount) {
+    const prefill = getApplyPrefill(searchParams);
+    if (!prefill) {
       return;
     }
 
-    if (name) {
-      const [firstName = '', ...lastNameParts] = name.split(/\s+/);
+    if (prefill.name) {
+      const [firstName = '', ...lastNameParts] = prefill.name.split(/\s+/);
       setPersonal((current) => ({
         ...current,
         firstName: current.firstName || firstName,
@@ -262,11 +284,12 @@ export default function ApplyPage() {
       }));
     }
 
-    if (hasValidCreditRange) {
-      setEstimatedCreditRange(creditRange);
+    if (prefill.creditRange) {
+      setEstimatedCreditRange(prefill.creditRange);
     }
 
-    if (hasValidLoanAmount) {
+    if (prefill.loanAmount !== null) {
+      const loanAmount = prefill.loanAmount;
       setHasVehicle(true);
       setVehicle((current) => ({
         ...current,
