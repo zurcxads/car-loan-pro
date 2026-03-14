@@ -132,7 +132,10 @@ export async function POST(req: NextRequest) {
     };
 
     const app = await dbCreateApplication(appData);
-    if (!app) return apiError('Failed to create application', 500);
+    if (!app) {
+      // Temporary: return more detail for debugging
+      return apiError('Failed to create application. Check server logs for DB error details.', 500);
+    }
 
     let userId: string | null = null;
 

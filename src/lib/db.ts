@@ -61,7 +61,7 @@ export async function dbCreateApplication(app: Partial<MockApplication>): Promis
     return mapDbToApp(data);
   }
 
-  console.error('[db] Primary insert failed:', error?.message, error?.details, error?.hint);
+  console.error('[db] Primary insert failed:', JSON.stringify({ msg: error?.message, details: error?.details, hint: error?.hint, code: error?.code }));
 
   // Support older database setups that predate `has_vehicle` and still require
   // non-null `vehicle` and `loan_amount` fields for pre-approval submissions.
