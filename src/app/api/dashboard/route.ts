@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError } from '@/lib/api-helpers';
+import { useMockData } from '@/lib/env';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { MOCK_APPLICATIONS } from '@/lib/mock-data';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
@@ -13,7 +14,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    if (!isSupabaseConfigured()) {
+    if (useMockData()) {
       const app = MOCK_APPLICATIONS.find((application) => (application as unknown as { sessionToken?: string }).sessionToken === token);
       if (!app) {
         return apiError('Session expired or invalid', 401);
@@ -32,6 +33,9 @@ export async function GET(request: NextRequest) {
           selectedOffer: null,
         },
       });
+    }
+    if (!isSupabaseConfigured()) {
+      return apiError('Dashboard unavailable: Supabase is not configured', 503);
     }
 
     const supabase = getServiceClient();

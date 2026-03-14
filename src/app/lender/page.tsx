@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
+import { isDev } from '@/lib/env';
 import LenderPortalClient from '@/components/portal/LenderPortalClient';
 
 function getRoleRedirect(role?: string | null) {
@@ -12,15 +13,8 @@ function getRoleRedirect(role?: string | null) {
 
 export const dynamic = 'force-dynamic';
 
-export default async function LenderPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ dev?: string }>;
-}) {
-  const params = await searchParams;
-  const isDevMode = process.env.NODE_ENV !== 'production' && params.dev === 'true';
-
-  if (isDevMode) {
+export default async function LenderPage() {
+  if (isDev()) {
     return <LenderPortalClient user={{ name: 'Demo Lender', email: 'lender@demo.com', entityId: 'LND-001' }} />;
   }
 

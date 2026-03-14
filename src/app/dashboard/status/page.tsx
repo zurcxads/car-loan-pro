@@ -1,8 +1,8 @@
 "use client";
 
 import { Suspense, useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { isDev as isDevEnvironment } from '@/lib/env';
 
 interface StatusStep {
   label: string;
@@ -11,8 +11,7 @@ interface StatusStep {
 }
 
 function StatusContent() {
-  const searchParams = useSearchParams();
-  const isDev = searchParams.get('dev') === 'true';
+  const isDev = isDevEnvironment();
   const [application, setApplication] = useState<{ id: string; status: string; submittedAt: string; offersReceived: number } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -90,7 +89,7 @@ function StatusContent() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href={isDev ? '/dashboard?dev=true' : '/dashboard'} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
+          <Link href="/dashboard" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -159,7 +158,7 @@ function StatusContent() {
             <div className="text-sm text-blue-800 space-y-2">
               <p>You have {application.offersReceived} loan offer{application.offersReceived > 1 ? 's' : ''} waiting for you!</p>
               <Link
-                href={isDev ? '/results?dev=true' : '/results'}
+                href="/results"
                 className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
               >
                 View Your Offers

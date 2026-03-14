@@ -2,13 +2,14 @@
 "use client";
 
 import { useState, useEffect, Suspense, useId, useRef } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Check, Clock3 } from 'lucide-react';
 import { SkeletonOfferCards } from '@/components/shared/Skeleton';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { isDev as isDevEnvironment } from '@/lib/env';
 
 interface AnonymizedOffer {
   id: string;
@@ -116,7 +117,6 @@ function Tooltip({ content }: { content: string }) {
 }
 
 function ResultsContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const compareDialogRef = useRef<HTMLDivElement>(null);
   const confirmDialogRef = useRef<HTMLDivElement>(null);
@@ -143,7 +143,7 @@ function ResultsContent() {
   });
   useFocusTrap(showConfirmModal, confirmDialogRef, () => setShowConfirmModal(false));
 
-  const isDev = searchParams.get('dev') === 'true';
+  const isDev = isDevEnvironment();
 
   // Calculate average dealer rate (for comparison)
   const averageDealerRate = 8.5; // Average dealer APR (would be fetched from backend in production)
@@ -371,7 +371,7 @@ function ResultsContent() {
     // Dev mode: skip API, go to dashboard
     if (isDev) {
       setTimeout(() => {
-        router.push('/dashboard?dev=true');
+        router.push('/dashboard');
       }, 1500);
       return;
     }

@@ -10,7 +10,7 @@ const pages = [
   { section: 'Consumer Flow', links: [
     { name: 'Homepage', path: '/' },
     { name: 'Apply (7-step form)', path: '/apply' },
-    { name: 'Results (dev preview)', path: '/results?dev=true' },
+    { name: 'Results (dev preview)', path: '/results' },
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Dashboard — Offers', path: '/dashboard/offers' },
     { name: 'Dashboard — Status', path: '/dashboard/status' },
@@ -147,7 +147,7 @@ export default function DevPage() {
             <h1 className="text-3xl font-bold">Auto Loan Pro — Developer Dashboard</h1>
           </div>
           <p className="text-gray-400 text-sm">
-            Dev mode tools, quick actions, and complete sitemap. Enable dev mode with ?dev=true
+            Development-only tools, quick actions, and complete sitemap.
           </p>
         </div>
 
@@ -203,7 +203,7 @@ export default function DevPage() {
             </Link>
             <button
               onClick={() => {
-                router.push('/apply?dev=true');
+                router.push('/apply');
               }}
               className="flex items-center gap-3 px-6 py-4 bg-gray-900 border border-gray-800 rounded-xl hover:border-blue-600 hover:bg-gray-800 transition-all duration-200 text-left"
             >

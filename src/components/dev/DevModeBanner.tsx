@@ -3,12 +3,13 @@
 import { useDevMode } from '@/contexts/DevModeContext';
 import { useState } from 'react';
 import { User, Car, Building, Store, Settings } from 'lucide-react';
+import { showDevTools } from '@/lib/env';
 
 export default function DevModeBanner() {
   const { isDevMode, currentRole, setRole, disableDevMode } = useDevMode();
   const [showRoleMenu, setShowRoleMenu] = useState(false);
 
-  if (!isDevMode) return null;
+  if (!showDevTools() || !isDevMode) return null;
 
   const roles = [
     { value: null, label: 'No Role (Guest)', icon: User },
@@ -94,7 +95,7 @@ export default function DevModeBanner() {
           onClick={disableDevMode}
           className="text-xs font-medium text-red-700 hover:text-red-900 underline"
         >
-          Exit Dev Mode
+          Clear Dev Role
         </button>
       </div>
     </div>

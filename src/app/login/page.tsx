@@ -7,6 +7,7 @@ import { signIn } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Mail } from 'lucide-react';
+import { isDev } from '@/lib/env';
 
 const PORTAL_REDIRECTS = new Set(['/admin', '/lender', '/dealer']);
 
@@ -16,19 +17,11 @@ function LoginForm() {
   const redirect = searchParams.get('redirect');
   const safeRedirect = redirect && redirect.startsWith('/') ? redirect : '/dashboard';
   const isPortalLogin = PORTAL_REDIRECTS.has(safeRedirect);
-  const isDevMode = searchParams.get('dev') === 'true';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
-
-  // Dev mode: skip login entirely, redirect to the portal with dev=true
-  useEffect(() => {
-    if (isDevMode) {
-      window.location.href = safeRedirect + (safeRedirect.includes('?') ? '&' : '?') + 'dev=true';
-    }
-  }, [isDevMode, safeRedirect]);
 
   useEffect(() => {
     if (errorParam === 'invalid_token') {
@@ -52,7 +45,7 @@ function LoginForm() {
           email,
           password,
           redirect: false,
-          callbackUrl: isDevMode ? `${safeRedirect}?dev=true` : safeRedirect,
+          callbackUrl: safeRedirect,
         });
 
         if (!result || result.error) {
@@ -200,7 +193,7 @@ function LoginForm() {
               </h3>
               <p className="text-xs text-gray-600 dark:text-zinc-300 leading-relaxed">
                 {isPortalLogin
-                  ? 'Production portal access is validated against Supabase auth. Demo credentials are accepted only in dev mode.'
+                  ? `Production portal access is validated against Supabase auth. Demo credentials are accepted only in ${isDev() ? 'local development' : 'no environment'}.`
                   : 'We use magic links instead of passwords. It&apos;s faster, more secure, and one less password to remember.'}
               </p>
             </div>

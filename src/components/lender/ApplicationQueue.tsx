@@ -7,6 +7,7 @@ import { formatCurrency, ficoColor } from '@/lib/format-utils';
 import StatusBadge from '@/components/shared/StatusBadge';
 import ApplicationDetailDrawer from './ApplicationDetailDrawer';
 import { dbGetApplications } from '@/lib/db';
+import { isDev as isDevEnvironment } from '@/lib/env';
 
 const DecisionModal = dynamic(() => import('./DecisionModal'), { ssr: false });
 
@@ -42,7 +43,7 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
         const payload = await response.json();
         setApps(payload.data?.applications || []);
       } catch (fetchError) {
-        const isDevMode = typeof window !== 'undefined' && window.location.search.includes('dev=true');
+        const isDevMode = isDevEnvironment();
         if (!isDevMode) {
           setError(fetchError instanceof Error ? fetchError.message : 'Failed to load applications');
         } else {

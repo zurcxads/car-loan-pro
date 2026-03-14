@@ -1,4 +1,5 @@
 import { createHash, randomInt } from 'crypto';
+import { useMockData } from '@/lib/env';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
 type VerificationChannel = 'email' | 'phone';
@@ -28,9 +29,12 @@ export async function createVerificationCode(
   const codeHash = hashCode(code);
   const expiresAt = new Date(Date.now() + VERIFICATION_TTL_SECONDS * 1000).toISOString();
 
-  if (!isSupabaseConfigured()) {
+  if (useMockData()) {
     verificationStore.set(getStoreKey(channel, normalizedRecipient), { codeHash, expiresAt });
     return { code, expiresIn: VERIFICATION_TTL_SECONDS };
+  }
+  if (!isSupabaseConfigured()) {
+    throw new Error('Verification code storage requires Supabase outside local development');
   }
 
   const supabase = getServiceClient();
@@ -66,7 +70,7 @@ export async function verifyStoredCode(
   const normalizedRecipient = normalizeRecipient(channel, recipient);
   const codeHash = hashCode(code);
 
-  if (!isSupabaseConfigured()) {
+  if (useMockData()) {
     const record = verificationStore.get(getStoreKey(channel, normalizedRecipient));
     if (!record) return false;
 
@@ -77,6 +81,7 @@ export async function verifyStoredCode(
     verificationStore.delete(getStoreKey(channel, normalizedRecipient));
     return true;
   }
+  if (!isSupabaseConfigured()) return false;
 
   const supabase = getServiceClient();
   const now = new Date().toISOString();

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { isDev as isDevEnvironment } from '@/lib/env';
 
 interface UserProfile {
   name: string;
@@ -13,8 +14,7 @@ interface UserProfile {
 
 function SettingsContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const isDev = searchParams.get('dev') === 'true';
+  const isDev = isDevEnvironment();
 
   const [profile, setProfile] = useState<UserProfile>({ name: '', email: '' });
   const [notifications, setNotifications] = useState({
@@ -82,10 +82,10 @@ function SettingsContent() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href={isDev ? '/dashboard?dev=true' : '/dashboard'} className="text-lg font-semibold tracking-tight text-gray-900">
+          <Link href="/dashboard" className="text-lg font-semibold tracking-tight text-gray-900">
             Auto Loan Pro
           </Link>
-          <Link href={isDev ? '/dashboard?dev=true' : '/dashboard'} className="text-sm text-gray-500 hover:text-gray-900">
+          <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900">
             ← Back to Dashboard
           </Link>
         </div>

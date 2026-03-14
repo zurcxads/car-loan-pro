@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import KPICard from '@/components/shared/KPICard';
+import { isDev as isDevEnvironment } from '@/lib/env';
 import { MOCK_APPLICATIONS } from '@/lib/mock-data';
 
 interface BuyerRecord {
@@ -46,7 +47,7 @@ export default function DealerDashboard({ dealerId }: { dealerId: string | null 
         setBuyers(buyersJson.data?.buyers || []);
         setDeals(dealsJson.data?.deals || []);
       } catch (fetchError) {
-        const isDevMode = typeof window !== 'undefined' && window.location.search.includes('dev=true');
+        const isDevMode = isDevEnvironment();
         if (!isDevMode) {
           setError(fetchError instanceof Error ? fetchError.message : 'Failed to load dealer dashboard');
         } else {

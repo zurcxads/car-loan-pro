@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { isDev } from '@/lib/env';
 import type { User } from '@supabase/supabase-js';
 
 export type UserRole = 'admin' | 'lender' | 'dealer' | 'consumer';
@@ -44,8 +45,7 @@ function mapSupabaseUser(user: User): AuthUser {
 }
 
 function checkDevMode(): boolean {
-  if (typeof window === 'undefined') return false;
-  return new URLSearchParams(window.location.search).get('dev') === 'true';
+  return isDev();
 }
 
 const DEV_USERS: Record<string, AuthUser> = {
@@ -57,7 +57,17 @@ const DEV_USERS: Record<string, AuthUser> = {
 
 function getInitialDevUser(): AuthUser | null {
   if (typeof window === 'undefined') return null;
-  if (new URLSearchParams(window.location.search).get('dev') !== 'true') return null;
+  if (!isDev()) return null;
+
+  const roleCookie = document.cookie.split('; ').find(row => row.startsWith('alp_dev_role='));
+  const role = roleCookie?.split('=')[1] as UserRole | undefined;
+  if (role) {
+    if (role === 'admin') return DEV_USERS['/admin'];
+    if (role === 'lender') return DEV_USERS['/lender'];
+    if (role === 'dealer') return DEV_USERS['/dealer'];
+    return DEV_USERS['/dashboard'];
+  }
+
   const path = window.location.pathname;
   const match = Object.entries(DEV_USERS).find(([prefix]) => path.startsWith(prefix));
   return match ? match[1] : null;

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { apiError, apiSuccess, parseBody } from '@/lib/api-helpers';
+import { useMockData } from '@/lib/env';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
 const contactSubmissionSchema = z.object({
@@ -21,10 +22,13 @@ export async function POST(request: NextRequest) {
   };
 
   try {
-    if (!isSupabaseConfigured()) {
+    if (useMockData()) {
       return apiSuccess({
         message: `Thanks, ${data.name}. Your message has been received and we'll get back to you within 24 hours.`,
       }, 201);
+    }
+    if (!isSupabaseConfigured()) {
+      return apiError('Contact form unavailable: Supabase is not configured', 503);
     }
 
     try {

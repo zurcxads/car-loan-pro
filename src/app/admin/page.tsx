@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
+import { isDev } from '@/lib/env';
 import AdminPortalClient from '@/components/portal/AdminPortalClient';
 
 function getRoleRedirect(role?: string | null) {
@@ -12,15 +13,8 @@ function getRoleRedirect(role?: string | null) {
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ dev?: string }>;
-}) {
-  const params = await searchParams;
-  const isDevMode = process.env.NODE_ENV !== 'production' && params.dev === 'true';
-
-  if (isDevMode) {
+export default async function AdminPage() {
+  if (isDev()) {
     return <AdminPortalClient user={{ name: 'Admin (Dev)', email: 'admin@autoloanpro.co', entityId: null }} />;
   }
 

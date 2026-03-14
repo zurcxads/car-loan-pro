@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { SkeletonDashboard } from '@/components/shared/Skeleton';
+import { isDev as isDevEnvironment } from '@/lib/env';
 
 interface Application {
   id: string;
@@ -34,9 +35,8 @@ interface Application {
 }
 
 function DashboardContent() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const isDev = searchParams.get('dev') === 'true';
+  const isDev = isDevEnvironment();
 
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
@@ -403,7 +403,7 @@ function DashboardContent() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* View Offers */}
               <Link
-                href={isDev ? '/results?dev=true' : '/results'}
+                href="/results"
                 className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-blue-400 hover:shadow-lg transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -430,7 +430,7 @@ function DashboardContent() {
 
               {/* Approval Letter */}
               <Link
-                href={isDev ? '/dashboard/approval-letter?dev=true' : '/dashboard/approval-letter'}
+                href="/dashboard/approval-letter"
                 className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-green-400 hover:shadow-lg transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -450,7 +450,7 @@ function DashboardContent() {
 
               {/* Documents */}
               <Link
-                href={isDev ? '/dashboard/documents?dev=true' : '/dashboard/documents'}
+                href="/dashboard/documents"
                 className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-purple-400 hover:shadow-lg transition-all group"
               >
                 <div className="flex items-start justify-between mb-3">

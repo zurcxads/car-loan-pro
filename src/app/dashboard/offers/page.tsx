@@ -3,9 +3,10 @@
 import { Suspense, useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { MockOffer } from '@/lib/mock-data';
+import { isDev as isDevEnvironment } from '@/lib/env';
 
 const OfferSelectionModal = dynamic(() => import('@/components/offers/OfferSelectionModal'), {
   ssr: false,
@@ -13,8 +14,7 @@ const OfferSelectionModal = dynamic(() => import('@/components/offers/OfferSelec
 
 function OffersContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const isDev = searchParams.get('dev') === 'true';
+  const isDev = isDevEnvironment();
   const [offers, setOffers] = useState<MockOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<MockOffer | null>(null);
@@ -85,7 +85,7 @@ function OffersContent() {
       setTimeout(() => {
         toast.success('Offer selected successfully!');
         setIsModalOpen(false);
-        router.push('/dashboard?dev=true');
+        router.push('/dashboard');
       }, 500);
       return;
     }
@@ -136,7 +136,7 @@ function OffersContent() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href={isDev ? '/dashboard?dev=true' : '/dashboard'} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
+          <Link href="/dashboard" className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>

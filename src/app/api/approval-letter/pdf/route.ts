@@ -4,6 +4,7 @@ import QRCode from 'qrcode';
 import { createApprovalLetterPDF } from '@/lib/pdf-template';
 import { ApprovalLetterData } from '@/lib/approval-letter';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
+import { isDev } from '@/lib/env';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,11 +12,11 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const token = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value || searchParams.get('token');
-    const isDev = searchParams.get('dev') === 'true';
+    const devEnvironment = isDev();
 
     let letterData: ApprovalLetterData;
 
-    if (isDev) {
+    if (devEnvironment) {
       // Dev mode: generate mock data
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + 30);
@@ -50,8 +51,8 @@ export async function GET(request: NextRequest) {
       }
 
       // Placeholder: In real implementation, fetch from DB
-      return NextResponse.json(
-        { error: 'Production mode not yet implemented. Use ?dev=true for testing.' },
+        return NextResponse.json(
+        { error: 'Production mode not yet implemented.' },
         { status: 501 }
       );
     }

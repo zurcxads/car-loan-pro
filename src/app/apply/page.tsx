@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { Check } from 'lucide-react';
 import { US_STATES, POPULAR_MAKES } from '@/lib/constants';
 import { apiPost } from '@/lib/api-client';
+import { isDev as isDevEnvironment } from '@/lib/env';
 import type {
   BorrowerPersonalInfo, AddressInfo, EmploymentInfo, VehicleInfo,
   DealStructure, ConsentInfo, ApplicationType, VehicleCondition,
@@ -213,17 +214,11 @@ export default function ApplyPage() {
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [isDevMode, setIsDevMode] = useState(false);
+  const [isDevMode, setIsDevMode] = useState(isDevEnvironment());
   const [timeEstimate, setTimeEstimate] = useState(2); // minutes remaining
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const devParam = urlParams.get('dev');
-      const devCookie = document.cookie.split('; ').find(row => row.startsWith('alp_dev_mode='));
-      const hasDevMode = devParam === 'true' || devCookie?.split('=')[1] === 'true';
-      setIsDevMode(hasDevMode);
-    }
+    setIsDevMode(isDevEnvironment());
   }, []);
 
   // Calculate time estimate based on step
@@ -372,16 +367,14 @@ export default function ApplyPage() {
     return Object.keys(e).length === 0;
   };
 
-  const next = () => { if (checkDevMode() || validate()) setStep(s => Math.min(s + 1, 3)); };
+  const next = () => { if (isDevMode || validate()) setStep(s => Math.min(s + 1, 3)); };
   const back = () => setStep(s => Math.max(s - 1, 0));
-
-  const checkDevMode = () => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('dev') === 'true';
 
   const submitApplication = async () => {
     // Dev mode: skip EVERYTHING, go straight to results
-    if (checkDevMode()) {
+    if (isDevMode) {
       setSubmitting(true);
-      router.push('/results?dev=true');
+      router.push('/results');
       return;
     }
 

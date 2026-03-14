@@ -1,6 +1,7 @@
 // Database abstraction layer
 // Falls back to mock data when Supabase is not configured
 
+import { useMockData } from './env';
 import { isSupabaseConfigured, getServiceClient } from './supabase';
 import {
   MOCK_APPLICATIONS, MOCK_OFFERS, MOCK_LENDERS, MOCK_DEALERS,
@@ -11,18 +12,21 @@ import {
 
 // All DB operations use service role client to bypass RLS
 const db = () => getServiceClient();
+const canUseMockData = () => useMockData();
 
 // ---------- Applications ----------
 
 export async function dbGetApplications(): Promise<MockApplication[]> {
-  if (!isSupabaseConfigured()) return MOCK_APPLICATIONS;
+  if (canUseMockData()) return MOCK_APPLICATIONS;
+  if (!isSupabaseConfigured()) return [];
   const { data, error } = await db().from('applications').select('*').order('submitted_at', { ascending: false });
-  if (error || !data) return MOCK_APPLICATIONS;
+  if (error || !data) return canUseMockData() ? MOCK_APPLICATIONS : [];
   return data.map(mapDbToApp);
 }
 
 export async function dbGetApplication(id: string): Promise<MockApplication | null> {
-  if (!isSupabaseConfigured()) return MOCK_APPLICATIONS.find(a => a.id === id) || null;
+  if (canUseMockData()) return MOCK_APPLICATIONS.find(a => a.id === id) || null;
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('applications').select('*').eq('id', id).single();
   if (error || !data) return null;
   return mapDbToApp(data);
@@ -33,7 +37,7 @@ export async function dbCreateApplication(app: Partial<MockApplication>): Promis
   const sessionToken = crypto.randomUUID();
   const sessionExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
   
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     const newApp = { 
       ...app, 
       id: `APP-${String(MOCK_APPLICATIONS.length + 1).padStart(3, '0')}`,
@@ -43,6 +47,7 @@ export async function dbCreateApplication(app: Partial<MockApplication>): Promis
     MOCK_APPLICATIONS.push(newApp as MockApplication);
     return newApp;
   }
+  if (!isSupabaseConfigured()) return null;
   
   const appWithToken = {
     ...mapAppToDb(app),
@@ -56,21 +61,23 @@ export async function dbCreateApplication(app: Partial<MockApplication>): Promis
 }
 
 export async function dbUpdateApplication(id: string, updates: Partial<MockApplication>): Promise<MockApplication | null> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     const idx = MOCK_APPLICATIONS.findIndex(a => a.id === id);
     if (idx === -1) return null;
     Object.assign(MOCK_APPLICATIONS[idx], updates, { updatedAt: new Date().toISOString() });
     return MOCK_APPLICATIONS[idx];
   }
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('applications').update(mapAppToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToApp(data);
 }
 
 export async function dbGetApplicationByToken(token: string): Promise<MockApplication | null> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     return MOCK_APPLICATIONS.find(a => (a as unknown as { sessionToken?: string }).sessionToken === token) || null;
   }
+  if (!isSupabaseConfigured()) return null;
   const { data, error} = await db()
     .from('applications')
     .select('*')
@@ -88,13 +95,14 @@ export async function dbGetApplicationByToken(token: string): Promise<MockApplic
 // ---------- Offers ----------
 
 export async function dbGetOffers(applicationId?: string): Promise<MockOffer[]> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     return applicationId ? MOCK_OFFERS.filter(o => o.applicationId === applicationId) : MOCK_OFFERS;
   }
+  if (!isSupabaseConfigured()) return [];
   let query = db().from('offers').select('*');
   if (applicationId) query = query.eq('application_id', applicationId);
   const { data, error } = await query.order('apr', { ascending: true });
-  if (error || !data) return applicationId ? MOCK_OFFERS.filter(o => o.applicationId === applicationId) : MOCK_OFFERS;
+  if (error || !data) return canUseMockData() ? (applicationId ? MOCK_OFFERS.filter(o => o.applicationId === applicationId) : MOCK_OFFERS) : [];
   return data.map(mapDbToOffer);
 }
 
@@ -103,30 +111,33 @@ export async function dbGetOffersByApplication(applicationId: string): Promise<M
 }
 
 export async function dbGetOffer(id: string): Promise<MockOffer | null> {
-  if (!isSupabaseConfigured()) return MOCK_OFFERS.find(o => o.id === id) || null;
+  if (canUseMockData()) return MOCK_OFFERS.find(o => o.id === id) || null;
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('offers').select('*').eq('id', id).single();
   if (error || !data) return null;
   return mapDbToOffer(data);
 }
 
 export async function dbCreateOffer(offer: Partial<MockOffer>): Promise<MockOffer | null> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     const newOffer = { ...offer, id: `OFR-${String(MOCK_OFFERS.length + 1).padStart(3, '0')}` } as MockOffer;
     MOCK_OFFERS.push(newOffer);
     return newOffer;
   }
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('offers').insert(mapOfferToDb(offer)).select().single();
   if (error || !data) return null;
   return mapDbToOffer(data);
 }
 
 export async function dbUpdateOffer(id: string, updates: Partial<MockOffer>): Promise<MockOffer | null> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     const idx = MOCK_OFFERS.findIndex(o => o.id === id);
     if (idx === -1) return null;
     Object.assign(MOCK_OFFERS[idx], updates);
     return MOCK_OFFERS[idx];
   }
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('offers').update(mapOfferToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToOffer(data);
@@ -135,26 +146,29 @@ export async function dbUpdateOffer(id: string, updates: Partial<MockOffer>): Pr
 // ---------- Lenders ----------
 
 export async function dbGetLenders(): Promise<MockLender[]> {
-  if (!isSupabaseConfigured()) return MOCK_LENDERS;
+  if (canUseMockData()) return MOCK_LENDERS;
+  if (!isSupabaseConfigured()) return [];
   const { data, error } = await db().from('lenders').select('*');
-  if (error || !data) return MOCK_LENDERS;
+  if (error || !data) return canUseMockData() ? MOCK_LENDERS : [];
   return data.map(mapDbToLender);
 }
 
 export async function dbGetLender(id: string): Promise<MockLender | null> {
-  if (!isSupabaseConfigured()) return MOCK_LENDERS.find(l => l.id === id) || null;
+  if (canUseMockData()) return MOCK_LENDERS.find(l => l.id === id) || null;
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('lenders').select('*').eq('id', id).single();
   if (error || !data) return null;
   return mapDbToLender(data);
 }
 
 export async function dbUpdateLender(id: string, updates: Partial<MockLender>): Promise<MockLender | null> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     const idx = MOCK_LENDERS.findIndex(l => l.id === id);
     if (idx === -1) return null;
     Object.assign(MOCK_LENDERS[idx], updates);
     return MOCK_LENDERS[idx];
   }
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('lenders').update(mapLenderToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToLender(data);
@@ -163,26 +177,29 @@ export async function dbUpdateLender(id: string, updates: Partial<MockLender>): 
 // ---------- Dealers ----------
 
 export async function dbGetDealers(): Promise<MockDealer[]> {
-  if (!isSupabaseConfigured()) return MOCK_DEALERS;
+  if (canUseMockData()) return MOCK_DEALERS;
+  if (!isSupabaseConfigured()) return [];
   const { data, error } = await db().from('dealers').select('*');
-  if (error || !data) return MOCK_DEALERS;
+  if (error || !data) return canUseMockData() ? MOCK_DEALERS : [];
   return data.map(mapDbToDealer);
 }
 
 export async function dbGetDealer(id: string): Promise<MockDealer | null> {
-  if (!isSupabaseConfigured()) return MOCK_DEALERS.find(d => d.id === id) || null;
+  if (canUseMockData()) return MOCK_DEALERS.find(d => d.id === id) || null;
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('dealers').select('*').eq('id', id).single();
   if (error || !data) return null;
   return mapDbToDealer(data);
 }
 
 export async function dbUpdateDealer(id: string, updates: Partial<MockDealer>): Promise<MockDealer | null> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     const idx = MOCK_DEALERS.findIndex(d => d.id === id);
     if (idx === -1) return null;
     Object.assign(MOCK_DEALERS[idx], updates);
     return MOCK_DEALERS[idx];
   }
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('dealers').update(mapDealerToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToDealer(data);
@@ -191,34 +208,37 @@ export async function dbUpdateDealer(id: string, updates: Partial<MockDealer>): 
 // ---------- Deals ----------
 
 export async function dbGetDeals(dealerId?: string): Promise<MockDeal[]> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     return dealerId ? MOCK_DEALS.filter(d => d.dealerId === dealerId) : MOCK_DEALS;
   }
+  if (!isSupabaseConfigured()) return [];
   let query = db().from('deals').select('*');
   if (dealerId) query = query.eq('dealer_id', dealerId);
   const { data, error } = await query;
-  if (error || !data) return dealerId ? MOCK_DEALS.filter(d => d.dealerId === dealerId) : MOCK_DEALS;
+  if (error || !data) return canUseMockData() ? (dealerId ? MOCK_DEALS.filter(d => d.dealerId === dealerId) : MOCK_DEALS) : [];
   return data.map(mapDbToDeal);
 }
 
 export async function dbCreateDeal(deal: Partial<MockDeal>): Promise<MockDeal | null> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     const newDeal = { ...deal, id: `DEAL-${String(MOCK_DEALS.length + 1).padStart(3, '0')}` } as MockDeal;
     MOCK_DEALS.push(newDeal);
     return newDeal;
   }
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('deals').insert(mapDealToDb(deal)).select().single();
   if (error || !data) return null;
   return mapDbToDeal(data);
 }
 
 export async function dbUpdateDeal(id: string, updates: Partial<MockDeal>): Promise<MockDeal | null> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     const idx = MOCK_DEALS.findIndex(d => d.id === id);
     if (idx === -1) return null;
     Object.assign(MOCK_DEALS[idx], updates);
     return MOCK_DEALS[idx];
   }
+  if (!isSupabaseConfigured()) return null;
   const { data, error } = await db().from('deals').update(mapDealToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToDeal(data);
@@ -227,17 +247,19 @@ export async function dbUpdateDeal(id: string, updates: Partial<MockDeal>): Prom
 // ---------- Activity Events ----------
 
 export async function dbGetActivityEvents(): Promise<ActivityEvent[]> {
-  if (!isSupabaseConfigured()) return MOCK_ACTIVITY_EVENTS;
+  if (canUseMockData()) return MOCK_ACTIVITY_EVENTS;
+  if (!isSupabaseConfigured()) return [];
   const { data, error } = await db().from('activity_events').select('*').order('timestamp', { ascending: false });
-  if (error || !data) return MOCK_ACTIVITY_EVENTS;
+  if (error || !data) return canUseMockData() ? MOCK_ACTIVITY_EVENTS : [];
   return data.map(mapDbToActivityEvent);
 }
 
 export async function dbCreateActivityEvent(event: Omit<ActivityEvent, 'id'>): Promise<void> {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     MOCK_ACTIVITY_EVENTS.unshift({ ...event, id: `EVT-${String(MOCK_ACTIVITY_EVENTS.length + 1).padStart(3, '0')}` });
     return;
   }
+  if (!isSupabaseConfigured()) return;
   await db().from('activity_events').insert({
     type: event.type,
     description: event.description,
@@ -248,16 +270,17 @@ export async function dbCreateActivityEvent(event: Omit<ActivityEvent, 'id'>): P
 // ---------- Compliance ----------
 
 export async function dbGetComplianceAlerts(): Promise<ComplianceAlert[]> {
-  if (!isSupabaseConfigured()) return MOCK_COMPLIANCE_ALERTS;
+  if (canUseMockData()) return MOCK_COMPLIANCE_ALERTS;
+  if (!isSupabaseConfigured()) return [];
   const { data, error } = await db().from('compliance_alerts').select('*').order('timestamp', { ascending: false });
-  if (error || !data) return MOCK_COMPLIANCE_ALERTS;
+  if (error || !data) return canUseMockData() ? MOCK_COMPLIANCE_ALERTS : [];
   return data.map(mapDbToComplianceAlert);
 }
 
 // ---------- Stats ----------
 
 export async function dbGetPlatformStats() {
-  if (!isSupabaseConfigured()) {
+  if (canUseMockData()) {
     const apps = MOCK_APPLICATIONS;
     const offers = MOCK_OFFERS;
     const deals = MOCK_DEALS;
@@ -271,6 +294,18 @@ export async function dbGetPlatformStats() {
       totalDealsFunded: deals.filter(d => d.status === 'funded').length,
       totalVolumeFunded: deals.filter(d => d.status === 'funded').reduce((s, d) => s + d.amount, 0),
       avgApprovalRate: Math.round(lenders.reduce((s, l) => s + l.approvalRate, 0) / lenders.length),
+    };
+  }
+  if (!isSupabaseConfigured()) {
+    return {
+      totalApplications: 0,
+      pendingApplications: 0,
+      totalOffers: 0,
+      totalLenders: 0,
+      activeLenders: 0,
+      totalDealsFunded: 0,
+      totalVolumeFunded: 0,
+      avgApprovalRate: 0,
     };
   }
 

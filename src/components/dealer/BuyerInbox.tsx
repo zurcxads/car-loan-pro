@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MOCK_APPLICATIONS, MOCK_OFFERS, type MockApplication } from '@/lib/mock-data';
+import { isDev as isDevEnvironment } from '@/lib/env';
 import { formatCurrency, formatAPR, daysUntil } from '@/lib/format-utils';
 import BuyerCard from './BuyerCard';
 import StatusBadge from '@/components/shared/StatusBadge';
@@ -48,7 +49,7 @@ export default function BuyerInbox({ dealerId, onStartDeal }: BuyerInboxProps) {
         const buyers = (payload.data?.buyers || []) as BuyerApiRecord[];
         setApplications(buyers.map((buyer) => buyer.application));
       } catch (fetchError) {
-        const isDevMode = typeof window !== 'undefined' && window.location.search.includes('dev=true');
+        const isDevMode = isDevEnvironment();
         if (!isDevMode) {
           setError(fetchError instanceof Error ? fetchError.message : 'Failed to load buyers');
         } else {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { isDev as isDevEnvironment } from '@/lib/env';
 import { useRouter } from 'next/navigation';
 import PortalLayout from '@/components/shared/PortalLayout';
 
@@ -203,7 +204,7 @@ export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const isDevMode = typeof window !== 'undefined' && window.location.search.includes('dev=true');
+  const isDevMode = isDevEnvironment();
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading && !isDevMode) {
