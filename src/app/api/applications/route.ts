@@ -212,7 +212,8 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (err) {
-    console.error('Application creation error:', err);
-    return apiError('Failed to create application', 500);
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error('Application creation error:', errMsg, err instanceof Error ? err.stack : '');
+    return apiError(`Failed to create application: ${errMsg}`, 500);
   }
 }
