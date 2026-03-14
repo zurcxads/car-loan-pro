@@ -11,6 +11,7 @@ type Filter = 'all' | 'new' | 'expiring' | 'invited';
 type Sort = 'amount' | 'recent' | 'expiring';
 
 interface BuyerInboxProps {
+  dealerId?: string | null;
   onStartDeal: (app: MockApplication) => void;
 }
 
