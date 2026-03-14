@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, requireAuth, parseBody } from '@/lib/api-helpers';
 import { z } from 'zod';
+import { createVerificationCode, verifyStoredCode } from '@/lib/verification-codes';
 
 const sendEmailCodeSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -13,7 +14,7 @@ const verifyEmailCodeSchema = z.object({
 
 // POST /api/verify/email — send verification code to email
 export async function POST(req: NextRequest) {
-  const { error: authError } = await requireAuth();
+  const { session, error: authError } = await requireAuth();
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, sendEmailCodeSchema);
@@ -30,10 +31,13 @@ export async function POST(req: NextRequest) {
     // 3. Send email via SendGrid/AWS SES
     // 4. Return success
 
+    const verification = await createVerificationCode('email', data.email, session?.user.id);
+
     return apiSuccess({
       message: 'Verification code sent to your email',
       email: data.email,
-      expiresIn: 600,
+      expiresIn: verification.expiresIn,
+      ...(process.env.NODE_ENV !== 'production' ? { code: verification.code } : {}),
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to send verification code';
@@ -52,14 +56,11 @@ export async function PUT(req: NextRequest) {
   if (!data) return apiError('Invalid data');
 
   try {
-    // TODO: Verify code from Redis/DB
-    // In production, this would:
-    // 1. Check code against stored value
-    // 2. Check if not expired
-    // 3. Delete code after successful verification
-    // 4. Return success/failure
+    const verified = await verifyStoredCode('email', data.email, data.code);
+    if (!verified) {
+      return apiError('Invalid or expired verification code', 400);
+    }
 
-    // For now, accept any 6-digit code as valid
     return apiSuccess({
       verified: true,
       email: data.email,

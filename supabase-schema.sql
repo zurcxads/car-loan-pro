@@ -147,6 +147,17 @@ CREATE TABLE IF NOT EXISTS compliance_alerts (
   resolved BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE IF NOT EXISTS verification_codes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  channel TEXT NOT NULL CHECK (channel IN ('email', 'phone')),
+  recipient TEXT NOT NULL,
+  code_hash TEXT NOT NULL,
+  created_by UUID,
+  expires_at TIMESTAMPTZ NOT NULL,
+  verified_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
 -- Row Level Security policies
 ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE offers ENABLE ROW LEVEL SECURITY;
@@ -158,3 +169,5 @@ CREATE INDEX IF NOT EXISTS idx_applications_state ON applications(state);
 CREATE INDEX IF NOT EXISTS idx_offers_application_id ON offers(application_id);
 CREATE INDEX IF NOT EXISTS idx_deals_dealer_id ON deals(dealer_id);
 CREATE INDEX IF NOT EXISTS idx_deals_application_id ON deals(application_id);
+CREATE INDEX IF NOT EXISTS idx_verification_codes_lookup ON verification_codes(channel, recipient, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_verification_codes_expires_at ON verification_codes(expires_at);

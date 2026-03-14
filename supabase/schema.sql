@@ -158,6 +158,17 @@ CREATE TABLE IF NOT EXISTS notifications (
   data JSONB DEFAULT '{}'
 );
 
+CREATE TABLE IF NOT EXISTS verification_codes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  channel TEXT NOT NULL CHECK (channel IN ('email', 'phone')),
+  recipient TEXT NOT NULL,
+  code_hash TEXT NOT NULL,
+  created_by UUID,
+  expires_at TIMESTAMPTZ NOT NULL,
+  verified_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_applications_status ON applications(status);
 CREATE INDEX IF NOT EXISTS idx_applications_state ON applications(state);
@@ -166,6 +177,8 @@ CREATE INDEX IF NOT EXISTS idx_deals_dealer_id ON deals(dealer_id);
 CREATE INDEX IF NOT EXISTS idx_deals_application_id ON deals(application_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_read ON notifications(read);
+CREATE INDEX IF NOT EXISTS idx_verification_codes_lookup ON verification_codes(channel, recipient, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_verification_codes_expires_at ON verification_codes(expires_at);
 
 -- Row Level Security
 ALTER TABLE applications ENABLE ROW LEVEL SECURITY;
@@ -175,6 +188,7 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE lenders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE dealers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE verification_codes ENABLE ROW LEVEL SECURITY;
 
 -- Allow service role full access (API routes use service role key)
 CREATE POLICY "Service role full access" ON applications FOR ALL USING (true) WITH CHECK (true);
@@ -184,3 +198,4 @@ CREATE POLICY "Service role full access" ON users FOR ALL USING (true) WITH CHEC
 CREATE POLICY "Service role full access" ON lenders FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access" ON dealers FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Service role full access" ON notifications FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Service role full access" ON verification_codes FOR ALL USING (true) WITH CHECK (true);
