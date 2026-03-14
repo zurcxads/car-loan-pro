@@ -1,5 +1,5 @@
 import { createHash, randomInt } from 'crypto';
-import { useMockData } from '@/lib/env';
+import { useMockData as shouldUseMockData } from '@/lib/env';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
 type VerificationChannel = 'email' | 'phone';
@@ -29,7 +29,7 @@ export async function createVerificationCode(
   const codeHash = hashCode(code);
   const expiresAt = new Date(Date.now() + VERIFICATION_TTL_SECONDS * 1000).toISOString();
 
-  if (useMockData()) {
+  if (shouldUseMockData()) {
     verificationStore.set(getStoreKey(channel, normalizedRecipient), { codeHash, expiresAt });
     return { code, expiresIn: VERIFICATION_TTL_SECONDS };
   }
@@ -70,7 +70,7 @@ export async function verifyStoredCode(
   const normalizedRecipient = normalizeRecipient(channel, recipient);
   const codeHash = hashCode(code);
 
-  if (useMockData()) {
+  if (shouldUseMockData()) {
     const record = verificationStore.get(getStoreKey(channel, normalizedRecipient));
     if (!record) return false;
 

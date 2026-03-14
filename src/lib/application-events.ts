@@ -1,7 +1,7 @@
 // Application Events Helper
 // Creates and tracks lifecycle events for applications
 
-import { useMockData } from './env';
+import { useMockData as shouldUseMockData } from './env';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export interface ApplicationEvent {
@@ -32,7 +32,7 @@ export async function createApplicationEvent(
   description: string,
   metadata: Record<string, unknown> = {}
 ): Promise<ApplicationEvent | null> {
-  if (useMockData()) {
+  if (shouldUseMockData()) {
     return {
       id: crypto.randomUUID(),
       application_id: applicationId,
@@ -67,7 +67,7 @@ export async function createApplicationEvent(
  * Get all events for an application
  */
 export async function getApplicationEvents(applicationId: string): Promise<ApplicationEvent[]> {
-  if (useMockData()) {
+  if (shouldUseMockData()) {
     return [];
   }
   if (!isSupabaseConfigured()) return [];

@@ -1,7 +1,7 @@
 // Database abstraction layer
 // Falls back to mock data when Supabase is not configured
 
-import { useMockData } from './env';
+import { useMockData as shouldUseMockData } from './env';
 import { isSupabaseConfigured, getServiceClient } from './supabase';
 import {
   MOCK_APPLICATIONS, MOCK_OFFERS, MOCK_LENDERS, MOCK_DEALERS,
@@ -12,7 +12,7 @@ import {
 
 // All DB operations use service role client to bypass RLS
 const db = () => getServiceClient();
-const canUseMockData = () => useMockData();
+const canUseMockData = () => shouldUseMockData();
 
 // ---------- Applications ----------
 

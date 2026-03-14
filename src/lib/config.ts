@@ -1,6 +1,6 @@
-import { useMockData } from '@/lib/env';
+import { useMockData as shouldUseMockData } from '@/lib/env';
 
-export const USE_MOCK_DATA = useMockData();
+export const USE_MOCK_DATA = shouldUseMockData();
 
 export const FEATURE_FLAGS = {
   ITIN_BORROWERS: true,
