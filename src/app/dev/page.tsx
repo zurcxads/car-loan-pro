@@ -67,7 +67,7 @@ export default function DevPage() {
 
       if (!response.ok) throw new Error('Failed to create test application');
 
-      const data = await response.json();
+      await response.json();
       toast.success(`Test application created!`);
 
       setTimeout(() => {
