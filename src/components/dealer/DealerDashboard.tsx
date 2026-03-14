@@ -22,7 +22,7 @@ export default function DealerDashboard() {
     <div>
       <div className="mb-8">
         <h2 className="text-lg font-semibold mb-1">Good morning</h2>
-        <p className="text-xs text-gray-500">{today}</p>
+        <p className="text-xs text-gray-500 dark:text-zinc-400">{today}</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
@@ -39,36 +39,36 @@ export default function DealerDashboard() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6"
+          className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-6"
         >
           <h3 className="text-sm font-semibold mb-4">Recent Activity</h3>
           <div className="space-y-3">
             <div className="flex items-start gap-3 pb-3 border-b border-gray-100">
               <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900">New pre-approved buyer in your area</p>
-                <p className="text-xs text-gray-500">Sarah Johnson - $32K approval - 8 min ago</p>
+                <p className="text-sm text-gray-900 dark:text-zinc-100">New pre-approved buyer in your area</p>
+                <p className="text-xs text-gray-500 dark:text-zinc-400">Sarah Johnson - $32K approval - 8 min ago</p>
               </div>
             </div>
             <div className="flex items-start gap-3 pb-3 border-b border-gray-100">
               <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900">Deal funded</p>
-                <p className="text-xs text-gray-500">Mike Rodriguez - 2019 Honda Accord - 2 hours ago</p>
+                <p className="text-sm text-gray-900 dark:text-zinc-100">Deal funded</p>
+                <p className="text-xs text-gray-500 dark:text-zinc-400">Mike Rodriguez - 2019 Honda Accord - 2 hours ago</p>
               </div>
             </div>
             <div className="flex items-start gap-3 pb-3 border-b border-gray-100">
               <div className="w-2 h-2 rounded-full bg-yellow-500 mt-1.5" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900">Approval expiring soon</p>
-                <p className="text-xs text-gray-500">Lisa Chen - $28K approval - Expires in 3 days</p>
+                <p className="text-sm text-gray-900 dark:text-zinc-100">Approval expiring soon</p>
+                <p className="text-xs text-gray-500 dark:text-zinc-400">Lisa Chen - $28K approval - Expires in 3 days</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900">Lead contacted</p>
-                <p className="text-xs text-gray-500">James Wilson - Marked contacted - 5 hours ago</p>
+                <p className="text-sm text-gray-900 dark:text-zinc-100">Lead contacted</p>
+                <p className="text-xs text-gray-500 dark:text-zinc-400">James Wilson - Marked contacted - 5 hours ago</p>
               </div>
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function DealerDashboard() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6"
+          className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-6"
         >
           <h3 className="text-sm font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-2">
@@ -88,13 +88,13 @@ export default function DealerDashboard() {
               </svg>
               View All Pre-Approved Shoppers
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors text-sm font-medium cursor-pointer">
+            <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl transition-colors text-sm font-medium cursor-pointer">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               Manage Leads
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors text-sm font-medium cursor-pointer">
+            <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-700 text-gray-700 dark:text-zinc-300 rounded-xl transition-colors text-sm font-medium cursor-pointer">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -108,17 +108,17 @@ export default function DealerDashboard() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 p-6 mt-6"
+          className="rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/40 dark:to-blue-900/20 border border-blue-200 dark:border-blue-900 p-6 mt-6"
       >
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-white rounded-xl">
+          <div className="p-3 bg-white dark:bg-zinc-900 rounded-xl">
             <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">New pre-approved shoppers available</h3>
-            <p className="text-xs text-gray-600 mb-3">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-zinc-100 mb-1">New pre-approved shoppers available</h3>
+            <p className="text-xs text-gray-600 dark:text-zinc-300 mb-3">
               {activeShoppersInArea} buyers in the Houston area are actively shopping with pre-approval in hand. Reach out now to close more deals.
             </p>
             <button className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium rounded-lg transition-colors cursor-pointer">

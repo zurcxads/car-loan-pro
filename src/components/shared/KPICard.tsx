@@ -17,17 +17,17 @@ export default function KPICard({ label, value, delta, deltaType = 'neutral', ic
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+      className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900/50"
     >
       <div className="flex items-start justify-between mb-3">
-        <div className="text-[10px] text-gray-500 uppercase tracking-widest font-medium">{label}</div>
-        {icon && <div className="text-gray-400">{icon}</div>}
+        <div className="text-[10px] font-medium uppercase tracking-widest text-gray-500 dark:text-zinc-400">{label}</div>
+        {icon && <div className="text-gray-400 dark:text-zinc-500">{icon}</div>}
       </div>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: delay + 0.1, duration: 0.3 }}
-        className="text-2xl font-bold text-gray-900"
+        className="text-2xl font-bold text-gray-900 dark:text-zinc-100"
       >
         {value}
       </motion.div>
@@ -37,7 +37,7 @@ export default function KPICard({ label, value, delta, deltaType = 'neutral', ic
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: delay + 0.2, duration: 0.2 }}
           className={`text-xs mt-1.5 font-medium ${
-            deltaType === 'up' ? 'text-green-600' : deltaType === 'down' ? 'text-red-500' : 'text-gray-500'
+            deltaType === 'up' ? 'text-blue-600' : deltaType === 'down' ? 'text-red-500' : 'text-gray-500 dark:text-zinc-400'
           }`}
         >
           {deltaType === 'up' && '+'}{delta}
