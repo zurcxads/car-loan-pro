@@ -55,7 +55,7 @@ export default function CalculatorPage() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [showAmortization, setShowAmortization] = useState(false);
 
-  const loanAmount = vehiclePrice - downPayment;
+  const loanAmount = Math.max(0, vehiclePrice - downPayment);
 
   // Rate based on credit score (simplified model)
   const getInterestRate = (score: number) => {
@@ -73,6 +73,12 @@ export default function CalculatorPage() {
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
   }, []);
+
+  useEffect(() => {
+    if (downPayment > vehiclePrice) {
+      setDownPayment(vehiclePrice);
+    }
+  }, [downPayment, vehiclePrice]);
 
   const results = useMemo(() => {
     const monthly = calculatePayment(loanAmount, interestRate, termMonths);
@@ -211,7 +217,7 @@ export default function CalculatorPage() {
                 />
                 <div className="flex justify-between text-[10px] text-gray-400 mt-1.5">
                   <span>$0</span>
-                  <span>{((downPayment / vehiclePrice) * 100).toFixed(0)}% down</span>
+                  <span>{vehiclePrice > 0 ? ((downPayment / vehiclePrice) * 100).toFixed(0) : 0}% down</span>
                 </div>
               </div>
 
