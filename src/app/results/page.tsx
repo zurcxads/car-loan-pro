@@ -28,6 +28,17 @@ interface RateTier {
   rateMax: number;
 }
 
+interface ResultsPayload {
+  application?: {
+    id: string;
+    status: string;
+    offersReceived: number;
+    hasVehicle: boolean;
+  };
+  offers: AnonymizedOffer[];
+  suggestedDownPayment: number;
+}
+
 const TERM_OPTIONS = [24, 36, 48, 60, 72, 84];
 
 function Confetti() {
@@ -102,6 +113,7 @@ function ResultsContent() {
 
   const [offers, setOffers] = useState<AnonymizedOffer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [applicationStatus, setApplicationStatus] = useState<string>('pending_decision');
   const [term, setTerm] = useState(60);
   const [downPayment, setDownPayment] = useState(0);
   const [calculating, setCalculating] = useState(false);
@@ -187,25 +199,57 @@ function ResultsContent() {
       return;
     }
 
-    // Fetch offers from backend
-    fetch('/api/results')
-      .then(res => res.json())
-      .then(data => {
+    let cancelled = false;
+    let attempts = 0;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const loadResults = async () => {
+      try {
+        const res = await fetch('/api/results', { cache: 'no-store' });
+        const data = await res.json();
+
         if (!data.success) {
           toast.error(data.error || 'Failed to load offers');
           router.push('/apply');
-        } else {
-          setOffers(data.data?.offers || []);
-          setDownPayment(data.data?.suggestedDownPayment || 0);
-          setLoading(false);
+          return;
+        }
+
+        const payload = (data.data || {}) as ResultsPayload;
+        const nextOffers = payload.offers || [];
+        const nextStatus = payload.application?.status || 'pending_decision';
+
+        if (cancelled) return;
+
+        setApplicationStatus(nextStatus);
+        setOffers(nextOffers);
+        setDownPayment(payload.suggestedDownPayment || 0);
+
+        if (nextOffers.length === 0 && nextStatus === 'pending_decision' && attempts < 5) {
+          attempts += 1;
+          retryTimer = setTimeout(loadResults, 1000);
+          return;
+        }
+
+        setLoading(false);
+
+        if (nextOffers.length > 0) {
           setShowConfetti(true);
           setTimeout(() => setShowConfetti(false), 4000);
         }
-      })
-      .catch(() => {
-        toast.error('Failed to load offers');
-        router.push('/apply');
-      });
+      } catch {
+        if (!cancelled) {
+          toast.error('Failed to load offers');
+          router.push('/apply');
+        }
+      }
+    };
+
+    loadResults();
+
+    return () => {
+      cancelled = true;
+      if (retryTimer) clearTimeout(retryTimer);
+    };
   }, [router, isDev]);
 
   // Recalculate payment based on term and down payment
@@ -315,7 +359,7 @@ function ResultsContent() {
     }
 
     try {
-      const res = await fetch('/api/results/select', {
+      const res = await fetch('/api/offers/select', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -336,7 +380,7 @@ function ResultsContent() {
       // Reveal lender and redirect to dashboard with pre-approval letter
       toast.success(`Pre-approved with ${data.data?.lenderName || 'your lender'}!`);
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push(data.data?.redirectTo || '/dashboard');
       }, 1500);
     } catch {
       toast.error('Failed to select offer');
@@ -382,15 +426,27 @@ function ResultsContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
         <div className="max-w-md w-full bg-white rounded-2xl border border-gray-200 p-8 text-center">
-          <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${applicationStatus === 'pending_decision' ? 'bg-blue-100' : 'bg-yellow-100'}`}>
+            {applicationStatus === 'pending_decision' ? (
+              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            )}
           </div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">No Offers Available</h2>
-          <p className="text-sm text-gray-500 mb-6">We could not find matching offers at this time. Our team will review your application manually.</p>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+            {applicationStatus === 'pending_decision' ? 'Still Matching Lenders' : 'No Offers Available'}
+          </h2>
+          <p className="text-sm text-gray-500 mb-6">
+            {applicationStatus === 'pending_decision'
+              ? 'Your application was submitted successfully. We are still finalizing your offers.'
+              : 'We could not find matching offers at this time. Our team will review your application manually.'}
+          </p>
           <Link href="/" className="inline-flex px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors">
-            Return Home
+            {applicationStatus === 'pending_decision' ? 'Return to Home' : 'Return Home'}
           </Link>
         </div>
       </div>

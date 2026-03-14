@@ -22,7 +22,16 @@ export async function GET(req: NextRequest) {
     const offers = await dbGetOffersByApplication(application.id);
 
     if (!offers || offers.length === 0) {
-      return apiSuccess({ offers: [], suggestedDownPayment: 0 });
+      return apiSuccess({
+        application: {
+          id: application.id,
+          status: application.status,
+          offersReceived: application.offersReceived || 0,
+          hasVehicle: application.hasVehicle,
+        },
+        offers: [],
+        suggestedDownPayment: 0,
+      });
     }
 
     // Sort offers by APR (best first)
@@ -45,6 +54,12 @@ export async function GET(req: NextRequest) {
     const suggestedDownPayment = Math.round((anonymizedOffers[0]?.approvedAmount || 0) * 0.1);
 
     return apiSuccess({
+      application: {
+        id: application.id,
+        status: application.status,
+        offersReceived: application.offersReceived || offers.length,
+        hasVehicle: application.hasVehicle,
+      },
       offers: anonymizedOffers,
       suggestedDownPayment,
     });

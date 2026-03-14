@@ -178,11 +178,12 @@ export async function POST(req: NextRequest) {
       console.error('Failed to send application received email:', err);
     });
 
-    // Trigger lender matching engine in background
-    // Don't await - let it run async so user doesn't wait
-    matchLendersAndGenerateOffers(app).catch(err => {
-      console.error('Lender matching failed:', err);
-    });
+    try {
+      await matchLendersAndGenerateOffers(app);
+    } catch (matchError) {
+      console.error('Lender matching failed:', matchError);
+      return apiError('Failed to generate offers', 500);
+    }
 
     const response = NextResponse.json({
       success: true,
