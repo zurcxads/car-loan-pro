@@ -64,14 +64,14 @@ function getInitialDevUser(): AuthUser | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const initialDevUser = typeof window !== 'undefined' ? getInitialDevUser() : null;
+  const [initialDevUser] = useState<AuthUser | null>(() => getInitialDevUser());
   const [user, setUser] = useState<AuthUser | null>(initialDevUser);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(!initialDevUser);
 
   useEffect(() => {
     // Dev mode already handled in initial state
-    if (checkDevMode() && user) {
+    if (initialDevUser && checkDevMode()) {
       return;
     }
 
@@ -105,7 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [initialDevUser]);
 
   const login = async (email: string, password: string) => {
     const supabase = createClient();
