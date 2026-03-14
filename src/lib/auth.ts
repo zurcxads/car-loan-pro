@@ -5,31 +5,44 @@ import { createClient } from '@supabase/supabase-js';
 import { isDev } from '@/lib/env';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
+const DEV_ONLY_DEMO_PASSWORD = 'AutoLoanPro2026!';
+
+const DEV_ONLY_DEMO_EMAILS = new Set([
+  'admin@autoloanpro.co',
+  'demo@ally.com',
+  'demo@dealer.com',
+]);
+
+type DemoUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: 'lender' | 'dealer' | 'admin' | 'consumer';
+  entityId: string | null;
+  passwordHash?: string;
+};
+
 // Demo users for when Supabase is not configured
-// Pre-computed bcrypt hashes for security (avoid runtime hashing)
-const DEMO_USERS = [
+const DEMO_USERS: DemoUser[] = [
   {
     id: 'usr_lender_1',
-    email: 'lender@demo.com',
-    name: 'Demo Lender',
+    email: 'demo@ally.com',
+    name: 'Ally Financial Rep',
     role: 'lender',
-    passwordHash: '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', // demo123
     entityId: 'LND-001'
   },
   {
     id: 'usr_dealer_1',
-    email: 'dealer@demo.com',
-    name: 'AutoMax Houston',
+    email: 'demo@dealer.com',
+    name: 'Houston Toyota',
     role: 'dealer',
-    passwordHash: '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', // demo123
     entityId: 'DLR-001'
   },
   {
     id: 'usr_admin_1',
     email: 'admin@autoloanpro.co',
-    name: 'Admin',
+    name: 'Admin User',
     role: 'admin',
-    passwordHash: '$2a$10$rBxJ5FQ5eQ.kH5PqjZ8Hvu7YqW6kC6xLJVxR5Z8Y5Z5Z5Z5Z5Z5Z5', // admin2026
     entityId: null
   },
   {
@@ -53,6 +66,12 @@ export const authOptions: AuthOptions = {
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
         void req;
+        const email = credentials.email.toLowerCase();
+        const isProtectedDemoAccount = DEV_ONLY_DEMO_EMAILS.has(email);
+
+        if (isProtectedDemoAccount && !isDev()) {
+          return null;
+        }
 
         if (isSupabaseConfigured()) {
           const supabase = createClient(
@@ -60,7 +79,7 @@ export const authOptions: AuthOptions = {
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
           );
           const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-            email: credentials.email,
+            email,
             password: credentials.password,
           });
 
@@ -69,7 +88,7 @@ export const authOptions: AuthOptions = {
             const { data: userRecord, error: userError } = await serviceClient
               .from('users')
               .select('id, email, name, role, entity_id')
-              .eq('email', credentials.email)
+              .eq('email', email)
               .single();
 
             await supabase.auth.signOut();
@@ -95,14 +114,25 @@ export const authOptions: AuthOptions = {
           return null;
         }
 
-        const user = DEMO_USERS.find(u => u.email === credentials.email);
-        if (user && await bcrypt.compare(credentials.password, user.passwordHash)) {
+        const user = DEMO_USERS.find(u => u.email === email);
+        if (user && credentials.password === DEV_ONLY_DEMO_PASSWORD) {
           return {
             id: user.id,
             email: user.email,
             name: user.name,
             role: user.role,
             entityId: user.entityId,
+          };
+        }
+
+        const fallbackUser = DEMO_USERS.find(u => u.email === email && u.passwordHash);
+        if (fallbackUser?.passwordHash && await bcrypt.compare(credentials.password, fallbackUser.passwordHash)) {
+          return {
+            id: fallbackUser.id,
+            email: fallbackUser.email,
+            name: fallbackUser.name,
+            role: fallbackUser.role,
+            entityId: fallbackUser.entityId,
           };
         }
         return null;

@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { isDev } from '@/lib/env';
+
+const PROTECTED_DEMO_EMAILS = new Set([
+  'admin@autoloanpro.co',
+  'demo@ally.com',
+  'demo@dealer.com',
+]);
 
 // Standard API response helpers
 export function apiSuccess<T>(data: T, status = 200) {
@@ -47,6 +54,12 @@ export async function requireAuth(requiredRole?: string) {
   }
 
   const user = session.user as { role: string; id: string; email?: string | null; name?: string | null; entityId?: string | null };
+  const normalizedEmail = user.email?.toLowerCase() || '';
+
+  if (!isDev() && PROTECTED_DEMO_EMAILS.has(normalizedEmail)) {
+    return { session: null, error: apiError('Unauthorized', 401) };
+  }
+
   const role = user.role || 'consumer';
 
   if (requiredRole && role !== requiredRole && role !== 'admin') {
