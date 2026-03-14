@@ -159,12 +159,6 @@ export async function POST(req: NextRequest) {
       // Continue anyway - user can still access via session token
     }
 
-    // Generate session token for immediate access
-    const sessionToken = crypto.randomUUID();
-
-    // Store session token in application metadata (in real app, use a sessions table)
-    // For now, we'll use the token as a query param and validate it on each request
-
     // Send application received email
     const emailData = applicationReceivedEmail(
       data.personalInfo.email,
@@ -183,7 +177,7 @@ export async function POST(req: NextRequest) {
 
     return apiSuccess({
       id: app.id,
-      sessionToken,
+      sessionToken: (app as MockApplication & { sessionToken?: string }).sessionToken,
       userId,
     }, 201);
   } catch (err) {
