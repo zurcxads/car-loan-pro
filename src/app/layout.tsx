@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import Providers from "@/components/providers/SessionProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { DevModeProvider } from "@/contexts/DevModeContext";
@@ -9,9 +9,10 @@ import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import Header from "@/components/shared/Header";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+const sansFont = localFont({
+  src: "./fonts/GeistVF.woff",
   variable: "--font-inter",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -57,9 +58,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Auto Loan Pro" />
         <meta name="theme-color" content="#2563EB" />
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
-      <body className={`${inter.variable} font-sans bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased transition-colors`}>
+      <body className={`${sansFont.variable} font-sans bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased transition-colors`}>
         <a
           href="#main-content"
           className="skip-link focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"

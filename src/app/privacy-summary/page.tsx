@@ -2,7 +2,7 @@
 import { Database, Eye, Share2, Clock, UserX, FileText } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { createPageMetadata } from '@/lib/metadata';
+import { createPageMetadata } from '@/lib/page-metadata';
 
 export const metadata: Metadata = createPageMetadata({
   title: 'Privacy Summary',

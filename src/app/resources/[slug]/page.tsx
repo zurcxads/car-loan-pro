@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { articles, getArticleBySlug, getRelatedArticles } from '@/data/articles';
 import DOMPurify from 'isomorphic-dompurify';
-import { createPageMetadata } from '@/lib/metadata';
+import { createPageMetadata } from '@/lib/page-metadata';
 
 export function generateStaticParams() {
   return articles.map((article) => ({ slug: article.slug }));

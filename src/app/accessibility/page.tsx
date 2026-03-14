@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { CheckCircle, AlertCircle, Mail } from 'lucide-react';
 import type { Metadata } from 'next';
-import { createPageMetadata } from '@/lib/metadata';
+import { createPageMetadata } from '@/lib/page-metadata';
 
 export const metadata: Metadata = createPageMetadata({
   title: 'Accessibility Statement',

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import { articles } from '@/data/articles';
-import { createPageMetadata } from '@/lib/metadata';
+import { createPageMetadata } from '@/lib/page-metadata';
 
 export const metadata: Metadata = createPageMetadata({
   title: 'Auto Loan Resources',

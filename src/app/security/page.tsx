@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { Shield, Lock, Eye, FileCheck, Trash2, UserCheck, Clock, AlertTriangle, Check, X } from 'lucide-react';
 import type { Metadata } from 'next';
-import { createPageMetadata } from '@/lib/metadata';
+import { createPageMetadata } from '@/lib/page-metadata';
 
 export const metadata: Metadata = createPageMetadata({
   title: 'Security and Data Protection',
