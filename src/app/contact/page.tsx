@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check } from 'lucide-react';
 import Footer from '@/components/shared/Footer';
@@ -61,15 +60,7 @@ export default function ContactPage() {
   const [submitMessage, setSubmitMessage] = useState('');
   const [submitError, setSubmitError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handler, { passive: true });
-    return () => window.removeEventListener('scroll', handler);
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,37 +97,7 @@ export default function ContactPage() {
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="min-h-screen bg-white dark:bg-zinc-950">
-      {/* Nav */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-b border-gray-200 dark:border-zinc-800 shadow-sm' : 'bg-white dark:bg-zinc-950 border-b border-gray-100 dark:border-zinc-800'}`}>
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 dark:text-zinc-100">Auto Loan Pro</Link>
-          <div className="hidden md:flex items-center gap-8 text-sm text-gray-500 dark:text-zinc-400">
-            <Link href="/how-it-works" className="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors duration-200">How It Works</Link>
-            <Link href="/calculator" className="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors duration-200">Calculator</Link>
-            <Link href="/resources" className="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors duration-200">Resources</Link>
-            <Link href="/login" className="hover:text-gray-900 dark:hover:text-zinc-100 transition-colors duration-200">Sign In</Link>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="/apply" className="hidden md:inline-flex px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200 active:scale-[0.98] transition-transform">
-              Apply Now
-            </Link>
-            <button onClick={() => setMobileMenu(!mobileMenu)} className="md:hidden p-2 text-gray-500 dark:text-zinc-400 cursor-pointer">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm0 5.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" /></svg>
-            </button>
-          </div>
-        </div>
-        {mobileMenu && (
-          <div className="md:hidden border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-6 py-4 flex flex-col gap-4 text-sm">
-            <Link href="/how-it-works" className="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100" onClick={() => setMobileMenu(false)}>How It Works</Link>
-            <Link href="/calculator" className="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100" onClick={() => setMobileMenu(false)}>Calculator</Link>
-            <Link href="/resources" className="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100" onClick={() => setMobileMenu(false)}>Resources</Link>
-            <Link href="/login" className="text-gray-500 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-zinc-100" onClick={() => setMobileMenu(false)}>Sign In</Link>
-            <Link href="/apply" className="mt-2 text-center px-5 py-2.5 bg-blue-600 rounded-lg text-sm font-medium text-white" onClick={() => setMobileMenu(false)}>Apply Now</Link>
-          </div>
-        )}
-      </nav>
-
-      <section className="pt-32 pb-16 px-6">
+      <section className="pt-28 pb-16 px-6">
         <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-2xl mx-auto">
           <motion.h1 variants={fadeUp} className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-zinc-100 text-center">Contact Us</motion.h1>
           <motion.p variants={fadeUp} className="mt-4 text-lg text-gray-500 dark:text-zinc-400 text-center font-light">
