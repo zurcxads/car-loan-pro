@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { apiSuccess, apiError, parseBody } from '@/lib/api-helpers';
+import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
 import { applicationSubmitSchema } from '@/lib/validations';
 import { dbGetApplications, dbCreateApplication } from '@/lib/db';
 import { generateCreditProfile } from '@/lib/store';
@@ -10,6 +10,14 @@ import { applicationReceivedEmail, sendEmail } from '@/lib/email-templates';
 
 // GET /api/applications — list all applications
 export async function GET(req: NextRequest) {
+  const { session, error: authError } = await requireAuth();
+  if (authError) return authError;
+
+  const role = session?.user.role;
+  if (role !== 'admin' && role !== 'lender') {
+    return apiError('Forbidden', 403);
+  }
+
   try {
     const status = req.nextUrl.searchParams.get('status');
     let apps = await dbGetApplications();
