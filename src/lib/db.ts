@@ -1,7 +1,7 @@
 // Database abstraction layer
 // Falls back to mock data when Supabase is not configured
 
-import { supabase, isSupabaseConfigured } from './supabase';
+import { isSupabaseConfigured, getServiceClient } from './supabase';
 import {
   MOCK_APPLICATIONS, MOCK_OFFERS, MOCK_LENDERS, MOCK_DEALERS,
   MOCK_DEALS, MOCK_ACTIVITY_EVENTS, MOCK_COMPLIANCE_ALERTS,
@@ -9,18 +9,21 @@ import {
   type MockDeal, type ActivityEvent, type ComplianceAlert,
 } from './mock-data';
 
+// All DB operations use service role client to bypass RLS
+const db = () => getServiceClient();
+
 // ---------- Applications ----------
 
 export async function dbGetApplications(): Promise<MockApplication[]> {
   if (!isSupabaseConfigured()) return MOCK_APPLICATIONS;
-  const { data, error } = await supabase.from('applications').select('*').order('submitted_at', { ascending: false });
+  const { data, error } = await db().from('applications').select('*').order('submitted_at', { ascending: false });
   if (error || !data) return MOCK_APPLICATIONS;
   return data.map(mapDbToApp);
 }
 
 export async function dbGetApplication(id: string): Promise<MockApplication | null> {
   if (!isSupabaseConfigured()) return MOCK_APPLICATIONS.find(a => a.id === id) || null;
-  const { data, error } = await supabase.from('applications').select('*').eq('id', id).single();
+  const { data, error } = await db().from('applications').select('*').eq('id', id).single();
   if (error || !data) return null;
   return mapDbToApp(data);
 }
@@ -47,7 +50,7 @@ export async function dbCreateApplication(app: Partial<MockApplication>): Promis
     session_expires_at: sessionExpiresAt.toISOString(),
   };
   
-  const { data, error } = await supabase.from('applications').insert(appWithToken).select().single();
+  const { data, error } = await db().from('applications').insert(appWithToken).select().single();
   if (error || !data) return null;
   return mapDbToApp(data);
 }
@@ -59,7 +62,7 @@ export async function dbUpdateApplication(id: string, updates: Partial<MockAppli
     Object.assign(MOCK_APPLICATIONS[idx], updates, { updatedAt: new Date().toISOString() });
     return MOCK_APPLICATIONS[idx];
   }
-  const { data, error } = await supabase.from('applications').update(mapAppToDb(updates)).eq('id', id).select().single();
+  const { data, error } = await db().from('applications').update(mapAppToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToApp(data);
 }
@@ -68,7 +71,7 @@ export async function dbGetApplicationByToken(token: string): Promise<MockApplic
   if (!isSupabaseConfigured()) {
     return MOCK_APPLICATIONS.find(a => (a as unknown as { sessionToken?: string }).sessionToken === token) || null;
   }
-  const { data, error} = await supabase
+  const { data, error} = await db()
     .from('applications')
     .select('*')
     .eq('session_token', token)
@@ -88,7 +91,7 @@ export async function dbGetOffers(applicationId?: string): Promise<MockOffer[]> 
   if (!isSupabaseConfigured()) {
     return applicationId ? MOCK_OFFERS.filter(o => o.applicationId === applicationId) : MOCK_OFFERS;
   }
-  let query = supabase.from('offers').select('*');
+  let query = db().from('offers').select('*');
   if (applicationId) query = query.eq('application_id', applicationId);
   const { data, error } = await query.order('apr', { ascending: true });
   if (error || !data) return applicationId ? MOCK_OFFERS.filter(o => o.applicationId === applicationId) : MOCK_OFFERS;
@@ -101,7 +104,7 @@ export async function dbGetOffersByApplication(applicationId: string): Promise<M
 
 export async function dbGetOffer(id: string): Promise<MockOffer | null> {
   if (!isSupabaseConfigured()) return MOCK_OFFERS.find(o => o.id === id) || null;
-  const { data, error } = await supabase.from('offers').select('*').eq('id', id).single();
+  const { data, error } = await db().from('offers').select('*').eq('id', id).single();
   if (error || !data) return null;
   return mapDbToOffer(data);
 }
@@ -112,7 +115,7 @@ export async function dbCreateOffer(offer: Partial<MockOffer>): Promise<MockOffe
     MOCK_OFFERS.push(newOffer);
     return newOffer;
   }
-  const { data, error } = await supabase.from('offers').insert(mapOfferToDb(offer)).select().single();
+  const { data, error } = await db().from('offers').insert(mapOfferToDb(offer)).select().single();
   if (error || !data) return null;
   return mapDbToOffer(data);
 }
@@ -124,7 +127,7 @@ export async function dbUpdateOffer(id: string, updates: Partial<MockOffer>): Pr
     Object.assign(MOCK_OFFERS[idx], updates);
     return MOCK_OFFERS[idx];
   }
-  const { data, error } = await supabase.from('offers').update(mapOfferToDb(updates)).eq('id', id).select().single();
+  const { data, error } = await db().from('offers').update(mapOfferToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToOffer(data);
 }
@@ -133,14 +136,14 @@ export async function dbUpdateOffer(id: string, updates: Partial<MockOffer>): Pr
 
 export async function dbGetLenders(): Promise<MockLender[]> {
   if (!isSupabaseConfigured()) return MOCK_LENDERS;
-  const { data, error } = await supabase.from('lenders').select('*');
+  const { data, error } = await db().from('lenders').select('*');
   if (error || !data) return MOCK_LENDERS;
   return data.map(mapDbToLender);
 }
 
 export async function dbGetLender(id: string): Promise<MockLender | null> {
   if (!isSupabaseConfigured()) return MOCK_LENDERS.find(l => l.id === id) || null;
-  const { data, error } = await supabase.from('lenders').select('*').eq('id', id).single();
+  const { data, error } = await db().from('lenders').select('*').eq('id', id).single();
   if (error || !data) return null;
   return mapDbToLender(data);
 }
@@ -152,7 +155,7 @@ export async function dbUpdateLender(id: string, updates: Partial<MockLender>): 
     Object.assign(MOCK_LENDERS[idx], updates);
     return MOCK_LENDERS[idx];
   }
-  const { data, error } = await supabase.from('lenders').update(mapLenderToDb(updates)).eq('id', id).select().single();
+  const { data, error } = await db().from('lenders').update(mapLenderToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToLender(data);
 }
@@ -161,14 +164,14 @@ export async function dbUpdateLender(id: string, updates: Partial<MockLender>): 
 
 export async function dbGetDealers(): Promise<MockDealer[]> {
   if (!isSupabaseConfigured()) return MOCK_DEALERS;
-  const { data, error } = await supabase.from('dealers').select('*');
+  const { data, error } = await db().from('dealers').select('*');
   if (error || !data) return MOCK_DEALERS;
   return data.map(mapDbToDealer);
 }
 
 export async function dbGetDealer(id: string): Promise<MockDealer | null> {
   if (!isSupabaseConfigured()) return MOCK_DEALERS.find(d => d.id === id) || null;
-  const { data, error } = await supabase.from('dealers').select('*').eq('id', id).single();
+  const { data, error } = await db().from('dealers').select('*').eq('id', id).single();
   if (error || !data) return null;
   return mapDbToDealer(data);
 }
@@ -180,7 +183,7 @@ export async function dbUpdateDealer(id: string, updates: Partial<MockDealer>): 
     Object.assign(MOCK_DEALERS[idx], updates);
     return MOCK_DEALERS[idx];
   }
-  const { data, error } = await supabase.from('dealers').update(mapDealerToDb(updates)).eq('id', id).select().single();
+  const { data, error } = await db().from('dealers').update(mapDealerToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToDealer(data);
 }
@@ -191,7 +194,7 @@ export async function dbGetDeals(dealerId?: string): Promise<MockDeal[]> {
   if (!isSupabaseConfigured()) {
     return dealerId ? MOCK_DEALS.filter(d => d.dealerId === dealerId) : MOCK_DEALS;
   }
-  let query = supabase.from('deals').select('*');
+  let query = db().from('deals').select('*');
   if (dealerId) query = query.eq('dealer_id', dealerId);
   const { data, error } = await query;
   if (error || !data) return dealerId ? MOCK_DEALS.filter(d => d.dealerId === dealerId) : MOCK_DEALS;
@@ -204,7 +207,7 @@ export async function dbCreateDeal(deal: Partial<MockDeal>): Promise<MockDeal | 
     MOCK_DEALS.push(newDeal);
     return newDeal;
   }
-  const { data, error } = await supabase.from('deals').insert(mapDealToDb(deal)).select().single();
+  const { data, error } = await db().from('deals').insert(mapDealToDb(deal)).select().single();
   if (error || !data) return null;
   return mapDbToDeal(data);
 }
@@ -216,7 +219,7 @@ export async function dbUpdateDeal(id: string, updates: Partial<MockDeal>): Prom
     Object.assign(MOCK_DEALS[idx], updates);
     return MOCK_DEALS[idx];
   }
-  const { data, error } = await supabase.from('deals').update(mapDealToDb(updates)).eq('id', id).select().single();
+  const { data, error } = await db().from('deals').update(mapDealToDb(updates)).eq('id', id).select().single();
   if (error || !data) return null;
   return mapDbToDeal(data);
 }
@@ -225,7 +228,7 @@ export async function dbUpdateDeal(id: string, updates: Partial<MockDeal>): Prom
 
 export async function dbGetActivityEvents(): Promise<ActivityEvent[]> {
   if (!isSupabaseConfigured()) return MOCK_ACTIVITY_EVENTS;
-  const { data, error } = await supabase.from('activity_events').select('*').order('timestamp', { ascending: false });
+  const { data, error } = await db().from('activity_events').select('*').order('timestamp', { ascending: false });
   if (error || !data) return MOCK_ACTIVITY_EVENTS;
   return data.map(mapDbToActivityEvent);
 }
@@ -235,7 +238,7 @@ export async function dbCreateActivityEvent(event: Omit<ActivityEvent, 'id'>): P
     MOCK_ACTIVITY_EVENTS.unshift({ ...event, id: `EVT-${String(MOCK_ACTIVITY_EVENTS.length + 1).padStart(3, '0')}` });
     return;
   }
-  await supabase.from('activity_events').insert({
+  await db().from('activity_events').insert({
     type: event.type,
     description: event.description,
     timestamp: event.timestamp,
@@ -246,7 +249,7 @@ export async function dbCreateActivityEvent(event: Omit<ActivityEvent, 'id'>): P
 
 export async function dbGetComplianceAlerts(): Promise<ComplianceAlert[]> {
   if (!isSupabaseConfigured()) return MOCK_COMPLIANCE_ALERTS;
-  const { data, error } = await supabase.from('compliance_alerts').select('*').order('timestamp', { ascending: false });
+  const { data, error } = await db().from('compliance_alerts').select('*').order('timestamp', { ascending: false });
   if (error || !data) return MOCK_COMPLIANCE_ALERTS;
   return data.map(mapDbToComplianceAlert);
 }
@@ -273,10 +276,10 @@ export async function dbGetPlatformStats() {
 
   // Aggregate from Supabase
   const [appsRes, offersRes, lendersRes, dealsRes] = await Promise.all([
-    supabase.from('applications').select('status'),
-    supabase.from('offers').select('id'),
-    supabase.from('lenders').select('is_active'),
-    supabase.from('deals').select('status, amount'),
+    db().from('applications').select('status'),
+    db().from('offers').select('id'),
+    db().from('lenders').select('is_active'),
+    db().from('deals').select('status, amount'),
   ]);
 
   const apps = appsRes.data || [];
@@ -575,7 +578,7 @@ export interface Notification {
 
 export async function dbGetNotifications(userId: string): Promise<Notification[]> {
   if (!isSupabaseConfigured()) return [];
-  const { data, error } = await supabase
+  const { data, error } = await db()
     .from('notifications')
     .select('*')
     .eq('user_id', userId)
@@ -596,7 +599,7 @@ export async function dbGetNotifications(userId: string): Promise<Notification[]
 
 export async function dbCreateNotification(notification: Omit<Notification, 'id' | 'createdAt'>): Promise<Notification | null> {
   if (!isSupabaseConfigured()) return null;
-  const { data, error } = await supabase
+  const { data, error } = await db()
     .from('notifications')
     .insert({
       user_id: notification.userId,
@@ -623,17 +626,17 @@ export async function dbCreateNotification(notification: Omit<Notification, 'id'
 
 export async function dbMarkNotificationRead(id: string): Promise<void> {
   if (!isSupabaseConfigured()) return;
-  await supabase.from('notifications').update({ read: true }).eq('id', id);
+  await db().from('notifications').update({ read: true }).eq('id', id);
 }
 
 export async function dbMarkAllNotificationsRead(userId: string): Promise<void> {
   if (!isSupabaseConfigured()) return;
-  await supabase.from('notifications').update({ read: true }).eq('user_id', userId).eq('read', false);
+  await db().from('notifications').update({ read: true }).eq('user_id', userId).eq('read', false);
 }
 
 export async function dbGetUnreadNotificationCount(userId: string): Promise<number> {
   if (!isSupabaseConfigured()) return 0;
-  const { count, error } = await supabase
+  const { count, error } = await db()
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
