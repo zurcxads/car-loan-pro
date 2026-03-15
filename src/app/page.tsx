@@ -254,7 +254,7 @@ export default function HomePage() {
   const monthlyPayment = Math.round(loanAmount / 72);
 
   return (
-    <main className="min-h-screen bg-white text-[#425466]">
+    <div className="min-h-screen bg-white text-[#425466]">
       <section className="min-h-[85vh] px-6 pb-20 pt-28 md:pb-24 md:pt-32">
         <div className="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
@@ -529,6 +529,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

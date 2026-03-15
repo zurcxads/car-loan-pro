@@ -5,7 +5,7 @@ import Link from 'next/link';
 export default function ECOANoticePage() {
   return (
     <div className="min-h-screen bg-white">
-      <nav className="border-b border-gray-200 bg-white">
+      <nav role="navigation" className="border-b border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <Link href="/apply" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200">Apply Now</Link>

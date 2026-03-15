@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { formatCurrency } from '@/lib/format-utils';
 import { MOCK_APPLICATIONS, type MockApplication } from '@/lib/mock-data';
 import type { DealerLead, LeadStatus } from '@/lib/portal-data';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 type Filter = 'all' | 'new' | 'contacted' | 'qualified' | 'sold' | 'lost';
 
@@ -18,6 +19,7 @@ const statusColors: Record<LeadStatus, string> = {
 export default function LeadManagement() {
   const [filter, setFilter] = useState<Filter>('all');
   const [selectedLead, setSelectedLead] = useState<DealerLead | null>(null);
+  const detailDialogRef = useRef<HTMLDivElement>(null);
   const [applications, setApplications] = useState<MockApplication[]>(MOCK_APPLICATIONS);
   const [leadStatuses, setLeadStatuses] = useState<Record<string, LeadStatus>>(
     Object.fromEntries(MOCK_APPLICATIONS.map((application, index) => [application.id, (['new', 'contacted', 'qualified', 'sold', 'lost'] as LeadStatus[])[index % 5]])),
@@ -78,6 +80,8 @@ export default function LeadManagement() {
       setSelectedLead(prev => prev ? { ...prev, status } : null);
     }
   };
+
+  useFocusTrap(!!selectedLead, detailDialogRef, () => setSelectedLead(null));
 
   const counts = {
     all: leads.length,
@@ -184,6 +188,7 @@ export default function LeadManagement() {
                       )}
                       <button
                         onClick={() => setSelectedLead(lead)}
+                        aria-label={`View details for ${lead.name}`}
                         className="cursor-pointer p-1.5 text-gray-400 transition-colors hover:text-gray-600"
                         title="View details"
                       >
@@ -213,10 +218,17 @@ export default function LeadManagement() {
       {selectedLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedLead(null)} />
-          <div className="animate-fadeIn relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+          <div
+            ref={detailDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="lead-details-title"
+            tabIndex={-1}
+            className="animate-fadeIn relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
+          >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Lead Details</h3>
-              <button onClick={() => setSelectedLead(null)} className="cursor-pointer p-1 text-gray-400 hover:text-gray-600">
+              <h3 id="lead-details-title" className="text-lg font-semibold text-gray-900">Lead Details</h3>
+              <button onClick={() => setSelectedLead(null)} aria-label="Close lead details" className="cursor-pointer p-1 text-gray-400 hover:text-gray-600">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>

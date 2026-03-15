@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import Link from 'next/link';
 import Logo from './Logo';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface NavItem {
   key: string;
@@ -34,6 +35,9 @@ export default function PortalLayout({
   children,
 }: PortalLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  useFocusTrap(sidebarOpen, sidebarRef, () => setSidebarOpen(false));
 
   const badgeStyles: Record<string, string> = {
     blue: 'text-blue-600 bg-blue-50 border border-blue-200',
@@ -47,21 +51,30 @@ export default function PortalLayout({
         <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-60 bg-white  border-r border-gray-200  flex flex-col transform transition-transform duration-200 lg:translate-x-0 ${
+      <aside
+        ref={sidebarRef}
+        role="dialog"
+        aria-modal={sidebarOpen ? 'true' : undefined}
+        aria-labelledby="portal-navigation-title"
+        tabIndex={-1}
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-60 bg-white  border-r border-gray-200  flex flex-col transform transition-transform duration-200 lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      }`}
+      >
         <div className="p-6 border-b border-gray-200">
+          <h2 id="portal-navigation-title" className="sr-only">Portal navigation</h2>
           <Link href="/" className="block"><Logo size="sm" /></Link>
           <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium uppercase tracking-wider mt-2 inline-block ${badgeStyles[badgeColor] || badgeStyles.blue}`}>
             {portalBadge}
           </span>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1">
+        <nav role="navigation" aria-label={`${portalName} sections`} className="flex-1 p-3 space-y-1">
           {navItems.map(item => (
             <button
               key={item.key}
               onClick={() => { onTabChange(item.key); setSidebarOpen(false); }}
+              aria-current={activeTab === item.key ? 'page' : undefined}
               className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-colors duration-200 cursor-pointer ${
                 activeTab === item.key
                   ? 'bg-blue-50  text-blue-600 border-l-2 border-blue-500'
@@ -91,6 +104,9 @@ export default function PortalLayout({
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(true)}
+                aria-label="Open portal navigation"
+                aria-expanded={sidebarOpen}
+                aria-controls="portal-navigation-title"
                 className="lg:hidden p-2 -ml-2 text-gray-500  hover:text-gray-900  cursor-pointer"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>

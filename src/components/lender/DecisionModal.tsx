@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { MockApplication } from '@/lib/mock-data';
 import { formatCurrency } from '@/lib/format-utils';
 import { computeMonthlyPayment } from '@/lib/underwriting-engine';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 type DecisionAction = 'approve' | 'decline' | 'counter' | 'request_docs';
 
@@ -48,6 +49,7 @@ const DOC_TYPES = [
 ];
 
 export default function DecisionModal({ app, action, onClose }: Props) {
+  const dialogRef = useRef<HTMLDivElement>(null);
   // Approve / Counter state
   const [apr, setApr] = useState('5.49');
   const [amount, setAmount] = useState(String(app.loanAmount));
@@ -66,6 +68,16 @@ export default function DecisionModal({ app, action, onClose }: Props) {
   const [docMessage, setDocMessage] = useState(`Hi ${app.borrower.firstName}, we need some additional documents to complete your application review. Please upload the following at your earliest convenience.`);
 
   const monthlyPayment = computeMonthlyPayment(Number(amount), Number(apr), Number(term));
+  const title =
+    action === 'approve'
+      ? `Build Offer -- ${app.id}`
+      : action === 'decline'
+        ? `Decline Application -- ${app.id}`
+        : action === 'counter'
+          ? `Counter Offer -- ${app.id}`
+          : `Request Documents -- ${app.id}`;
+
+  useFocusTrap(!submitted, dialogRef, onClose);
 
   const toggleCondition = (c: string) => {
     setConditions(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
@@ -102,11 +114,17 @@ export default function DecisionModal({ app, action, onClose }: Props) {
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-white/60 px-6 py-10 backdrop-blur-sm">
         <motion.div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="decision-modal-title"
+          tabIndex={-1}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-8"
         >
+          <h2 id="decision-modal-title" className="sr-only">{title}</h2>
           {/* APPROVE / COUNTER */}
           {(action === 'approve' || action === 'counter') && (
             <>

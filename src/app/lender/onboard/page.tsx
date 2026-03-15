@@ -64,7 +64,7 @@ export default function LenderOnboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Nav */}
-      <nav className="bg-white border-b border-gray-200">
+      <nav role="navigation" className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <Link href="/lender" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">

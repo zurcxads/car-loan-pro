@@ -82,7 +82,7 @@ export default function ArticlePage({ params }: Props) {
       />
       <div className="min-h-screen">
         {/* Nav */}
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-sm">
+        <nav role="navigation" className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200 shadow-sm">
           <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
             <div className="hidden md:flex items-center gap-8 text-sm text-gray-500">

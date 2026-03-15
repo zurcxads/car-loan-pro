@@ -52,7 +52,7 @@ export default function Header() {
             <Logo size="md" />
           </Link>
 
-          <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
+          <nav role="navigation" aria-label="Primary" className="hidden items-center gap-8 lg:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -130,7 +130,7 @@ export default function Header() {
                 </button>
               </div>
 
-              <nav aria-label="Mobile" className="mt-6">
+              <nav role="navigation" aria-label="Mobile" className="mt-6">
                 <div className="space-y-2">
                   {navLinks.map((link) => (
                     <Link

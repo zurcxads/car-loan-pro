@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef } from 'react';
 import { MockOffer } from '@/lib/mock-data';
 import { formatCurrency, formatAPR } from '@/lib/format-utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface OfferSelectionModalProps {
   offer: MockOffer;
@@ -19,11 +21,14 @@ export default function OfferSelectionModal({
   onConfirm,
   loading = false,
 }: OfferSelectionModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
   const expirationDate = new Date(offer.expiresAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+
+  useFocusTrap(isOpen, dialogRef, onClose);
 
   return (
     <AnimatePresence>
@@ -41,6 +46,11 @@ export default function OfferSelectionModal({
           {/* Modal */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
+              ref={dialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="offer-selection-title"
+              tabIndex={-1}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -49,10 +59,12 @@ export default function OfferSelectionModal({
               {/* Header */}
               <div className="bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-8 text-white">
                 <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-2xl font-bold">Confirm Your Selection</h2>
+                  <h2 id="offer-selection-title" className="text-2xl font-bold">Confirm Your Selection</h2>
                   <button
+                    type="button"
                     onClick={onClose}
                     disabled={loading}
+                    aria-label="Close offer selection dialog"
                     className="text-white/80 hover:text-white transition-colors disabled:opacity-50"
                   >
                     <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -1,9 +1,11 @@
 "use client";
 
+import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MockApplication, MOCK_OFFERS } from '@/lib/mock-data';
 import { formatCurrency, formatAPR, ficoColor, ltvColor, dtiColor, ptiColor } from '@/lib/format-utils';
 import StatusBadge from '@/components/shared/StatusBadge';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 interface Props {
   app: MockApplication;
@@ -33,8 +35,11 @@ function Field({ label, value, className = '' }: { label: string; value: string 
 }
 
 export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDecline, onCounter, onRequestDocs }: Props) {
+  const drawerRef = useRef<HTMLDivElement>(null);
   const offers = MOCK_OFFERS.filter(o => o.applicationId === app.id);
   const lender = { maxLtv: 120, maxDti: 48, minFico: 620 }; // Demo lender params
+
+  useFocusTrap(true, drawerRef, onClose);
 
   return (
     <AnimatePresence>
@@ -47,6 +52,11 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
           onClick={onClose}
         />
         <motion.div
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="application-detail-title"
+          tabIndex={-1}
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
@@ -56,10 +66,10 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
           {/* Header */}
           <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="font-mono text-sm text-gray-500">{app.id}</span>
+              <h2 id="application-detail-title" className="font-mono text-sm text-gray-500">{app.id}</h2>
               <StatusBadge status={app.status} />
             </div>
-            <button onClick={onClose} className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer">
+            <button onClick={onClose} aria-label="Close application details" className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
           </div>

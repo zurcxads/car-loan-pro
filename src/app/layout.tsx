@@ -70,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <DevModeBanner />
             <Header />
             <Providers>
-              <main id="main-content" tabIndex={-1}>
+              <main id="main-content" role="main" tabIndex={-1}>
                 {children}
               </main>
             </Providers>

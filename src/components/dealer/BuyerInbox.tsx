@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MOCK_APPLICATIONS, MOCK_OFFERS, type MockApplication } from '@/lib/mock-data';
 import { showDevTools } from '@/lib/env';
 import { formatCurrency, formatAPR, daysUntil } from '@/lib/format-utils';
 import BuyerCard from './BuyerCard';
 import StatusBadge from '@/components/shared/StatusBadge';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 
 type Filter = 'all' | 'new' | 'expiring' | 'invited';
 type Sort = 'amount' | 'recent' | 'expiring';
@@ -25,6 +26,7 @@ export default function BuyerInbox({ dealerId, onStartDeal }: BuyerInboxProps) {
   const [sort, setSort] = useState<Sort>('recent');
   const [invited, setInvited] = useState<Set<string>>(new Set());
   const [detailApp, setDetailApp] = useState<MockApplication | null>(null);
+  const detailDrawerRef = useRef<HTMLDivElement>(null);
   const [applications, setApplications] = useState<MockApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -88,6 +90,8 @@ export default function BuyerInbox({ dealerId, onStartDeal }: BuyerInboxProps) {
     }
   }, [applications, filter, sort, invited]);
 
+  useFocusTrap(!!detailApp, detailDrawerRef, () => setDetailApp(null));
+
   if (loading) {
     return <div className="py-12 text-sm text-gray-500">Loading pre-approved buyers...</div>;
   }
@@ -146,10 +150,21 @@ export default function BuyerInbox({ dealerId, onStartDeal }: BuyerInboxProps) {
         {detailApp && (
           <div className="fixed inset-0 z-50 flex justify-end">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-white/50" onClick={() => setDetailApp(null)} />
-            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="relative w-full max-w-md bg-white border-l border-gray-200 overflow-y-auto">
+            <motion.div
+              ref={detailDrawerRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="buyer-details-title"
+              tabIndex={-1}
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-md bg-white border-l border-gray-200 overflow-y-auto"
+            >
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Buyer Details</h3>
-                <button onClick={() => setDetailApp(null)} className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer">
+                <h3 id="buyer-details-title" className="text-sm font-semibold">Buyer Details</h3>
+                <button onClick={() => setDetailApp(null)} aria-label="Close buyer details" className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               </div>
