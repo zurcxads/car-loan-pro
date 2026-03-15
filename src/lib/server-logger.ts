@@ -21,7 +21,7 @@ function serializeError(error: unknown) {
   };
 }
 
-function writeServerLog(level: 'error' | 'warn', message: string, metadata?: ServerLogMetadata) {
+function writeServerLog(level: 'error' | 'warn' | 'info', message: string, metadata?: ServerLogMetadata) {
   const payload = {
     level,
     message,
@@ -42,6 +42,9 @@ export const serverLogger = {
   },
   warn(message: string, metadata?: ServerLogMetadata) {
     writeServerLog('warn', message, metadata);
+  },
+  info(message: string, metadata?: ServerLogMetadata) {
+    writeServerLog('info', message, metadata);
   },
 };
 

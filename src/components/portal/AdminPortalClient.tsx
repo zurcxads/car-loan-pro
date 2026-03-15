@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import PortalLayout from '@/components/shared/PortalLayout';
 import PlatformOverview from '@/components/admin/PlatformOverview';
@@ -11,6 +10,7 @@ import DealerManagement from '@/components/admin/DealerManagement';
 import ComplianceCenter from '@/components/admin/ComplianceCenter';
 import RevenueBilling from '@/components/admin/RevenueBilling';
 import SystemSettings from '@/components/admin/SystemSettings';
+import { createClient } from '@/lib/supabase/client';
 
 type Tab = 'overview' | 'applications' | 'lenders' | 'dealers' | 'compliance' | 'revenue' | 'system';
 
@@ -53,7 +53,11 @@ export default function AdminPortalClient({ user }: { user: PortalUser }) {
       activeTab={tab}
       onTabChange={(t) => setTab(t as Tab)}
       onLogout={async () => {
-        await signOut({ redirect: false });
+        try {
+          await createClient().auth.signOut();
+        } catch {
+          // Ignore logout errors in local preview mode.
+        }
         router.push('/');
       }}
       userName={user.name || user.email || 'Admin'}

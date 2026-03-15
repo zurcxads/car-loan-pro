@@ -1,8 +1,7 @@
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
 import LenderPortalClient from '@/components/portal/LenderPortalClient';
 import { isServerDevAccessGranted } from '@/lib/dev-access-server';
+import { getServerAuthSession } from '@/lib/api-helpers';
 
 function getRoleRedirect(role?: string | null) {
   if (role === 'admin') return '/admin';
@@ -18,8 +17,8 @@ export default async function LenderPage() {
     return <LenderPortalClient user={{ name: 'Demo Lender', email: 'lender@demo.com', entityId: 'LND-001' }} />;
   }
 
-  const session = await getServerSession(authOptions);
-  const user = session?.user as { role?: string; name?: string | null; email?: string | null; entityId?: string | null } | undefined;
+  const session = await getServerAuthSession();
+  const user = session?.user;
 
   if (!session || !user) {
     redirect('/login?redirect=/lender');

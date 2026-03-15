@@ -323,7 +323,7 @@ export async function sendEmail(emailData: EmailData): Promise<{ success: boolea
   const resendApiKey = process.env.RESEND_API_KEY;
 
   if (!resendApiKey) {
-    serverLogger.warn('Email send skipped: RESEND_API_KEY not configured', {
+    serverLogger.info('Email would have been sent', {
       subject: emailData.subject,
       to: emailData.to,
     });
@@ -339,7 +339,7 @@ export async function sendEmail(emailData: EmailData): Promise<{ success: boolea
       },
       body: JSON.stringify({
         from: 'Auto Loan Pro <noreply@autoloanpro.co>',
-        to: emailData.to,
+        to: [emailData.to],
         subject: emailData.subject,
         html: emailData.html,
       }),

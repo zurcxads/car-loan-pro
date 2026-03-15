@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { isServerDevAccessGranted } from '@/lib/dev-access-server';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
+import { createClient as createSupabaseServerClient } from '@/lib/supabase/server';
+import { isSupabaseConfigured } from '@/lib/supabase';
 
 const PROTECTED_DEMO_EMAILS = new Set([
   'admin@autoloanpro.co',
@@ -83,15 +83,14 @@ async function resolveAuth(requiredRole?: string, allowAnonymous = false): Promi
     };
   }
 
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user) {
+  const session = await getServerAuthSession();
+  if (!session?.user) {
     return allowAnonymous
       ? { session: null, error: null }
       : { session: null, error: apiError('Unauthorized', 401) };
   }
 
-  const normalizedUser = normalizeSessionUser(session.user as { role: string; id: string; email?: string | null; name?: string | null; entityId?: string | null });
+  const normalizedUser = normalizeSessionUser(session.user);
   if (!normalizedUser) {
     return allowAnonymous
       ? { session: null, error: null }
@@ -108,6 +107,45 @@ async function resolveAuth(requiredRole?: string, allowAnonymous = false): Promi
     },
     error: null,
   };
+}
+
+export async function getServerAuthSession(): Promise<{ user: AuthenticatedUser } | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
+    if (error || !user) {
+      return null;
+    }
+
+    const metadata = user.user_metadata ?? {};
+    const normalizedUser = normalizeSessionUser({
+      id: user.id,
+      email: user.email ?? '',
+      name: typeof metadata.full_name === 'string'
+        ? metadata.full_name
+        : typeof metadata.name === 'string'
+          ? metadata.name
+          : user.email?.split('@')[0] ?? '',
+      role: typeof metadata.role === 'string' ? metadata.role : 'consumer',
+      entityId: typeof metadata.entity_id === 'string' ? metadata.entity_id : null,
+    });
+
+    if (!normalizedUser) {
+      return null;
+    }
+
+    return { user: normalizedUser };
+  } catch {
+    return null;
+  }
 }
 
 // Parse and validate request body
@@ -138,7 +176,6 @@ export async function parseBody<T>(req: NextRequest, schema: z.ZodType<T>): Prom
   }
 }
 
-// Get authenticated session with role check using NextAuth
 export async function requireAuth(requiredRole?: string) {
   return resolveAuth(requiredRole, false);
 }

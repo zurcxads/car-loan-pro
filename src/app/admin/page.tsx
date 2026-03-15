@@ -1,8 +1,7 @@
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
 import AdminPortalClient from '@/components/portal/AdminPortalClient';
 import { isServerDevAccessGranted } from '@/lib/dev-access-server';
+import { getServerAuthSession } from '@/lib/api-helpers';
 
 function getRoleRedirect(role?: string | null) {
   if (role === 'lender') return '/lender';
@@ -18,8 +17,8 @@ export default async function AdminPage() {
     return <AdminPortalClient user={{ name: 'Admin (Dev)', email: 'admin@autoloanpro.co', entityId: null }} />;
   }
 
-  const session = await getServerSession(authOptions);
-  const user = session?.user as { role?: string; name?: string | null; email?: string | null } | undefined;
+  const session = await getServerAuthSession();
+  const user = session?.user;
 
   if (!session || !user) {
     redirect('/login?redirect=/admin');

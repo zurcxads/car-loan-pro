@@ -12,8 +12,6 @@ import { generateMagicToken } from '@/lib/magic-link';
 import { serverLogger } from '@/lib/server-logger';
 import { findSupabaseUserByEmail } from '@/lib/consumer-auth';
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-
 // GET /api/applications — list all applications
 export async function GET(req: NextRequest) {
   const { session, error: authError } = await requireAuth();
@@ -179,14 +177,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    let magicLinkUrl = `${BASE_URL}/login`;
+    const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    let magicLinkUrl = `${appBaseUrl}/login`;
     const { token: magicToken, error: magicTokenError } = await generateMagicToken(
       data.personalInfo.email,
       app.id
     );
 
     if (magicToken && !magicTokenError) {
-      magicLinkUrl = `${BASE_URL}/api/auth/magic-link/verify?token=${magicToken}`;
+      magicLinkUrl = `${appBaseUrl}/api/auth/magic-link/verify?token=${magicToken}`;
     } else {
       serverLogger.error('Failed to generate application email magic link', {
         applicationId: app.id,

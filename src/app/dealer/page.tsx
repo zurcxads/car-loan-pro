@@ -1,8 +1,7 @@
-import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
 import DealerPortalClient from '@/components/portal/DealerPortalClient';
 import { isServerDevAccessGranted } from '@/lib/dev-access-server';
+import { getServerAuthSession } from '@/lib/api-helpers';
 
 function getRoleRedirect(role?: string | null) {
   if (role === 'admin') return '/admin';
@@ -18,8 +17,8 @@ export default async function DealerPage() {
     return <DealerPortalClient user={{ name: 'Demo Dealer', email: 'dealer@demo.com', entityId: 'DLR-001' }} />;
   }
 
-  const session = await getServerSession(authOptions);
-  const user = session?.user as { role?: string; name?: string | null; email?: string | null; entityId?: string | null } | undefined;
+  const session = await getServerAuthSession();
+  const user = session?.user;
 
   if (!session || !user) {
     redirect('/login?redirect=/dealer');

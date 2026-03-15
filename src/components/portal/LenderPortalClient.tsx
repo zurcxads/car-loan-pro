@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import PortalLayout from '@/components/shared/PortalLayout';
 import ApplicationQueue from '@/components/lender/ApplicationQueue';
@@ -9,6 +8,7 @@ import UnderwritingRules from '@/components/lender/UnderwritingRules';
 import Pipeline from '@/components/lender/Pipeline';
 import Reporting from '@/components/lender/Reporting';
 import LenderSettings from '@/components/lender/LenderSettings';
+import { createClient } from '@/lib/supabase/client';
 import type { PortalUser } from './AdminPortalClient';
 
 type Tab = 'applications' | 'underwriting' | 'pipeline' | 'reporting' | 'settings';
@@ -42,7 +42,11 @@ export default function LenderPortalClient({ user }: { user: PortalUser }) {
       activeTab={tab}
       onTabChange={(t) => setTab(t as Tab)}
       onLogout={async () => {
-        await signOut({ redirect: false });
+        try {
+          await createClient().auth.signOut();
+        } catch {
+          // Ignore logout errors in local preview mode.
+        }
         router.push('/');
       }}
       userName={user.name || user.email || 'Lender'}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import PortalLayout from '@/components/shared/PortalLayout';
 import DealerDashboard from '@/components/dealer/DealerDashboard';
@@ -9,6 +8,7 @@ import BuyerInbox from '@/components/dealer/BuyerInbox';
 import LeadManagement from '@/components/dealer/LeadManagement';
 import PerformanceDashboard from '@/components/dealer/PerformanceDashboard';
 import DealerSettings from '@/components/dealer/DealerSettings';
+import { createClient } from '@/lib/supabase/client';
 import type { PortalUser } from './AdminPortalClient';
 
 type Tab = 'dashboard' | 'shoppers' | 'leads' | 'performance' | 'settings';
@@ -42,7 +42,11 @@ export default function DealerPortalClient({ user }: { user: PortalUser }) {
       activeTab={tab}
       onTabChange={(t) => setTab(t as Tab)}
       onLogout={async () => {
-        await signOut({ redirect: false });
+        try {
+          await createClient().auth.signOut();
+        } catch {
+          // Ignore logout errors in local preview mode.
+        }
         router.push('/');
       }}
       userName={user.name || user.email || 'Dealer'}
