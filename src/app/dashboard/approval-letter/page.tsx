@@ -338,6 +338,7 @@ function ApprovalLetterContent() {
                   alt="Verification QR Code"
                   width={128}
                   height={128}
+                  loading="lazy"
                   className="rounded-lg border-2 border-gray-200"
                 />
                 <p className="text-xs text-gray-500 mt-2">

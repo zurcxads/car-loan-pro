@@ -1,5 +1,14 @@
+import dynamic from "next/dynamic";
 import type { Metadata } from 'next';
-import CalculatorPageClient from './CalculatorPageClient';
+
+const CalculatorPageClient = dynamic(() => import("./CalculatorPageClient"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex min-h-[60vh] items-center justify-center bg-white text-[#6B7C93]">
+      Loading calculator...
+    </div>
+  ),
+});
 
 const title = 'Auto Loan Calculator — Auto Loan Pro';
 const description = 'Estimate monthly car payments, compare loan terms, and review amortization details with the Auto Loan Pro calculator.';
