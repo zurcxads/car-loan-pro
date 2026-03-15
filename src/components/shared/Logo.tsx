@@ -52,7 +52,7 @@ export default function Logo({
     return (
       <div className={`flex flex-col items-center ${className}`}>
         <LogoIcon size={s.icon * 1.5} />
-        <span className={`${s.text} font-medium mt-2 ${darkMode ? "text-white" : "text-gray-900 dark:text-gray-100"}`}>
+        <span className={`${s.text} font-medium mt-2 ${darkMode ? "text-white" : "text-gray-900 "}`}>
           Auto Loan{" "}
           <span className="font-bold text-blue-600">Pro</span>
         </span>
@@ -63,7 +63,7 @@ export default function Logo({
   return (
     <div className={`flex items-center ${s.gap} ${className}`}>
       <LogoIcon size={s.icon} />
-      <span className={`${s.text} font-medium ${darkMode ? "text-white" : "text-gray-900 dark:text-gray-100"}`}>
+      <span className={`${s.text} font-medium ${darkMode ? "text-white" : "text-gray-900 "}`}>
         Auto Loan{" "}
         <span className="font-bold text-blue-600">Pro</span>
       </span>

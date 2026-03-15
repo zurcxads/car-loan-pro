@@ -33,12 +33,12 @@ export default function LenderSettings() {
   return (
     <div className="max-w-2xl space-y-8">
       {/* Lender Profile */}
-      <div className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-8">
+      <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
         <h3 className="text-sm font-semibold mb-6">Lender Profile</h3>
         <div className="space-y-3">
           <div>
-            <label className="text-[10px] text-gray-500 dark:text-zinc-400 mb-1 block">Company Name</label>
-            <input value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-600/50" />
+            <label className="text-[10px] text-gray-500  mb-1 block">Company Name</label>
+            <input value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50  border border-gray-200  rounded-xl text-sm text-gray-900  focus:outline-none focus:border-blue-600/50" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -57,7 +57,7 @@ export default function LenderSettings() {
       </div>
 
       {/* API Integration */}
-      <div className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-8">
+      <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
         <h3 className="text-sm font-semibold mb-6">API Integration</h3>
         <div className="space-y-4">
           <div>
@@ -105,7 +105,7 @@ export default function LenderSettings() {
       </div>
 
       {/* Webhook Configuration */}
-      <div className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-8">
+      <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
         <h3 className="text-sm font-semibold mb-6">Webhook Configuration</h3>
         <div className="space-y-4">
           <div>
@@ -135,7 +135,7 @@ export default function LenderSettings() {
       </div>
 
       {/* Team Members */}
-      <div className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-8">
+      <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
         <h3 className="text-sm font-semibold mb-6">Team Members</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

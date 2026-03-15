@@ -82,15 +82,15 @@ export default function DecisionModal({ app, action, onClose }: Props) {
 
   if (submitted) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 px-6 backdrop-blur-sm dark:bg-black/60">
-        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/40">
-            <Check className="h-7 w-7 text-blue-600 dark:text-blue-300" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 px-6 backdrop-blur-sm ">
+        <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center  ">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50 ">
+            <Check className="h-7 w-7 text-blue-600 " />
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-zinc-100">
+          <h3 className="mb-2 text-lg font-semibold text-gray-900 ">
             {action === 'approve' ? 'Offer Sent' : action === 'decline' ? 'Application Declined' : action === 'counter' ? 'Counter Offer Sent' : 'Document Request Sent'}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-zinc-400">
+          <p className="text-sm text-gray-500 ">
             {action === 'approve' ? `Offer sent to ${app.borrower.firstName} ${app.borrower.lastName}` : action === 'decline' ? 'Adverse action notice will be generated' : action === 'counter' ? 'Counter offer sent to borrower' : 'Document request sent via email'}
           </p>
         </motion.div>
@@ -100,52 +100,52 @@ export default function DecisionModal({ app, action, onClose }: Props) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-white/60 px-6 py-10 backdrop-blur-sm dark:bg-black/60">
+      <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-white/60 px-6 py-10 backdrop-blur-sm ">
         <motion.div
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900"
+          className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-8  "
         >
           {/* APPROVE / COUNTER */}
           {(action === 'approve' || action === 'counter') && (
             <>
-              <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-zinc-100">{action === 'approve' ? 'Build Offer' : 'Counter Offer'} -- {app.id}</h3>
+              <h3 className="mb-1 text-lg font-semibold text-gray-900 ">{action === 'approve' ? 'Build Offer' : 'Counter Offer'} -- {app.id}</h3>
               {action === 'counter' && (
-                <p className="mb-4 text-xs text-gray-500 dark:text-zinc-400">Original request: {app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'} at {app.dealStructure.requestedTerm} months</p>
+                <p className="mb-4 text-xs text-gray-500 ">Original request: {app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'} at {app.dealStructure.requestedTerm} months</p>
               )}
               <div className="space-y-4 mt-4">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-zinc-400">APR (%)</label>
-                  <input type="number" step="0.01" value={apr} onChange={e => setApr(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                  <label className="mb-1.5 block text-xs font-medium text-gray-500 ">APR (%)</label>
+                  <input type="number" step="0.01" value={apr} onChange={e => setApr(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50   " />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-zinc-400">Approved Amount ($)</label>
-                  <input type="number" value={amount} onChange={e => setAmount(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                  <label className="mb-1.5 block text-xs font-medium text-gray-500 ">Approved Amount ($)</label>
+                  <input type="number" value={amount} onChange={e => setAmount(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50   " />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-zinc-400">Term</label>
-                  <select value={term} onChange={e => setTerm(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                  <label className="mb-1.5 block text-xs font-medium text-gray-500 ">Term</label>
+                  <select value={term} onChange={e => setTerm(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50   ">
                     {[36, 48, 60, 72, 84].map(t => <option key={t} value={t}>{t} months</option>)}
                   </select>
                 </div>
 
                 {/* Live computed payment */}
                 <div className="rounded-xl bg-blue-50 border border-blue-200 p-4 text-center">
-                  <span className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-zinc-400">Est. Monthly Payment</span>
+                  <span className="text-[10px] uppercase tracking-wider text-gray-500 ">Est. Monthly Payment</span>
                   <div className="text-2xl font-bold text-blue-600 mt-1">{formatCurrency(monthlyPayment)}</div>
                 </div>
 
                 {/* Conditions */}
                 <div>
-                  <label className="mb-2 block text-xs font-medium text-gray-500 dark:text-zinc-400">Conditions</label>
+                  <label className="mb-2 block text-xs font-medium text-gray-500 ">Conditions</label>
                   <div className="flex flex-wrap gap-2">
                     {CONDITION_OPTIONS.map(c => (
                       <button
                         key={c}
                         onClick={() => toggleCondition(c)}
                         className={`px-3 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer ${
-                          conditions.includes(c) ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300' : 'border-gray-200 text-gray-500 dark:border-zinc-800 dark:text-zinc-400'
+                          conditions.includes(c) ? 'bg-blue-50 border-blue-200 text-blue-600' : 'border-gray-200 text-gray-500'
                         }`}
                       >
                         {c}
@@ -157,12 +157,12 @@ export default function DecisionModal({ app, action, onClose }: Props) {
                     value={customCondition}
                     onChange={e => setCustomCondition(e.target.value)}
                     placeholder="Add custom condition..."
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500"
+                    className="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50    "
                   />
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
-                <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800">Cancel</button>
+                <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50   ">Cancel</button>
                 <button onClick={handleSubmit} className="flex-1 cursor-pointer rounded-xl bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500">Send Offer to Borrower</button>
               </div>
             </>
@@ -171,29 +171,29 @@ export default function DecisionModal({ app, action, onClose }: Props) {
           {/* DECLINE */}
           {action === 'decline' && (
             <>
-              <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-zinc-100">Decline Application -- {app.id}</h3>
+              <h3 className="mb-4 text-lg font-semibold text-gray-900 ">Decline Application -- {app.id}</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-zinc-400">Decline Reason</label>
-                  <select value={declineReason} onChange={e => setDeclineReason(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white">
+                  <label className="mb-1.5 block text-xs font-medium text-gray-500 ">Decline Reason</label>
+                  <select value={declineReason} onChange={e => setDeclineReason(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50   ">
                     <option value="">Select reason...</option>
                     {DECLINE_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-zinc-400">Internal Notes (optional)</label>
-                  <textarea value={internalNotes} onChange={e => setInternalNotes(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-500" placeholder="Not shown to borrower..." />
+                  <label className="mb-1.5 block text-xs font-medium text-gray-500 ">Internal Notes (optional)</label>
+                  <textarea value={internalNotes} onChange={e => setInternalNotes(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50    " placeholder="Not shown to borrower..." />
                 </div>
                 <label className="flex items-center gap-2 cursor-pointer" onClick={() => setGenerateAdverse(!generateAdverse)}>
-                  <div className={`flex h-4 w-4 items-center justify-center rounded border ${generateAdverse ? 'border-blue-600 bg-blue-600' : 'border-gray-200 dark:border-zinc-700'}`}>
+                  <div className={`flex h-4 w-4 items-center justify-center rounded border ${generateAdverse ? 'border-blue-600 bg-blue-600' : 'border-gray-200'}`}>
                     {generateAdverse && <Check className="h-3 w-3 text-white" />}
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-zinc-400">Generate ECOA Adverse Action Notice</span>
+                  <span className="text-xs text-gray-500 ">Generate ECOA Adverse Action Notice</span>
                 </label>
               </div>
               <div className="flex gap-3 mt-6">
-                <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800">Cancel</button>
-                <button onClick={handleSubmit} disabled={!declineReason} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${declineReason ? 'cursor-pointer bg-red-600 text-white hover:bg-red-500' : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-zinc-800 dark:text-zinc-500'}`}>Confirm Decline</button>
+                <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50   ">Cancel</button>
+                <button onClick={handleSubmit} disabled={!declineReason} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${declineReason ? 'cursor-pointer bg-red-600 text-white hover:bg-red-500' : 'cursor-not-allowed bg-gray-200 text-gray-500'}`}>Confirm Decline</button>
               </div>
             </>
           )}
@@ -201,29 +201,29 @@ export default function DecisionModal({ app, action, onClose }: Props) {
           {/* REQUEST DOCS */}
           {action === 'request_docs' && (
             <>
-              <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-zinc-100">Request Documents -- {app.id}</h3>
+              <h3 className="mb-4 text-lg font-semibold text-gray-900 ">Request Documents -- {app.id}</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-xs font-medium text-gray-500 dark:text-zinc-400">Select Documents</label>
+                  <label className="mb-2 block text-xs font-medium text-gray-500 ">Select Documents</label>
                   <div className="space-y-2">
                     {DOC_TYPES.map(d => (
                       <label key={d} className="flex items-center gap-2 cursor-pointer" onClick={() => toggleDoc(d)}>
-                        <div className={`flex h-4 w-4 items-center justify-center rounded border ${requestedDocs.includes(d) ? 'border-blue-600 bg-blue-600' : 'border-gray-200 dark:border-zinc-700'}`}>
+                        <div className={`flex h-4 w-4 items-center justify-center rounded border ${requestedDocs.includes(d) ? 'border-blue-600 bg-blue-600' : 'border-gray-200'}`}>
                           {requestedDocs.includes(d) && <Check className="h-3 w-3 text-white" />}
                         </div>
-                        <span className="text-sm text-gray-700 dark:text-zinc-300">{d}</span>
+                        <span className="text-sm text-gray-700 ">{d}</span>
                       </label>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500 dark:text-zinc-400">Message to Borrower</label>
-                  <textarea value={docMessage} onChange={e => setDocMessage(e.target.value)} rows={4} className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white" />
+                  <label className="mb-1.5 block text-xs font-medium text-gray-500 ">Message to Borrower</label>
+                  <textarea value={docMessage} onChange={e => setDocMessage(e.target.value)} rows={4} className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50   " />
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
-                <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800">Cancel</button>
-                <button onClick={handleSubmit} disabled={requestedDocs.length === 0} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${requestedDocs.length > 0 ? 'cursor-pointer bg-blue-600 text-white hover:bg-blue-500' : 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-zinc-800 dark:text-zinc-500'}`}>Send Request</button>
+                <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50   ">Cancel</button>
+                <button onClick={handleSubmit} disabled={requestedDocs.length === 0} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${requestedDocs.length > 0 ? 'cursor-pointer bg-blue-600 text-white hover:bg-blue-500' : 'cursor-not-allowed bg-gray-200 text-gray-500'}`}>Send Request</button>
               </div>
             </>
           )}

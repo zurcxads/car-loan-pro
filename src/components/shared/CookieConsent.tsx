@@ -31,20 +31,20 @@ export default function CookieConsent() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-slide-up">
-      <div className="max-w-5xl mx-auto bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-zinc-800">
+      <div className="max-w-5xl mx-auto bg-white  rounded-2xl shadow-2xl border border-gray-200 ">
         <div className="p-6 sm:p-8">
           <div className="flex items-start gap-4">
             {/* Icon */}
-            <div className="flex-shrink-0 p-3 bg-blue-50 dark:bg-blue-950/50 rounded-xl">
+            <div className="flex-shrink-0 p-3 bg-blue-50  rounded-xl">
               <Cookie className="w-6 h-6 text-blue-600" />
             </div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900  mb-2">
                 We Use Essential Cookies
               </h3>
-              <p className="text-sm text-gray-600 dark:text-zinc-300 mb-4">
+              <p className="text-sm text-gray-600  mb-4">
                 We use essential cookies to make Auto Loan Pro work properly (like keeping you logged in and securing your session).
                 We don't use tracking cookies or sell data to advertisers.
                 {' '}
@@ -63,7 +63,7 @@ export default function CookieConsent() {
                 </button>
                 <button
                   onClick={handleDecline}
-                  className="px-6 py-2.5 bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  className="px-6 py-2.5 bg-gray-100  text-gray-800  rounded-lg font-medium hover:bg-gray-200  transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
                   Decline Non-Essential
                 </button>
@@ -73,7 +73,7 @@ export default function CookieConsent() {
             {/* Close Button */}
             <button
               onClick={handleDecline}
-              className="flex-shrink-0 p-2 text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="flex-shrink-0 p-2 text-gray-500  hover:text-gray-700  hover:bg-gray-100  rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               aria-label="Close"
             >
               <X className="w-5 h-5" />

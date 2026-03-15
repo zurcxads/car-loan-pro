@@ -32,7 +32,7 @@ export default function DealerSettings() {
   return (
     <div className="max-w-2xl space-y-8">
       {/* Dealership Info */}
-      <div className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-8">
+      <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
         <h3 className="text-sm font-semibold mb-6">Dealership Information</h3>
         <div className="space-y-3">
           <div><label className="text-[10px] text-gray-500 mb-1 block">Dealership Name</label><input value={name} onChange={e => setName(e.target.value)} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" /></div>
@@ -53,7 +53,7 @@ export default function DealerSettings() {
       </div>
 
       {/* Team Members */}
-      <div className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-8">
+      <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
         <h3 className="text-sm font-semibold mb-6">Team Members</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -79,7 +79,7 @@ export default function DealerSettings() {
       </div>
 
       {/* Notifications */}
-      <div className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-8">
+      <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
         <h3 className="text-sm font-semibold mb-6">Notifications</h3>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -104,7 +104,7 @@ export default function DealerSettings() {
       </div>
 
       {/* Subscription */}
-      <div className="rounded-2xl bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 shadow-sm p-8">
+      <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
         <h3 className="text-sm font-semibold mb-6">Subscription</h3>
         <div className="grid grid-cols-2 gap-4 text-sm mb-4">
           <div><span className="text-[10px] text-gray-500 block">Current Plan</span><span className="font-semibold text-blue-600">{dealer.plan} ${dealer.planPrice}/mo</span></div>

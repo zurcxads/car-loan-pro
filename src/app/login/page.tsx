@@ -74,10 +74,10 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-gray-50 dark:bg-zinc-950">
+    <div className="min-h-screen flex items-center justify-center px-6 bg-gray-50 ">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
-        <div className="rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm p-8">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 dark:text-zinc-100 block mb-8">Auto Loan Pro</Link>
+        <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900  block mb-8">Auto Loan Pro</Link>
 
           <AnimatePresence mode="wait">
             {!sent ? (
@@ -87,10 +87,10 @@ function LoginForm() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-1">
+                <h2 className="text-lg font-semibold text-gray-900  mb-1">
                   {isPortalLogin ? 'Portal Sign In' : 'Access Your Dashboard'}
                 </h2>
-                <p className="text-xs text-gray-500 dark:text-zinc-400 mb-6">
+                <p className="text-xs text-gray-500  mb-6">
                   {isPortalLogin
                     ? 'Sign in with your portal credentials.'
                     : 'Enter your email and we&apos;ll send you a secure login link. No password needed.'}
@@ -98,27 +98,27 @@ function LoginForm() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs text-gray-500 dark:text-zinc-400 mb-2 font-medium">Email Address</label>
+                    <label className="block text-xs text-gray-500  mb-2 font-medium">Email Address</label>
                     <input
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="you@example.com"
                       required
-                      className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
+                      className="w-full px-4 py-3 bg-gray-50  border border-gray-200  rounded-xl text-sm text-gray-900  placeholder-gray-400  focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
                     />
                   </div>
 
                   {isPortalLogin && (
                     <div>
-                      <label className="block text-xs text-gray-500 dark:text-zinc-400 mb-2 font-medium">Password</label>
+                      <label className="block text-xs text-gray-500  mb-2 font-medium">Password</label>
                       <input
                         type="password"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         placeholder="Enter your password"
                         required
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
+                        className="w-full px-4 py-3 bg-gray-50  border border-gray-200  rounded-xl text-sm text-gray-900  placeholder-gray-400  focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
                       />
                     </div>
                   )}
@@ -140,8 +140,8 @@ function LoginForm() {
                 </form>
 
                 {!isPortalLogin && (
-                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-zinc-800">
-                    <p className="text-xs text-gray-500 dark:text-zinc-400 text-center">
+                  <div className="mt-6 pt-6 border-t border-gray-200 ">
+                    <p className="text-xs text-gray-500  text-center">
                       First time here?{' '}
                       <Link href="/apply" className="text-blue-600 hover:text-blue-500 font-medium">Apply for pre-approval</Link>
                     </p>
@@ -155,14 +155,14 @@ function LoginForm() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-4"
               >
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-950/40">
-                  <Mail className="h-8 w-8 text-blue-600 dark:text-blue-300" />
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 ">
+                  <Mail className="h-8 w-8 text-blue-600 " />
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-2">Check Your Email</h2>
-                <p className="text-sm text-gray-500 dark:text-zinc-400 mb-6">
+                <h2 className="text-lg font-semibold text-gray-900  mb-2">Check Your Email</h2>
+                <p className="text-sm text-gray-500  mb-6">
                   We sent a login link to <strong>{email}</strong>. Click the link in the email to access your dashboard.
                 </p>
-                <p className="text-xs text-gray-400 dark:text-zinc-500 mb-4">The link expires in 24 hours.</p>
+                <p className="text-xs text-gray-400  mb-4">The link expires in 24 hours.</p>
                 <button
                   onClick={() => setSent(false)}
                   className="text-sm text-blue-600 hover:text-blue-500 font-medium"
@@ -179,7 +179,7 @@ function LoginForm() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mt-6 bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900 rounded-xl p-4"
+          className="mt-6 bg-blue-50  border border-blue-100  rounded-xl p-4"
         >
           <div className="flex items-start gap-3">
             <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -188,10 +188,10 @@ function LoginForm() {
               </svg>
             </div>
             <div>
-              <h3 className="text-xs font-semibold text-gray-900 dark:text-zinc-100 mb-1">
+              <h3 className="text-xs font-semibold text-gray-900  mb-1">
                 {isPortalLogin ? 'Portal Access' : 'Passwordless & Secure'}
               </h3>
-              <p className="text-xs text-gray-600 dark:text-zinc-300 leading-relaxed">
+              <p className="text-xs text-gray-600  leading-relaxed">
                 {isPortalLogin
                   ? `Production portal access is validated against Supabase auth. Demo credentials are accepted only in ${isDev() ? 'local development' : 'no environment'}.`
                   : 'We use magic links instead of passwords. It&apos;s faster, more secure, and one less password to remember.'}
@@ -207,7 +207,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-950">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 ">
         <div className="relative w-12 h-12">
           <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
         </div>

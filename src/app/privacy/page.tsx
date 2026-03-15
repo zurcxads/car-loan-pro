@@ -7,19 +7,19 @@ const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, tra
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
-      <nav className="border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+    <div className="min-h-screen bg-white ">
+      <nav className="border-b border-gray-200  bg-white ">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 dark:text-zinc-100">Auto Loan Pro</Link>
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 ">Auto Loan Pro</Link>
           <Link href="/apply" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200">Apply Now</Link>
         </div>
       </nav>
 
       <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-3xl mx-auto px-6 py-16">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-zinc-100 mb-2">Privacy Policy</h1>
-        <p className="text-sm text-gray-500 dark:text-zinc-400 mb-10">Effective Date: March 13, 2026</p>
+        <h1 className="text-3xl font-bold text-gray-900  mb-2">Privacy Policy</h1>
+        <p className="text-sm text-gray-500  mb-10">Effective Date: March 13, 2026</p>
 
-        <div className="prose prose-sm prose-gray dark:prose-invert max-w-none space-y-8 text-gray-600 dark:text-zinc-300 leading-relaxed">
+        <div className="prose prose-sm prose-gray  max-w-none space-y-8 text-gray-600  leading-relaxed">
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">1. Introduction</h2>
             <p>Auto Loan Pro LLC (&quot;Auto Loan Pro,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) operates an online auto loan marketplace at autoloanpro.co (the &quot;Platform&quot;). This Privacy Policy explains how we collect, use, disclose, and protect your personal information when you use our Platform.</p>
@@ -329,12 +329,12 @@ export default function PrivacyPage() {
         </div>
       </motion.div>
 
-      <footer className="border-t border-gray-200 dark:border-zinc-800 py-8 px-6 bg-gray-50 dark:bg-zinc-900">
-        <div className="max-w-5xl mx-auto flex flex-wrap gap-6 justify-center text-xs text-gray-400 dark:text-zinc-500">
-          <Link href="/privacy" className="hover:text-gray-600 dark:hover:text-zinc-300">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-gray-600 dark:hover:text-zinc-300">Terms of Service</Link>
-          <Link href="/disclosures" className="hover:text-gray-600 dark:hover:text-zinc-300">Disclosures</Link>
-          <Link href="/contact" className="hover:text-gray-600 dark:hover:text-zinc-300">Contact</Link>
+      <footer className="border-t border-gray-200  py-8 px-6 bg-gray-50 ">
+        <div className="max-w-5xl mx-auto flex flex-wrap gap-6 justify-center text-xs text-gray-400 ">
+          <Link href="/privacy" className="hover:text-gray-600 ">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-gray-600 ">Terms of Service</Link>
+          <Link href="/disclosures" className="hover:text-gray-600 ">Disclosures</Link>
+          <Link href="/contact" className="hover:text-gray-600 ">Contact</Link>
         </div>
       </footer>
     </div>

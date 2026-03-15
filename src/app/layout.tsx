@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Providers from "@/components/providers/SessionProvider";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { DevModeProvider } from "@/contexts/DevModeContext";
 import DevModeBanner from "@/components/dev/DevModeBanner";
 import CookieConsent from "@/components/shared/CookieConsent";
@@ -51,7 +50,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -59,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-title" content="Auto Loan Pro" />
         <meta name="theme-color" content="#2563EB" />
       </head>
-      <body className={`${sansFont.variable} font-sans bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased transition-colors`}>
+      <body className={`${sansFont.variable} font-sans bg-white text-gray-900 antialiased`}>
         <a
           href="#main-content"
           className="skip-link focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
@@ -67,18 +66,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to main content
         </a>
         <ErrorBoundary>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <DevModeProvider>
-              <DevModeBanner />
-              <Header />
-              <Providers>
-                <main id="main-content" tabIndex={-1}>
-                  {children}
-                </main>
-              </Providers>
-              <CookieConsent />
-            </DevModeProvider>
-          </ThemeProvider>
+          <DevModeProvider>
+            <DevModeBanner />
+            <Header />
+            <Providers>
+              <main id="main-content" tabIndex={-1}>
+                {children}
+              </main>
+            </Providers>
+            <CookieConsent />
+          </DevModeProvider>
         </ErrorBoundary>
       </body>
     </html>

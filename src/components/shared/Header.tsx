@@ -42,8 +42,8 @@ export default function Header() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl shadow-md py-3 border-b border-gray-200 dark:border-gray-800'
-            : 'bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl py-4'
+            ? 'bg-white/95 backdrop-blur-xl shadow-md py-3 border-b border-gray-200'
+            : 'bg-white/95 backdrop-blur-xl py-4'
         }`}
       >
         <div className="max-w-7xl mx-auto px-6">
@@ -62,7 +62,7 @@ export default function Header() {
                   className={`text-sm font-medium transition-colors relative ${
                     isActive(link.href)
                       ? 'text-blue-600'
-                      : 'text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'
+                      : 'text-gray-700 hover:text-gray-900'
                   }`}
                   aria-current={isActive(link.href) ? 'page' : undefined}
                 >
@@ -88,7 +88,7 @@ export default function Header() {
             <div className="flex lg:hidden items-center gap-2">
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100 transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="p-2 text-gray-700 hover:text-gray-900   transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 aria-label="Toggle menu"
                 aria-expanded={mobileMenuOpen}
                 aria-controls="mobile-navigation-dialog"
@@ -105,7 +105,7 @@ export default function Header() {
         <>
           <div
             role="presentation"
-            className="fixed inset-0 bg-black/30 dark:bg-black/60 z-40 lg:hidden animate-fade-in"
+            className="fixed inset-0 bg-black/30  z-40 lg:hidden animate-fade-in"
             onClick={() => setMobileMenuOpen(false)}
           />
 
@@ -116,10 +116,10 @@ export default function Header() {
             aria-modal="true"
             aria-labelledby="mobile-navigation-title"
             tabIndex={-1}
-            className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white dark:bg-gray-950 shadow-2xl z-50 lg:hidden animate-slide-in-right"
+            className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white  shadow-2xl z-50 lg:hidden animate-slide-in-right"
           >
             <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 ">
                 <Link
                   href="/"
                   className="hover:opacity-90 transition-opacity focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg"
@@ -130,7 +130,7 @@ export default function Header() {
                 <h2 id="mobile-navigation-title" className="sr-only">Mobile navigation</h2>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  className="p-2 text-gray-700  hover:text-gray-900  transition-colors rounded-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   aria-label="Close menu"
                 >
                   <X className="w-6 h-6" />
@@ -146,8 +146,8 @@ export default function Header() {
                       onClick={() => setMobileMenuOpen(false)}
                       className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                         isActive(link.href)
-                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600'
-                          : 'text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800'
+                          ? 'bg-blue-50  text-blue-600'
+                          : 'text-gray-800 hover:bg-gray-50'
                       }`}
                       aria-current={isActive(link.href) ? 'page' : undefined}
                     >
@@ -157,7 +157,7 @@ export default function Header() {
                 </div>
               </nav>
 
-              <div className="p-6 border-t border-gray-200 dark:border-gray-800">
+              <div className="p-6 border-t border-gray-200 ">
                 <Link
                   href="/apply"
                   onClick={() => setMobileMenuOpen(false)}
