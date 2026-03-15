@@ -10,6 +10,7 @@ export type MockAppStatus =
   | 'conditional'
   | 'funded'
   | 'expired'
+  | 'cancelled'
   | 'declined';
 export type MockOfferStatus = 'available' | 'approved' | 'conditional' | 'declined' | 'selected' | 'locked' | 'expired';
 export type LenderTierType = 'prime' | 'near_prime' | 'subprime';

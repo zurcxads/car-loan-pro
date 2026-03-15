@@ -4,6 +4,8 @@ import { dbGetApplicationByToken, dbGetOffer } from '@/lib/db';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 import { serverLogger } from '@/lib/server-logger';
 
+const ACTIVE_LOCKED_STATUSES = new Set(['offer_accepted', 'documents_requested', 'under_review']);
+
 export async function GET(request: NextRequest) {
   const token = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value;
   if (!token) {
@@ -17,6 +19,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (!application.lockedOfferId || !application.offerExpiresAt) {
+      return apiSuccess({ hasActive: false });
+    }
+
+    if (!ACTIVE_LOCKED_STATUSES.has(application.status)) {
       return apiSuccess({ hasActive: false });
     }
 
