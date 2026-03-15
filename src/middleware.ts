@@ -3,8 +3,46 @@ import { updateSession } from '@/lib/supabase/middleware';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limiter';
 import { verifyDevAccessRequest } from '@/lib/dev-access';
 
-function getAllowedOrigin(request: NextRequest) {
-  return process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+function normalizeOrigin(origin: string | null) {
+  if (!origin) return null;
+
+  try {
+    return new URL(origin).origin;
+  } catch {
+    return null;
+  }
+}
+
+function getAllowedOrigins(request: NextRequest) {
+  const allowedOrigins = new Set<string>();
+  const requestOrigin = normalizeOrigin(request.nextUrl.origin);
+  const configuredOrigin = normalizeOrigin(process.env.NEXT_PUBLIC_APP_URL ?? null);
+
+  if (requestOrigin) {
+    allowedOrigins.add(requestOrigin);
+  }
+
+  if (configuredOrigin) {
+    allowedOrigins.add(configuredOrigin);
+  }
+
+  return allowedOrigins;
+}
+
+function isAllowedMutationRequest(request: NextRequest) {
+  const allowedOrigins = getAllowedOrigins(request);
+  const origin = normalizeOrigin(request.headers.get('origin'));
+  const referer = normalizeOrigin(request.headers.get('referer'));
+
+  if (origin && allowedOrigins.has(origin)) {
+    return true;
+  }
+
+  if (!origin && referer && allowedOrigins.has(referer)) {
+    return true;
+  }
+
+  return false;
 }
 
 export async function middleware(request: NextRequest) {
@@ -53,10 +91,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/')
     && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
   ) {
-    const origin = request.headers.get('origin');
-    const allowedOrigin = getAllowedOrigin(request);
-
-    if (!origin || origin !== allowedOrigin) {
+    if (!isAllowedMutationRequest(request)) {
       return NextResponse.json(
         {
           error: 'Invalid request origin',
