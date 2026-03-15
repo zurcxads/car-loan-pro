@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
 import ApplicationDetailDrawer from './ApplicationDetailDrawer';
 import type { MockApplication, MockOffer } from '@/lib/mock-data';
 
@@ -12,6 +13,8 @@ type ActiveApplication = {
 type ActiveApplicationsResponse =
   | { success: true; data: { applications: ActiveApplication[] } }
   | { success: false; error?: string };
+
+const DecisionModal = dynamic(() => import('./DecisionModal'), { ssr: false });
 
 function formatCurrency(value: number | undefined) {
   if (!value) {
@@ -53,6 +56,7 @@ function getStatusLabel(status: string) {
 export default function ApplicationQueue({ lenderId }: { lenderId: string | null }) {
   const [search, setSearch] = useState('');
   const [selectedApplication, setSelectedApplication] = useState<ActiveApplication | null>(null);
+  const [requestDocsApplication, setRequestDocsApplication] = useState<MockApplication | null>(null);
   const [applications, setApplications] = useState<ActiveApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -112,6 +116,16 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
 
   const documentRequestedCount = applications.filter(({ application }) => application.status === 'documents_requested').length;
   const activeOfferCount = applications.filter(({ lockedOffer }) => lockedOffer.status === 'locked').length;
+
+  const reloadApplications = async () => {
+    const response = await fetch('/api/lender/applications', { cache: 'no-store' });
+    const payload = await response.json() as ActiveApplicationsResponse;
+    if (!response.ok || !payload.success) {
+      throw new Error(payload.success ? 'Failed to load lender applications' : payload.error || 'Failed to load lender applications');
+    }
+
+    setApplications(payload.data.applications);
+  };
 
   if (loading) {
     return (
@@ -206,6 +220,13 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
+                      onClick={() => setRequestDocsApplication(application)}
+                      className="inline-flex rounded-xl border border-[#E3E8EE] px-4 py-2.5 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC]"
+                    >
+                      Request Documents
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setSelectedApplication({ application, lockedOffer })}
                       className="inline-flex rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
                     >
@@ -243,6 +264,37 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
         <ApplicationDetailDrawer
           app={selectedApplication.application}
           onClose={() => setSelectedApplication(null)}
+          footer={(
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setSelectedApplication(null)}
+                className="rounded-xl border border-[#E3E8EE] px-4 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC]"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setRequestDocsApplication(selectedApplication.application);
+                  setSelectedApplication(null);
+                }}
+                className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+              >
+                Request Documents
+              </button>
+            </div>
+          )}
+        />
+      ) : null}
+      {requestDocsApplication ? (
+        <DecisionModal
+          app={requestDocsApplication}
+          action="request_docs"
+          onClose={() => setRequestDocsApplication(null)}
+          onSubmitted={() => {
+            void reloadApplications();
+          }}
         />
       ) : null}
     </div>

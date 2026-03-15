@@ -3,10 +3,12 @@
 import { useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { MockApplication } from '@/lib/mock-data';
 import { formatCurrency } from '@/lib/format-utils';
 import { computeMonthlyPayment } from '@/lib/underwriting-engine';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import type { DocumentRequestType } from '@/lib/types';
 
 type DecisionAction = 'approve' | 'decline' | 'counter' | 'request_docs';
 
@@ -14,6 +16,7 @@ interface Props {
   app: MockApplication;
   action: DecisionAction;
   onClose: () => void;
+  onSubmitted?: () => void;
 }
 
 const CONDITION_OPTIONS = [
@@ -38,17 +41,28 @@ const DECLINE_REASONS = [
   'Other',
 ];
 
-const DOC_TYPES = [
-  'Paystub (last 2)',
-  'Bank Statement (last 2 months)',
-  'Tax Return (most recent)',
-  'Driver License',
-  'Proof of Insurance',
-  'Proof of Residence',
-  'Other',
+const DOC_TYPES: { label: string; value: DocumentRequestType }[] = [
+  { label: 'Pay Stub', value: 'pay_stub' },
+  { label: 'ID', value: 'drivers_license' },
+  { label: 'Bank Statement', value: 'bank_statement' },
+  { label: 'Proof of Insurance', value: 'proof_of_insurance' },
+  { label: 'Proof of Residence', value: 'proof_of_residence' },
+  { label: 'Other', value: 'other' },
 ];
 
-export default function DecisionModal({ app, action, onClose }: Props) {
+const DEADLINE_OPTIONS = [
+  { label: '7 days', value: '7' },
+  { label: '14 days', value: '14' },
+  { label: '30 days', value: '30' },
+] as const;
+
+function buildDeadline(daysFromNow: string) {
+  const deadline = new Date();
+  deadline.setDate(deadline.getDate() + Number(daysFromNow));
+  return deadline.toISOString();
+}
+
+export default function DecisionModal({ app, action, onClose, onSubmitted }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
   // Approve / Counter state
   const [apr, setApr] = useState('5.49');
@@ -64,8 +78,10 @@ export default function DecisionModal({ app, action, onClose }: Props) {
   const [generateAdverse, setGenerateAdverse] = useState(true);
 
   // Request docs state
-  const [requestedDocs, setRequestedDocs] = useState<string[]>([]);
-  const [docMessage, setDocMessage] = useState(`Hi ${app.borrower.firstName}, we need some additional documents to complete your application review. Please upload the following at your earliest convenience.`);
+  const [requestedDocs, setRequestedDocs] = useState<DocumentRequestType[]>([]);
+  const [deadlineDays, setDeadlineDays] = useState<(typeof DEADLINE_OPTIONS)[number]['value']>('14');
+  const [requestNotes, setRequestNotes] = useState(`Please upload the selected documents so we can complete your application review.`);
+  const [submitting, setSubmitting] = useState(false);
 
   const monthlyPayment = computeMonthlyPayment(Number(amount), Number(apr), Number(term));
   const title =
@@ -83,13 +99,55 @@ export default function DecisionModal({ app, action, onClose }: Props) {
     setConditions(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
   };
 
-  const toggleDoc = (d: string) => {
+  const toggleDoc = (d: DocumentRequestType) => {
     setRequestedDocs(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (action === 'request_docs') {
+      if (requestedDocs.length === 0) {
+        return;
+      }
+
+      setSubmitting(true);
+
+      try {
+        const response = await fetch('/api/lender/document-requests', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            applicationId: app.id,
+            docTypes: requestedDocs,
+            deadline: buildDeadline(deadlineDays),
+            notes: requestNotes.trim() || undefined,
+          }),
+        });
+
+        const payload = await response.json() as
+          | { success: true }
+          | { success: false; error?: string };
+
+        if (!response.ok || !payload.success) {
+          toast.error(payload.success ? 'Unable to send document request.' : payload.error || 'Unable to send document request.');
+          return;
+        }
+
+        onSubmitted?.();
+      } catch {
+        toast.error('Unable to send document request.');
+        return;
+      } finally {
+        setSubmitting(false);
+      }
+    }
+
     setSubmitted(true);
-    setTimeout(() => onClose(), 2000);
+    setTimeout(() => {
+      onSubmitted?.();
+      onClose();
+    }, 1200);
   };
 
   if (submitted) {
@@ -99,10 +157,10 @@ export default function DecisionModal({ app, action, onClose }: Props) {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
             <Check className="h-7 w-7 text-blue-600" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-gray-900">
+          <h3 className="mb-2 text-lg font-semibold text-[#0A2540]">
             {action === 'approve' ? 'Offer Sent' : action === 'decline' ? 'Application Declined' : action === 'counter' ? 'Counter Offer Sent' : 'Document Request Sent'}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[#6B7C93]">
             {action === 'approve' ? `Offer sent to ${app.borrower.firstName} ${app.borrower.lastName}` : action === 'decline' ? 'Adverse action notice will be generated' : action === 'counter' ? 'Counter offer sent to borrower' : 'Document request sent via email'}
           </p>
         </motion.div>
@@ -122,7 +180,7 @@ export default function DecisionModal({ app, action, onClose }: Props) {
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-8"
+          className="w-full max-w-lg rounded-2xl border border-[#E3E8EE] bg-white p-8"
         >
           <h2 id="decision-modal-title" className="sr-only">{title}</h2>
           {/* APPROVE / COUNTER */}
@@ -219,29 +277,63 @@ export default function DecisionModal({ app, action, onClose }: Props) {
           {/* REQUEST DOCS */}
           {action === 'request_docs' && (
             <>
-              <h3 className="mb-4 text-lg font-semibold text-gray-900">Request Documents -- {app.id}</h3>
+              <h3 className="mb-1 text-lg font-semibold text-[#0A2540]">Request Documents -- {app.id}</h3>
+              <p className="mb-4 text-sm text-[#6B7C93]">Select the items this consumer must upload and set a due date.</p>
               <div className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-xs font-medium text-gray-500">Select Documents</label>
-                  <div className="space-y-2">
-                    {DOC_TYPES.map(d => (
-                      <label key={d} className="flex items-center gap-2 cursor-pointer" onClick={() => toggleDoc(d)}>
-                        <div className={`flex h-4 w-4 items-center justify-center rounded border ${requestedDocs.includes(d) ? 'border-blue-600 bg-blue-600' : 'border-gray-200'}`}>
-                          {requestedDocs.includes(d) && <Check className="h-3 w-3 text-white" />}
+                  <label className="mb-2 block text-xs font-medium uppercase tracking-[0.18em] text-[#6B7C93]">Select Documents</label>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {DOC_TYPES.map((documentType) => (
+                      <button
+                        key={documentType.value}
+                        type="button"
+                        onClick={() => toggleDoc(documentType.value)}
+                        className={`flex items-center justify-between rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
+                          requestedDocs.includes(documentType.value)
+                            ? 'border-blue-600 bg-blue-50 text-[#0A2540]'
+                            : 'border-[#E3E8EE] bg-white text-[#425466] hover:border-blue-600/40'
+                        }`}
+                      >
+                        <span>{documentType.label}</span>
+                        <div className={`flex h-5 w-5 items-center justify-center rounded border ${requestedDocs.includes(documentType.value) ? 'border-blue-600 bg-blue-600' : 'border-[#E3E8EE]'}`}>
+                          {requestedDocs.includes(documentType.value) ? <Check className="h-3.5 w-3.5 text-white" /> : null}
                         </div>
-                        <span className="text-sm text-gray-700">{d}</span>
-                      </label>
+                      </button>
                     ))}
                   </div>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500">Message to Borrower</label>
-                  <textarea value={docMessage} onChange={e => setDocMessage(e.target.value)} rows={4} className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50" />
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.18em] text-[#6B7C93]">Deadline</label>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {DEADLINE_OPTIONS.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setDeadlineDays(option.value)}
+                        className={`rounded-xl border px-4 py-3 text-sm font-medium transition-colors ${
+                          deadlineDays === option.value
+                            ? 'border-blue-600 bg-blue-50 text-blue-600'
+                            : 'border-[#E3E8EE] text-[#425466] hover:border-blue-600/40'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.18em] text-[#6B7C93]">Notes to Consumer</label>
+                  <textarea
+                    value={requestNotes}
+                    onChange={e => setRequestNotes(e.target.value)}
+                    rows={4}
+                    className="w-full resize-none rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] focus:border-blue-600 focus:outline-none"
+                  />
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
-                <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50">Cancel</button>
-                <button onClick={handleSubmit} disabled={requestedDocs.length === 0} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${requestedDocs.length > 0 ? 'cursor-pointer bg-blue-600 text-white hover:bg-blue-500' : 'cursor-not-allowed bg-gray-200 text-gray-500'}`}>Send Request</button>
+                <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-[#E3E8EE] px-4 py-3 text-sm text-[#0A2540] transition-colors hover:bg-[#F6F9FC]">Cancel</button>
+                <button onClick={() => void handleSubmit()} disabled={requestedDocs.length === 0 || submitting} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${requestedDocs.length > 0 && !submitting ? 'cursor-pointer bg-blue-600 text-white hover:bg-blue-500' : 'cursor-not-allowed bg-[#E3E8EE] text-[#6B7C93]'}`}>{submitting ? 'Sending...' : 'Send Request'}</button>
               </div>
             </>
           )}
