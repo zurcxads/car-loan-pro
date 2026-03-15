@@ -3,28 +3,20 @@ import Logo from "./Logo";
 
 const footerColumns = [
   {
-    title: "Company",
+    title: "Navigation",
     links: [
-      { label: "About", href: "/about" },
       { label: "How It Works", href: "/how-it-works" },
+      { label: "About", href: "/about" },
       { label: "Contact", href: "/contact" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { label: "Calculator", href: "/calculator" },
       { label: "Resources", href: "/resources" },
-      { label: "System Status", href: "/status" },
     ],
   },
   {
     title: "Legal",
     links: [
-      { label: "Terms", href: "/terms" },
-      { label: "Privacy", href: "/privacy" },
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
       { label: "Disclosures", href: "/disclosures" },
-      { label: "Accessibility", href: "/accessibility" },
     ],
   },
   {
@@ -35,11 +27,11 @@ const footerColumns = [
     ],
   },
   {
-    title: "Connect",
+    title: "Contact",
     links: [
-      { label: "Get Pre-Approved", href: "/apply" },
-      { label: "Sign In", href: "/login" },
       { label: "Email Us", href: "mailto:hello@autoloanpro.co" },
+      { label: "System Status", href: "/status" },
+      { label: "Accessibility", href: "/accessibility" },
     ],
   },
 ];
@@ -55,9 +47,10 @@ export default function Footer() {
               Auto Loan Pro is a marketplace built to help borrowers compare financing options with more clarity before
               they step into the dealership.
             </p>
+            <p className="mt-4 text-sm font-medium text-[#0A2540]">hello@autoloanpro.co</p>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-4">
+          <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {footerColumns.map((column) => (
               <div key={column.title}>
                 <h2 className="text-sm font-semibold text-[#0A2540]">{column.title}</h2>
@@ -85,7 +78,7 @@ export default function Footer() {
               Terms
             </Link>
             <Link href="/privacy" className="transition-colors hover:text-[#0A2540]">
-              Privacy
+              Privacy Policy
             </Link>
             <Link href="/disclosures" className="transition-colors hover:text-[#0A2540]">
               Disclosures
