@@ -102,7 +102,7 @@ function Label({
   helper?: React.ReactNode;
 }) {
   return (
-    <div className="mb-1.5 flex items-center justify-between gap-3">
+    <div className="mb-1.5 flex flex-wrap items-center gap-2">
       <label htmlFor={htmlFor} className="block text-sm font-medium text-[#0A2540]">
         {children}
       </label>
@@ -375,7 +375,7 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-4 rounded-xl bg-[#F6F9FC] p-6">
+    <section className="space-y-4 overflow-hidden rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-5 sm:p-6">
       <h3 className="text-sm font-semibold text-[#0A2540]">{title}</h3>
       {children}
     </section>
@@ -718,8 +718,8 @@ export default function ApplyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans">
-      <div className="mx-auto max-w-2xl px-4 pt-28 pb-16 sm:px-6">
+    <div className="min-h-screen bg-white pb-24 font-sans sm:pb-0">
+      <div className="mx-auto max-w-2xl px-4 pb-16 pt-28 sm:px-6">
         <div className="mb-8 space-y-4">
           {activeOfferLender && (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -753,13 +753,32 @@ export default function ApplyPage() {
                 className="h-full rounded-full bg-blue-600"
               />
             </div>
-            <div className="flex items-center justify-between sm:hidden">
-              <span className="text-sm font-medium text-[#0A2540]">{STEP_NAMES[step]}</span>
-              {isDevMode && (
-                <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">
-                  Auto-filled
-                </span>
-              )}
+            <div className="grid grid-cols-4 gap-2">
+              {STEP_NAMES.map((stepName, index) => {
+                const isActive = index === step;
+                const isComplete = index < step;
+
+                return (
+                  <div key={stepName} className="min-w-0">
+                    <div
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-colors ${
+                        isComplete || isActive
+                          ? "border-[#2563EB] bg-[#2563EB] text-white"
+                          : "border-[#D7DFE8] bg-white text-[#6B7C93]"
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                    <p
+                      className={`mt-2 text-[11px] font-medium leading-4 sm:text-xs ${
+                        isActive ? "text-[#0A2540]" : "text-[#6B7C93]"
+                      }`}
+                    >
+                      {stepName}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <div className="sr-only" aria-live="polite">
@@ -821,7 +840,7 @@ export default function ApplyPage() {
                           isValid={validateSSN(personal.ssn)}
                           autoComplete="off"
                           helper={
-                            <span className="inline-flex items-center gap-1 text-xs text-[#6B7C93]">
+                            <span className="inline-flex items-center gap-1 text-xs leading-none text-[#6B7C93]">
                               <Lock className="h-3.5 w-3.5" />
                               256-bit encrypted
                             </span>
@@ -1163,7 +1182,7 @@ export default function ApplyPage() {
                                   placeholder="123-45-6789"
                                   maxLength={11}
                                   helper={
-                                    <span className="inline-flex items-center gap-1 text-xs text-[#6B7C93]">
+                                    <span className="inline-flex items-center gap-1 text-xs leading-none text-[#6B7C93]">
                                       <Lock className="h-3.5 w-3.5" />
                                       Encrypted
                                     </span>
@@ -1274,24 +1293,22 @@ export default function ApplyPage() {
       </div>
 
       <div className="hidden sm:block">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-6 pb-10">
+        <div className={`mx-auto grid max-w-2xl gap-3 px-6 pb-10 ${step > 0 ? 'sm:grid-cols-2' : 'sm:grid-cols-1'}`}>
           {step > 0 ? (
             <button
               type="button"
               onClick={back}
-              className="min-h-[52px] rounded-full border border-[#E3E8EE] bg-white px-8 py-3.5 text-base font-medium text-[#0A2540] transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="min-h-[52px] w-full rounded-full border border-[#E3E8EE] bg-white px-8 py-3.5 text-base font-medium text-[#0A2540] transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Back
             </button>
-          ) : (
-            <div />
-          )}
+          ) : null}
           {step === 3 ? (
             <button
               type="button"
               onClick={submitApplication}
               disabled={submitting}
-              className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
               Submit Application
@@ -1300,7 +1317,7 @@ export default function ApplyPage() {
             <button
               type="button"
               onClick={next}
-              className="min-h-[52px] rounded-full bg-blue-600 px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-blue-500"
+              className="min-h-[52px] w-full rounded-full bg-blue-600 px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-blue-500"
             >
               Next Step
             </button>

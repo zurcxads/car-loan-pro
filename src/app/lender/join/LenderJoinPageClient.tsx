@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { LayoutDashboard, Shield, Users } from 'lucide-react';
 
 const ficoOptions = ['500', '550', '600', '620', '640', '660', '680', '700', '720'] as const;
 const termOptions = ['24', '36', '48', '60', '72', '84'] as const;
@@ -48,19 +49,27 @@ const valueProps = [
   {
     title: 'Pre-Qualified Leads',
     description: 'Every applicant has consented to a credit check and provided verified information',
+    icon: Users,
   },
   {
     title: 'Dashboard Access',
     description: 'Review applications, request documents, and manage decisions from your portal',
+    icon: LayoutDashboard,
   },
   {
     title: 'No Risk',
     description: 'Pay only when a deal funds. No subscription fees, no commitments',
+    icon: Shield,
   },
 ];
 
-function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label className="mb-2 block text-sm font-medium text-[#0A2540]">{children}</label>;
+function FieldLabel({ children, required = false }: { children: React.ReactNode; required?: boolean }) {
+  return (
+    <label className="mb-2 block text-sm font-medium text-[#0A2540]">
+      {children}
+      {required ? <span className="ml-1 text-[#2563EB]">*</span> : null}
+    </label>
+  );
 }
 
 function inputClassName() {
@@ -149,16 +158,19 @@ export default function LenderJoinPageClient() {
             </div>
 
             <div className="mt-12 grid gap-5 md:grid-cols-3">
-              {valueProps.map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-3xl border border-[#E3E8EE] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)]"
-                >
-                  <div className="h-10 w-10 rounded-2xl bg-blue-50 ring-1 ring-blue-100" />
-                  <h2 className="mt-5 text-lg font-semibold text-[#0A2540]">{item.title}</h2>
-                  <p className="mt-3 text-sm leading-6 text-[#425466]">{item.description}</p>
-                </div>
-              ))}
+              {valueProps.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <div key={item.title} className="rounded-3xl border border-[#E3E8EE] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-[#2563EB] ring-1 ring-blue-100">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h2 className="mt-5 text-lg font-semibold text-[#0A2540]">{item.title}</h2>
+                    <p className="mt-3 text-sm leading-6 text-[#425466]">{item.description}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -184,27 +196,36 @@ export default function LenderJoinPageClient() {
                 </p>
               </div>
 
-              <form className="space-y-10" onSubmit={handleSubmit}>
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div>
-                    <FieldLabel>Company Name</FieldLabel>
-                    <input required name="companyName" value={formData.companyName} onChange={handleChange} className={inputClassName()} />
+              <form className="space-y-8" onSubmit={handleSubmit}>
+                <div className="rounded-3xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                  <h3 className="text-lg font-semibold text-[#0A2540]">Company details</h3>
+                  <div className="mt-6 grid gap-6 md:grid-cols-2">
+                    <div>
+                      <FieldLabel required={true}>Company Name</FieldLabel>
+                      <input required name="companyName" value={formData.companyName} onChange={handleChange} className={inputClassName()} />
+                    </div>
+                    <div>
+                      <FieldLabel required={true}>NMLS Number</FieldLabel>
+                      <input required name="nmlsNumber" value={formData.nmlsNumber} onChange={handleChange} className={inputClassName()} />
+                    </div>
                   </div>
-                  <div>
-                    <FieldLabel>NMLS Number</FieldLabel>
-                    <input required name="nmlsNumber" value={formData.nmlsNumber} onChange={handleChange} className={inputClassName()} />
-                  </div>
-                  <div>
-                    <FieldLabel>Contact Name</FieldLabel>
-                    <input required name="contactName" value={formData.contactName} onChange={handleChange} className={inputClassName()} />
-                  </div>
-                  <div>
-                    <FieldLabel>Email</FieldLabel>
-                    <input required type="email" name="email" value={formData.email} onChange={handleChange} className={inputClassName()} />
-                  </div>
-                  <div className="md:col-span-2">
-                    <FieldLabel>Phone</FieldLabel>
-                    <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClassName()} />
+                </div>
+
+                <div className="rounded-3xl border border-[#E3E8EE] bg-white p-6">
+                  <h3 className="text-lg font-semibold text-[#0A2540]">Primary contact</h3>
+                  <div className="mt-6 grid gap-6 md:grid-cols-2">
+                    <div>
+                      <FieldLabel required={true}>Contact Name</FieldLabel>
+                      <input required name="contactName" value={formData.contactName} onChange={handleChange} className={inputClassName()} />
+                    </div>
+                    <div>
+                      <FieldLabel required={true}>Email</FieldLabel>
+                      <input required type="email" name="email" value={formData.email} onChange={handleChange} className={inputClassName()} />
+                    </div>
+                    <div>
+                      <FieldLabel required={true}>Phone</FieldLabel>
+                      <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClassName()} />
+                    </div>
                   </div>
                 </div>
 
@@ -212,7 +233,7 @@ export default function LenderJoinPageClient() {
                   <h3 className="text-lg font-semibold text-[#0A2540]">Lending Criteria</h3>
                   <div className="mt-6 grid gap-6 md:grid-cols-2">
                     <div>
-                      <FieldLabel>Min FICO Score</FieldLabel>
+                      <FieldLabel required={true}>Min FICO Score</FieldLabel>
                       <select name="minFicoScore" value={formData.minFicoScore} onChange={handleChange} className={inputClassName()}>
                         {ficoOptions.map((option) => (
                           <option key={option} value={option}>
@@ -222,36 +243,36 @@ export default function LenderJoinPageClient() {
                       </select>
                     </div>
                     <div>
-                      <FieldLabel>Max LTV %</FieldLabel>
+                      <FieldLabel required={true}>Max LTV %</FieldLabel>
                       <input required type="number" min="0" step="0.01" name="maxLtv" value={formData.maxLtv} onChange={handleChange} className={inputClassName()} />
                     </div>
                     <div className="md:col-span-2">
-                      <FieldLabel>Rate Range Min-Max</FieldLabel>
+                      <FieldLabel required={true}>Rate Range Min-Max</FieldLabel>
                       <div className="grid gap-4 sm:grid-cols-2">
                         <input required type="number" min="0" step="0.01" name="rateMin" value={formData.rateMin} onChange={handleChange} className={inputClassName()} placeholder="Minimum rate" />
                         <input required type="number" min="0" step="0.01" name="rateMax" value={formData.rateMax} onChange={handleChange} className={inputClassName()} placeholder="Maximum rate" />
                       </div>
                     </div>
                     <div className="md:col-span-2">
-                      <FieldLabel>States Served</FieldLabel>
+                      <FieldLabel required={true}>States Served</FieldLabel>
                       <textarea required name="statesServed" value={formData.statesServed} onChange={handleChange} rows={4} className={inputClassName()} placeholder="CA, TX, FL" />
                     </div>
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                <div className="rounded-3xl border border-[#E3E8EE] bg-white p-6">
                   <h3 className="text-lg font-semibold text-[#0A2540]">Loan Parameters</h3>
                   <div className="mt-6 grid gap-6 md:grid-cols-2">
                     <div>
-                      <FieldLabel>Min Loan Amount</FieldLabel>
+                      <FieldLabel required={true}>Min Loan Amount</FieldLabel>
                       <input required type="number" min="0" step="1" name="minLoanAmount" value={formData.minLoanAmount} onChange={handleChange} className={inputClassName()} />
                     </div>
                     <div>
-                      <FieldLabel>Max Loan Amount</FieldLabel>
+                      <FieldLabel required={true}>Max Loan Amount</FieldLabel>
                       <input required type="number" min="0" step="1" name="maxLoanAmount" value={formData.maxLoanAmount} onChange={handleChange} className={inputClassName()} />
                     </div>
                     <div>
-                      <FieldLabel>Max Term in months</FieldLabel>
+                      <FieldLabel required={true}>Max Term in months</FieldLabel>
                       <select name="maxTermMonths" value={formData.maxTermMonths} onChange={handleChange} className={inputClassName()}>
                         {termOptions.map((option) => (
                           <option key={option} value={option}>
@@ -284,7 +305,7 @@ export default function LenderJoinPageClient() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70 sm:mx-auto sm:w-auto sm:min-w-[220px]"
                 >
                   {isSubmitting ? 'Submitting...' : 'Apply to Join'}
                 </button>

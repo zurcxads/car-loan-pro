@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { Building2, Clock, Plug } from 'lucide-react';
 import { US_STATES } from '@/lib/us-states';
 
 const monthlySalesOptions = ['1-10', '11-25', '26-50', '51-100', '100+'] as const;
@@ -47,19 +48,27 @@ const valueProps = [
   {
     title: 'Instant Pre-Approval',
     description: 'Customers get real offers in minutes, not days',
+    icon: Clock,
   },
   {
     title: 'Multiple Lenders',
     description: 'More options means more approvals and better rates for your buyers',
+    icon: Building2,
   },
   {
     title: 'Seamless Integration',
     description: 'Simple dashboard to track deals and communicate with lenders',
+    icon: Plug,
   },
 ];
 
-function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label className="mb-2 block text-sm font-medium text-[#0A2540]">{children}</label>;
+function FieldLabel({ children, required = false }: { children: React.ReactNode; required?: boolean }) {
+  return (
+    <label className="mb-2 block text-sm font-medium text-[#0A2540]">
+      {children}
+      {required ? <span className="ml-1 text-[#2563EB]">*</span> : null}
+    </label>
+  );
 }
 
 function inputClassName() {
@@ -163,16 +172,19 @@ export default function DealerJoinPageClient() {
             </div>
 
             <div className="mt-12 grid gap-5 md:grid-cols-3">
-              {valueProps.map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-3xl border border-[#E3E8EE] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)]"
-                >
-                  <div className="h-10 w-10 rounded-2xl bg-blue-50 ring-1 ring-blue-100" />
-                  <h2 className="mt-5 text-lg font-semibold text-[#0A2540]">{item.title}</h2>
-                  <p className="mt-3 text-sm leading-6 text-[#425466]">{item.description}</p>
-                </div>
-              ))}
+              {valueProps.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <div key={item.title} className="rounded-3xl border border-[#E3E8EE] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-[#2563EB] ring-1 ring-blue-100">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h2 className="mt-5 text-lg font-semibold text-[#0A2540]">{item.title}</h2>
+                    <p className="mt-3 text-sm leading-6 text-[#425466]">{item.description}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -198,27 +210,36 @@ export default function DealerJoinPageClient() {
                 </p>
               </div>
 
-              <form className="space-y-10" onSubmit={handleSubmit}>
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div>
-                    <FieldLabel>Dealership Name</FieldLabel>
-                    <input required name="dealershipName" value={formData.dealershipName} onChange={handleChange} className={inputClassName()} />
+              <form className="space-y-8" onSubmit={handleSubmit}>
+                <div className="rounded-3xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                  <h3 className="text-lg font-semibold text-[#0A2540]">Dealership details</h3>
+                  <div className="mt-6 grid gap-6 md:grid-cols-2">
+                    <div>
+                      <FieldLabel required={true}>Dealership Name</FieldLabel>
+                      <input required name="dealershipName" value={formData.dealershipName} onChange={handleChange} className={inputClassName()} />
+                    </div>
+                    <div>
+                      <FieldLabel required={true}>Dealer License Number</FieldLabel>
+                      <input required name="dealerLicenseNumber" value={formData.dealerLicenseNumber} onChange={handleChange} className={inputClassName()} />
+                    </div>
                   </div>
-                  <div>
-                    <FieldLabel>Dealer License Number</FieldLabel>
-                    <input required name="dealerLicenseNumber" value={formData.dealerLicenseNumber} onChange={handleChange} className={inputClassName()} />
-                  </div>
-                  <div>
-                    <FieldLabel>Contact Name</FieldLabel>
-                    <input required name="contactName" value={formData.contactName} onChange={handleChange} className={inputClassName()} />
-                  </div>
-                  <div>
-                    <FieldLabel>Email</FieldLabel>
-                    <input required type="email" name="email" value={formData.email} onChange={handleChange} className={inputClassName()} />
-                  </div>
-                  <div className="md:col-span-2">
-                    <FieldLabel>Phone</FieldLabel>
-                    <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClassName()} />
+                </div>
+
+                <div className="rounded-3xl border border-[#E3E8EE] bg-white p-6">
+                  <h3 className="text-lg font-semibold text-[#0A2540]">Primary contact</h3>
+                  <div className="mt-6 grid gap-6 md:grid-cols-2">
+                    <div>
+                      <FieldLabel required={true}>Contact Name</FieldLabel>
+                      <input required name="contactName" value={formData.contactName} onChange={handleChange} className={inputClassName()} />
+                    </div>
+                    <div>
+                      <FieldLabel required={true}>Email</FieldLabel>
+                      <input required type="email" name="email" value={formData.email} onChange={handleChange} className={inputClassName()} />
+                    </div>
+                    <div>
+                      <FieldLabel required={true}>Phone</FieldLabel>
+                      <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClassName()} />
+                    </div>
                   </div>
                 </div>
 
@@ -226,15 +247,15 @@ export default function DealerJoinPageClient() {
                   <h3 className="text-lg font-semibold text-[#0A2540]">Address</h3>
                   <div className="mt-6 grid gap-6 md:grid-cols-2">
                     <div className="md:col-span-2">
-                      <FieldLabel>Street</FieldLabel>
+                      <FieldLabel required={true}>Street</FieldLabel>
                       <input required name="street" value={formData.street} onChange={handleChange} className={inputClassName()} />
                     </div>
                     <div>
-                      <FieldLabel>City</FieldLabel>
+                      <FieldLabel required={true}>City</FieldLabel>
                       <input required name="city" value={formData.city} onChange={handleChange} className={inputClassName()} />
                     </div>
                     <div>
-                      <FieldLabel>State</FieldLabel>
+                      <FieldLabel required={true}>State</FieldLabel>
                       <select required name="state" value={formData.state} onChange={handleChange} className={inputClassName()}>
                         <option value="">Select state</option>
                         {US_STATES.map((state) => (
@@ -245,16 +266,17 @@ export default function DealerJoinPageClient() {
                       </select>
                     </div>
                     <div>
-                      <FieldLabel>Zip</FieldLabel>
+                      <FieldLabel required={true}>Zip</FieldLabel>
                       <input required inputMode="numeric" pattern="\d{5}" name="zip" value={formData.zip} onChange={handleChange} className={inputClassName()} />
                     </div>
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                <div className="rounded-3xl border border-[#E3E8EE] bg-white p-6">
+                  <h3 className="text-lg font-semibold text-[#0A2540]">Business profile</h3>
                   <div className="grid gap-6 md:grid-cols-2">
                     <div>
-                      <FieldLabel>Monthly Vehicle Sales Volume</FieldLabel>
+                      <FieldLabel required={true}>Monthly Vehicle Sales Volume</FieldLabel>
                       <select name="monthlyVehicleSalesVolume" value={formData.monthlyVehicleSalesVolume} onChange={handleChange} className={inputClassName()}>
                         {monthlySalesOptions.map((option) => (
                           <option key={option} value={option}>
@@ -264,7 +286,7 @@ export default function DealerJoinPageClient() {
                       </select>
                     </div>
                     <div>
-                      <FieldLabel>Vehicle Types</FieldLabel>
+                      <FieldLabel required={true}>Vehicle Types</FieldLabel>
                       <div className="grid gap-3 rounded-xl border border-[#D7E0EA] bg-white p-4">
                         {vehicleTypeOptions.map((option) => (
                           <label key={option} className="flex items-center gap-3 text-sm text-[#425466]">
@@ -304,7 +326,7 @@ export default function DealerJoinPageClient() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70 sm:mx-auto sm:w-auto sm:min-w-[220px]"
                 >
                   {isSubmitting ? 'Submitting...' : 'Apply to Join'}
                 </button>
