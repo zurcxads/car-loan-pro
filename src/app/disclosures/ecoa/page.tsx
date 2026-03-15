@@ -1,9 +1,6 @@
 "use client";
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-
-const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
 
 export default function ECOANoticePage() {
   return (
@@ -15,7 +12,7 @@ export default function ECOANoticePage() {
         </div>
       </nav>
 
-      <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-3xl mx-auto px-6 py-16">
+      <div className="animate-fadeIn max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Equal Credit Opportunity Act Notice</h1>
         <p className="text-sm text-gray-500 mb-10">Your Rights Under the ECOA</p>
 
@@ -173,7 +170,7 @@ export default function ECOANoticePage() {
         <div className="mt-10 pt-8 border-t border-gray-200">
           <Link href="/disclosures" className="text-sm text-blue-600 hover:text-blue-500">← Back to Disclosures</Link>
         </div>
-      </motion.div>
+      </div>
 
       <footer className="border-t border-gray-200 py-8 px-6 bg-gray-50">
         <div className="max-w-5xl mx-auto flex flex-wrap gap-6 justify-center text-xs text-gray-400">

@@ -1,28 +1,9 @@
 "use client";
 
-import { motion } from 'framer-motion';
-
-const shimmer = {
-  hidden: { x: '-100%' },
-  visible: {
-    x: '100%',
-    transition: {
-      repeat: Infinity,
-      duration: 1.5,
-      ease: [0, 0, 1, 1] as [number, number, number, number],
-    },
-  },
-};
-
 export function SkeletonText({ className = '', width = 'w-full' }: { className?: string; width?: string }) {
   return (
     <div className={`relative h-4 ${width} bg-gray-200 rounded overflow-hidden ${className}`}>
-      <motion.div
-        variants={shimmer}
-        initial="hidden"
-        animate="visible"
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100 to-transparent"
-      />
+      <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
     </div>
   );
 }
@@ -36,12 +17,7 @@ export function SkeletonAvatar({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 
   return (
     <div className={`relative ${sizeClasses[size]} bg-gray-200 rounded-full overflow-hidden flex-shrink-0`}>
-      <motion.div
-        variants={shimmer}
-        initial="hidden"
-        animate="visible"
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100 to-transparent"
-      />
+      <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
     </div>
   );
 }
@@ -76,12 +52,7 @@ export function SkeletonCard({ className = '' }: { className?: string }) {
 
       <div className="mt-6">
         <div className="relative h-12 w-full bg-gray-200 rounded-xl overflow-hidden">
-          <motion.div
-            variants={shimmer}
-            initial="hidden"
-            animate="visible"
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100 to-transparent"
-          />
+          <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
         </div>
       </div>
     </div>
@@ -121,12 +92,7 @@ export function SkeletonDashboard() {
     <div className="space-y-8">
       {/* Hero Skeleton */}
       <div className="relative bg-gray-200 rounded-2xl p-8 h-64 overflow-hidden">
-        <motion.div
-          variants={shimmer}
-          initial="hidden"
-          animate="visible"
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100 to-transparent"
-        />
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
         <div className="relative z-10 space-y-4">
           <SkeletonText width="w-48" className="h-6" />
           <SkeletonText width="w-64" className="h-12" />
@@ -153,12 +119,7 @@ export function SkeletonDashboard() {
           <div key={i} className="bg-white rounded-xl border-2 border-gray-200 p-5">
             <div className="flex items-start justify-between mb-3">
               <div className="relative w-12 h-12 bg-gray-200 rounded-xl overflow-hidden">
-                <motion.div
-                  variants={shimmer}
-                  initial="hidden"
-                  animate="visible"
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100 to-transparent"
-                />
+                <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
               </div>
             </div>
             <SkeletonText width="w-32" className="h-5 mb-2" />

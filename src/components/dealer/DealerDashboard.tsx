@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import KPICard from '@/components/shared/KPICard';
 import { MOCK_APPLICATIONS, type MockApplication } from '@/lib/mock-data';
 
@@ -46,7 +45,7 @@ export default function DealerDashboard({ dealerId }: { dealerId: string | null 
     return (
       <div className="rounded-2xl border border-gray-200  bg-white  p-8 text-center">
         <h3 className="text-sm font-semibold text-gray-900  mb-2">No dealer activity yet</h3>
-        <p className="text-sm text-gray-500 ">Selected consumers and funded deals will appear here once real data exists in Supabase.</p>
+        <p className="text-sm text-gray-500">Selected consumers and funded deals will appear here once real data exists in Supabase.</p>
       </div>
     );
   }
@@ -55,7 +54,7 @@ export default function DealerDashboard({ dealerId }: { dealerId: string | null 
     <div>
       <div className="mb-8">
         <h2 className="text-lg font-semibold mb-1">Good morning</h2>
-        <p className="text-xs text-gray-500 ">{today}</p>
+        <p className="text-xs text-gray-500">{today}</p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
@@ -68,20 +67,15 @@ export default function DealerDashboard({ dealerId }: { dealerId: string | null 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-6"
-        >
+        <div style={{ animationDelay: '0.3s' }} className="animate-fadeIn opacity-0 rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-4">Recent Activity</h3>
           <div className="space-y-3">
             {applications.slice(0, 3).map((application) => (
               <div key={application.id} className="flex items-start gap-3 pb-3 border-b border-gray-100">
                 <div className="w-2 h-2 rounded-full bg-green-500 mt-1.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900 ">New pre-approved buyer available</p>
-                  <p className="text-xs text-gray-500 ">Application {application.id}</p>
+                  <p className="text-sm text-gray-900">New pre-approved buyer available</p>
+                  <p className="text-xs text-gray-500">Application {application.id}</p>
                 </div>
               </div>
             ))}
@@ -89,20 +83,15 @@ export default function DealerDashboard({ dealerId }: { dealerId: string | null 
               <div key={index} className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900 ">Deal activity</p>
-                  <p className="text-xs text-gray-500 ">{application.status} {application.loanAmount ? `• $${Number(application.loanAmount).toLocaleString()}` : ''}</p>
+                  <p className="text-sm text-gray-900">Deal activity</p>
+                  <p className="text-xs text-gray-500">{application.status} {application.loanAmount ? `• $${Number(application.loanAmount).toLocaleString()}` : ''}</p>
                 </div>
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-6"
-        >
+        <div style={{ animationDelay: '0.35s' }} className="animate-fadeIn opacity-0 rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
           <h3 className="text-sm font-semibold mb-4">Quick Actions</h3>
           <div className="space-y-2">
             <button className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl transition-colors text-sm font-medium cursor-pointer">
@@ -115,7 +104,7 @@ export default function DealerDashboard({ dealerId }: { dealerId: string | null 
               View Performance
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

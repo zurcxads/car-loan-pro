@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import PortalLayout from '@/components/shared/PortalLayout';
 import PlatformOverview from '@/components/admin/PlatformOverview';
 import ApplicationManagement from '@/components/admin/ApplicationManagement';
@@ -59,7 +58,7 @@ export default function AdminPortalClient({ user }: { user: PortalUser }) {
       }}
       userName={user.name || user.email || 'Admin'}
     >
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+      <div className="animate-fadeIn">
         {tab === 'overview' && <PlatformOverview />}
         {tab === 'applications' && <ApplicationManagement />}
         {tab === 'lenders' && <LenderManagement />}
@@ -67,7 +66,7 @@ export default function AdminPortalClient({ user }: { user: PortalUser }) {
         {tab === 'compliance' && <ComplianceCenter />}
         {tab === 'revenue' && <RevenueBilling />}
         {tab === 'system' && <SystemSettings />}
-      </motion.div>
+      </div>
     </PortalLayout>
   );
 }

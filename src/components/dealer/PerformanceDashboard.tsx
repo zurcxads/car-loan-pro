@@ -41,8 +41,8 @@ function SimpleBarChart({ data, dataKey, labelKey }: { data: { [key: string]: st
         return (
           <g key={i}>
             <rect x={x} y={y} width={barW} height={barH} rx={4} fill="#3B82F6" />
-            <text x={x + barW / 2} y={chartH + 18} textAnchor="middle" className="fill-gray-500 text-[11px] ">{String(d[labelKey])}</text>
-            <text x={x + barW / 2} y={y - 6} textAnchor="middle" className="fill-gray-700 text-[11px] font-medium ">{val}</text>
+            <text x={x + barW / 2} y={chartH + 18} textAnchor="middle" className="fill-gray-500 text-[11px]">{String(d[labelKey])}</text>
+            <text x={x + barW / 2} y={y - 6} textAnchor="middle" className="fill-gray-700 text-[11px] font-medium">{val}</text>
           </g>
         );
       })}
@@ -91,7 +91,7 @@ function SimpleDonutChart({ data }: { data: { name: string; value: number; color
         {arcs.map((arc, i) => (
           <div key={i} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: arc.color }} />
-            <span className="text-gray-700 ">{arc.name} {arc.pct}%</span>
+            <span className="text-gray-700">{arc.name} {arc.pct}%</span>
           </div>
         ))}
       </div>
@@ -104,7 +104,7 @@ export default function PerformanceDashboard() {
 
   return (
     <div>
-      <div className="mb-8 flex w-fit gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1  ">
+      <div className="mb-8 flex w-fit gap-1 rounded-xl border border-gray-200 bg-gray-50 p-1">
         {[['month', 'This Month'], ['lastMonth', 'Last Month'], ['90', 'Last 90 Days'], ['ytd', 'YTD']].map(([key, label]) => (
           <button key={key} onClick={() => setRange(key)} className={`cursor-pointer rounded-lg px-4 py-2 text-xs transition-colors ${range === key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}>{label}</button>
         ))}
@@ -121,19 +121,19 @@ export default function PerformanceDashboard() {
       </div>
 
       {/* Funnel */}
-      <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm  ">
-        <h3 className="mb-6 text-sm font-semibold text-gray-900 ">Conversion Funnel</h3>
+      <div className="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 className="mb-6 text-sm font-semibold text-gray-900">Conversion Funnel</h3>
         <div className="space-y-3">
           {funnelData.map((step, i) => (
             <div key={step.stage}>
               <div className="flex items-center justify-between text-sm mb-1">
-                <span className="text-gray-700 ">{step.stage}</span>
+                <span className="text-gray-700">{step.stage}</span>
                 <div className="flex items-center gap-3">
-                  <span className="font-semibold text-gray-900 ">{step.count}</span>
-                  {i > 0 && <span className="text-[10px] text-gray-500 ">{Math.round((funnelData[i].count / funnelData[i - 1].count) * 100)}% from prev</span>}
+                  <span className="font-semibold text-gray-900">{step.count}</span>
+                  {i > 0 && <span className="text-[10px] text-gray-500">{Math.round((funnelData[i].count / funnelData[i - 1].count) * 100)}% from prev</span>}
                 </div>
               </div>
-              <div className="h-3 overflow-hidden rounded-full bg-gray-100 ">
+              <div className="h-3 overflow-hidden rounded-full bg-gray-100">
                 <div className="h-full bg-blue-600 rounded-full transition-all" style={{ width: `${step.pct}%` }} />
               </div>
             </div>
@@ -143,14 +143,14 @@ export default function PerformanceDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar chart */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm  ">
-          <h3 className="mb-6 text-sm font-semibold text-gray-900 ">Funded Deals by Week</h3>
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h3 className="mb-6 text-sm font-semibold text-gray-900">Funded Deals by Week</h3>
           <SimpleBarChart data={weeklyFunded} dataKey="deals" labelKey="week" />
         </div>
 
         {/* Donut chart */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm  ">
-          <h3 className="mb-6 text-sm font-semibold text-gray-900 ">Funding by Lender</h3>
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+          <h3 className="mb-6 text-sm font-semibold text-gray-900">Funding by Lender</h3>
           <SimpleDonutChart data={lenderBreakdown} />
         </div>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 export default function ReferralPage() {
@@ -16,12 +15,12 @@ export default function ReferralPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 ">
+    <div className="min-h-screen bg-gray-50">
       {/* Nav */}
-      <nav className="bg-white  border-b border-gray-200 ">
+      <nav className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 ">Auto Loan Pro</Link>
-          <Link href="/dashboard" className="text-sm text-gray-600  hover:text-gray-900  transition-colors">
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
+          <Link href="/dashboard" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
             Dashboard
           </Link>
         </div>
@@ -29,26 +28,17 @@ export default function ReferralPage() {
 
       <div className="max-w-5xl mx-auto px-6 py-16">
         {/* Hero */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
+        <div className="animate-fadeIn text-center mb-16">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900  mb-4">
             Refer Friends, Earn Rewards
           </h1>
           <p className="text-lg text-gray-600  max-w-2xl mx-auto">
             Share Auto Loan Pro with friends and family. When they get approved, you both benefit.
           </p>
-        </motion.div>
+        </div>
 
         {/* How It Works */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-16"
-        >
+        <div style={{ animationDelay: '0.1s' }} className="animate-fadeIn opacity-0 mb-16">
           <h2 className="text-xl font-bold text-gray-900  text-center mb-10">How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
@@ -83,12 +73,10 @@ export default function ReferralPage() {
                 ),
               },
             ].map((item, i) => (
-              <motion.div
+              <div
                 key={item.step}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.1 }}
-                className="relative text-center"
+                style={{ animationDelay: `${0.2 + i * 0.1}s` }}
+                className="animate-fadeIn opacity-0 relative text-center"
               >
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 mb-4">
                   {item.icon}
@@ -100,18 +88,13 @@ export default function ReferralPage() {
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900  mb-2 mt-4">{item.title}</h3>
                 <p className="text-sm text-gray-600  leading-relaxed">{item.description}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Referral Link Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-16 p-8 rounded-2xl bg-white  border border-gray-200  shadow-sm"
-        >
+        <div style={{ animationDelay: '0.3s' }} className="animate-fadeIn opacity-0 mb-16 p-8 rounded-2xl bg-white border border-gray-200 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900  mb-6">Your Referral Link</h2>
 
           <div className="mb-4">
@@ -121,14 +104,14 @@ export default function ReferralPage() {
                 type="text"
                 value={referralCode}
                 readOnly
-                className="flex-1 px-4 py-3 bg-gray-50  border border-gray-200  rounded-lg text-sm font-mono text-gray-900 "
+                className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm font-mono text-gray-900"
               />
               <button
                 onClick={() => {
                   const newCode = 'AUTOLOAN-' + Math.random().toString(36).substring(2, 8).toUpperCase();
                   setReferralCode(newCode);
                 }}
-                className="px-4 py-3 text-sm text-gray-600  hover:text-gray-900  border border-gray-200  rounded-lg hover:bg-gray-50  transition-colors"
+                className="px-4 py-3 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Regenerate
               </button>
@@ -142,7 +125,7 @@ export default function ReferralPage() {
                 type="text"
                 value={referralLink}
                 readOnly
-                className="flex-1 px-4 py-3 bg-gray-50  border border-gray-200  rounded-lg text-sm text-gray-600  font-mono"
+                className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600 font-mono"
               />
               <button
                 onClick={copyToClipboard}
@@ -156,7 +139,7 @@ export default function ReferralPage() {
           <div className="flex flex-wrap gap-3">
             <a
               href={`mailto:?subject=Check out Auto Loan Pro&body=I found this great auto loan platform that saved me money. Get $25 off your first payment when you use my link: ${referralLink}`}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50  hover:bg-gray-100  text-gray-700  text-sm font-medium rounded-lg border border-gray-200  transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium rounded-lg border border-gray-200 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -165,7 +148,7 @@ export default function ReferralPage() {
             </a>
             <a
               href={`sms:?body=Check out Auto Loan Pro! Get $25 off your first payment: ${referralLink}`}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50  hover:bg-gray-100  text-gray-700  text-sm font-medium rounded-lg border border-gray-200  transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium rounded-lg border border-gray-200 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -173,15 +156,10 @@ export default function ReferralPage() {
               Share via Text
             </a>
           </div>
-        </motion.div>
+        </div>
 
         {/* Referrals Tracking */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mb-16 p-8 rounded-2xl bg-white  border border-gray-200  shadow-sm"
-        >
+        <div style={{ animationDelay: '0.4s' }} className="animate-fadeIn opacity-0 mb-16 p-8 rounded-2xl bg-white border border-gray-200 shadow-sm">
           <h2 className="text-lg font-semibold text-gray-900  mb-6">Your Referrals</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -189,34 +167,29 @@ export default function ReferralPage() {
               <div className="text-sm text-blue-600 font-medium mb-1">Total Referrals</div>
               <div className="text-3xl font-bold text-blue-600">0</div>
             </div>
-            <div className="rounded-xl border border-blue-200 bg-blue-50 p-6  ">
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-6">
               <div className="mb-1 text-sm font-medium text-blue-600">Approved</div>
               <div className="text-3xl font-bold text-blue-600">0</div>
             </div>
-            <div className="p-6 rounded-xl bg-blue-50  border border-blue-200 ">
+            <div className="p-6 rounded-xl bg-blue-50 border border-blue-200">
               <div className="text-sm text-blue-600 font-medium mb-1">Earnings</div>
               <div className="text-3xl font-bold text-blue-600">$0</div>
             </div>
           </div>
 
-          <div className="text-center py-12 border-t border-gray-200 ">
+          <div className="text-center py-12 border-t border-gray-200">
             <svg className="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <p className="text-sm text-gray-500  mb-2">No referrals yet</p>
-            <p className="text-xs text-gray-400 ">Share your link above to start earning rewards</p>
+            <p className="text-sm text-gray-500 mb-2">No referrals yet</p>
+            <p className="text-xs text-gray-400">Share your link above to start earning rewards</p>
           </div>
-        </motion.div>
+        </div>
 
         {/* Terms */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="p-8 rounded-2xl bg-gray-50  border border-gray-200 "
-        >
+        <div style={{ animationDelay: '0.5s' }} className="animate-fadeIn opacity-0 p-8 rounded-2xl bg-gray-50 border border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900  mb-4">Program Terms</h2>
-          <div className="space-y-3 text-sm text-gray-600 ">
+          <div className="space-y-3 text-sm text-gray-600">
             <div className="flex gap-2">
               <span className="text-blue-600 mt-0.5">&bull;</span>
               <p>Referral rewards are paid after your friend&apos;s loan is funded and first payment is received.</p>
@@ -242,7 +215,7 @@ export default function ReferralPage() {
               <p>Maximum 10 successful referrals per calendar year per account.</p>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

@@ -119,7 +119,7 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
     return (
       <div className="rounded-xl bg-white  border border-gray-200  shadow-sm p-8 text-center">
         <h3 className="text-sm font-semibold text-gray-900  mb-2">Applications unavailable</h3>
-        <p className="text-sm text-gray-500 ">{error}</p>
+        <p className="text-sm text-gray-500">{error}</p>
       </div>
     );
   }
@@ -135,7 +135,7 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
         ].map((metric, index) => (
           <div key={index} className="rounded-xl bg-white  border border-gray-200  p-4 shadow-sm">
             <div className="text-[10px] text-gray-500  uppercase tracking-wider mb-1">{metric.label}</div>
-            <div className="text-2xl font-semibold text-gray-900 ">{metric.value}</div>
+            <div className="text-2xl font-semibold text-gray-900">{metric.value}</div>
           </div>
         ))}
       </div>
@@ -172,14 +172,14 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
         )}
       </div>
 
-      <div className="mb-4 text-sm text-gray-600 ">
+      <div className="mb-4 text-sm text-gray-600">
         {filtered.length} application{filtered.length !== 1 ? 's' : ''}
       </div>
 
       <div className="rounded-xl bg-white  border border-gray-200  shadow-sm overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200  bg-gray-50 ">
+            <tr className="border-b border-gray-200  bg-gray-50">
               <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">ID</th>
               <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Borrower</th>
               <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Credit Tier</th>
@@ -194,23 +194,23 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
               const matchScore = Math.min(95, 60 + (app.credit.ficoScore || 600) / 15);
               return (
                 <tr key={app.id} className="border-b border-gray-100  hover:bg-gray-50  transition-colors">
-                  <td className="py-4 px-4 font-mono text-xs text-gray-500 ">{app.id}</td>
+                  <td className="py-4 px-4 font-mono text-xs text-gray-500">{app.id}</td>
                   <td className="py-4 px-4">
-                    <div className="text-sm font-medium text-gray-900 ">{app.borrower.firstName} {app.borrower.lastName.charAt(0)}.</div>
-                    <div className="text-xs text-gray-500 ">{app.state}</div>
+                    <div className="text-sm font-medium text-gray-900">{app.borrower.firstName} {app.borrower.lastName.charAt(0)}.</div>
+                    <div className="text-xs text-gray-500">{app.state}</div>
                   </td>
                   <td className="py-4 px-4">
                     <span className={`text-sm font-medium ${ficoColor(app.credit.ficoScore)}`}>
                       {app.credit.scoreTier.replace(/_/g, ' ')}
                     </span>
                   </td>
-                  <td className="py-4 px-4 text-sm font-medium text-gray-900 ">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</td>
+                  <td className="py-4 px-4 text-sm font-medium text-gray-900">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</td>
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-1.5 bg-gray-100  rounded-full overflow-hidden max-w-[60px]">
                         <div className="h-full bg-blue-600 rounded-full" style={{ width: `${matchScore}%` }} />
                       </div>
-                      <span className="text-xs font-medium text-gray-700 ">{Math.round(matchScore)}%</span>
+                      <span className="text-xs font-medium text-gray-700">{Math.round(matchScore)}%</span>
                     </div>
                   </td>
                   <td className="py-4 px-4"><StatusBadge status={app.status} /></td>
@@ -225,12 +225,12 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
           </tbody>
         </table>
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-sm text-gray-500 ">
+          <div className="text-center py-12 text-sm text-gray-500">
             {apps.length === 0 ? 'No applications are assigned to this lender yet.' : 'No applications found.'}
           </div>
         )}
         {filtered.length > 20 && (
-          <div className="p-4 text-center text-xs text-gray-500  border-t border-gray-200 ">
+          <div className="p-4 text-center text-xs text-gray-500  border-t border-gray-200">
             Showing first 20 of {filtered.length} results
           </div>
         )}

@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { isDev as isDevEnvironment } from '@/lib/env';
 
@@ -137,7 +136,7 @@ function ReferralsContent() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-12">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="animate-fadeIn">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Referral Program</h1>
             <p className="text-gray-500">Earn $50 for every friend who gets funded through Auto Loan Pro</p>
@@ -259,7 +258,7 @@ function ReferralsContent() {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

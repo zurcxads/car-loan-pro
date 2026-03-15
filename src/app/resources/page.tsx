@@ -12,11 +12,11 @@ export const metadata: Metadata = createPageMetadata({
 
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-white ">
+    <div className="min-h-screen bg-white">
       {/* Hero */}
       <section className="pt-28 pb-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 ">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
             Auto Loan Resources
           </h1>
           <p className="mt-4 text-lg text-gray-600  font-light">
@@ -38,7 +38,7 @@ export default function ResourcesPage() {
                 <span className="inline-flex px-2.5 py-1 rounded-full bg-blue-50  border border-blue-200  text-blue-600 text-xs font-medium">
                   {article.category}
                 </span>
-                <span className="text-xs text-gray-500 ">{article.readTime}</span>
+                <span className="text-xs text-gray-500">{article.readTime}</span>
               </div>
               <h2 className="text-lg font-semibold text-gray-900  mb-2 group-hover:text-blue-600 transition-colors duration-200">
                 {article.title}
@@ -56,8 +56,8 @@ export default function ResourcesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200  py-12 px-6 bg-gray-50 ">
-        <div className="max-w-5xl mx-auto text-center text-xs text-gray-500 ">
+      <footer className="border-t border-gray-200  py-12 px-6 bg-gray-50">
+        <div className="max-w-5xl mx-auto text-center text-xs text-gray-500">
           Auto Loan Pro is not a lender. Offers are subject to credit approval. NMLS #000000
         </div>
       </footer>

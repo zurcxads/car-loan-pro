@@ -1,21 +1,18 @@
 "use client";
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-
-const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-white ">
-      <nav className="border-b border-gray-200  bg-white ">
+    <div className="min-h-screen bg-white">
+      <nav className="border-b border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 ">Auto Loan Pro</Link>
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
           <Link href="/apply" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors duration-200">Apply Now</Link>
         </div>
       </nav>
 
-      <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-3xl mx-auto px-6 py-16">
+      <div className="animate-fadeIn max-w-3xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-bold text-gray-900  mb-2">Privacy Policy</h1>
         <p className="text-sm text-gray-500  mb-10">Effective Date: March 13, 2026</p>
 
@@ -327,14 +324,14 @@ export default function PrivacyPage() {
             <p>For privacy rights requests (access, deletion, correction), please include your full name, email address, and a description of your request. We will respond within the timeframes required by applicable law.</p>
           </section>
         </div>
-      </motion.div>
+      </div>
 
-      <footer className="border-t border-gray-200  py-8 px-6 bg-gray-50 ">
-        <div className="max-w-5xl mx-auto flex flex-wrap gap-6 justify-center text-xs text-gray-400 ">
-          <Link href="/privacy" className="hover:text-gray-600 ">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-gray-600 ">Terms of Service</Link>
-          <Link href="/disclosures" className="hover:text-gray-600 ">Disclosures</Link>
-          <Link href="/contact" className="hover:text-gray-600 ">Contact</Link>
+      <footer className="border-t border-gray-200 py-8 px-6 bg-gray-50">
+        <div className="max-w-5xl mx-auto flex flex-wrap gap-6 justify-center text-xs text-gray-400">
+          <Link href="/privacy" className="hover:text-gray-600">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-gray-600">Terms of Service</Link>
+          <Link href="/disclosures" className="hover:text-gray-600">Disclosures</Link>
+          <Link href="/contact" className="hover:text-gray-600">Contact</Link>
         </div>
       </footer>
     </div>

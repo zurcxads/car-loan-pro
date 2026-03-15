@@ -678,7 +678,7 @@ function ResultsContent() {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-gray-900  mb-1">Rate Lock Guarantee</h4>
-            <p className="text-xs text-gray-600 ">
+            <p className="text-xs text-gray-600">
               Your rates are locked until <strong>{expirationDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</strong> (30 days from today)
             </p>
           </div>
@@ -731,7 +731,7 @@ function ResultsContent() {
                         )}
                       </button>
                     )}
-                    <h3 className="text-xl font-bold text-gray-900 ">{offer.label}</h3>
+                    <h3 className="text-xl font-bold text-gray-900">{offer.label}</h3>
                   </div>
                   <div className="flex flex-col gap-1.5 items-end">
                     {offer.tag && (
@@ -756,7 +756,7 @@ function ResultsContent() {
                 {/* Savings Badge */}
                 {savings > 0 && (
                   <div className="mb-4 bg-blue-50  border border-blue-200  rounded-lg px-3 py-2">
-                    <p className="text-xs text-blue-800 ">
+                    <p className="text-xs text-blue-800">
                       <strong>Save ${savings.toLocaleString()}</strong> vs. average dealer markup
                     </p>
                   </div>
@@ -765,35 +765,35 @@ function ResultsContent() {
                 <div className="space-y-5 flex-1">
                   <div>
                     <div className="flex items-center gap-1.5 mb-2">
-                      <span className="text-xs text-gray-500 ">APR</span>
+                      <span className="text-xs text-gray-500">APR</span>
                       <Tooltip content="Annual Percentage Rate - the yearly cost of your loan including interest" />
                     </div>
-                    <div className="text-5xl font-bold text-gray-900 ">{apr.toFixed(2)}%</div>
+                    <div className="text-5xl font-bold text-gray-900">{apr.toFixed(2)}%</div>
                   </div>
 
                   <div>
                     <div className="flex items-center gap-1.5 mb-2">
-                      <span className="text-xs text-gray-500 ">Monthly Payment</span>
+                      <span className="text-xs text-gray-500">Monthly Payment</span>
                       <Tooltip content="Your estimated monthly payment including principal and interest" />
                     </div>
-                    <div className="text-3xl font-bold text-gray-900 ">${payment.toLocaleString()}</div>
+                    <div className="text-3xl font-bold text-gray-900">${payment.toLocaleString()}</div>
                     <div className="text-xs text-gray-500  mt-1">for {term} months</div>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-200 ">
+                  <div className="pt-4 border-t border-gray-200">
                     <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-xs text-gray-500 ">Total Cost</span>
+                      <span className="text-xs text-gray-500">Total Cost</span>
                       <Tooltip content="Total amount you'll pay over the life of the loan (principal + interest + down payment)" />
                     </div>
-                    <div className="text-lg font-semibold text-gray-700 ">${totalCost.toLocaleString()}</div>
+                    <div className="text-lg font-semibold text-gray-700">${totalCost.toLocaleString()}</div>
                     <div className="text-xs text-gray-500  mt-0.5">over {term} months</div>
                   </div>
 
-                  <div className="pt-4 border-t border-gray-200 ">
+                  <div className="pt-4 border-t border-gray-200">
                     <div className="flex items-center gap-1.5 mb-1">
-                      <span className="text-xs text-gray-500 ">Approved Amount</span>
+                      <span className="text-xs text-gray-500">Approved Amount</span>
                     </div>
-                    <div className="text-lg font-semibold text-gray-900 ">
+                    <div className="text-lg font-semibold text-gray-900">
                       {offer.maxApprovedAmount
                         ? `Up to $${offer.maxApprovedAmount.toLocaleString()}`
                         : `$${offer.approvedAmount.toLocaleString()}`}
@@ -832,7 +832,7 @@ function ResultsContent() {
               <p className="text-sm text-gray-600  leading-relaxed mb-3">
                 Offers are anonymized to help you focus on the numbers, not the brand. When you select an offer, the lender will be revealed and you'll receive your pre-approval letter.
               </p>
-              <p className="text-xs text-gray-600 ">
+              <p className="text-xs text-gray-600">
                 <strong>Important:</strong> Rates shown are estimates. A hard credit inquiry will be performed by the lender to finalize your offer. This may affect your credit score.
               </p>
             </div>

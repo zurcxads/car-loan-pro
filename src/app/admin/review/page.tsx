@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 
 interface ReviewApplication {
   id: string;
@@ -116,12 +115,10 @@ export default function AdminReviewPage() {
         ) : (
           <div className="space-y-4">
             {applications.map((app, index) => (
-              <motion.div
+              <div
                 key={app.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-2xl border border-gray-200 p-6"
+                style={{ animationDelay: `${index * 0.05}s` }}
+                className="animate-fadeIn opacity-0 bg-white rounded-2xl border border-gray-200 p-6"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
@@ -185,7 +182,7 @@ export default function AdminReviewPage() {
                     View Details →
                   </Link>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}

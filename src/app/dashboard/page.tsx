@@ -4,7 +4,6 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { SkeletonDashboard } from '@/components/shared/Skeleton';
 import { isDev as isDevEnvironment } from '@/lib/env';
 
@@ -189,7 +188,7 @@ function DashboardContent() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="animate-fadeIn">
           {/* Welcome */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -199,12 +198,7 @@ function DashboardContent() {
           </div>
 
           {/* Status Hero Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 mb-8 text-white shadow-xl"
-          >
+          <div style={{ animationDelay: '0.1s' }} className="animate-fadeIn opacity-0 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 mb-8 text-white shadow-xl">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-4">
@@ -252,15 +246,10 @@ function DashboardContent() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Status Timeline */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 mb-8"
-          >
+          <div style={{ animationDelay: '0.2s' }} className="animate-fadeIn opacity-0 bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 mb-8">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">Application Progress</h2>
             <div className="relative">
               {/* Progress bar background */}
@@ -295,15 +284,10 @@ function DashboardContent() {
                 ))}
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* What's Next Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-green-50 to-blue-50 border border-green-200 rounded-2xl p-6 mb-8"
-          >
+          <div style={{ animationDelay: '0.3s' }} className="animate-fadeIn opacity-0 bg-gradient-to-br from-green-50 to-blue-50 border border-green-200 rounded-2xl p-6 mb-8">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -344,15 +328,10 @@ function DashboardContent() {
                 </ul>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Recent Activity Feed */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-white rounded-2xl border border-gray-200 p-6 mb-8"
-          >
+          <div style={{ animationDelay: '0.4s' }} className="animate-fadeIn opacity-0 bg-white rounded-2xl border border-gray-200 p-6 mb-8">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
             <div className="space-y-4">
               <div className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
@@ -399,14 +378,10 @@ function DashboardContent() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Quick Actions Grid - Single column on mobile */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
+          <div style={{ animationDelay: '0.5s' }} className="animate-fadeIn opacity-0">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* View Offers */}
@@ -500,7 +475,7 @@ function DashboardContent() {
                 </Link>
               )}
             </div>
-          </motion.div>
+          </div>
 
           {/* Help Section */}
           <div className="mt-8 bg-blue-50 border border-blue-100 rounded-2xl p-6">
@@ -526,7 +501,7 @@ function DashboardContent() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

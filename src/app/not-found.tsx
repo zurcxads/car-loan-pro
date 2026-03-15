@@ -80,7 +80,7 @@ export default function NotFound() {
                   <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} />
                   </svg>
-                  <span className="text-xs font-medium text-gray-700 ">{link.label}</span>
+                  <span className="text-xs font-medium text-gray-700">{link.label}</span>
                 </Link>
               ))}
             </div>
@@ -88,7 +88,7 @@ export default function NotFound() {
 
           {/* Help Text */}
           <div className="mt-12 pt-8 border-t border-gray-200  max-w-md mx-auto">
-            <p className="text-sm text-gray-500 ">
+            <p className="text-sm text-gray-500">
               Need help? Contact us at{' '}
               <a href="mailto:hello@autoloanpro.co" className="text-blue-600 hover:text-blue-700 font-medium">
                 hello@autoloanpro.co

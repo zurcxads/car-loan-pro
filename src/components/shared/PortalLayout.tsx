@@ -42,7 +42,7 @@ export default function PortalLayout({
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50 ">
+    <div className="min-h-screen flex bg-gray-50">
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/40 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
@@ -50,7 +50,7 @@ export default function PortalLayout({
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-60 bg-white  border-r border-gray-200  flex flex-col transform transition-transform duration-200 lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="p-6 border-b border-gray-200 ">
+        <div className="p-6 border-b border-gray-200">
           <Link href="/" className="block"><Logo size="sm" /></Link>
           <span className={`text-[10px] px-2.5 py-1 rounded-full font-medium uppercase tracking-wider mt-2 inline-block ${badgeStyles[badgeColor] || badgeStyles.blue}`}>
             {portalBadge}
@@ -74,7 +74,7 @@ export default function PortalLayout({
           ))}
         </nav>
 
-        <div className="p-4 border-t border-gray-200 ">
+        <div className="p-4 border-t border-gray-200">
           {userName && <div className="text-xs text-gray-500  mb-2 truncate">{userName}</div>}
           <button
             onClick={onLogout}
@@ -95,10 +95,10 @@ export default function PortalLayout({
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
               </button>
-              <h1 className="text-sm font-semibold text-gray-900 ">{portalName}</h1>
+              <h1 className="text-sm font-semibold text-gray-900">{portalName}</h1>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-[10px] text-gray-400 ">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              <span className="text-[10px] text-gray-400">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
             </div>
           </div>
         </div>

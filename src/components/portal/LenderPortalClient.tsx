@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import PortalLayout from '@/components/shared/PortalLayout';
 import ApplicationQueue from '@/components/lender/ApplicationQueue';
 import UnderwritingRules from '@/components/lender/UnderwritingRules';
@@ -48,13 +47,13 @@ export default function LenderPortalClient({ user }: { user: PortalUser }) {
       }}
       userName={user.name || user.email || 'Lender'}
     >
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+      <div className="animate-fadeIn">
         {tab === 'applications' && <ApplicationQueue lenderId={user.entityId || null} />}
         {tab === 'underwriting' && <UnderwritingRules />}
         {tab === 'pipeline' && <Pipeline />}
         {tab === 'reporting' && <Reporting />}
         {tab === 'settings' && <LenderSettings />}
-      </motion.div>
+      </div>
     </PortalLayout>
   );
 }

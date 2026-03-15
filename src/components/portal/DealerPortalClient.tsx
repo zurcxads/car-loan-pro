@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import PortalLayout from '@/components/shared/PortalLayout';
 import DealerDashboard from '@/components/dealer/DealerDashboard';
 import BuyerInbox from '@/components/dealer/BuyerInbox';
@@ -48,13 +47,13 @@ export default function DealerPortalClient({ user }: { user: PortalUser }) {
       }}
       userName={user.name || user.email || 'Dealer'}
     >
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+      <div className="animate-fadeIn">
         {tab === 'dashboard' && <DealerDashboard dealerId={user.entityId || null} />}
         {tab === 'shoppers' && <BuyerInbox dealerId={user.entityId || null} onStartDeal={() => {}} />}
         {tab === 'leads' && <LeadManagement />}
         {tab === 'performance' && <PerformanceDashboard />}
         {tab === 'settings' && <DealerSettings />}
-      </motion.div>
+      </div>
     </PortalLayout>
   );
 }

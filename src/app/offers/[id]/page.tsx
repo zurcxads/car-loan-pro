@@ -4,11 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import Footer from '@/components/shared/Footer';
-
-const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 
 // Mock offer data (in production, this would come from API/database)
 interface OfferDetails {
@@ -141,9 +137,9 @@ export default function OfferDetailPage() {
       </nav>
 
       <section className="pt-32 pb-16 px-6">
-        <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           {/* Success Banner */}
-          <motion.div variants={fadeUp} className="rounded-2xl bg-green-50 border border-green-200 p-8 text-center mb-8">
+          <div className="animate-fadeIn rounded-2xl bg-green-50 border border-green-200 p-8 text-center mb-8">
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -151,10 +147,10 @@ export default function OfferDetailPage() {
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Congratulations! You're Pre-Approved</h1>
             <p className="text-gray-600">Your pre-approval is ready. Here are the full details of your selected offer.</p>
-          </motion.div>
+          </div>
 
           {/* Lender Info */}
-          <motion.div variants={fadeUp} className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8 mb-6">
+          <div style={{ animationDelay: '0.1s' }} className="animate-fadeIn opacity-0 rounded-2xl border border-gray-200 bg-white shadow-sm p-8 mb-6">
             <div className="flex items-start justify-between mb-6">
               <div>
                 <div className="text-sm text-gray-500 mb-1">Your Lender</div>
@@ -176,10 +172,10 @@ export default function OfferDetailPage() {
                 <div className="text-lg font-semibold text-gray-900">{new Date(offer.expiresAt).toLocaleDateString()}</div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Full Terms */}
-          <motion.div variants={fadeUp} className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8 mb-6">
+          <div style={{ animationDelay: '0.2s' }} className="animate-fadeIn opacity-0 rounded-2xl border border-gray-200 bg-white shadow-sm p-8 mb-6">
             <h3 className="text-lg font-bold text-gray-900 mb-6">Full Loan Terms</h3>
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="p-4 rounded-xl bg-gray-50 border border-gray-200">
@@ -216,10 +212,10 @@ export default function OfferDetailPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Payment Schedule */}
-          <motion.div variants={fadeUp} className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8 mb-6">
+          <div style={{ animationDelay: '0.3s' }} className="animate-fadeIn opacity-0 rounded-2xl border border-gray-200 bg-white shadow-sm p-8 mb-6">
             <h3 className="text-lg font-bold text-gray-900 mb-6">Payment Schedule Preview (First 6 Months)</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -245,10 +241,10 @@ export default function OfferDetailPage() {
                 </tbody>
               </table>
             </div>
-          </motion.div>
+          </div>
 
           {/* What Happens Next */}
-          <motion.div variants={fadeUp} className="rounded-2xl border border-gray-200 bg-white shadow-sm p-8 mb-6">
+          <div style={{ animationDelay: '0.4s' }} className="animate-fadeIn opacity-0 rounded-2xl border border-gray-200 bg-white shadow-sm p-8 mb-6">
             <h3 className="text-lg font-bold text-gray-900 mb-6">What Happens Next</h3>
             <div className="space-y-6">
               <div className="flex gap-4">
@@ -273,10 +269,10 @@ export default function OfferDetailPage() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Actions */}
-          <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
+          <div style={{ animationDelay: '0.5s' }} className="animate-fadeIn opacity-0 flex flex-col sm:flex-row gap-4">
             <button
               onClick={handleDownloadLetter}
               className="flex-1 py-4 bg-blue-600 hover:bg-blue-500 text-white text-base font-semibold rounded-xl transition-colors duration-200 cursor-pointer"
@@ -289,14 +285,14 @@ export default function OfferDetailPage() {
             >
               Share via Email
             </button>
-          </motion.div>
+          </div>
 
-          <motion.div variants={fadeUp} className="mt-6 text-center">
+          <div style={{ animationDelay: '0.6s' }} className="animate-fadeIn opacity-0 mt-6 text-center">
             <Link href="/results" className="text-sm text-blue-600 hover:text-blue-500 underline">
               Change My Selection
             </Link>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
       <Footer />

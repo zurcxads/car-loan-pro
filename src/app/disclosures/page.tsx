@@ -1,11 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { BarChart3, Scale, Megaphone, Map } from 'lucide-react';
-
-const fadeUp = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] } } };
-const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 
 const disclosures = [
   {
@@ -57,7 +53,7 @@ export default function DisclosuresHubPage() {
         </div>
       </nav>
 
-      <motion.div initial="hidden" animate="visible" variants={fadeUp} className="max-w-4xl mx-auto px-6 py-16">
+      <div className="animate-fadeIn max-w-4xl mx-auto px-6 py-16">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Disclosures & Legal Information</h1>
         <p className="text-base text-gray-600 mb-12 max-w-2xl">
           Auto Loan Pro is committed to transparency and compliance with federal and state consumer protection laws.
@@ -66,9 +62,9 @@ export default function DisclosuresHubPage() {
 
         <section className="mb-16">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Consumer Rights & Disclosures</h2>
-          <motion.div initial="hidden" animate="visible" variants={stagger} className="grid md:grid-cols-2 gap-5">
+          <div className="grid md:grid-cols-2 gap-5">
             {disclosures.map((item, i) => (
-              <motion.div key={i} variants={fadeUp}>
+              <div key={item.href} style={{ animationDelay: `${i * 0.08}s` }} className="animate-fadeIn opacity-0">
                 <Link href={item.href} className="block p-6 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 h-full">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
@@ -81,16 +77,16 @@ export default function DisclosuresHubPage() {
                     </div>
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </section>
 
         <section className="mb-16">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Legal Documents</h2>
-          <motion.div initial="hidden" animate="visible" variants={stagger} className="space-y-4">
+          <div className="space-y-4">
             {legalLinks.map((item, i) => (
-              <motion.div key={i} variants={fadeUp}>
+              <div key={item.href} style={{ animationDelay: `${0.12 + i * 0.08}s` }} className="animate-fadeIn opacity-0">
                 <Link href={item.href} className="block p-5 rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-sm transition-all duration-200">
                   <div className="flex items-center justify-between">
                     <div>
@@ -100,9 +96,9 @@ export default function DisclosuresHubPage() {
                     <div className="text-blue-600 text-xl">→</div>
                   </div>
                 </Link>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </section>
 
         <section className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-16">
@@ -140,7 +136,7 @@ export default function DisclosuresHubPage() {
         <div className="mt-12 pt-8 border-t border-gray-200 text-center">
           <Link href="/" className="text-sm text-blue-600 hover:text-blue-500">← Back to Home</Link>
         </div>
-      </motion.div>
+      </div>
 
       <footer className="border-t border-gray-200 py-8 px-6 bg-gray-50">
         <div className="max-w-5xl mx-auto flex flex-wrap gap-6 justify-center text-xs text-gray-400">

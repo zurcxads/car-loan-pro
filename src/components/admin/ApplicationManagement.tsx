@@ -89,7 +89,7 @@ export default function ApplicationManagement() {
       </div>
 
       {/* Results count */}
-      <div className="mb-4 text-sm text-gray-600 ">
+      <div className="mb-4 text-sm text-gray-600">
         Showing {filtered.length} application{filtered.length !== 1 ? 's' : ''}
       </div>
 
@@ -97,7 +97,7 @@ export default function ApplicationManagement() {
       <div className="rounded-xl bg-white  border border-gray-200  shadow-sm overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200  bg-gray-50 ">
+            <tr className="border-b border-gray-200  bg-gray-50">
               <th className="text-left py-3 px-4 text-[10px] text-gray-600  uppercase tracking-wider font-medium">ID</th>
               <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Borrower</th>
               <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Date</th>
@@ -116,12 +116,12 @@ export default function ApplicationManagement() {
                   className="border-b border-gray-100  hover:bg-gray-50  transition-colors cursor-pointer"
                   onClick={() => toggleRow(app.id)}
                 >
-                  <td className="py-3 px-4 font-mono text-xs text-gray-500 ">{app.id}</td>
+                  <td className="py-3 px-4 font-mono text-xs text-gray-500">{app.id}</td>
                   <td className="py-3 px-4">
-                    <div className="text-sm font-medium text-gray-900 ">{app.borrower.firstName} {app.borrower.lastName}</div>
-                    <div className="text-xs text-gray-500 ">{app.borrower.email}</div>
+                    <div className="text-sm font-medium text-gray-900">{app.borrower.firstName} {app.borrower.lastName}</div>
+                    <div className="text-xs text-gray-500">{app.borrower.email}</div>
                   </td>
-                  <td className="py-3 px-4 text-xs text-gray-500 ">{formatRelativeTime(app.submittedAt)}</td>
+                  <td className="py-3 px-4 text-xs text-gray-500">{formatRelativeTime(app.submittedAt)}</td>
                   <td className="py-3 px-4">
                     <span className={`text-xs font-medium ${ficoColor(app.credit.ficoScore)}`}>
                       {app.credit.scoreTier.replace(/_/g, ' ')}
@@ -129,7 +129,7 @@ export default function ApplicationManagement() {
                   </td>
                   <td className="py-3 px-4"><StatusBadge status={app.status} /></td>
                   <td className="py-3 px-4 text-sm font-medium">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</td>
-                  <td className="py-3 px-4 text-sm text-gray-600 ">{app.lendersSubmitted} sent / {app.offersReceived} offers</td>
+                  <td className="py-3 px-4 text-sm text-gray-600">{app.lendersSubmitted} sent / {app.offersReceived} offers</td>
                   <td className="py-3 px-4">
                     <svg className={`w-4 h-4 text-gray-400 transition-transform ${expandedRow === app.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -137,22 +137,22 @@ export default function ApplicationManagement() {
                   </td>
                 </tr>
                 {expandedRow === app.id && (
-                  <tr className="bg-gray-50 ">
+                  <tr className="bg-gray-50">
                     <td colSpan={8} className="p-6">
                       <div className="grid grid-cols-3 gap-6">
                         <div>
                           <h4 className="text-xs font-semibold text-gray-900  mb-3">Credit Profile</h4>
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
-                              <span className="text-gray-600 ">FICO:</span>
+                              <span className="text-gray-600">FICO:</span>
                               <span className={`font-medium ${ficoColor(app.credit.ficoScore)}`}>{app.credit.ficoScore || 'N/A'}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-600 ">DTI:</span>
+                              <span className="text-gray-600">DTI:</span>
                               <span className={`font-medium ${dtiColor(app.dtiPercent)}`}>{app.dtiPercent}%</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-600 ">LTV:</span>
+                              <span className="text-gray-600">LTV:</span>
                               <span className={`font-medium ${ltvColor(app.ltvPercent || 0)}`}>{app.ltvPercent || 'N/A'}{app.ltvPercent ? '%' : ''}</span>
                             </div>
                           </div>
@@ -161,11 +161,11 @@ export default function ApplicationManagement() {
                           <h4 className="text-xs font-semibold text-gray-900  mb-3">Employment</h4>
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
-                              <span className="text-gray-600 ">Income:</span>
+                              <span className="text-gray-600">Income:</span>
                               <span className="font-medium">{formatCurrency(app.employment.grossMonthlyIncome)}/mo</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-600 ">Employer:</span>
+                              <span className="text-gray-600">Employer:</span>
                               <span className="font-medium text-right">{app.employment.employer}</span>
                             </div>
                           </div>
@@ -176,11 +176,11 @@ export default function ApplicationManagement() {
                             {app.vehicle ? (
                               <>
                                 <div className="font-medium">{app.vehicle.year} {app.vehicle.make} {app.vehicle.model}</div>
-                                <div className="text-gray-600 ">{app.vehicle.mileage?.toLocaleString()} mi</div>
-                                <div className="text-gray-600 ">Asking: {formatCurrency(app.vehicle.askingPrice)}</div>
+                                <div className="text-gray-600">{app.vehicle.mileage?.toLocaleString()} mi</div>
+                                <div className="text-gray-600">Asking: {formatCurrency(app.vehicle.askingPrice)}</div>
                               </>
                             ) : (
-                              <div className="text-gray-500 ">Pre-Approval (No vehicle)</div>
+                              <div className="text-gray-500">Pre-Approval (No vehicle)</div>
                             )}
                           </div>
                         </div>
@@ -198,10 +198,10 @@ export default function ApplicationManagement() {
           </tbody>
         </table>
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-sm text-gray-500 ">No applications found</div>
+          <div className="text-center py-12 text-sm text-gray-500">No applications found</div>
         )}
         {filtered.length > 20 && (
-          <div className="p-4 text-center text-xs text-gray-500  border-t border-gray-200 ">
+          <div className="p-4 text-center text-xs text-gray-500  border-t border-gray-200">
             Showing first 20 of {filtered.length} results
           </div>
         )}

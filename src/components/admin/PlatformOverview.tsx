@@ -159,7 +159,7 @@ export default function PlatformOverview() {
     return (
       <div className="rounded-xl bg-white  border border-gray-200  shadow-sm p-8 text-center">
         <h3 className="text-sm font-semibold text-gray-900  mb-2">Dashboard unavailable</h3>
-        <p className="text-sm text-gray-500 ">{error}</p>
+        <p className="text-sm text-gray-500">{error}</p>
       </div>
     );
   }
@@ -168,7 +168,7 @@ export default function PlatformOverview() {
     return (
       <div className="rounded-xl bg-white  border border-gray-200  shadow-sm p-8 text-center">
         <h3 className="text-sm font-semibold text-gray-900  mb-2">No admin data yet</h3>
-        <p className="text-sm text-gray-500 ">Once applications and lender activity are stored in Supabase, metrics will appear here.</p>
+        <p className="text-sm text-gray-500">Once applications and lender activity are stored in Supabase, metrics will appear here.</p>
       </div>
     );
   }
@@ -182,7 +182,7 @@ export default function PlatformOverview() {
         </div>
         <div className="rounded-xl bg-white  border border-gray-200  p-4 shadow-sm">
           <div className="text-[10px] text-gray-500  uppercase tracking-wider mb-2">Pending Review</div>
-          <div className="text-2xl font-semibold text-gray-900 ">{summary.pendingApplications}</div>
+          <div className="text-2xl font-semibold text-gray-900">{summary.pendingApplications}</div>
         </div>
         <div className="rounded-xl bg-white  border border-gray-200  p-4 shadow-sm">
           <div className="text-[10px] text-gray-500  uppercase tracking-wider mb-2">Offers Extended</div>
@@ -197,13 +197,13 @@ export default function PlatformOverview() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2 rounded-xl bg-white  border border-gray-200  shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-semibold text-gray-900 ">Applications Over Time</h3>
-            <span className="text-xs text-gray-500 ">Last 7 days</span>
+            <h3 className="text-sm font-semibold text-gray-900">Applications Over Time</h3>
+            <span className="text-xs text-gray-500">Last 7 days</span>
           </div>
           {appsOverTime.some((point) => point.value > 0) ? (
             <LineChart data={appsOverTime} height={200} color="#3B82F6" />
           ) : (
-            <div className="h-[200px] flex items-center justify-center text-sm text-gray-500 ">No application history yet.</div>
+            <div className="h-[200px] flex items-center justify-center text-sm text-gray-500">No application history yet.</div>
           )}
         </div>
 
@@ -225,7 +225,7 @@ export default function PlatformOverview() {
           {creditScoreDist.some((bucket) => bucket.value > 0) ? (
             <DistributionBars data={creditScoreDist} />
           ) : (
-            <div className="h-[180px] flex items-center justify-center text-sm text-gray-500 ">Credit distribution will populate as applications arrive.</div>
+            <div className="h-[180px] flex items-center justify-center text-sm text-gray-500">Credit distribution will populate as applications arrive.</div>
           )}
         </div>
 
@@ -242,7 +242,7 @@ export default function PlatformOverview() {
               </div>
             ))}
             {events.length === 0 && (
-              <div className="text-sm text-gray-500 ">No platform activity yet.</div>
+              <div className="text-sm text-gray-500">No platform activity yet.</div>
             )}
           </div>
         </div>

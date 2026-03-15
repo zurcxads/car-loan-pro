@@ -4,7 +4,6 @@ import { useState, Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Mail } from 'lucide-react';
 import { isDev } from '@/lib/env';
@@ -74,19 +73,13 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-gray-50 ">
-      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
-        <div className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-8">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900  block mb-8">Auto Loan Pro</Link>
+    <div className="min-h-screen flex items-center justify-center px-6 bg-gray-50">
+      <div className="animate-fadeIn w-full max-w-sm">
+        <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-8">
+          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 block mb-8">Auto Loan Pro</Link>
 
-          <AnimatePresence mode="wait">
-            {!sent ? (
-              <motion.div
-                key="form"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
+          {!sent ? (
+            <div className="animate-fadeIn">
                 <h2 className="text-lg font-semibold text-gray-900  mb-1">
                   {isPortalLogin ? 'Portal Sign In' : 'Access Your Dashboard'}
                 </h2>
@@ -140,23 +133,18 @@ function LoginForm() {
                 </form>
 
                 {!isPortalLogin && (
-                  <div className="mt-6 pt-6 border-t border-gray-200 ">
+                  <div className="mt-6 pt-6 border-t border-gray-200">
                     <p className="text-xs text-gray-500  text-center">
                       First time here?{' '}
                       <Link href="/apply" className="text-blue-600 hover:text-blue-500 font-medium">Apply for pre-approval</Link>
                     </p>
                   </div>
                 )}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-4"
-              >
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 ">
-                  <Mail className="h-8 w-8 text-blue-600 " />
+            </div>
+          ) : (
+            <div className="animate-fadeIn text-center py-4">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+                  <Mail className="h-8 w-8 text-blue-600" />
                 </div>
                 <h2 className="text-lg font-semibold text-gray-900  mb-2">Check Your Email</h2>
                 <p className="text-sm text-gray-500  mb-6">
@@ -169,18 +157,12 @@ function LoginForm() {
                 >
                   Send to a different email
                 </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            </div>
+          )}
         </div>
 
         {/* Security Notice */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mt-6 bg-blue-50  border border-blue-100  rounded-xl p-4"
-        >
+        <div style={{ animationDelay: '0.2s' }} className="animate-fadeIn opacity-0 mt-6 bg-blue-50 border border-blue-100 rounded-xl p-4">
           <div className="flex items-start gap-3">
             <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
@@ -198,8 +180,8 @@ function LoginForm() {
               </p>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -207,7 +189,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 ">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="relative w-12 h-12">
           <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
         </div>

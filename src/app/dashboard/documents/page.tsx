@@ -3,7 +3,6 @@
 import { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { CreditCard, DollarSign, ShieldCheck, Home } from 'lucide-react';
 import { isDev as isDevEnvironment } from '@/lib/env';
 
@@ -184,7 +183,7 @@ function DocumentsContent() {
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-12">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="animate-fadeIn">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Document Upload Center</h1>
             <p className="text-gray-500">Upload required documents to complete your application. Max file size: 10MB. Accepted formats: PDF, JPG, PNG.</p>
@@ -284,7 +283,7 @@ function DocumentsContent() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

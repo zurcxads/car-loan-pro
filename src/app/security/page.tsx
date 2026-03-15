@@ -54,7 +54,7 @@ export default function SecurityPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white  ">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
       <div className="bg-blue-600 text-white">
         <div className="max-w-5xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
@@ -106,8 +106,8 @@ export default function SecurityPage() {
             <h2 className="text-2xl font-bold text-gray-900  mb-4">
               Who Sees Your Data
             </h2>
-            <div className="bg-white  rounded-2xl p-6 border border-gray-200 ">
-              <div className="space-y-4 text-sm text-gray-700 ">
+            <div className="bg-white  rounded-2xl p-6 border border-gray-200">
+              <div className="space-y-4 text-sm text-gray-700">
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-blue-100  rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Check className="w-4 h-4 text-blue-600" />
@@ -149,7 +149,7 @@ export default function SecurityPage() {
             <h2 className="text-2xl font-bold text-gray-900  mb-4">
               How to Delete Your Data
             </h2>
-            <div className="bg-white  rounded-2xl p-6 border border-gray-200 ">
+            <div className="bg-white  rounded-2xl p-6 border border-gray-200">
               <p className="text-sm text-gray-700  mb-4">
                 You have the right to request deletion of your personal information at any time. Here's how:
               </p>
@@ -159,8 +159,8 @@ export default function SecurityPage() {
                 <li>We will confirm your identity and process your request within 30 days</li>
                 <li>You will receive confirmation once your data has been deleted</li>
               </ol>
-              <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4  ">
-                <p className="text-xs text-blue-900 ">
+              <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                <p className="text-xs text-blue-900">
                   <strong>Note:</strong> Some data may be retained for legal compliance (e.g., FCRA requires 7-year retention of credit inquiries). We will inform you of any data that cannot be deleted and why.
                 </p>
               </div>
@@ -172,24 +172,24 @@ export default function SecurityPage() {
             <h2 className="text-2xl font-bold text-gray-900  mb-4">
               Contact Our Security Team
             </h2>
-            <div className="bg-white  rounded-2xl p-6 border border-gray-200 ">
+            <div className="bg-white  rounded-2xl p-6 border border-gray-200">
               <p className="text-sm text-gray-700  mb-4">
                 Have questions about our security practices or want to report a concern?
               </p>
               <div className="space-y-2 text-sm">
-                <p className="text-gray-700 ">
+                <p className="text-gray-700">
                   <strong>Email:</strong>{' '}
                   <a href="mailto:security@autoloanpro.co" className="text-blue-600 hover:underline">
                     security@autoloanpro.co
                   </a>
                 </p>
-                <p className="text-gray-700 ">
+                <p className="text-gray-700">
                   <strong>Privacy Inquiries:</strong>{' '}
                   <a href="mailto:privacy@autoloanpro.co" className="text-blue-600 hover:underline">
                     privacy@autoloanpro.co
                   </a>
                 </p>
-                <p className="text-gray-700 ">
+                <p className="text-gray-700">
                   <strong>Response Time:</strong> Within 48 hours
                 </p>
               </div>
