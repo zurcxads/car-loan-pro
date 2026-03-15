@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { SkeletonDashboard } from '@/components/shared/Skeleton';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { showDevTools } from '@/lib/env';
+import type { DocumentRequest } from '@/lib/types';
 
 type LockedOffer = {
   id: string;
@@ -41,6 +42,10 @@ interface Application {
   };
   lockedOffer?: LockedOffer | null;
 }
+
+type DocumentRequestsApiResponse =
+  | { success: true; data: { documentRequests: DocumentRequest[]; note?: string } }
+  | { success: false; error?: string };
 
 type DashboardPayload = {
   application: Application | null;
@@ -103,6 +108,22 @@ function getNextStepsCopy(status: string): string {
   }
 }
 
+function formatDocumentType(type: string): string {
+  return type
+    .split('_')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function mergeDocumentRequest(
+  documentRequests: DocumentRequest[],
+  nextRequest: DocumentRequest
+): DocumentRequest[] {
+  return documentRequests.map((documentRequest) => (
+    documentRequest.id === nextRequest.id ? nextRequest : documentRequest
+  ));
+}
+
 function DashboardContent() {
   const router = useRouter();
   const isDev = showDevTools();
@@ -113,6 +134,10 @@ function DashboardContent() {
   const [error, setError] = useState('');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
+  const [documentRequests, setDocumentRequests] = useState<DocumentRequest[]>([]);
+  const [documentsLoading, setDocumentsLoading] = useState(true);
+  const [documentsError, setDocumentsError] = useState('');
+  const [uploadingRequestId, setUploadingRequestId] = useState<string | null>(null);
 
   useFocusTrap(showCancelModal, cancelDialogRef, () => setShowCancelModal(false));
 
@@ -141,6 +166,33 @@ function DashboardContent() {
           status: 'locked',
         },
       });
+      setDocumentRequests([
+        {
+          id: 'doc-request-1',
+          applicationId: 'APP-DEV-001',
+          type: 'pay_stub',
+          status: 'pending',
+          requestedAt: new Date().toISOString(),
+          deadline: expiresAt.toISOString(),
+          notes: 'Upload your two most recent pay stubs.',
+        },
+        {
+          id: 'doc-request-2',
+          applicationId: 'APP-DEV-001',
+          type: 'drivers_license',
+          status: 'uploaded',
+          requestedAt: new Date().toISOString(),
+          uploadedAt: new Date().toISOString(),
+          notes: 'Front and back image accepted.',
+          document: {
+            fileName: 'drivers-license.pdf',
+            fileSize: 248312,
+            mimeType: 'application/pdf',
+            uploadedAt: new Date().toISOString(),
+          },
+        },
+      ]);
+      setDocumentsLoading(false);
       setLoading(false);
       return;
     }
@@ -162,6 +214,40 @@ function DashboardContent() {
         setLoading(false);
       });
   }, [isDev]);
+
+  useEffect(() => {
+    if (isDev) {
+      return;
+    }
+
+    if (!application?.id) {
+      setDocumentRequests([]);
+      setDocumentsLoading(false);
+      return;
+    }
+
+    setDocumentsLoading(true);
+    setDocumentsError('');
+
+    fetch(`/api/documents/requests?applicationId=${encodeURIComponent(application.id)}`, {
+      cache: 'no-store',
+    })
+      .then((response) => response.json().then((payload: DocumentRequestsApiResponse) => ({ response, payload })))
+      .then(({ response, payload }) => {
+        if (!response.ok || !payload.success) {
+          setDocumentsError(payload.success ? 'Failed to load documents' : payload.error || 'Failed to load documents');
+          return;
+        }
+
+        setDocumentRequests(payload.data.documentRequests);
+      })
+      .catch(() => {
+        setDocumentsError('Failed to load documents');
+      })
+      .finally(() => {
+        setDocumentsLoading(false);
+      });
+  }, [application?.id, isDev]);
 
   const daysRemaining = useMemo(() => {
     if (!application?.offerExpiresAt) return 0;
@@ -194,6 +280,42 @@ function DashboardContent() {
       toast.error('Unable to complete your request.');
     } finally {
       setCancelSubmitting(false);
+    }
+  };
+
+  const handleUploadDocument = async (requestId: string, file: File | null) => {
+    if (!application?.id || !file) {
+      return;
+    }
+
+    setUploadingRequestId(requestId);
+
+    try {
+      const formData = new FormData();
+      formData.set('applicationId', application.id);
+      formData.set('requestId', requestId);
+      formData.set('file', file);
+
+      const response = await fetch('/api/documents/requests', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const payload = await response.json() as
+        | { success: true; data: { documentRequest?: DocumentRequest; note?: string } }
+        | { success: false; error?: string };
+
+      if (!response.ok || !payload.success || !payload.data.documentRequest) {
+        toast.error(payload.success ? 'Unable to upload document.' : payload.error || 'Unable to upload document.');
+        return;
+      }
+
+      setDocumentRequests((currentRequests) => mergeDocumentRequest(currentRequests, payload.data.documentRequest as DocumentRequest));
+      toast.success(payload.data.note || 'Document uploaded successfully.');
+    } catch {
+      toast.error('Unable to upload document.');
+    } finally {
+      setUploadingRequestId(null);
     }
   };
 
@@ -377,6 +499,93 @@ function DashboardContent() {
             </section>
           </div>
         )}
+
+        <section className="mt-6 rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
+          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Documents</p>
+              <h2 className="text-2xl font-semibold text-[#0A2540]">Requested documents</h2>
+            </div>
+            <p className="text-sm text-[#6B7C93]">Upload the items your lender needs to keep your application moving.</p>
+          </div>
+
+          {documentsLoading ? (
+            <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-6 text-sm text-[#6B7C93]">
+              Loading documents...
+            </div>
+          ) : documentsError ? (
+            <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-6 text-sm text-[#6B7C93]">
+              {documentsError}
+            </div>
+          ) : documentRequests.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-[#E3E8EE] bg-[#F6F9FC] px-4 py-8 text-center text-sm text-[#6B7C93]">
+              No documents requested yet
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {documentRequests.map((documentRequest) => {
+                const isUploaded = documentRequest.status === 'uploaded' || documentRequest.status === 'approved' || documentRequest.status === 'reviewed';
+
+                return (
+                  <article
+                    key={documentRequest.id}
+                    className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-4 sm:p-5"
+                  >
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-2 flex flex-wrap items-center gap-2">
+                          <h3 className="text-lg font-semibold text-[#0A2540]">{formatDocumentType(documentRequest.type)}</h3>
+                          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${isUploaded ? 'bg-blue-100 text-blue-700' : 'bg-[#E3E8EE] text-[#425466]'}`}>
+                            {isUploaded ? 'Uploaded' : 'Pending'}
+                          </span>
+                        </div>
+                        <div className="space-y-1 text-sm text-[#425466]">
+                          <p>
+                            Requested {new Date(documentRequest.requestedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </p>
+                          <p>
+                            Deadline {documentRequest.deadline
+                              ? new Date(documentRequest.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                              : 'Not set'}
+                          </p>
+                          {documentRequest.notes ? <p>{documentRequest.notes}</p> : null}
+                          {documentRequest.document?.fileName ? (
+                            <p className="inline-flex items-center gap-2 text-blue-700">
+                              <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 fill-current">
+                                <path d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.2 7.26a1 1 0 0 1-1.42 0L4.79 10.66a1 1 0 0 1 1.414-1.414l2.596 2.596 6.493-6.546a1 1 0 0 1 1.41-.006Z" />
+                              </svg>
+                              {documentRequest.document.fileName}
+                            </p>
+                          ) : null}
+                          {documentRequest.document?.uploadPending ? (
+                            <p className="text-xs text-[#6B7C93]">
+                              Upload metadata is saved. Configure the Supabase Storage bucket to persist the file itself.
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      <label className="inline-flex cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500">
+                        {uploadingRequestId === documentRequest.id ? 'Uploading...' : isUploaded ? 'Replace file' : 'Upload file'}
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                          className="hidden"
+                          disabled={uploadingRequestId === documentRequest.id}
+                          onChange={(event) => {
+                            const nextFile = event.target.files?.[0] ?? null;
+                            void handleUploadDocument(documentRequest.id, nextFile);
+                            event.target.value = '';
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
       </div>
 
       {showCancelModal && hasLockedOffer && (
