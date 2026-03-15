@@ -39,6 +39,9 @@ export async function updateSession(request: NextRequest) {
 
   // Get user role from metadata
   const userRole = user?.user_metadata?.role || '';
+  const isAdminLogin = pathname === '/admin/login';
+  const isLenderLogin = pathname === '/lender/login';
+  const isDealerLogin = pathname === '/dealer/login';
 
   // Auth pages — redirect to home if already authenticated
   if (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/register')) {
@@ -55,6 +58,25 @@ export async function updateSession(request: NextRequest) {
       }
       return NextResponse.redirect(url);
     }
+  }
+
+  // Portal login pages stay public, but authenticated users should land in their portal.
+  if (isAdminLogin || isLenderLogin || isDealerLogin) {
+    if (user) {
+      const url = request.nextUrl.clone();
+
+      if (isAdminLogin) {
+        url.pathname = userRole === 'admin' ? '/admin' : '/';
+      } else if (isLenderLogin) {
+        url.pathname = userRole === 'lender' || userRole === 'admin' ? '/lender' : '/';
+      } else {
+        url.pathname = userRole === 'dealer' || userRole === 'admin' ? '/dealer' : '/';
+      }
+
+      return NextResponse.redirect(url);
+    }
+
+    return supabaseResponse;
   }
 
   // Protected routes — allow token-based access for consumers, otherwise redirect
@@ -85,7 +107,7 @@ export async function updateSession(request: NextRequest) {
   if (pathname.startsWith('/admin')) {
     if (!user) {
       const url = request.nextUrl.clone();
-      url.pathname = '/auth/login';
+      url.pathname = '/admin/login';
       url.searchParams.set('redirectTo', pathname);
       return NextResponse.redirect(url);
     }
@@ -100,7 +122,7 @@ export async function updateSession(request: NextRequest) {
   if (pathname.startsWith('/lender')) {
     if (!user) {
       const url = request.nextUrl.clone();
-      url.pathname = '/auth/login';
+      url.pathname = '/lender/login';
       url.searchParams.set('redirectTo', pathname);
       return NextResponse.redirect(url);
     }
@@ -115,7 +137,7 @@ export async function updateSession(request: NextRequest) {
   if (pathname.startsWith('/dealer')) {
     if (!user) {
       const url = request.nextUrl.clone();
-      url.pathname = '/auth/login';
+      url.pathname = '/dealer/login';
       url.searchParams.set('redirectTo', pathname);
       return NextResponse.redirect(url);
     }
