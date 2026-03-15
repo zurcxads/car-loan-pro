@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limiter';
+import { parseBody } from '@/lib/api-helpers';
 import {
   createDevAccessToken,
   DEFAULT_DEV_FEATURE_FLAGS,
@@ -29,19 +30,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body', success: false }, { status: 400 });
-  }
-
-  const parsed = requestSchema.safeParse(body);
-  if (!parsed.success) {
+  const { data, error } = await parseBody(request, requestSchema);
+  if (error) return error;
+  if (!data) {
     return NextResponse.json({ error: 'Invalid PIN', success: false }, { status: 400 });
   }
 
-  if (parsed.data.pin !== getDevAccessPin()) {
+  if (data.pin !== getDevAccessPin()) {
     return NextResponse.json({ error: 'Invalid PIN', success: false }, { status: 401 });
   }
 

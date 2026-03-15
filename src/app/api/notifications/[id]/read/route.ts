@@ -1,27 +1,29 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, requireAuth } from '@/lib/api-helpers';
-import { dbMarkNotificationRead } from '@/lib/db';
+import { dbGetNotification, dbMarkNotificationRead } from '@/lib/db';
+import { logServerError } from '@/lib/server-logger';
 
 // PATCH /api/notifications/[id]/read — mark a notification as read
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error } = await requireAuth();
+  const { session, error } = await requireAuth();
   if (error) return error;
 
   const { id } = await params;
 
   try {
-    // TODO: Add ownership check - verify notification belongs to the authenticated user
-    // This requires dbGetNotification to return the notification with user_id
-    // For now, we'll add a comment as a reminder
+    const notification = await dbGetNotification(id);
+    if (!notification) return apiError('Notification not found', 404);
+    if (!session || notification.userId !== session.user.id) {
+      return apiError('Access denied', 403);
+    }
 
     await dbMarkNotificationRead(id);
     return apiSuccess({ message: 'Notification marked as read' });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to mark notification as read';
-    console.error('Failed to mark notification as read:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/notifications/[id]/read', action: 'PATCH', metadata: { notificationId: id } });
+    return apiError('Failed to mark notification as read', 500);
   }
 }

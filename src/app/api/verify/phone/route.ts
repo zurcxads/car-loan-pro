@@ -2,6 +2,27 @@ import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, requireAuth, parseBody } from '@/lib/api-helpers';
 import { z } from 'zod';
 import { createVerificationCode, verifyStoredCode } from '@/lib/verification-codes';
+import { logServerError } from '@/lib/server-logger';
+
+const PHONE_WINDOW_MS = 60 * 60 * 1000;
+const PHONE_MAX_REQUESTS = 3;
+const phoneVerificationAttempts = new Map<string, number[]>();
+
+function isPhoneRateLimited(phone: string) {
+  const now = Date.now();
+  const recentAttempts = (phoneVerificationAttempts.get(phone) || []).filter(
+    (timestamp) => now - timestamp < PHONE_WINDOW_MS
+  );
+
+  if (recentAttempts.length >= PHONE_MAX_REQUESTS) {
+    phoneVerificationAttempts.set(phone, recentAttempts);
+    return true;
+  }
+
+  recentAttempts.push(now);
+  phoneVerificationAttempts.set(phone, recentAttempts);
+  return false;
+}
 
 const sendPhoneCodeSchema = z.object({
   phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Invalid phone number format'),
@@ -22,8 +43,9 @@ export async function POST(req: NextRequest) {
   if (!data) return apiError('Invalid data');
 
   try {
-    // TODO: Add rate limiting here (3 SMS per hour per user)
-    // TODO: Integrate with SMS service (e.g., Twilio, AWS SNS)
+    if (isPhoneRateLimited(data.phone)) {
+      return apiError('Too many verification attempts', 429);
+    }
 
     // In production, this would:
     // 1. Generate a 6-digit code
@@ -40,9 +62,8 @@ export async function POST(req: NextRequest) {
       ...(process.env.NODE_ENV !== 'production' ? { code: verification.code } : {}),
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to send verification code';
-    console.error('Phone verification error:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/verify/phone', action: 'POST', metadata: { phone: data.phone } });
+    return apiError('Failed to send verification code', 500);
   }
 }
 
@@ -66,8 +87,7 @@ export async function PUT(req: NextRequest) {
       phone: data.phone,
     });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to verify code';
-    console.error('Phone verification error:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/verify/phone', action: 'PUT', metadata: { phone: data.phone } });
+    return apiError('Failed to verify code', 500);
   }
 }

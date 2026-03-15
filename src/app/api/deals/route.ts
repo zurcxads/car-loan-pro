@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
 import { dealSubmitSchema } from '@/lib/validations';
-import { dbGetDeals, dbCreateDeal, dbUpdateDeal, dbGetApplication, dbCreateActivityEvent } from '@/lib/db';
+import { dbGetDeals, dbCreateDeal, dbUpdateDeal, dbGetApplication, dbCreateActivityEvent, dbGetDeal } from '@/lib/db';
+import { logServerError } from '@/lib/server-logger';
 import { z } from 'zod';
 
 const updateDealSchema = z.object({
@@ -17,27 +18,29 @@ const updateDealSchema = z.object({
 
 // GET /api/deals?dealerId=DLR-001
 export async function GET(req: NextRequest) {
-  const { error: authError } = await requireAuth();
+  const { session, error: authError } = await requireAuth('dealer');
   if (authError) return authError;
 
   try {
-    const dealerId = req.nextUrl.searchParams.get('dealerId') || undefined;
+    const requestedDealerId = req.nextUrl.searchParams.get('dealerId') || undefined;
+    const userRole = session?.user.role;
+    const dealerId = userRole === 'admin' ? requestedDealerId : session?.user.entityId || undefined;
 
-    // TODO: Add ownership check - dealers should only see their own deals
-    // unless they are admin with permissions
+    if (userRole !== 'admin' && !dealerId) {
+      return apiError('Access denied', 403);
+    }
 
     const deals = await dbGetDeals(dealerId);
     return apiSuccess(deals);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch deals';
-    console.error('Failed to fetch deals:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/deals', action: 'GET', metadata: { dealerId: req.nextUrl.searchParams.get('dealerId') } });
+    return apiError('Failed to fetch deals', 500);
   }
 }
 
 // POST /api/deals — submit a new deal
 export async function POST(req: NextRequest) {
-  const { error: authError } = await requireAuth();
+  const { session, error: authError } = await requireAuth('dealer');
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, dealSubmitSchema);
@@ -45,7 +48,11 @@ export async function POST(req: NextRequest) {
   if (!data) return apiError('Invalid data');
 
   try {
-    // TODO: Add ownership check - dealers should only create deals for their dealership
+    const userRole = session?.user.role;
+    const dealerEntityId = session?.user.entityId;
+    if (userRole !== 'admin' && data.dealerId !== dealerEntityId) {
+      return apiError('Access denied', 403);
+    }
 
     const app = await dbGetApplication(data.applicationId);
     if (!app) return apiError('Application not found', 404);
@@ -78,15 +85,14 @@ export async function POST(req: NextRequest) {
 
     return apiSuccess(deal, 201);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to create deal';
-    console.error('Failed to create deal:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/deals', action: 'POST', metadata: { applicationId: data.applicationId, dealerId: data.dealerId } });
+    return apiError('Failed to create deal', 500);
   }
 }
 
 // PATCH /api/deals — update deal status
 export async function PATCH(req: NextRequest) {
-  const { error: authError } = await requireAuth();
+  const { session, error: authError } = await requireAuth('dealer');
   if (authError) return authError;
 
   const { data, error } = await parseBody(req, updateDealSchema);
@@ -95,15 +101,18 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const { dealId, ...updates } = data;
+    const existingDeal = await dbGetDeal(dealId);
+    if (!existingDeal) return apiError('Deal not found', 404);
 
-    // TODO: Add ownership check - dealers should only update their own deals
+    if (session?.user.role !== 'admin' && existingDeal.dealerId !== session?.user.entityId) {
+      return apiError('Access denied', 403);
+    }
 
     const deal = await dbUpdateDeal(dealId, updates);
     if (!deal) return apiError('Deal not found', 404);
     return apiSuccess(deal);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to update deal';
-    console.error('Failed to update deal:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/deals', action: 'PATCH', metadata: { dealId: data.dealId } });
+    return apiError('Failed to update deal', 500);
   }
 }

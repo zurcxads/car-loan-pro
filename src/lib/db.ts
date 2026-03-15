@@ -34,6 +34,47 @@ export async function dbGetApplication(id: string): Promise<MockApplication | nu
   return mapDbToApp(data);
 }
 
+export async function dbGetApplicationByIdAndSessionToken(id: string, sessionToken: string): Promise<MockApplication | null> {
+  if (canUseMockData()) {
+    return (
+      MOCK_APPLICATIONS.find((application) => {
+        const typedApplication = application as MockApplication & { sessionToken?: string };
+        return typedApplication.id === id && typedApplication.sessionToken === sessionToken;
+      }) || null
+    );
+  }
+
+  if (!hasDatabaseAccess()) return null;
+
+  const { data, error } = await db()
+    .from('applications')
+    .select('*')
+    .eq('id', id)
+    .eq('session_token', sessionToken)
+    .single();
+
+  if (error || !data) return null;
+  return mapDbToApp(data);
+}
+
+export async function dbGetApplicationByIdAndEmail(id: string, email: string): Promise<MockApplication | null> {
+  if (canUseMockData()) {
+    return MOCK_APPLICATIONS.find((application) => application.id === id && application.borrower.email === email) || null;
+  }
+
+  if (!hasDatabaseAccess()) return null;
+
+  const { data, error } = await db()
+    .from('applications')
+    .select('*')
+    .eq('id', id)
+    .eq('borrower->>email', email)
+    .single();
+
+  if (error || !data) return null;
+  return mapDbToApp(data);
+}
+
 export async function dbCreateApplication(app: Partial<MockApplication>): Promise<MockApplication | null> {
   // Generate session token for consumer dashboard access
   const sessionToken = crypto.randomUUID();
@@ -150,6 +191,21 @@ export async function dbGetOffer(id: string): Promise<MockOffer | null> {
   return mapDbToOffer(data);
 }
 
+export async function dbGetOfferByIdAndApplicationId(id: string, applicationId: string): Promise<MockOffer | null> {
+  if (canUseMockData()) {
+    return MOCK_OFFERS.find((offer) => offer.id === id && offer.applicationId === applicationId) || null;
+  }
+  if (!hasDatabaseAccess()) return null;
+  const { data, error } = await db()
+    .from('offers')
+    .select('*')
+    .eq('id', id)
+    .eq('application_id', applicationId)
+    .single();
+  if (error || !data) return null;
+  return mapDbToOffer(data);
+}
+
 export async function dbCreateOffer(offer: Partial<MockOffer>): Promise<MockOffer | null> {
   if (canUseMockData()) {
     const newOffer = { ...offer, id: `OFR-${String(MOCK_OFFERS.length + 1).padStart(3, '0')}` } as MockOffer;
@@ -206,6 +262,44 @@ export async function dbUpdateLender(id: string, updates: Partial<MockLender>): 
   return mapDbToLender(data);
 }
 
+export async function dbCreateLender(lender: Partial<MockLender>): Promise<MockLender | null> {
+  if (canUseMockData()) {
+    const newLender = {
+      id: `LND-${String(MOCK_LENDERS.length + 1).padStart(3, '0')}`,
+      name: lender.name || 'New Lender',
+      tier: lender.tier || 'prime',
+      minFico: lender.minFico || 600,
+      maxLtv: lender.maxLtv || 120,
+      maxDti: lender.maxDti || 50,
+      maxPti: lender.maxPti || 20,
+      minLoanAmount: lender.minLoanAmount || 5000,
+      maxLoanAmount: lender.maxLoanAmount || 50000,
+      maxVehicleAge: lender.maxVehicleAge || 10,
+      maxMileage: lender.maxMileage || 120000,
+      acceptsCPO: lender.acceptsCPO ?? true,
+      acceptsPrivateParty: lender.acceptsPrivateParty ?? false,
+      acceptsITIN: lender.acceptsITIN ?? false,
+      statesActive: lender.statesActive || ['All 50'],
+      referralFee: lender.referralFee || 0,
+      isActive: lender.isActive ?? false,
+      integrationStatus: lender.integrationStatus || 'Pending',
+      avgDecisionTimeMinutes: lender.avgDecisionTimeMinutes || 0,
+      appsReceivedMTD: lender.appsReceivedMTD || 0,
+      approvalRate: lender.approvalRate || 0,
+      totalFundedVolume: lender.totalFundedVolume || 0,
+      totalReferralFeesOwed: lender.totalReferralFeesOwed || 0,
+      lastActivity: lender.lastActivity || new Date().toISOString(),
+      rateTiers: lender.rateTiers || [],
+    } satisfies MockLender;
+    MOCK_LENDERS.push(newLender);
+    return newLender;
+  }
+  if (!hasDatabaseAccess()) return null;
+  const { data, error } = await db().from('lenders').insert(mapLenderToDb(lender)).select().single();
+  if (error || !data) return null;
+  return mapDbToLender(data);
+}
+
 // ---------- Dealers ----------
 
 export async function dbGetDealers(): Promise<MockDealer[]> {
@@ -233,6 +327,37 @@ export async function dbUpdateDealer(id: string, updates: Partial<MockDealer>): 
   }
   if (!hasDatabaseAccess()) return null;
   const { data, error } = await db().from('dealers').update(mapDealerToDb(updates)).eq('id', id).select().single();
+  if (error || !data) return null;
+  return mapDbToDealer(data);
+}
+
+export async function dbCreateDealer(dealer: Partial<MockDealer>): Promise<MockDealer | null> {
+  if (canUseMockData()) {
+    const newDealer = {
+      id: `DLR-${String(MOCK_DEALERS.length + 1).padStart(3, '0')}`,
+      name: dealer.name || 'New Dealer',
+      city: dealer.city || '',
+      state: dealer.state || '',
+      address: dealer.address || '',
+      zip: dealer.zip || '',
+      phone: dealer.phone || '',
+      website: dealer.website || '',
+      contactEmail: dealer.contactEmail || '',
+      franchiseBrands: dealer.franchiseBrands || [],
+      buyersSentMTD: dealer.buyersSentMTD || 0,
+      dealsFundedMTD: dealer.dealsFundedMTD || 0,
+      plan: dealer.plan || 'trial',
+      planPrice: dealer.planPrice || 0,
+      billingDate: dealer.billingDate || new Date().toISOString(),
+      status: dealer.status || 'pending',
+      joinedDate: dealer.joinedDate || new Date().toISOString(),
+      teamMembers: dealer.teamMembers || [],
+    } satisfies MockDealer;
+    MOCK_DEALERS.push(newDealer);
+    return newDealer;
+  }
+  if (!hasDatabaseAccess()) return null;
+  const { data, error } = await db().from('dealers').insert(mapDealerToDb(dealer)).select().single();
   if (error || !data) return null;
   return mapDbToDealer(data);
 }
@@ -272,6 +397,14 @@ export async function dbUpdateDeal(id: string, updates: Partial<MockDeal>): Prom
   }
   if (!hasDatabaseAccess()) return null;
   const { data, error } = await db().from('deals').update(mapDealToDb(updates)).eq('id', id).select().single();
+  if (error || !data) return null;
+  return mapDbToDeal(data);
+}
+
+export async function dbGetDeal(id: string): Promise<MockDeal | null> {
+  if (canUseMockData()) return MOCK_DEALS.find((deal) => deal.id === id) || null;
+  if (!hasDatabaseAccess()) return null;
+  const { data, error } = await db().from('deals').select('*').eq('id', id).single();
   if (error || !data) return null;
   return mapDbToDeal(data);
 }
@@ -732,6 +865,28 @@ export async function dbCreateNotification(notification: Omit<Notification, 'id'
     .select()
     .single();
   if (error || !data) return null;
+  return {
+    id: data.id as string,
+    userId: data.user_id as string,
+    type: data.type as Notification['type'],
+    title: data.title as string,
+    message: data.message as string,
+    read: data.read as boolean,
+    createdAt: data.created_at as string,
+    data: (data.data as Record<string, unknown>) || {},
+  };
+}
+
+export async function dbGetNotification(id: string): Promise<Notification | null> {
+  if (!hasDatabaseAccess()) return null;
+  const { data, error } = await db()
+    .from('notifications')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) return null;
+
   return {
     id: data.id as string,
     userId: data.user_id as string,

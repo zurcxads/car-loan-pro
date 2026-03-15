@@ -3,12 +3,28 @@ import { z } from 'zod';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { isServerDevAccessGranted } from '@/lib/dev-access-server';
+import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 
 const PROTECTED_DEMO_EMAILS = new Set([
   'admin@autoloanpro.co',
   'demo@ally.com',
   'demo@dealer.com',
 ]);
+
+export const MAX_JSON_BODY_BYTES = 100 * 1024;
+
+type AuthenticatedUser = {
+  email: string;
+  entityId: string | null;
+  id: string;
+  name: string;
+  role: string;
+};
+
+type AuthResult = {
+  session: { user: AuthenticatedUser } | null;
+  error: NextResponse | null;
+};
 
 // Standard API response helpers
 export function apiSuccess<T>(data: T, status = 200) {
@@ -31,22 +47,23 @@ export function apiValidationError(error: z.ZodError) {
   );
 }
 
-// Parse and validate request body
-export async function parseBody<T>(req: NextRequest, schema: z.ZodType<T>): Promise<{ data: T | null; error: NextResponse | null }> {
-  try {
-    const body = await req.json();
-    const result = schema.safeParse(body);
-    if (!result.success) {
-      return { data: null, error: apiValidationError(result.error) };
-    }
-    return { data: result.data, error: null };
-  } catch {
-    return { data: null, error: apiError('Invalid JSON body', 400) };
+function normalizeSessionUser(user: { role: string; id: string; email?: string | null; name?: string | null; entityId?: string | null }): AuthenticatedUser | null {
+  const normalizedEmail = user.email?.toLowerCase() || '';
+
+  if (PROTECTED_DEMO_EMAILS.has(normalizedEmail)) {
+    return null;
   }
+
+  return {
+    id: user.id,
+    email: user.email || '',
+    name: user.name || '',
+    role: user.role || 'consumer',
+    entityId: user.entityId || null,
+  };
 }
 
-// Get authenticated session with role check using NextAuth
-export async function requireAuth(requiredRole?: string) {
+async function resolveAuth(requiredRole?: string, allowAnonymous = false): Promise<AuthResult> {
   if (await isServerDevAccessGranted()) {
     const role = requiredRole === 'dealer' || requiredRole === 'lender' || requiredRole === 'admin'
       ? requiredRole
@@ -69,34 +86,71 @@ export async function requireAuth(requiredRole?: string) {
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
-    return { session: null, error: apiError('Unauthorized', 401) };
+    return allowAnonymous
+      ? { session: null, error: null }
+      : { session: null, error: apiError('Unauthorized', 401) };
   }
 
-  const user = session.user as { role: string; id: string; email?: string | null; name?: string | null; entityId?: string | null };
-  const normalizedEmail = user.email?.toLowerCase() || '';
-
-  if (PROTECTED_DEMO_EMAILS.has(normalizedEmail)) {
-    return { session: null, error: apiError('Unauthorized', 401) };
+  const normalizedUser = normalizeSessionUser(session.user as { role: string; id: string; email?: string | null; name?: string | null; entityId?: string | null });
+  if (!normalizedUser) {
+    return allowAnonymous
+      ? { session: null, error: null }
+      : { session: null, error: apiError('Unauthorized', 401) };
   }
 
-  const role = user.role || 'consumer';
-
-  if (requiredRole && role !== requiredRole && role !== 'admin') {
+  if (requiredRole && normalizedUser.role !== requiredRole && normalizedUser.role !== 'admin') {
     return { session: null, error: apiError('Forbidden', 403) };
   }
 
   return {
     session: {
-      user: {
-        id: user.id,
-        email: user.email || '',
-        name: user.name || '',
-        role,
-        entityId: user.entityId || null,
-      }
+      user: normalizedUser,
     },
     error: null,
   };
+}
+
+// Parse and validate request body
+export async function parseBody<T>(req: NextRequest, schema: z.ZodType<T>): Promise<{ data: T | null; error: NextResponse | null }> {
+  const contentLength = req.headers.get('content-length');
+  if (contentLength) {
+    const parsedLength = Number(contentLength);
+    if (Number.isFinite(parsedLength) && parsedLength > MAX_JSON_BODY_BYTES) {
+      return { data: null, error: apiError('Request too large', 413) };
+    }
+  }
+
+  try {
+    const rawBody = await req.text();
+    const bodySize = new TextEncoder().encode(rawBody).length;
+    if (bodySize > MAX_JSON_BODY_BYTES) {
+      return { data: null, error: apiError('Request too large', 413) };
+    }
+
+    const body = JSON.parse(rawBody) as unknown;
+    const result = schema.safeParse(body);
+    if (!result.success) {
+      return { data: null, error: apiValidationError(result.error) };
+    }
+    return { data: result.data, error: null };
+  } catch {
+    return { data: null, error: apiError('Invalid JSON body', 400) };
+  }
+}
+
+// Get authenticated session with role check using NextAuth
+export async function requireAuth(requiredRole?: string) {
+  return resolveAuth(requiredRole, false);
+}
+
+export async function getOptionalAuth(requiredRole?: string) {
+  return resolveAuth(requiredRole, true);
+}
+
+export function getConsumerSessionToken(req: NextRequest): string | null {
+  return req.cookies.get('consumer_session')?.value
+    || req.cookies.get(CONSUMER_SESSION_COOKIE)?.value
+    || null;
 }
 
 // Extract query params

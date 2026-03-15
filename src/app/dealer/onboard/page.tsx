@@ -30,6 +30,9 @@ const POPULAR_BRANDS = [
 
 export default function DealerOnboardPage() {
   const [step, setStep] = useState<Step>(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     dealershipName: '',
     dealerLicense: '',
@@ -48,6 +51,8 @@ export default function DealerOnboardPage() {
   });
 
   const updateField = (field: keyof FormData, value: string | string[]) => {
+    setErrorMessage(null);
+    setSuccessMessage(null);
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -68,8 +73,47 @@ export default function DealerOnboardPage() {
     if (step > 1) setStep((step - 1) as Step);
   };
 
-  const handleSubmit = () => {
-    // TODO: implement dealer onboarding submission
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const response = await fetch('/api/dealers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          dealershipName: formData.dealershipName,
+          dealerLicense: formData.dealerLicense,
+          brands: formData.brands,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state.toUpperCase(),
+          zip: formData.zip,
+          primaryContactName: formData.primaryContactName,
+          primaryContactTitle: formData.primaryContactTitle,
+          phone: formData.phone,
+          email: formData.email,
+          serviceZipCodes: formData.serviceZipCodes,
+          serviceRadius: Number(formData.serviceRadius),
+          preferredBrands: formData.preferredBrands,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        setErrorMessage(result.error || 'Unable to submit application.');
+        return;
+      }
+
+      setSuccessMessage('Application submitted. Our dealer success team will review your dealership profile.');
+    } catch {
+      setErrorMessage('Unable to submit application.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const progress = (step / 4) * 100;
@@ -461,12 +505,19 @@ export default function DealerOnboardPage() {
             ) : (
               <button
                 onClick={handleSubmit}
-                className="px-8 py-3 bg-green-600 hover:bg-green-500 text-white text-sm font-medium rounded-lg transition-colors"
+                disabled={isSubmitting}
+                className="px-8 py-3 bg-green-600 hover:bg-green-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
-                Submit Application
+                {isSubmitting ? 'Submitting...' : 'Submit Application'}
               </button>
             )}
           </div>
+          {errorMessage ? (
+            <p className="mt-4 text-sm text-red-600">{errorMessage}</p>
+          ) : null}
+          {successMessage ? (
+            <p className="mt-4 text-sm text-green-700">{successMessage}</p>
+          ) : null}
         </div>
 
         {/* Save Draft */}

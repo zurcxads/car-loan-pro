@@ -3,6 +3,10 @@ import { updateSession } from '@/lib/supabase/middleware';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limiter';
 import { verifyDevAccessRequest } from '@/lib/dev-access';
 
+function getAllowedOrigin(request: NextRequest) {
+  return process.env.NEXT_PUBLIC_APP_URL || request.nextUrl.origin;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const ip = getClientIp(request);
@@ -41,6 +45,24 @@ export async function middleware(request: NextRequest) {
           retryAfter: Math.ceil((limit.resetAt - Date.now()) / 1000)
         },
         { status: 429 }
+      );
+    }
+  }
+
+  if (
+    pathname.startsWith('/api/')
+    && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
+  ) {
+    const origin = request.headers.get('origin');
+    const allowedOrigin = getAllowedOrigin(request);
+
+    if (!origin || origin !== allowedOrigin) {
+      return NextResponse.json(
+        {
+          error: 'Invalid request origin',
+          success: false,
+        },
+        { status: 403 }
       );
     }
   }

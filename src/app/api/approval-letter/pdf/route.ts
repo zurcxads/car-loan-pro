@@ -2,59 +2,32 @@ import { NextRequest, NextResponse } from 'next/server';
 import { renderToStream } from '@react-pdf/renderer';
 import QRCode from 'qrcode';
 import { createApprovalLetterPDF } from '@/lib/pdf-template';
-import { ApprovalLetterData } from '@/lib/approval-letter';
-import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
-import { isDev } from '@/lib/env';
+import { generateApprovalLetterData } from '@/lib/approval-letter';
+import { dbGetApplicationByToken, dbGetOffersByApplication } from '@/lib/db';
+import { getConsumerSessionToken } from '@/lib/api-helpers';
+import { logServerError } from '@/lib/server-logger';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value;
-    const devEnvironment = isDev();
-
-    let letterData: ApprovalLetterData;
-
-    if (devEnvironment) {
-      // Dev mode: generate mock data
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + 30);
-
-      const approvalCode = 'ALP-DEMO-1234';
-      letterData = {
-        approvalCode,
-        lenderName: 'Capital Auto Finance',
-        approvedAmount: 42000,
-        apr: 4.2,
-        termMonths: 60,
-        monthlyPayment: 779,
-        expiresAt: expiryDate.toISOString(),
-        borrowerName: 'Maria Rodriguez',
-        applicationId: 'APP-DEMO-001',
-        offerId: 'OFFER-DEMO-001',
-        generatedAt: new Date().toISOString(),
-        conditions: [
-          'Proof of income required at closing',
-          'Final approval subject to vehicle inspection and appraisal',
-          'Down payment of at least 10% recommended for optimal terms'
-        ],
-      };
-    } else {
-      // TODO: In production, fetch real data from database using token
-      // For now, return error if not in dev mode
-      if (!token) {
-        return NextResponse.json(
-          { error: 'Token required' },
-          { status: 400 }
-        );
-      }
-
-      // Placeholder: In real implementation, fetch from DB
-        return NextResponse.json(
-        { error: 'Production mode not yet implemented.' },
-        { status: 501 }
-      );
+    const token = getConsumerSessionToken(request);
+    if (!token) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
+
+    const application = await dbGetApplicationByToken(token);
+    if (!application) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
+
+    const offers = await dbGetOffersByApplication(application.id);
+    const selectedOffer = offers.find((offer) => offer.status === 'selected');
+    if (!selectedOffer) {
+      return NextResponse.json({ error: 'Approval letter unavailable' }, { status: 404 });
+    }
+
+    const letterData = generateApprovalLetterData(selectedOffer, application);
 
     // Generate QR code
     const verifyUrl = `https://autoloanpro.co/verify/${letterData.approvalCode}`;
@@ -88,10 +61,10 @@ export async function GET(request: NextRequest) {
         'Content-Length': buffer.length.toString(),
       },
     });
-  } catch (error) {
-    console.error('PDF generation error:', error);
+  } catch (error: unknown) {
+    logServerError(error, { route: '/api/approval-letter/pdf', action: 'GET' });
     return NextResponse.json(
-      { error: 'Failed to generate PDF', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to generate PDF' },
       { status: 500 }
     );
   }

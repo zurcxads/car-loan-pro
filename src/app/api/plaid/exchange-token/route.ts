@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 import { dbGetApplication } from '@/lib/db';
-import { requireAuth } from '@/lib/api-helpers';
+import { apiError, parseBody, requireAuth } from '@/lib/api-helpers';
+import { logServerError } from '@/lib/server-logger';
+import { z } from 'zod';
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[process.env.PLAID_ENV as keyof typeof PlaidEnvironments] || PlaidEnvironments.sandbox,
@@ -15,21 +17,21 @@ const configuration = new Configuration({
 
 const plaidClient = new PlaidApi(configuration);
 
+const exchangeTokenSchema = z.object({
+  public_token: z.string().min(1),
+  applicationId: z.string().min(1),
+});
+
 export async function POST(request: NextRequest) {
   const { session, error: authError } = await requireAuth();
   if (authError) return authError;
 
+  const { data, error } = await parseBody(request, exchangeTokenSchema);
+  if (error) return error;
+  if (!data) return apiError('Invalid data');
+
   try {
-    const { public_token, applicationId } = await request.json();
-
-    if (!public_token || !applicationId) {
-      return NextResponse.json(
-        { error: 'Missing public_token or applicationId' },
-        { status: 400 }
-      );
-    }
-
-    const application = await dbGetApplication(applicationId);
+    const application = await dbGetApplication(data.applicationId);
     if (!application) {
       return NextResponse.json(
         { error: 'Application not found' },
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // Exchange public token for access token
     const exchangeResponse = await plaidClient.itemPublicTokenExchange({
-      public_token,
+      public_token: data.public_token,
     });
 
     const accessToken = exchangeResponse.data.access_token;
@@ -73,8 +75,8 @@ export async function POST(request: NextRequest) {
       public_records: [],
       identity: identityResponse.data.accounts?.[0]?.owners?.[0] || null,
     });
-  } catch (error) {
-    console.error('Error exchanging Plaid token:', error);
+  } catch (error: unknown) {
+    logServerError(error, { route: '/api/plaid/exchange-token', action: 'POST', metadata: { applicationId: data.applicationId } });
     return NextResponse.json(
       { error: 'Failed to exchange token' },
       { status: 500 }

@@ -1,39 +1,41 @@
 import { NextRequest } from 'next/server';
-import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
+import { apiSuccess, apiError, parseBody } from '@/lib/api-helpers';
 import { selectOfferSchema } from '@/lib/validations';
-import { dbGetOffers, dbUpdateOffer, dbUpdateApplication, dbGetApplication } from '@/lib/db';
+import { dbGetOffers, dbUpdateOffer, dbUpdateApplication, dbGetOfferByIdAndApplicationId } from '@/lib/db';
+import { getOwnedApplicationForRequest } from '@/lib/application-ownership';
+import { logServerError } from '@/lib/server-logger';
 
 // GET /api/offers?applicationId=APP-001
 export async function GET(req: NextRequest) {
-  const { error: authError } = await requireAuth();
-  if (authError) return authError;
-
   try {
     const applicationId = req.nextUrl.searchParams.get('applicationId') || undefined;
+    if (!applicationId) return apiError('Application ID is required', 400);
 
-    // TODO: Add ownership check - users should only see offers for their own applications
-    // unless they are admin/lender/dealer with permissions
+    const { application, error } = await getOwnedApplicationForRequest(req, applicationId);
+    if (error) return error;
+    if (!application) return apiError('Access denied', 403);
 
     const offers = await dbGetOffers(applicationId);
     return apiSuccess(offers);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch offers';
-    console.error('Failed to fetch offers:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/offers', action: 'GET', metadata: { applicationId: req.nextUrl.searchParams.get('applicationId') } });
+    return apiError('Failed to fetch offers', 500);
   }
 }
 
 // POST /api/offers/select — select an offer (hard pull consent)
 export async function POST(req: NextRequest) {
-  const { error: authError } = await requireAuth();
-  if (authError) return authError;
-
   const { data, error } = await parseBody(req, selectOfferSchema);
   if (error) return error;
   if (!data) return apiError('Invalid data');
 
   try {
-    // TODO: Add ownership check - users should only select offers for their own applications
+    const { application, error: ownershipError } = await getOwnedApplicationForRequest(req, data.applicationId);
+    if (ownershipError) return ownershipError;
+    if (!application) return apiError('Access denied', 403);
+
+    const ownedOffer = await dbGetOfferByIdAndApplicationId(data.offerId, data.applicationId);
+    if (!ownedOffer) return apiError('Access denied', 403);
 
     // Update the offer status to selected
     const offer = await dbUpdateOffer(data.offerId, { status: 'selected' as const });
@@ -43,12 +45,9 @@ export async function POST(req: NextRequest) {
     await dbUpdateApplication(data.applicationId, { status: 'conditional' as const } as Record<string, unknown>);
 
     // Get full app for response
-    const app = await dbGetApplication(data.applicationId);
-
-    return apiSuccess({ offer, application: app });
+    return apiSuccess({ offer, application });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to select offer';
-    console.error('Failed to select offer:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/offers', action: 'POST', metadata: { applicationId: data.applicationId, offerId: data.offerId } });
+    return apiError('Failed to select offer', 500);
   }
 }

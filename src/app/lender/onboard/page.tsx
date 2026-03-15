@@ -25,6 +25,9 @@ interface FormData {
 
 export default function LenderOnboardPage() {
   const [step, setStep] = useState<Step>(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     companyName: '',
     lenderType: '',
@@ -44,6 +47,8 @@ export default function LenderOnboardPage() {
   });
 
   const updateField = (field: keyof FormData, value: string) => {
+    setErrorMessage(null);
+    setSuccessMessage(null);
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -55,8 +60,48 @@ export default function LenderOnboardPage() {
     if (step > 1) setStep((step - 1) as Step);
   };
 
-  const handleSubmit = () => {
-    // TODO: implement lender onboarding submission
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const response = await fetch('/api/lenders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          companyName: formData.companyName,
+          lenderType: formData.lenderType,
+          nmls: formData.nmls,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state.toUpperCase(),
+          zip: formData.zip,
+          minCreditScore: Number(formData.minCreditScore),
+          maxCreditScore: Number(formData.maxCreditScore),
+          maxDti: Number(formData.maxDti),
+          minRate: Number(formData.minRate),
+          maxRate: Number(formData.maxRate),
+          maxLoanAmount: Number(formData.maxLoanAmount),
+          apiKey: formData.apiKey,
+          webhookUrl: formData.webhookUrl,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        setErrorMessage(result.error || 'Unable to submit application.');
+        return;
+      }
+
+      setSuccessMessage('Application submitted. Our partner team will review your lender profile.');
+    } catch {
+      setErrorMessage('Unable to submit application.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const progress = (step / 4) * 100;
@@ -453,12 +498,19 @@ export default function LenderOnboardPage() {
             ) : (
               <button
                 onClick={handleSubmit}
-                className="px-8 py-3 bg-green-600 hover:bg-green-500 text-white text-sm font-medium rounded-lg transition-colors"
+                disabled={isSubmitting}
+                className="px-8 py-3 bg-green-600 hover:bg-green-500 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
               >
-                Submit Application
+                {isSubmitting ? 'Submitting...' : 'Submit Application'}
               </button>
             )}
           </div>
+          {errorMessage ? (
+            <p className="mt-4 text-sm text-red-600">{errorMessage}</p>
+          ) : null}
+          {successMessage ? (
+            <p className="mt-4 text-sm text-green-700">{successMessage}</p>
+          ) : null}
         </div>
 
         {/* Save Draft */}

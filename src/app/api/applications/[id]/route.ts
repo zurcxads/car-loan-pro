@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
-import { apiSuccess, apiError, requireAuth, parseBody } from '@/lib/api-helpers';
-import { dbGetApplication, dbUpdateApplication } from '@/lib/db';
+import { apiSuccess, apiError, parseBody } from '@/lib/api-helpers';
+import { dbUpdateApplication } from '@/lib/db';
+import { getOwnedApplicationForRequest } from '@/lib/application-ownership';
+import { logServerError } from '@/lib/server-logger';
 import { z } from 'zod';
 
 const updateApplicationSchema = z.object({
@@ -11,46 +13,36 @@ const updateApplicationSchema = z.object({
 
 // GET /api/applications/[id]
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error: authError } = await requireAuth();
-  if (authError) return authError;
-
   try {
     const { id } = await params;
-    const app = await dbGetApplication(id);
-    if (!app) return apiError('Application not found', 404);
+    const { application, error } = await getOwnedApplicationForRequest(_req, id);
+    if (error) return error;
+    if (!application) return apiError('Access denied', 403);
 
-    // TODO: Add ownership check - users should only see their own applications
-    // unless they are admin/lender/dealer with permissions
-
-    return apiSuccess(app);
+    return apiSuccess(application);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch application';
-    console.error('Failed to fetch application:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/applications/[id]', action: 'GET', metadata: { applicationId: (await params).id } });
+    return apiError('Failed to fetch application', 500);
   }
 }
 
 // PATCH /api/applications/[id] — update application status
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { error: authError } = await requireAuth();
-  if (authError) return authError;
-
   const { data, error } = await parseBody(req, updateApplicationSchema);
   if (error) return error;
   if (!data) return apiError('Invalid data');
 
   try {
     const { id } = await params;
-
-    // TODO: Add ownership check - users should only update their own applications
-    // unless they are admin/lender/dealer with permissions
+    const { application, error: ownershipError } = await getOwnedApplicationForRequest(req, id);
+    if (ownershipError) return ownershipError;
+    if (!application) return apiError('Access denied', 403);
 
     const updated = await dbUpdateApplication(id, data);
     if (!updated) return apiError('Application not found', 404);
     return apiSuccess(updated);
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Failed to update application';
-    console.error('Failed to update application:', error);
-    return apiError(message, 500);
+    logServerError(error, { route: '/api/applications/[id]', action: 'PATCH', metadata: { applicationId: (await params).id } });
+    return apiError('Failed to update application', 500);
   }
 }
