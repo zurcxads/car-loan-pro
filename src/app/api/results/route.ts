@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { apiSuccess, apiError } from '@/lib/api-helpers';
 import { dbGetApplicationByToken, dbGetOffersByApplication } from '@/lib/db';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
+import { consumerPasswordIsSet, findSupabaseUserByEmail } from '@/lib/consumer-auth';
 import { serverLogger } from '@/lib/server-logger';
 
 // GET /api/results — get anonymized offers for results page
@@ -18,6 +19,9 @@ export async function GET(req: NextRequest) {
       return apiError('Invalid or expired token', 401);
     }
 
+    const user = await findSupabaseUserByEmail(application.borrower.email);
+    const passwordConfigured = consumerPasswordIsSet(user);
+
     // Get all offers for this application
     const offers = await dbGetOffersByApplication(application.id);
 
@@ -28,6 +32,7 @@ export async function GET(req: NextRequest) {
           status: application.status,
           offersReceived: application.offersReceived || 0,
           hasVehicle: application.hasVehicle,
+          passwordConfigured,
         },
         offers: [],
         suggestedDownPayment: 0,
@@ -54,14 +59,15 @@ export async function GET(req: NextRequest) {
     const suggestedDownPayment = Math.round((anonymizedOffers[0]?.approvedAmount || 0) * 0.1);
 
     return apiSuccess({
-      application: {
-        id: application.id,
-        status: application.status,
-        offersReceived: application.offersReceived || offers.length,
-        hasVehicle: application.hasVehicle,
-      },
-      offers: anonymizedOffers,
-      suggestedDownPayment,
+        application: {
+          id: application.id,
+          status: application.status,
+          offersReceived: application.offersReceived || offers.length,
+          hasVehicle: application.hasVehicle,
+          passwordConfigured,
+        },
+        offers: anonymizedOffers,
+        suggestedDownPayment,
     });
   } catch (err) {
     serverLogger.error('Results fetch error', { error: err instanceof Error ? err.message : String(err) });

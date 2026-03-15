@@ -36,6 +36,7 @@ interface ResultsPayload {
     status: string;
     offersReceived: number;
     hasVehicle: boolean;
+    passwordConfigured?: boolean;
   };
   offers: AnonymizedOffer[];
   suggestedDownPayment: number;
@@ -133,6 +134,12 @@ function ResultsContent() {
   const [downPayment, setDownPayment] = useState(0);
   const [calculating, setCalculating] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [passwordConfigured, setPasswordConfigured] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<AnonymizedOffer | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [sortBy, setSortBy] = useState<'best_rate' | 'lowest_payment' | 'highest_amount'>('best_rate');
@@ -243,10 +250,12 @@ function ResultsContent() {
         const payload = response.data;
         const nextOffers = payload.offers || [];
         const nextStatus = payload.application?.status || 'pending_decision';
+        const nextPasswordConfigured = payload.application?.passwordConfigured ?? false;
 
         if (cancelled) return;
 
         setApplicationStatus(nextStatus);
+        setPasswordConfigured(nextPasswordConfigured);
         setOffers(nextOffers);
         setDownPayment(payload.suggestedDownPayment || 0);
 
@@ -368,6 +377,52 @@ function ResultsContent() {
   const handleSelectClick = (offer: AnonymizedOffer) => {
     setSelectedOffer(offer);
     setShowConfirmModal(true);
+  };
+
+  const handleSetPassword = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setPasswordError(null);
+
+    if (newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+
+    setSavingPassword(true);
+
+    try {
+      const response = await fetch('/api/auth/set-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password: newPassword }),
+      });
+
+      const payload = (await response.json()) as {
+        error?: string;
+        success?: boolean;
+      };
+
+      if (!response.ok || payload.success !== true) {
+        setPasswordError(payload.error ?? 'Unable to set password right now.');
+        return;
+      }
+
+      setPasswordConfigured(true);
+      setPasswordSuccess(true);
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch {
+      setPasswordError('Unable to set password right now.');
+    } finally {
+      setSavingPassword(false);
+    }
   };
 
   const handleConfirmSelection = async () => {
@@ -817,6 +872,64 @@ function ResultsContent() {
             );
           })}
         </div>
+
+        {(!passwordConfigured || passwordSuccess) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            className="mb-8 rounded-2xl border border-[#E3E8EE] bg-white p-6 shadow-sm"
+          >
+            <div className="max-w-2xl">
+              <h2 className="text-2xl font-semibold text-[#0A2540]">Save your access</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Set a password to access your dashboard anytime without a magic link.
+              </p>
+            </div>
+
+            {passwordSuccess && (
+              <div className="mt-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                Password set! You can now log in at /login
+              </div>
+            )}
+
+            {passwordError && (
+              <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {passwordError}
+              </div>
+            )}
+
+            {!passwordSuccess && (
+              <form onSubmit={handleSetPassword} className="mt-6 grid gap-4 md:grid-cols-[1fr_1fr_auto]">
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  placeholder="New password"
+                  autoComplete="new-password"
+                  className="w-full rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  required
+                />
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  placeholder="Confirm password"
+                  autoComplete="new-password"
+                  className="w-full rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={savingPassword}
+                  className="rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {savingPassword ? 'Saving...' : 'Set Password'}
+                </button>
+              </form>
+            )}
+          </motion.div>
+        )}
 
         {/* Info Banner */}
         <motion.div
