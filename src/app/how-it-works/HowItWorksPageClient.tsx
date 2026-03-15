@@ -12,6 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Footer from "@/components/shared/Footer";
+import { useInView } from "@/hooks/useInView";
 
 const processSteps = [
   {
@@ -78,14 +79,15 @@ const highlights = [
 
 export default function HowItWorksPage() {
   const [expandedStep, setExpandedStep] = useState<number>(0);
+  const processSection = useInView<HTMLDivElement>();
 
   useEffect(() => {
     document.title = "How It Works — Auto Loan Pro";
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-[#425466]">
-      <section className="px-6 py-20 pt-28 md:py-24 md:pt-32">
+    <div className="premium-page min-h-screen bg-white text-[#425466]">
+      <section className="animate-fade-in-up px-6 py-20 pt-28 md:py-24 md:pt-32">
         <div className="mx-auto grid max-w-6xl gap-16 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="max-w-2xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">
@@ -101,13 +103,13 @@ export default function HowItWorksPage() {
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <Link
                 href="/apply"
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="premium-button inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 Get pre-approved
               </Link>
               <Link
                 href="/calculator"
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="premium-button inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 Estimate your payment
               </Link>
@@ -120,10 +122,7 @@ export default function HowItWorksPage() {
                 const Icon = highlight.icon;
 
                 return (
-                  <div
-                    key={highlight.title}
-                    className="rounded-xl border border-[#E3E8EE] bg-white p-6"
-                  >
+                  <div key={highlight.title} className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-6">
                     <div className="flex items-start gap-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F9FC] text-[#2563EB]">
                         <Icon className="h-6 w-6" />
@@ -144,7 +143,7 @@ export default function HowItWorksPage() {
       </section>
 
       <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl">
+        <div ref={processSection.ref} className={`mx-auto max-w-6xl ${processSection.isInView ? "in-view-visible" : "in-view-section"}`}>
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">
               A guided process, not a black box
@@ -168,7 +167,7 @@ export default function HowItWorksPage() {
                     />
                   )}
 
-                  <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+                  <div className="step-card-hover rounded-xl border border-[#E3E8EE] bg-white p-8">
                     <div className="grid gap-6 md:grid-cols-[280px_minmax(0,1fr)] md:items-start">
                       <div className="flex items-start gap-4">
                         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F6F9FC] text-[#2563EB]">
@@ -185,7 +184,7 @@ export default function HowItWorksPage() {
                         <button
                           type="button"
                           onClick={() => setExpandedStep(isExpanded ? -1 : index)}
-                          className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border border-[#E3E8EE] bg-white px-5 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                          className="premium-button mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border border-[#E3E8EE] bg-white px-5 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                           aria-expanded={isExpanded}
                           aria-controls={`how-it-works-step-${step.number}`}
                         >
@@ -231,15 +230,15 @@ export default function HowItWorksPage() {
               </h2>
             </div>
             <div className="grid auto-rows-fr gap-6 sm:grid-cols-3">
-              <div className="flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+              <div className="premium-card flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                 <p className="text-3xl font-semibold text-[#0A2540]">2 min</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#425466]">Average time to complete the application flow.</p>
               </div>
-              <div className="flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+              <div className="premium-card flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                 <p className="text-3xl font-semibold text-[#0A2540]">1 view</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#425466]">One place to compare the financing details that matter.</p>
               </div>
-              <div className="flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+              <div className="premium-card flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                 <p className="text-3xl font-semibold text-[#0A2540]">0 markup</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#425466]">A process designed to keep dealer-added financing noise out of the way.</p>
               </div>
@@ -259,13 +258,13 @@ export default function HowItWorksPage() {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/apply"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Get pre-approved
             </Link>
             <Link
               href="/contact"
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Talk to our team
             </Link>

@@ -147,8 +147,8 @@ export default function CalculatorPage() {
   );
 
   return (
-    <div className="min-h-screen bg-white text-[#425466]">
-      <section className="px-6 py-20 pt-28 md:py-24 md:pt-32">
+    <div className="premium-page min-h-screen bg-white text-[#425466]">
+      <section className="animate-fade-in-up px-6 py-20 pt-28 md:py-24 md:pt-32">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">
@@ -164,7 +164,7 @@ export default function CalculatorPage() {
           </div>
 
           <div className="mt-16 grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+            <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
               <div className="sr-only" aria-live="polite">
                 Estimated monthly payment {formatCurrencyFull(results.monthly)} at {interestRate.toFixed(2)} percent APR.
               </div>
@@ -184,7 +184,7 @@ export default function CalculatorPage() {
                         type="number"
                         value={vehiclePrice}
                         onChange={(e) => setVehiclePrice(Math.max(0, Math.min(200000, Number(e.target.value))))}
-                        className="w-full rounded-xl border border-[#E3E8EE] bg-gray-50 py-3 pl-8 pr-4 text-right text-sm text-[#0A2540] focus:border-blue-500 focus:outline-none"
+                        className="premium-input w-full rounded-xl border border-[#E3E8EE] bg-gray-50 py-3 pl-8 pr-4 text-right text-sm text-[#0A2540]"
                       />
                     </div>
                   </div>
@@ -207,7 +207,7 @@ export default function CalculatorPage() {
                         type="number"
                         value={downPayment}
                         onChange={(e) => setDownPayment(Math.max(0, Math.min(vehiclePrice, Number(e.target.value))))}
-                        className="w-full rounded-xl border border-[#E3E8EE] bg-gray-50 py-3 pl-8 pr-4 text-right text-sm text-[#0A2540] focus:border-blue-500 focus:outline-none"
+                        className="premium-input w-full rounded-xl border border-[#E3E8EE] bg-gray-50 py-3 pl-8 pr-4 text-right text-sm text-[#0A2540]"
                       />
                     </div>
                   </div>
@@ -229,7 +229,7 @@ export default function CalculatorPage() {
                         type="number"
                         value={creditScore}
                         onChange={(e) => setCreditScore(Math.max(300, Math.min(850, Number(e.target.value))))}
-                        className="w-24 rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-right text-sm text-[#0A2540] focus:border-blue-500 focus:outline-none"
+                        className="premium-input w-24 rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-right text-sm text-[#0A2540]"
                       />
                       <span className="text-sm text-[#6B7C93]">{creditScoreLabel(creditScore)}</span>
                     </div>
@@ -251,7 +251,7 @@ export default function CalculatorPage() {
                         type="button"
                         onClick={() => setTermMonths(term)}
                         aria-pressed={termMonths === term}
-                        className={`inline-flex min-h-10 shrink-0 items-center justify-center rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+                        className={`premium-button inline-flex min-h-10 shrink-0 items-center justify-center rounded-full border px-3 py-1.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
                           termMonths === term
                             ? "border-[#2563EB] bg-[#2563EB] text-white"
                             : "border-[#E3E8EE] bg-white text-[#0A2540] hover:bg-[#F6F9FC]"
@@ -266,7 +266,7 @@ export default function CalculatorPage() {
             </div>
 
             <div className="space-y-6 self-start">
-              <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
+              <div className="premium-card rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
                 <p className="text-sm font-medium text-[#2563EB]">Estimated monthly payment</p>
                 <p className="mt-4 text-5xl font-semibold tracking-tight text-[#0A2540]">
                   {formatCurrencyFull(results.monthly)}
@@ -276,7 +276,7 @@ export default function CalculatorPage() {
                 </p>
               </div>
 
-              <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+              <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
                 <h2 className="text-2xl font-semibold text-[#0A2540]">Cost summary</h2>
                 <div className="mt-6 space-y-4">
                   <div className="flex items-center justify-between gap-4 text-sm">
@@ -308,7 +308,7 @@ export default function CalculatorPage() {
 
               <Link
                 href="/apply"
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="premium-button inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 Get your real rate
               </Link>
@@ -329,7 +329,7 @@ export default function CalculatorPage() {
           </div>
 
           <div className="mt-14 grid gap-6 md:grid-cols-2">
-            <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+            <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
               <p className="text-sm font-medium text-[#6B7C93]">Typical dealer rate</p>
               <p className="mt-4 text-4xl font-semibold tracking-tight text-[#0A2540]">{dealerRate.toFixed(1)}% APR</p>
               <div className="mt-6 space-y-4 text-sm">
@@ -348,7 +348,7 @@ export default function CalculatorPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+            <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
               <p className="text-sm font-medium text-[#2563EB]">Estimated Auto Loan Pro rate</p>
               <p className="mt-4 text-4xl font-semibold tracking-tight text-[#0A2540]">{interestRate.toFixed(1)}% APR</p>
               <div className="mt-6 space-y-4 text-sm">
@@ -390,7 +390,7 @@ export default function CalculatorPage() {
             <button
               type="button"
               onClick={() => setShowAmortization(!showAmortization)}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               aria-expanded={showAmortization}
               aria-controls="amortization-schedule"
             >
@@ -444,13 +444,13 @@ export default function CalculatorPage() {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/apply"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Get your real rate
             </Link>
             <Link
               href="/how-it-works"
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               See how it works
             </Link>

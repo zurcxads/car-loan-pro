@@ -13,9 +13,9 @@ export const metadata: Metadata = createPageMetadata({
 
 export default function ResourcesPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="premium-page min-h-screen bg-white">
       {/* Hero */}
-      <section className="px-6 py-20 pt-28 md:py-24 md:pt-32">
+      <section className="animate-fade-in-up px-6 py-20 pt-28 md:py-24 md:pt-32">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-3xl font-bold tracking-tight text-[#0A2540] sm:text-4xl">
             Auto Loan Resources
@@ -33,7 +33,7 @@ export default function ResourcesPage() {
             <Link
               key={article.slug}
               href={`/resources/${article.slug}`}
-              className="group block rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-6 transition-all duration-200 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="feature-card-hover group block rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-6 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               <div className="mb-3 flex items-center gap-3">
                 <span className="inline-flex rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600">

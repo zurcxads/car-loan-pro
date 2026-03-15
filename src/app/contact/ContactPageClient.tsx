@@ -99,8 +99,8 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-[#425466]">
-      <section className="px-6 py-20 pt-28 md:py-24 md:pt-32">
+    <div className="premium-page min-h-screen bg-white text-[#425466]">
+      <section className="animate-fade-in-up px-6 py-20 pt-28 md:py-24 md:pt-32">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">
@@ -116,7 +116,7 @@ export default function ContactPage() {
           </div>
 
           <div className="mt-16 grid items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+            <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
               <div className="sr-only" aria-live="polite">
                 {submitted
                   ? "Message sent successfully."
@@ -126,7 +126,7 @@ export default function ContactPage() {
               </div>
 
               {submitted ? (
-                <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8 text-center">
+                <div className="premium-card rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8 text-center">
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#2563EB]">
                     <Check className="h-7 w-7" />
                   </div>
@@ -135,7 +135,7 @@ export default function ContactPage() {
                   <button
                     type="button"
                     onClick={() => setSubmitted(false)}
-                    className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-5 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="premium-button mt-6 inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-5 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
                     Send another message
                   </button>
@@ -153,7 +153,7 @@ export default function ContactPage() {
                       onChange={(e) => setName(e.target.value)}
                       required
                       placeholder="Your name"
-                      className="w-full rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-sm text-[#0A2540] placeholder:text-[#6B7C93] focus:border-blue-500 focus:outline-none"
+                      className="premium-input w-full rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-sm text-[#0A2540] placeholder:text-[#6B7C93]"
                     />
                   </div>
 
@@ -168,7 +168,7 @@ export default function ContactPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       placeholder="you@example.com"
-                      className="w-full rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-sm text-[#0A2540] placeholder:text-[#6B7C93] focus:border-blue-500 focus:outline-none"
+                      className="premium-input w-full rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-sm text-[#0A2540] placeholder:text-[#6B7C93]"
                     />
                   </div>
 
@@ -180,7 +180,7 @@ export default function ContactPage() {
                       id="contact-subject"
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
-                      className="w-full rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-sm text-[#0A2540] focus:border-blue-500 focus:outline-none"
+                      className="premium-input w-full rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-sm text-[#0A2540]"
                     >
                       <option>General</option>
                       <option>Support</option>
@@ -201,7 +201,7 @@ export default function ContactPage() {
                       required
                       rows={6}
                       placeholder="How can we help?"
-                      className="w-full rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-sm text-[#0A2540] placeholder:text-[#6B7C93] focus:border-blue-500 focus:outline-none"
+                      className="premium-input w-full rounded-xl border border-[#E3E8EE] bg-gray-50 px-4 py-3 text-sm text-[#0A2540] placeholder:text-[#6B7C93]"
                     />
                   </div>
 
@@ -214,7 +214,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="premium-button inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
                     {submitting ? "Sending..." : "Send message"}
                   </button>
@@ -223,7 +223,7 @@ export default function ContactPage() {
             </div>
 
             <aside className="grid h-full auto-rows-fr gap-6 self-start">
-              <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
+              <div className="premium-card rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
                 <h2 className="text-2xl font-semibold text-[#0A2540]">Contact information</h2>
                 <div className="mt-6 space-y-5">
                   <div className="flex items-start gap-4">
@@ -266,7 +266,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+              <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
                 <h2 className="text-2xl font-semibold text-[#0A2540]">Prefer to self-serve?</h2>
                 <p className="mt-3 text-sm leading-relaxed text-[#425466]">
                   Review how the process works or estimate a monthly payment before you reach out.
@@ -274,13 +274,13 @@ export default function ContactPage() {
                 <div className="mt-6 flex flex-col gap-3">
                   <Link
                     href="/how-it-works"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-5 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="premium-button inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-5 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
                     Review the process
                   </Link>
                   <Link
                     href="/calculator"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-5 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="premium-button inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-5 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
                     Open the calculator
                   </Link>
@@ -307,7 +307,7 @@ export default function ContactPage() {
               const isExpanded = expandedFaq === index;
 
               return (
-                <div key={faq.question} className="rounded-xl border border-[#E3E8EE] bg-white">
+                <div key={faq.question} className="premium-card rounded-xl border border-[#E3E8EE] bg-white">
                   <button
                     type="button"
                     onClick={() => setExpandedFaq(isExpanded ? null : index)}

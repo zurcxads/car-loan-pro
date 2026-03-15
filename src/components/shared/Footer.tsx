@@ -59,7 +59,7 @@ export default function Footer() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-sm text-[#6B7C93] transition-colors hover:text-[#0A2540]"
+                        className="premium-footer-link text-sm text-[#6B7C93]"
                       >
                         {link.label}
                       </Link>
@@ -74,13 +74,13 @@ export default function Footer() {
         <div className="mt-8 flex flex-col gap-3 border-t border-[#E3E8EE] pt-6 text-sm text-[#6B7C93] md:flex-row md:items-center md:justify-between">
           <p>&copy; 2026 Auto Loan Pro. Auto Loan Pro is a marketplace, not a lender.</p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/terms" className="transition-colors hover:text-[#0A2540]">
+            <Link href="/terms" className="premium-footer-link">
               Terms
             </Link>
-            <Link href="/privacy" className="transition-colors hover:text-[#0A2540]">
+            <Link href="/privacy" className="premium-footer-link">
               Privacy Policy
             </Link>
-            <Link href="/disclosures" className="transition-colors hover:text-[#0A2540]">
+            <Link href="/disclosures" className="premium-footer-link">
               Disclosures
             </Link>
           </div>

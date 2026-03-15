@@ -181,8 +181,58 @@ input[type="range"]:focus-visible::-moz-range-thumb {
   }
 }
 
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate3d(24px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(16px, 0, 0);
+  }
+}
+
+@keyframes toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
 .animate-fade-in-up {
-  animation: fade-in-up 220ms ease-out both;
+  animation: fadeInUp 320ms ease-out both;
 }
 
 .animate-fade-in {
@@ -195,4 +245,142 @@ input[type="range"]:focus-visible::-moz-range-thumb {
 
 .animate-slide-in-right {
   animation: slide-in-right 280ms ease-out both;
+}
+
+.animate-shake {
+  animation: shake 360ms ease-in-out;
+}
+
+.premium-page {
+  animation: fadeInUp 320ms ease-out both;
+}
+
+.premium-card {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.premium-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.09);
+}
+
+.feature-card-hover {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease,
+    background-color 200ms ease;
+}
+
+.feature-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: #bfdbfe;
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.08);
+}
+
+.testimonial-card-hover {
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+
+.testimonial-card-hover:hover {
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.step-card-hover {
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.step-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: #bfdbfe;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.09);
+}
+
+.premium-button {
+  transition:
+    transform 200ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    color 200ms ease;
+}
+
+.premium-button:active {
+  transform: scale(0.98);
+}
+
+.premium-nav-link {
+  transition: color 200ms ease;
+}
+
+.premium-nav-link:hover {
+  color: #2563eb;
+}
+
+.premium-footer-link {
+  transition: color 200ms ease;
+}
+
+.premium-footer-link:hover {
+  color: #0a2540;
+}
+
+.premium-input {
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+
+.premium-input:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 2px #dbeafe, 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.premium-input-error {
+  border-color: #fca5a5;
+}
+
+.premium-input-error:focus {
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 2px #fee2e2, 0 0 0 4px rgba(239, 68, 68, 0.08);
+}
+
+.stagger-1 { animation-delay: 60ms; }
+.stagger-2 { animation-delay: 120ms; }
+.stagger-3 { animation-delay: 180ms; }
+.stagger-4 { animation-delay: 240ms; }
+
+.in-view-section {
+  opacity: 0;
+  transform: translateY(1rem);
+}
+
+.in-view-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 700ms ease,
+    transform 700ms ease;
+}
+
+.toast-enter {
+  animation: toast-in 240ms ease-out both;
+}
+
+.toast-exit {
+  animation: toast-out 200ms ease-in both;
+}
+
+.toast-progress {
+  transform-origin: left;
+  animation: toast-progress 4s linear forwards;
 }

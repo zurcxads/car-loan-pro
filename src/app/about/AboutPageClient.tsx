@@ -45,8 +45,8 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-[#425466]">
-      <section className="px-6 pb-20 pt-28 md:pb-24 md:pt-32">
+    <div className="premium-page min-h-screen bg-white text-[#425466]">
+      <section className="animate-fade-in-up px-6 pb-20 pt-28 md:pb-24 md:pt-32">
         <div className="mx-auto grid max-w-6xl gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
           <div className="max-w-2xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">
@@ -64,7 +64,7 @@ export default function AboutPage() {
 
           <div className="rounded-[2rem] border border-[#E3E8EE] bg-[#F6F9FC] p-8">
             <div className="space-y-6">
-              <div className="rounded-xl border border-[#E3E8EE] bg-white p-6">
+              <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-6">
                 <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F9FC] text-[#2563EB]">
                     <Building2 className="h-6 w-6" />
@@ -77,7 +77,7 @@ export default function AboutPage() {
                   </div>
                 </div>
               </div>
-              <div className="rounded-xl border border-[#E3E8EE] bg-white p-6">
+              <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-6">
                 <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F9FC] text-[#2563EB]">
                     <Users className="h-6 w-6" />
@@ -90,7 +90,7 @@ export default function AboutPage() {
                   </div>
                 </div>
               </div>
-              <div className="rounded-xl border border-[#E3E8EE] bg-white p-6">
+              <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-6">
                 <div className="flex items-center gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F9FC] text-[#2563EB]">
                     <BadgeCheck className="h-6 w-6" />
@@ -111,7 +111,7 @@ export default function AboutPage() {
       <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-            <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+            <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
               <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">
                 Our point of view
               </h2>
@@ -133,7 +133,7 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+            <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
               <h2 className="text-2xl font-semibold tracking-tight text-[#0A2540]">How we operate</h2>
               <ul className="mt-6 space-y-4">
                 {operatingPrinciples.map((principle) => (
@@ -171,7 +171,7 @@ export default function AboutPage() {
               const Icon = value.icon;
 
               return (
-                <div key={value.title} className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+                <div key={value.title} className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#F6F9FC] text-[#2563EB]">
                     <Icon className="h-6 w-6" />
                   </div>
@@ -197,7 +197,7 @@ export default function AboutPage() {
             </div>
             <Link
               href="/contact"
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Contact our team
             </Link>
@@ -205,7 +205,7 @@ export default function AboutPage() {
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {metrics.map((metric) => (
-              <div key={metric.label} className="rounded-xl border border-[#E3E8EE] bg-white p-8">
+              <div key={metric.label} className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8">
                 <p className="text-sm font-medium text-[#2563EB]">{metric.label}</p>
                 <p className="mt-4 text-4xl font-semibold tracking-tight text-[#0A2540]">{metric.value}</p>
                 <p className="mt-4 text-sm leading-relaxed text-[#425466]">{metric.description}</p>
@@ -227,13 +227,13 @@ export default function AboutPage() {
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
               href="/apply"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Get pre-approved
             </Link>
             <Link
               href="/how-it-works"
-              className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Review the process
             </Link>

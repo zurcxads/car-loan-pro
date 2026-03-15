@@ -15,6 +15,7 @@ import {
   Quote,
 } from "lucide-react";
 import Footer from "@/components/shared/Footer";
+import { useInView } from "@/hooks/useInView";
 
 const stats = [
   { value: "2 Min", label: "Avg. approval time" },
@@ -253,14 +254,18 @@ function SecurityMockup() {
 export default function HomePage() {
   const [loanAmount, setLoanAmount] = useState(32000);
   const monthlyPayment = Math.round(loanAmount / 72);
+  const statsSection = useInView<HTMLDivElement>();
+  const featuresSection = useInView<HTMLDivElement>();
+  const stepsSection = useInView<HTMLDivElement>();
+  const testimonialsSection = useInView<HTMLDivElement>();
 
   useEffect(() => {
     document.title = "Auto Loan Pro — Get Pre-Approved in Minutes";
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-[#425466]">
-      <section className="min-h-[85vh] px-6 py-20 pt-28 md:py-24 md:pt-32">
+    <div className="premium-page min-h-screen bg-white text-[#425466]">
+      <section className="animate-fade-in-up min-h-[85vh] px-6 py-20 pt-28 md:py-24 md:pt-32">
         <div className="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <div className="space-y-4">
@@ -278,14 +283,14 @@ export default function HomePage() {
             <div className="mt-6 flex flex-col gap-6 sm:flex-row">
               <Link
                 href="/apply"
-                className="inline-flex w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:w-auto"
+                className="premium-button inline-flex w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto"
               >
                 Get Pre-Approved
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <Link
                 href="#how-it-works"
-                className="inline-flex w-full items-center justify-center rounded-full border border-[#2563EB] bg-white px-6 py-3 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-[#F6F9FC] sm:w-auto"
+                className="premium-button inline-flex w-full items-center justify-center rounded-full border border-[#2563EB] bg-white px-6 py-3 text-sm font-semibold text-[#2563EB] hover:bg-[#F6F9FC] sm:w-auto"
               >
                 See How It Works
               </Link>
@@ -298,9 +303,12 @@ export default function HomePage() {
       </section>
 
       <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
-        <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div
+          ref={statsSection.ref}
+          className={`mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4 ${statsSection.isInView ? "in-view-visible" : "in-view-section"}`}
+        >
           {stats.map((stat) => (
-            <div key={stat.value} className="text-center lg:text-left">
+            <div key={stat.value} className="animate-fade-in-up text-center lg:text-left">
               <p className="text-4xl font-semibold text-[#0A2540]">{stat.value}</p>
               <p className="mt-2 text-sm text-[#425466]">{stat.label}</p>
             </div>
@@ -309,8 +317,8 @@ export default function HomePage() {
       </section>
 
       <section className="px-6 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl">
-          <div className="max-w-3xl">
+        <div ref={featuresSection.ref} className={`mx-auto max-w-6xl ${featuresSection.isInView ? "in-view-visible" : "in-view-section"}`}>
+          <div className="max-w-3xl animate-fade-in-up">
             <h2 className="max-w-[600px] text-4xl font-semibold leading-tight text-[#0A2540]">
               Everything you need to get the best auto loan.
             </h2>
@@ -321,14 +329,14 @@ export default function HomePage() {
 
           <div className="mt-14 space-y-6">
             <div className="grid gap-6 lg:grid-cols-12">
-              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F7FAFF_100%)] p-8 transition-shadow hover:shadow-md lg:col-span-7">
+              <div className="feature-card-hover stagger-1 h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F7FAFF_100%)] p-8 lg:col-span-7">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Apply in 2 Minutes</h3>
                 <p className="mt-3 max-w-lg text-[#425466]">
                   A short digital application replaces dealership paperwork, repeat credit checks, and back-office delays.
                 </p>
                 <PhoneMockup />
               </div>
-              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F8FBFF_100%)] p-8 transition-shadow hover:shadow-md lg:col-span-5">
+              <div className="feature-card-hover stagger-2 h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F8FBFF_100%)] p-8 lg:col-span-5">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Compare Real Offers</h3>
                 <p className="mt-3 max-w-sm text-[#425466]">
                   See rates, terms, and monthly payments at a glance so the best offer is obvious.
@@ -338,7 +346,7 @@ export default function HomePage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6 transition-shadow hover:shadow-md">
+              <div className="feature-card-hover stagger-1 h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Smart Pre-Approval</h3>
                 <p className="mt-3 text-[#425466]">
                   Know your buying power early so you can shop with financing already lined up.
@@ -346,7 +354,7 @@ export default function HomePage() {
                 <ApprovalMockup />
               </div>
 
-              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6 transition-shadow hover:shadow-md">
+              <div className="feature-card-hover stagger-2 h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Rate Calculator</h3>
                 <p className="mt-3 text-[#425466]">
                   Adjust the amount and preview how small changes affect your estimated monthly payment.
@@ -380,7 +388,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6 transition-shadow hover:shadow-md">
+              <div className="feature-card-hover stagger-3 h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Bank-Level Security</h3>
                 <p className="mt-3 text-[#425466]">
                   Sensitive data stays protected with encrypted transfer, secure storage, and controlled access.
@@ -389,7 +397,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-8 transition-shadow hover:shadow-md">
+            <div className="feature-card-hover stagger-4 rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-8">
               <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_auto_0.9fr]">
                 <div>
                   <h3 className="text-2xl font-semibold text-[#0A2540]">Shop Anywhere with Your Pre-Approval</h3>
@@ -453,7 +461,7 @@ export default function HomePage() {
       </section>
 
       <section id="how-it-works" className="bg-[#F6F9FC] px-6 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl">
+        <div ref={stepsSection.ref} className={`mx-auto max-w-6xl ${stepsSection.isInView ? "in-view-visible" : "in-view-section"}`}>
           <div className="max-w-2xl">
             <h2 className="text-4xl font-semibold text-[#0A2540]">How it works</h2>
             <p className="mt-4 text-lg text-[#425466]">
@@ -467,7 +475,7 @@ export default function HomePage() {
               const Icon = step.icon;
 
               return (
-                <div key={step.number} className="relative h-full rounded-xl border border-[#E3E8EE] bg-white p-8 transition-shadow hover:shadow-md">
+                <div key={step.number} className="step-card-hover relative h-full rounded-xl border border-[#E3E8EE] bg-white p-8">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0A2540] text-sm font-semibold text-white">
                     {step.number}
                   </div>
@@ -484,7 +492,7 @@ export default function HomePage() {
       </section>
 
       <section className="px-6 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl">
+        <div ref={testimonialsSection.ref} className={`mx-auto max-w-6xl ${testimonialsSection.isInView ? "in-view-visible" : "in-view-section"}`}>
           <div className="max-w-2xl">
             <h2 className="max-w-lg text-4xl font-semibold text-[#0A2540]">What customers&nbsp;say</h2>
             <p className="mt-4 text-lg text-[#425466]">
@@ -496,7 +504,7 @@ export default function HomePage() {
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.name}
-                className="h-full rounded-xl border border-[#E3E8EE] border-t-2 border-t-blue-600 p-8"
+                className="testimonial-card-hover h-full rounded-xl border border-[#E3E8EE] border-t-2 border-t-blue-600 p-8"
               >
                 <div className="flex items-center justify-between">
                   <Quote className="h-8 w-8 text-[#2563EB]" />
@@ -531,7 +539,7 @@ export default function HomePage() {
           <div className="mt-8">
             <Link
               href="/apply"
-              className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-blue-50 sm:w-auto"
+              className="premium-button inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#2563EB] hover:bg-blue-50 sm:w-auto"
             >
               Start Your Application
               <ArrowRight className="ml-2 h-4 w-4" />
