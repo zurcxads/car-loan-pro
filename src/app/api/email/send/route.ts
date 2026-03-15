@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  type EmailData,
   applicationReceivedEmail,
   offersReadyEmail,
   magicLinkEmail,
@@ -24,12 +25,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let emailData;
+    let emailData: EmailData;
 
     switch (type) {
       case 'application_submitted':
       case 'application_received':
-        emailData = applicationReceivedEmail(to, data.firstName, data.applicationId);
+        emailData = applicationReceivedEmail(to, data.firstName, data.applicationId, data.magicLinkUrl || '#');
         break;
 
       case 'offers_ready':

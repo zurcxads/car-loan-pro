@@ -53,7 +53,8 @@ function emailWrapper(content: string): string {
 export function applicationReceivedEmail(
   email: string,
   firstName: string,
-  applicationId: string
+  applicationId: string,
+  magicLink: string
 ): EmailData {
   const content = `
     <div class="content">
@@ -62,6 +63,12 @@ export function applicationReceivedEmail(
       <p style="color: #374151; line-height: 1.6;">
         We've received your auto loan application and our lender network is reviewing it now.
         You'll receive an email when your offers are ready—usually within minutes.
+      </p>
+      <p style="text-align: center;">
+        <a href="${magicLink}" class="button">Access My Dashboard</a>
+      </p>
+      <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
+        You can use this secure link any time in the next 24 hours to check your application status and review your offers.
       </p>
       <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
         <strong>Application ID:</strong> ${applicationId}
@@ -313,15 +320,17 @@ export function rateExpiringEmail(
  * Send email via Resend when configured
  */
 export async function sendEmail(emailData: EmailData): Promise<{ success: boolean; error?: string }> {
-  // Check if Resend API key is configured
   const resendApiKey = process.env.RESEND_API_KEY;
 
   if (!resendApiKey) {
+    serverLogger.warn('Email send skipped: RESEND_API_KEY not configured', {
+      subject: emailData.subject,
+      to: emailData.to,
+    });
     return { success: true };
   }
 
   try {
-    // Send via Resend API
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -338,7 +347,11 @@ export async function sendEmail(emailData: EmailData): Promise<{ success: boolea
 
     if (!response.ok) {
       const error = await response.text();
-      serverLogger.error('Resend API error', { error });
+      serverLogger.error('Resend API error', {
+        error,
+        subject: emailData.subject,
+        to: emailData.to,
+      });
       return { success: false, error: 'Failed to send email' };
     }
 

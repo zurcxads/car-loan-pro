@@ -34,7 +34,8 @@ export default function EmailPreviewPage() {
     'application-received': applicationReceivedEmail(
       mockData.email,
       mockData.firstName,
-      mockData.applicationId
+      mockData.applicationId,
+      mockData.magicLink
     ),
     'offers-ready': offersReadyEmail(
       mockData.email,

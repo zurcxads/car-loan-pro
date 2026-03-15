@@ -8,7 +8,11 @@ import type { MockApplication } from '@/lib/mock-data';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { applicationReceivedEmail, sendEmail } from '@/lib/email-templates';
 import { CONSUMER_SESSION_COOKIE, getConsumerSessionCookieOptions } from '@/lib/consumer-session';
+import { generateMagicToken } from '@/lib/magic-link';
 import { serverLogger } from '@/lib/server-logger';
+import { findSupabaseUserByEmail } from '@/lib/consumer-auth';
+
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 // GET /api/applications — list all applications
 export async function GET(req: NextRequest) {
@@ -147,31 +151,26 @@ export async function POST(req: NextRequest) {
     if (isSupabaseConfigured() && process.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const supabase = getServiceClient();
-        const { data: existingUsers, error: listUsersError } = await supabase.auth.admin.listUsers();
+        const existingUser = await findSupabaseUserByEmail(data.personalInfo.email);
 
-        if (listUsersError) {
-          serverLogger.error('Failed to list Supabase users', { error: listUsersError instanceof Error ? listUsersError.message : String(listUsersError) });
+        if (existingUser) {
+          userId = existingUser.id;
         } else {
-          const existingUser = existingUsers.users.find(u => u.email === data.personalInfo.email);
+          const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
+            email: data.personalInfo.email,
+            email_confirm: true,
+            user_metadata: {
+              role: 'consumer',
+              full_name: `${data.personalInfo.firstName} ${data.personalInfo.lastName}`,
+              application_id: app.id,
+              consumer_password_set: false,
+            },
+          });
 
-          if (existingUser) {
-            userId = existingUser.id;
-          } else {
-            const { data: newUser, error: signUpError } = await supabase.auth.admin.createUser({
-              email: data.personalInfo.email,
-              email_confirm: true,
-              user_metadata: {
-                role: 'consumer',
-                full_name: `${data.personalInfo.firstName} ${data.personalInfo.lastName}`,
-                application_id: app.id,
-              },
-            });
-
-            if (signUpError) {
-              serverLogger.error('Failed to create Supabase user', { error: signUpError instanceof Error ? signUpError.message : String(signUpError) });
-            } else if (newUser?.user) {
-              userId = newUser.user.id;
-            }
+          if (signUpError) {
+            serverLogger.error('Failed to create Supabase user', { error: signUpError instanceof Error ? signUpError.message : String(signUpError) });
+          } else if (newUser?.user) {
+            userId = newUser.user.id;
           }
         }
       } catch (err) {
@@ -180,11 +179,26 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Send application received email
+    let magicLinkUrl = `${BASE_URL}/login`;
+    const { token: magicToken, error: magicTokenError } = await generateMagicToken(
+      data.personalInfo.email,
+      app.id
+    );
+
+    if (magicToken && !magicTokenError) {
+      magicLinkUrl = `${BASE_URL}/api/auth/magic-link/verify?token=${magicToken}`;
+    } else {
+      serverLogger.error('Failed to generate application email magic link', {
+        applicationId: app.id,
+        error: magicTokenError ?? 'Unknown magic link generation error',
+      });
+    }
+
     const emailData = applicationReceivedEmail(
       data.personalInfo.email,
       data.personalInfo.firstName,
-      app.id
+      app.id,
+      magicLinkUrl
     );
     sendEmail(emailData).catch(err => {
       serverLogger.error('Failed to send application received email', { error: err instanceof Error ? err.message : String(err) });
