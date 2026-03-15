@@ -156,7 +156,7 @@ export default function DealerJoinPageClient() {
 
   return (
     <div className="bg-white">
-      <section className="px-6 py-20 pt-32">
+      <section className="px-6 py-20 pt-32 md:py-24">
         <div className="mx-auto max-w-4xl">
           <div className="rounded-[32px] border border-[#E3E8EE] bg-[linear-gradient(180deg,#F9FBFF_0%,#FFFFFF_100%)] px-8 py-12 shadow-[0_24px_80px_rgba(10,37,64,0.08)] sm:px-12">
             <div className="max-w-2xl">
@@ -177,8 +177,8 @@ export default function DealerJoinPageClient() {
 
                 return (
                   <div key={item.title} className="rounded-3xl border border-[#E3E8EE] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-[#2563EB] ring-1 ring-blue-100">
-                      <Icon className="h-5 w-5" />
+                    <div className="inline-flex rounded-xl bg-blue-50 p-3">
+                      <Icon className="h-10 w-10 text-[#2563EB]" />
                     </div>
                     <h2 className="mt-5 text-lg font-semibold text-[#0A2540]">{item.title}</h2>
                     <p className="mt-3 text-sm leading-6 text-[#425466]">{item.description}</p>
@@ -190,7 +190,7 @@ export default function DealerJoinPageClient() {
         </div>
       </section>
 
-      <section className="px-6 py-20">
+      <section className="px-6 py-20 md:py-24">
         <div className="mx-auto max-w-4xl">
           {isSuccess ? (
             <div className="rounded-[28px] border border-blue-100 bg-[linear-gradient(180deg,#EFF6FF_0%,#FFFFFF_100%)] p-10 shadow-[0_24px_60px_rgba(37,99,235,0.12)]">
@@ -326,7 +326,7 @@ export default function DealerJoinPageClient() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70 sm:mx-auto sm:w-auto sm:min-w-[220px]"
+                  className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 sm:mx-auto sm:w-auto sm:min-w-[220px]"
                 >
                   {isSubmitting ? 'Submitting...' : 'Apply to Join'}
                 </button>
