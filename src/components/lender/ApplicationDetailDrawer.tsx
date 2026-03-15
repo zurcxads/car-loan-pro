@@ -15,6 +15,7 @@ interface Props {
   onCounter?: () => void;
   onRequestDocs?: () => void;
   footer?: React.ReactNode;
+  supplementalSections?: React.ReactNode;
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -43,6 +44,7 @@ export default function ApplicationDetailDrawer({
   onCounter,
   onRequestDocs,
   footer,
+  supplementalSections,
 }: Props) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const offers = MOCK_OFFERS.filter(o => o.applicationId === app.id);
@@ -225,6 +227,7 @@ export default function ApplicationDetailDrawer({
                 </div>
               </Section>
             )}
+            {supplementalSections}
           </div>
 
           {footer ? (

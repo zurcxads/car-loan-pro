@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import toast from 'react-hot-toast';
 import ApplicationDetailDrawer from './ApplicationDetailDrawer';
 import type { MockApplication, MockOffer } from '@/lib/mock-data';
+import type { Message } from '@/lib/types';
 
 type ActiveApplication = {
   application: MockApplication;
@@ -15,6 +17,10 @@ type ActiveApplicationsResponse =
   | { success: false; error?: string };
 
 const DecisionModal = dynamic(() => import('./DecisionModal'), { ssr: false });
+
+type MessagesApiResponse =
+  | { success: true; data: { messages: Message[] } }
+  | { success: false; error?: string };
 
 function formatCurrency(value: number | undefined) {
   if (!value) {
@@ -53,6 +59,13 @@ function getStatusLabel(status: string) {
     .join(' ');
 }
 
+function formatMessageTime(value: string) {
+  return new Date(value).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
 export default function ApplicationQueue({ lenderId }: { lenderId: string | null }) {
   const [search, setSearch] = useState('');
   const [selectedApplication, setSelectedApplication] = useState<ActiveApplication | null>(null);
@@ -60,6 +73,11 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
   const [applications, setApplications] = useState<ActiveApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+  const [messagesError, setMessagesError] = useState('');
+  const [messageDraft, setMessageDraft] = useState('');
+  const [messageSubmitting, setMessageSubmitting] = useState(false);
 
   useEffect(() => {
     async function loadApplications() {
@@ -125,6 +143,78 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
     }
 
     setApplications(payload.data.applications);
+  };
+
+  useEffect(() => {
+    async function loadMessages(applicationId: string) {
+      setMessagesLoading(true);
+      setMessagesError('');
+
+      try {
+        const response = await fetch(`/api/messages?applicationId=${encodeURIComponent(applicationId)}`, {
+          cache: 'no-store',
+        });
+        const payload = await response.json() as MessagesApiResponse;
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.success ? 'Failed to load messages' : payload.error || 'Failed to load messages');
+        }
+
+        setMessages(payload.data.messages);
+      } catch (loadError) {
+        setMessagesError(loadError instanceof Error ? loadError.message : 'Failed to load messages');
+        setMessages([]);
+      } finally {
+        setMessagesLoading(false);
+      }
+    }
+
+    if (!selectedApplication) {
+      setMessages([]);
+      setMessagesError('');
+      setMessageDraft('');
+      setMessagesLoading(false);
+      return;
+    }
+
+    void loadMessages(selectedApplication.application.id);
+  }, [selectedApplication]);
+
+  const handleSendMessage = async () => {
+    if (!selectedApplication || !messageDraft.trim()) {
+      return;
+    }
+
+    setMessageSubmitting(true);
+
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          applicationId: selectedApplication.application.id,
+          content: messageDraft.trim(),
+        }),
+      });
+
+      const payload = await response.json() as
+        | { success: true; data: { message: Message } }
+        | { success: false; error?: string };
+
+      if (!response.ok || !payload.success) {
+        toast.error(payload.success ? 'Unable to send message.' : payload.error || 'Unable to send message.');
+        return;
+      }
+
+      setMessages((currentMessages) => [...currentMessages, payload.data.message]);
+      setMessageDraft('');
+    } catch {
+      toast.error('Unable to send message.');
+    } finally {
+      setMessageSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -264,6 +354,67 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
         <ApplicationDetailDrawer
           app={selectedApplication.application}
           onClose={() => setSelectedApplication(null)}
+          supplementalSections={(
+            <section className="mb-6">
+              <h3 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-gray-500">Messages</h3>
+              <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
+                {messagesLoading ? (
+                  <div className="rounded-xl border border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
+                    Loading messages...
+                  </div>
+                ) : messagesError ? (
+                  <div className="rounded-xl border border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
+                    {messagesError}
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
+                    No messages yet. Start the conversation if you need anything from this borrower.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {messages.map((message) => {
+                      const isLenderMessage = message.senderRole === 'lender' || message.senderRole === 'admin';
+
+                      return (
+                        <div key={message.id} className={`flex ${isLenderMessage ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${isLenderMessage ? 'bg-blue-600 text-white' : 'border border-[#E3E8EE] bg-white text-[#0A2540]'}`}>
+                            <p className="leading-6">{message.content}</p>
+                            <p className={`mt-2 text-xs ${isLenderMessage ? 'text-blue-100' : 'text-[#6B7C93]'}`}>
+                              {formatMessageTime(message.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <div className="mt-4 border-t border-[#E3E8EE] pt-4">
+                  <label htmlFor="lender-message-draft" className="mb-2 block text-sm font-medium text-[#0A2540]">
+                    Send a message
+                  </label>
+                  <textarea
+                    id="lender-message-draft"
+                    value={messageDraft}
+                    onChange={(event) => setMessageDraft(event.target.value)}
+                    rows={3}
+                    placeholder="Ask for clarification or give the borrower an update"
+                    className="w-full resize-none rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] outline-none transition focus:border-blue-600"
+                  />
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => void handleSendMessage()}
+                      disabled={messageSubmitting || !messageDraft.trim()}
+                      className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-300"
+                    >
+                      {messageSubmitting ? 'Sending...' : 'Send Message'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
           footer={(
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button

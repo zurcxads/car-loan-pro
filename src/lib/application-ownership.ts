@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { apiError, getConsumerSessionToken, getOptionalAuth } from '@/lib/api-helpers';
 import { dbGetApplication, dbGetApplicationByIdAndEmail, dbGetApplicationByIdAndSessionToken } from '@/lib/db';
+import { getLenderActiveApplication } from '@/lib/lender-applications';
 import type { MockApplication } from '@/lib/mock-data';
 
 type OwnershipResult = {
@@ -19,13 +20,27 @@ export async function getOwnedApplicationForRequest(
   }
 
   const role = auth.session?.user.role;
-  if (role === 'admin' || role === 'lender') {
+  if (role === 'admin') {
     const application = await dbGetApplication(applicationId);
     if (!application) {
       return { application: null, error: apiError('Application not found', 404), session: auth.session };
     }
 
     return { application, error: null, session: auth.session };
+  }
+
+  if (role === 'lender') {
+    const lenderId = auth.session?.user.entityId;
+    if (!lenderId) {
+      return { application: null, error: apiError('Access denied', 403), session: auth.session };
+    }
+
+    const ownedApplication = await getLenderActiveApplication(lenderId, applicationId);
+    if (!ownedApplication) {
+      return { application: null, error: apiError('Access denied', 403), session: auth.session };
+    }
+
+    return { application: ownedApplication.application, error: null, session: auth.session };
   }
 
   if (role === 'consumer' && auth.session?.user.email) {
