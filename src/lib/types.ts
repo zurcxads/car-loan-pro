@@ -10,6 +10,17 @@ export type IncomeType = 'employment' | 'self_employed' | 'retirement' | 'disabi
 export type LenderTier = 'prime' | 'near_prime' | 'subprime' | 'specialty';
 export type OfferStatus = 'pending' | 'available' | 'approved' | 'conditional' | 'declined' | 'expired' | 'selected' | 'locked';
 export type CreditPullType = 'soft' | 'hard';
+export type DocumentRequestType =
+  | 'pay_stub'
+  | 'drivers_license'
+  | 'bank_statement'
+  | 'proof_of_residence'
+  | 'proof_of_insurance'
+  | 'tax_return'
+  | 'income_verification'
+  | 'other';
+export type DocumentRequestStatus = 'pending' | 'uploaded' | 'reviewed' | 'approved' | 'rejected';
+export type MessageSenderRole = 'consumer' | 'lender' | 'admin';
 
 // Step 1: Personal Info
 export interface BorrowerPersonalInfo {
@@ -120,6 +131,8 @@ export interface Application {
   createdAt: string;
   submittedAt?: string;
   expiresAt?: string;
+  documentRequests?: DocumentRequest[];
+  messages?: Message[];
 }
 
 // Lender Offer
@@ -168,4 +181,36 @@ export interface Lender {
   statesActive: string[];
   referralFee: number;
   isActive: boolean;
+}
+
+export interface UploadedDocument {
+  fileName: string;
+  fileSize: number;
+  mimeType: string;
+  uploadedAt: string;
+  storagePath?: string;
+  publicUrl?: string;
+  uploadPending?: boolean;
+}
+
+export interface DocumentRequest {
+  id: string;
+  applicationId: string;
+  type: DocumentRequestType;
+  status: DocumentRequestStatus;
+  requestedAt: string;
+  deadline?: string;
+  uploadedAt?: string;
+  notes?: string;
+  document?: UploadedDocument;
+}
+
+export interface Message {
+  id: string;
+  applicationId: string;
+  senderId: string;
+  senderRole: MessageSenderRole;
+  content: string;
+  createdAt: string;
+  readAt?: string;
 }

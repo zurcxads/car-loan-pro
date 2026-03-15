@@ -85,6 +85,8 @@ export interface MockApplication {
   lendersSubmitted: number;
   offersReceived: number;
   flags: string[];
+  documentRequests?: import('./types').DocumentRequest[];
+  messages?: import('./types').Message[];
 }
 
 export interface MockOffer {

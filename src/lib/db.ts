@@ -526,6 +526,8 @@ function mapDbToApp(row: Record<string, unknown>): MockApplication {
     lendersSubmitted: Number(row.lenders_submitted || 0),
     offersReceived: Number(row.offers_received || 0),
     flags: (row.flags as string[]) || [],
+    documentRequests: (row.document_requests as MockApplication['documentRequests']) || [],
+    messages: (row.messages as MockApplication['messages']) || [],
   };
 
   // Include session token if present (used for consumer dashboard access)
@@ -559,6 +561,8 @@ function mapAppToDb(app: Partial<MockApplication>): Record<string, unknown> {
   if (app.lendersSubmitted !== undefined) dbRow.lenders_submitted = app.lendersSubmitted;
   if (app.offersReceived !== undefined) dbRow.offers_received = app.offersReceived;
   if (app.flags !== undefined) dbRow.flags = app.flags;
+  if (app.documentRequests !== undefined) dbRow.document_requests = app.documentRequests;
+  if (app.messages !== undefined) dbRow.messages = app.messages;
   return dbRow;
 }
 
