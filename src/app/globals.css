@@ -18,6 +18,11 @@
   --cookie-banner-offset: 0px;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+}
+
 body {
   min-height: 100vh;
   font-family: var(--font-inter), 'Inter', sans-serif;
@@ -320,6 +325,7 @@ input[type="range"]:focus-visible::-moz-range-thumb {
   transition:
     transform 200ms ease,
     background-color 200ms ease,
+    background-image 200ms ease,
     border-color 200ms ease,
     box-shadow 200ms ease,
     color 200ms ease;
@@ -365,6 +371,10 @@ input[type="range"]:focus-visible::-moz-range-thumb {
 .premium-input-error:focus {
   border-color: #fca5a5;
   box-shadow: 0 0 0 2px #fee2e2, 0 0 0 4px rgba(239, 68, 68, 0.08);
+}
+
+.scroll-offset-section {
+  scroll-margin-top: 6rem;
 }
 
 .stagger-1 { animation-delay: 60ms; }

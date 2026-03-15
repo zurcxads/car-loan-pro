@@ -27,7 +27,8 @@ export default function Header() {
   useFocusTrap(mobileMenuOpen, mobileDialogRef, () => setMobileMenuOpen(false));
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 16);
+    const handler = () => setScrolled(window.scrollY > 10);
+    handler();
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
@@ -61,10 +62,10 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed left-0 right-0 top-0 z-50 transition-all duration-200 ${
+        className={`fixed left-0 right-0 top-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "border-b border-[#E3E8EE] bg-white/90 backdrop-blur-xl"
-            : "bg-white/80 backdrop-blur-xl"
+            ? "border-b border-[#E3E8EE] bg-white/95 shadow-sm backdrop-blur-md"
+            : "bg-white/80 shadow-none"
         }`}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
@@ -95,7 +96,7 @@ export default function Header() {
           <div className="hidden items-center gap-4 lg:flex">
             <Link
               href="/apply"
-              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 text-sm font-semibold text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Get Pre-Approved
             </Link>
@@ -176,7 +177,7 @@ export default function Header() {
               <Link
                 href="/apply"
                 onClick={() => setMobileMenuOpen(false)}
-                className="premium-button mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="premium-button mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#2563EB] bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 text-sm font-semibold text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               >
                 Get Pre-Approved
               </Link>

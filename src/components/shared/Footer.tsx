@@ -38,7 +38,7 @@ const footerColumns = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-[#E3E8EE] bg-white">
+    <footer className="relative bg-white before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,#2563EB,transparent)]">
       <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
           <div className="max-w-md">
@@ -72,7 +72,12 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 flex flex-col gap-3 border-t border-[#E3E8EE] pt-6 text-sm text-[#6B7C93] md:flex-row md:items-center md:justify-between">
-          <p>&copy; 2026 Auto Loan Pro. Auto Loan Pro is a marketplace, not a lender.</p>
+          <div className="space-y-1">
+            <p>&copy; 2026 Auto Loan Pro. Auto Loan Pro is a marketplace, not a lender.</p>
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#6B7C93]">
+              Built with security in mind.
+            </p>
+          </div>
           <div className="flex flex-wrap gap-4">
             <Link href="/terms" className="premium-footer-link">
               Terms

@@ -19,10 +19,10 @@ interface ButtonProps {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-blue-600 hover:bg-blue-500 text-white shadow-sm hover:shadow-lg disabled:bg-gray-300 disabled:text-gray-500',
+  primary: 'bg-blue-600 bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-sm hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-500 hover:shadow-lg disabled:bg-gray-300 disabled:text-gray-500',
   secondary: 'bg-gray-600 hover:bg-gray-500 text-white shadow-sm hover:shadow-lg disabled:bg-gray-300 disabled:text-gray-500',
-  outline: 'bg-white hover:bg-gray-50 border-2 border-gray-200 hover:border-gray-300 text-gray-700 disabled:bg-gray-50 disabled:text-gray-400',
-  ghost: 'bg-transparent hover:bg-gray-100 text-gray-700 disabled:text-gray-400',
+  outline: 'bg-white hover:bg-blue-50 border-2 border-gray-200 hover:border-blue-200 text-gray-700 disabled:bg-gray-50 disabled:text-gray-400',
+  ghost: 'bg-transparent hover:bg-blue-50 text-gray-700 disabled:text-gray-400',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -80,7 +80,7 @@ export default function Button({
     }
   };
 
-  const baseStyles = 'font-semibold rounded-xl transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2';
+  const baseStyles = 'font-semibold rounded-xl transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2';
   const widthStyles = fullWidth ? 'w-full' : 'inline-flex';
 
   return (
