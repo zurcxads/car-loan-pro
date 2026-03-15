@@ -3,6 +3,7 @@
 import './globals.css';
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { captureException } from '@/lib/error-tracking';
 
 export default function GlobalError({
   error,
@@ -12,7 +13,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Global runtime error:', error);
+    captureException(error, { component: 'GlobalErrorBoundary' });
   }, [error]);
 
   return (

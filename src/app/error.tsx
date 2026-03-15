@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { captureException } from '@/lib/error-tracking';
 
 export default function Error({
   error,
@@ -11,8 +12,7 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log error to error reporting service (e.g., Sentry)
-    console.error('Runtime error:', error);
+    captureException(error, { component: 'AppErrorBoundary' });
   }, [error]);
 
   return (

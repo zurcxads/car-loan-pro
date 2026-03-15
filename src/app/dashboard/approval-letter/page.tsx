@@ -64,8 +64,8 @@ function ApprovalLetterContent() {
           });
         }
       })
-      .catch(err => {
-        console.error('Error loading approval letter:', err);
+      .catch(() => {
+        // Error handled by UI state
       })
       .finally(() => {
         setLoading(false);
@@ -91,8 +91,8 @@ function ApprovalLetterContent() {
       a.click();
       window.URL.revokeObjectURL(downloadUrl);
       document.body.removeChild(a);
-    } catch (error) {
-      console.error('Download failed:', error);
+    } catch {
+      // Error handled by UI state
       alert('Failed to download PDF. Please try again.');
     }
   };

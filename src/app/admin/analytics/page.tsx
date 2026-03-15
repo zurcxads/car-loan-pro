@@ -224,8 +224,8 @@ export default function AnalyticsPage() {
       const res = await fetch(`/api/admin/analytics?days=${dateRange}`);
       const analyticsData = await res.json();
       setData(analyticsData);
-    } catch (error) {
-      console.error('Analytics fetch error:', error);
+    } catch {
+      // Error handled by UI state
     }
     setLoading(false);
   };

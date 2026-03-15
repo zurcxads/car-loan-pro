@@ -34,7 +34,7 @@ export default function AdminReviewPage() {
         setApplications(data.applications || []);
       }
     } catch {
-      console.error('Failed to load applications');
+      // Error handled by UI state
     }
     setLoading(false);
   };

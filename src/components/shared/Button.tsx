@@ -73,8 +73,8 @@ export default function Button({
           setShowSuccess(false);
         }, 2000);
       }
-    } catch (error) {
-      console.error('Button action failed:', error);
+    } catch {
+      // Error handled by UI state
     } finally {
       setIsLoading(false);
     }

@@ -113,8 +113,8 @@ function OffersContent() {
       } else {
         toast.error(data.error || 'Failed to select offer');
       }
-    } catch (error) {
-      console.error('Error selecting offer:', error);
+    } catch {
+      // Error handled by UI state
       toast.error('Failed to select offer');
     } finally {
       setIsSelecting(false);
