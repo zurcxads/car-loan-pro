@@ -11,6 +11,12 @@ export interface MagicLinkToken {
   created_at: string;
 }
 
+type ValidMagicLinkToken = {
+  applicationId: string;
+  email: string;
+  id: string;
+};
+
 /**
  * Generate a magic link token and store it in the database
  * @param email - User email
@@ -58,9 +64,9 @@ export async function generateMagicToken(
  * @param token - The token to verify
  * @returns Application ID and email if valid, null if invalid/expired
  */
-export async function verifyMagicToken(
+export async function getValidMagicToken(
   token: string
-): Promise<{ applicationId: string; email: string } | null> {
+): Promise<ValidMagicLinkToken | null> {
   try {
     const supabase = await createClient();
 
@@ -85,13 +91,8 @@ export async function verifyMagicToken(
       return null;
     }
 
-    // Mark as used
-    await supabase
-      .from('magic_links')
-      .update({ used_at: new Date().toISOString() })
-      .eq('id', magicLink.id);
-
     return {
+      id: magicLink.id,
       applicationId: magicLink.application_id,
       email: magicLink.email,
     };
@@ -99,6 +100,41 @@ export async function verifyMagicToken(
     serverLogger.error('Magic link verification error', { error: err instanceof Error ? err.message : String(err) });
     return null;
   }
+}
+
+export async function consumeMagicToken(id: string): Promise<boolean> {
+  try {
+    const supabase = await createClient();
+    const { error } = await supabase
+      .from('magic_links')
+      .update({ used_at: new Date().toISOString() })
+      .eq('id', id)
+      .is('used_at', null);
+
+    return !error;
+  } catch (err) {
+    serverLogger.error('Magic link consume error', { error: err instanceof Error ? err.message : String(err) });
+    return false;
+  }
+}
+
+export async function verifyMagicToken(
+  token: string
+): Promise<{ applicationId: string; email: string } | null> {
+  const magicLink = await getValidMagicToken(token);
+  if (!magicLink) {
+    return null;
+  }
+
+  const consumed = await consumeMagicToken(magicLink.id);
+  if (!consumed) {
+    return null;
+  }
+
+  return {
+    applicationId: magicLink.applicationId,
+    email: magicLink.email,
+  };
 }
 
 /**

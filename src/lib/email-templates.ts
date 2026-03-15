@@ -145,6 +145,34 @@ export function magicLinkEmail(
   };
 }
 
+export function passwordResetEmail(
+  email: string,
+  firstName: string,
+  resetLink: string
+): EmailData {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Reset Your Password</h2>
+      <p style="color: #374151; line-height: 1.6;">Hi ${firstName},</p>
+      <p style="color: #374151; line-height: 1.6;">
+        We received a request to reset your Auto Loan Pro password.
+      </p>
+      <p style="text-align: center;">
+        <a href="${resetLink}" class="button">Reset Password</a>
+      </p>
+      <p style="color: #6b7280; font-size: 14px; margin-top: 24px;">
+        This secure link expires in 24 hours. If you did not request a password reset, you can ignore this email.
+      </p>
+    </div>
+  `;
+
+  return {
+    to: email,
+    subject: 'Reset Your Auto Loan Pro Password',
+    html: emailWrapper(content),
+  };
+}
+
 export function approvalLetterEmail(
   email: string,
   firstName: string,

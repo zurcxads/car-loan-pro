@@ -225,6 +225,11 @@ function LoginCard() {
                   className="w-full rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                   placeholder="Enter your password"
                 />
+                <div className="mt-3 text-right">
+                  <Link href="/forgot-password" className="text-sm font-medium text-blue-600">
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
 
               <button
