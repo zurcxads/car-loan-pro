@@ -295,7 +295,7 @@ function ResultsContent() {
       cancelled = true;
       if (retryTimer) clearTimeout(retryTimer);
     };
-  }, [router, isDev]);
+  }, [router, isDev, toast]);
 
   // Recalculate payment based on term and down payment
   const calculatePayment = (offer: AnonymizedOffer, termMonths: number, down: number): number => {

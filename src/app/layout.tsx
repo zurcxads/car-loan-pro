@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     description: "Pre-Approved in Minutes, Not Weeks",
     images: [
       {
-        url: '/og-image.svg',
+        url: '/opengraph-image',
         width: 1200,
         height: 630,
         alt: 'Auto Loan Pro',
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Auto Loan Pro — Auto Lending Marketplace",
     description: "Pre-Approved in Minutes, Not Weeks",
-    images: ['/og-image.svg'],
+    images: ['/twitter-image'],
   },
 };
 

@@ -131,7 +131,7 @@ export default function ToastProvider({ children }: { children: ReactNode }) {
     } catch {
       // Ignore corrupted session storage state.
     }
-  }, []);
+  }, [toast]);
 
   useEffect(() => () => {
     Object.values(dismissTimersRef.current).forEach((timer) => window.clearTimeout(timer));
