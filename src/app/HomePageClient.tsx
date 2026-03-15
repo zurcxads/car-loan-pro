@@ -7,7 +7,9 @@ import {
   FileText,
   BarChart3,
   CheckCircle,
+  ChevronDown,
   Shield,
+  ShieldCheck,
   Lock,
   Key,
   ArrowRight,
@@ -63,6 +65,67 @@ const testimonials = [
       "I expected a long process. It took a couple of minutes and I walked in already pre-approved at a lower rate.",
     name: "Elena V.",
     location: "San Diego, CA",
+  },
+];
+
+const trustedLenders = [
+  "Capital One",
+  "Chase Auto",
+  "Ally Financial",
+  "LightStream",
+  "PenFed",
+];
+
+const securityBadges = [
+  {
+    title: "256-bit Encryption",
+    description: "Application data is encrypted in transit and at rest.",
+    icon: Lock,
+  },
+  {
+    title: "SOC 2 Compliant",
+    description: "Operational controls are aligned to modern security standards.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "No Credit Impact",
+    description: "Initial matching starts with a soft pull, not a hard inquiry.",
+    icon: Shield,
+  },
+];
+
+const faqItems = [
+  {
+    question: "Will checking offers affect my credit score?",
+    answer: "No. Initial matching uses a soft inquiry so you can compare rates without a hard credit impact. A lender may request a hard pull later if you choose to proceed.",
+  },
+  {
+    question: "What APR range should I expect?",
+    answer: "APR depends on credit profile, vehicle details, and term length. Prime applicants may see lower single-digit offers, while higher-risk profiles can see higher rates.",
+  },
+  {
+    question: "Who is eligible to apply?",
+    answer: "Applicants generally need to be at least 18 years old, have verifiable income, and provide a valid U.S. address and contact information.",
+  },
+  {
+    question: "How does Auto Loan Pro work?",
+    answer: "You complete one application, we match you with participating lenders, and you review pre-approval offers side-by-side before selecting one to move forward with.",
+  },
+  {
+    question: "How is my data protected?",
+    answer: "We use encrypted data transfer, controlled access, and secure processing workflows designed to protect sensitive application information.",
+  },
+  {
+    question: "How long does approval take?",
+    answer: "Most borrowers see pre-approval results within minutes. Final approval timing can vary if a lender needs documents or additional verification.",
+  },
+  {
+    question: "Can I apply with a co-borrower?",
+    answer: "Yes. The application supports co-borrower information when you want a lender to evaluate the combined profile.",
+  },
+  {
+    question: "What happens after I get pre-approved?",
+    answer: "You choose an offer, receive next steps from the lender, and can shop for a vehicle with a clearer budget and financing terms already in place.",
   },
 ];
 
@@ -253,6 +316,7 @@ function SecurityMockup() {
 
 export default function HomePage() {
   const [loanAmount, setLoanAmount] = useState(32000);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const monthlyPayment = Math.round(loanAmount / 72);
   const statsSection = useInView<HTMLDivElement>();
   const featuresSection = useInView<HTMLDivElement>();
@@ -298,6 +362,28 @@ export default function HomePage() {
           </div>
           <div className="hidden md:block">
             <HeroArtwork />
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-[#E3E8EE] bg-white px-6 py-8">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-center text-sm font-medium uppercase tracking-[0.18em] text-[#6B7C93]">
+            Trusted by leading lenders
+          </p>
+
+          <div className="mt-6 hidden items-center justify-center gap-12 text-lg font-semibold text-[#6B7C93] opacity-50 grayscale md:flex">
+            {trustedLenders.map((lender) => (
+              <span key={lender}>{lender}</span>
+            ))}
+          </div>
+
+          <div className="mt-6 overflow-hidden md:hidden">
+            <div className="homepage-marquee-track flex min-w-max items-center gap-12 whitespace-nowrap text-lg font-semibold text-[#6B7C93] opacity-50 grayscale">
+              {[...trustedLenders, ...trustedLenders].map((lender, index) => (
+                <span key={`${lender}-${index}`}>{lender}</span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -526,6 +612,75 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 py-20 md:py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="rounded-[2rem] border border-[#E3E8EE] bg-[#F6F9FC] px-6 py-10 md:px-10">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-semibold text-[#0A2540] md:text-4xl">Security and trust built into every application</h2>
+              <p className="mt-4 text-base leading-7 text-[#425466]">
+                Borrowers should know exactly how their information is handled before they start an application.
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {securityBadges.map((badge) => {
+                const Icon = badge.icon;
+
+                return (
+                  <div key={badge.title} className="rounded-xl border border-[#E3E8EE] bg-white px-6 py-5">
+                    <div className="inline-flex items-center gap-3 rounded-full border border-[#E3E8EE] bg-white px-4 py-2 text-sm font-semibold text-[#0A2540]">
+                      <Icon className="h-4 w-4 text-[#2563EB]" />
+                      <span>{badge.title}</span>
+                    </div>
+                    <p className="mt-4 text-sm leading-6 text-[#6B7C93]">{badge.description}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 py-20 md:py-24">
+        <div className="mx-auto max-w-4xl">
+          <div className="max-w-2xl">
+            <h2 className="text-3xl font-semibold text-[#0A2540] md:text-4xl">Frequently asked questions</h2>
+            <p className="mt-4 text-base leading-7 text-[#425466]">
+              Clear answers about rates, eligibility, timing, and what happens after pre-approval.
+            </p>
+          </div>
+
+          <div className="mt-10 border-t border-[#E3E8EE]">
+            {faqItems.map((item, index) => {
+              const isOpen = openFaqIndex === index;
+
+              return (
+                <div key={item.question} className="border-b border-[#E3E8EE]">
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                    className="flex w-full items-center justify-between gap-4 py-5 text-left"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="text-base font-semibold text-[#0A2540]">{item.question}</span>
+                    <ChevronDown
+                      className={`h-5 w-5 flex-shrink-0 text-[#6B7C93] transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                  <div
+                    className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="pb-5 pr-10 text-sm leading-7 text-[#425466]">{item.answer}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
