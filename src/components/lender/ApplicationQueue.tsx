@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import ApplicationDetailDrawer from './ApplicationDetailDrawer';
+import { countUnreadApplicationNotifications } from '@/lib/application-metadata';
 import type { MockApplication, MockOffer } from '@/lib/mock-data';
 import type { Message } from '@/lib/types';
 
@@ -134,6 +135,10 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
 
   const documentRequestedCount = applications.filter(({ application }) => application.status === 'documents_requested').length;
   const activeOfferCount = applications.filter(({ lockedOffer }) => lockedOffer.status === 'locked').length;
+  const unreadNotificationCount = applications.reduce(
+    (count, { application }) => count + countUnreadApplicationNotifications(application.metadata),
+    0
+  );
 
   const reloadApplications = async () => {
     const response = await fetch('/api/lender/applications', { cache: 'no-store' });
@@ -238,12 +243,13 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-5">
         {[
           { label: 'Active Applications', value: applications.length },
           { label: 'Locked Today', value: lockedTodayCount },
           { label: 'Docs Requested', value: documentRequestedCount },
           { label: 'Locked Offers', value: activeOfferCount },
+          { label: 'Unread Alerts', value: unreadNotificationCount },
         ].map((metric) => (
           <div key={metric.label} className="rounded-xl border border-[#E3E8EE] bg-white p-4 shadow-sm">
             <div className="mb-1 text-[10px] uppercase tracking-[0.18em] text-[#6B7C93]">{metric.label}</div>
@@ -256,7 +262,14 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
         <div className="border-b border-[#E3E8EE] px-6 py-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Active Applications</p>
+              <div className="mb-2 flex flex-wrap items-center gap-3">
+                <p className="text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Active Applications</p>
+                {unreadNotificationCount > 0 ? (
+                  <span className="inline-flex items-center rounded-full bg-[#0A2540] px-3 py-1 text-xs font-semibold text-white">
+                    {unreadNotificationCount} unread
+                  </span>
+                ) : null}
+              </div>
               <h2 className="text-2xl font-semibold text-[#0A2540]">Locked with your lending program</h2>
             </div>
             <div className="w-full max-w-md">
@@ -308,6 +321,11 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
+                    {countUnreadApplicationNotifications(application.metadata) > 0 ? (
+                      <span className="inline-flex rounded-full bg-[#F6F9FC] px-3 py-1 text-xs font-semibold text-[#0A2540]">
+                        {countUnreadApplicationNotifications(application.metadata)} new
+                      </span>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => setRequestDocsApplication(application)}

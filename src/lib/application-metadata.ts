@@ -1,4 +1,4 @@
-import type { ApplicationMetadata, ApplicationNotification } from '@/lib/types';
+import type { ApplicationMetadata, ApplicationNotification, ApplicationNotificationType } from '@/lib/types';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -43,3 +43,28 @@ export function countUnreadApplicationNotifications(metadata: ApplicationMetadat
   return normalizeApplicationMetadata(metadata).notifications?.filter((notification) => !notification.readAt).length ?? 0;
 }
 
+export function appendApplicationNotification(
+  metadata: ApplicationMetadata | undefined,
+  notification: {
+    applicationId: string;
+    message: string;
+    type: ApplicationNotificationType;
+  }
+): ApplicationMetadata {
+  const normalizedMetadata = normalizeApplicationMetadata(metadata);
+  const notifications = normalizedMetadata.notifications ?? [];
+
+  return {
+    ...normalizedMetadata,
+    notifications: [
+      ...notifications,
+      {
+        id: crypto.randomUUID(),
+        applicationId: notification.applicationId,
+        createdAt: new Date().toISOString(),
+        message: notification.message,
+        type: notification.type,
+      },
+    ],
+  };
+}

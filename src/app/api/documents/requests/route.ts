@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { apiError, apiSuccess, getConsumerSessionToken } from '@/lib/api-helpers';
+import { appendApplicationNotification, normalizeApplicationMetadata } from '@/lib/application-metadata';
 import { dbGetApplicationByIdAndSessionToken, dbUpdateApplication } from '@/lib/db';
 import { isSupabaseConfigured, getServiceClient } from '@/lib/supabase';
 import { serverLogger } from '@/lib/server-logger';
@@ -20,6 +21,14 @@ const uploadPayloadSchema = z.object({
 
 function normalizeDocumentRequests(documentRequests: DocumentRequest[] | undefined): DocumentRequest[] {
   return Array.isArray(documentRequests) ? documentRequests : [];
+}
+
+function isDocumentUploaded(request: DocumentRequest): boolean {
+  return request.status === 'uploaded' || request.status === 'reviewed' || request.status === 'approved';
+}
+
+function areAllRequestedDocumentsUploaded(requests: DocumentRequest[]): boolean {
+  return requests.length > 0 && requests.every(isDocumentUploaded);
 }
 
 function sanitizeFileName(fileName: string): string {
@@ -202,6 +211,7 @@ export async function POST(request: NextRequest) {
       }
 
       const requests = normalizeDocumentRequests(application.documentRequests);
+      const allUploadedBeforeUpdate = areAllRequestedDocumentsUploaded(requests);
       const fileBuffer = Buffer.from(await file.arrayBuffer());
       const uploadResult = await uploadToStorage(applicationId, requestId, file.name, file.type, fileBuffer);
       const nextRequests = updateDocumentRequest(
@@ -218,8 +228,20 @@ export async function POST(request: NextRequest) {
         return apiError('Document request not found', 404);
       }
 
+      const allUploadedAfterUpdate = areAllRequestedDocumentsUploaded(nextRequests);
+      const shouldNotifyLender = !allUploadedBeforeUpdate && allUploadedAfterUpdate;
+      const nextMetadata = shouldNotifyLender
+        ? appendApplicationNotification(normalizeApplicationMetadata(application.metadata), {
+          type: 'documents_uploaded',
+          applicationId,
+          message: 'All requested documents have been uploaded',
+        })
+        : normalizeApplicationMetadata(application.metadata);
+
       const updatedApplication = await dbUpdateApplication(applicationId, {
         documentRequests: nextRequests,
+        status: application.status === 'documents_requested' && allUploadedAfterUpdate ? 'under_review' : application.status,
+        metadata: nextMetadata,
       });
 
       if (!updatedApplication) {
@@ -250,6 +272,7 @@ export async function POST(request: NextRequest) {
     }
 
     const requests = normalizeDocumentRequests(application.documentRequests);
+    const allUploadedBeforeUpdate = areAllRequestedDocumentsUploaded(requests);
     const uploadResult = await uploadToStorage(
       applicationId,
       requestId,
@@ -271,8 +294,20 @@ export async function POST(request: NextRequest) {
       return apiError('Document request not found', 404);
     }
 
+    const allUploadedAfterUpdate = areAllRequestedDocumentsUploaded(nextRequests);
+    const shouldNotifyLender = !allUploadedBeforeUpdate && allUploadedAfterUpdate;
+    const nextMetadata = shouldNotifyLender
+      ? appendApplicationNotification(normalizeApplicationMetadata(application.metadata), {
+        type: 'documents_uploaded',
+        applicationId,
+        message: 'All requested documents have been uploaded',
+      })
+      : normalizeApplicationMetadata(application.metadata);
+
     const updatedApplication = await dbUpdateApplication(applicationId, {
       documentRequests: nextRequests,
+      status: application.status === 'documents_requested' && allUploadedAfterUpdate ? 'under_review' : application.status,
+      metadata: nextMetadata,
     });
 
     if (!updatedApplication) {
