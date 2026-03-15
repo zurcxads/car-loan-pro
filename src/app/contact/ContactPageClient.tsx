@@ -233,7 +233,7 @@ export default function ContactPage() {
               )}
             </div>
 
-            <aside className="grid h-full auto-rows-fr gap-6 self-start">
+            <aside className="grid h-full auto-rows-fr gap-6 self-start pb-2">
               <div className="premium-card rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
                 <h2 className="text-2xl font-semibold text-[#0A2540]">Contact information</h2>
                 <div className="mt-6 space-y-5">
@@ -282,7 +282,7 @@ export default function ContactPage() {
                 <p className="mt-3 text-sm leading-relaxed text-[#425466]">
                   Review how the process works or estimate a monthly payment before you reach out.
                 </p>
-                <div className="mt-6 flex flex-col gap-3">
+                <div className="mt-8 flex flex-col gap-3">
                   <Link
                     href="/how-it-works"
                     className="premium-button inline-flex min-h-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-5 py-3 text-sm font-semibold text-[#0A2540] hover:bg-[#F6F9FC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"

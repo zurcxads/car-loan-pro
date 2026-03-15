@@ -25,6 +25,7 @@ import type {
 } from '@/lib/types';
 
 const STEP_NAMES = ['About You', 'Income & Employment', 'Credit Consent', 'Review & Submit'];
+const STEP_PROGRESS_LABELS = ['About You', 'Address', 'Employment', 'Review'];
 const CREDIT_RANGE_OPTIONS = [
   { value: 'fair', label: 'Fair (580-669)' },
   { value: 'good', label: 'Good (670-739)' },
@@ -124,16 +125,18 @@ function Field({
   count,
   maxLength,
   children,
+  counterBelow = false,
 }: {
   error?: string;
   count?: number;
   maxLength?: number;
   children: React.ReactNode;
+  counterBelow?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
       {children}
-      <div className="flex min-h-[20px] items-start justify-between gap-2">
+      <div className={counterBelow ? 'min-h-[20px] space-y-1' : 'flex min-h-[20px] items-start justify-between gap-2'}>
         {error ? (
           <motion.p
             initial={{ opacity: 0, y: -4 }}
@@ -147,7 +150,7 @@ function Field({
           <span />
         )}
         {typeof maxLength === 'number' && typeof count === 'number' && (
-          <span className="text-xs text-[#6B7C93]">
+          <span className={`text-xs text-[#6B7C93] ${counterBelow ? 'block' : ''}`}>
             {count}/{maxLength}
           </span>
         )}
@@ -168,6 +171,7 @@ function TextInput({
   showSuccess,
   autoComplete,
   helper,
+  counterBelow,
 }: {
   label: string;
   value: string;
@@ -180,11 +184,12 @@ function TextInput({
   showSuccess?: boolean;
   autoComplete?: string;
   helper?: React.ReactNode;
+  counterBelow?: boolean;
 }) {
   const inputId = useId();
 
   return (
-    <Field error={error} count={value.length} maxLength={maxLength}>
+    <Field error={error} count={value.length} maxLength={maxLength} counterBelow={counterBelow}>
       <Label htmlFor={inputId} helper={helper}>{label}</Label>
       <div className="relative">
         <input
@@ -392,7 +397,7 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-4 overflow-hidden rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-5 sm:p-6">
+    <section className="space-y-4 overflow-hidden rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-5 sm:p-6">
       <h3 className="text-sm font-semibold text-[#0A2540]">{title}</h3>
       {children}
     </section>
@@ -757,7 +762,7 @@ export default function ApplyPage() {
       <div className="mx-auto max-w-2xl px-4 pb-16 pt-28 sm:px-6">
         <div className="mb-8 space-y-4">
           {activeOfferLender && (
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
               You have an active offer with {activeOfferLender}. Cancel it to apply again.{' '}
               <Link href="/dashboard" className="font-semibold text-blue-600 hover:text-blue-500">
                 Go to dashboard
@@ -789,14 +794,14 @@ export default function ApplyPage() {
               />
             </div>
             <div className="grid grid-cols-4 gap-2">
-              {STEP_NAMES.map((stepName, index) => {
+              {STEP_PROGRESS_LABELS.map((stepName, index) => {
                 const isActive = index === step;
                 const isComplete = index < step;
 
                 return (
-                  <div key={stepName} className="min-w-0">
+                  <div key={stepName} className="min-w-0 text-center">
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-colors ${
+                      className={`mx-auto flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-colors ${
                         isComplete || isActive
                           ? "border-[#2563EB] bg-[#2563EB] text-white"
                           : "border-[#D7DFE8] bg-white text-[#6B7C93]"
@@ -821,7 +826,7 @@ export default function ApplyPage() {
           </div>
         </div>
 
-        <div className={`rounded-[28px] border border-[#E3E8EE] bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)] ${shakeForm ? 'animate-shake' : ''}`}>
+        <div className={`rounded-xl border border-[#E3E8EE] bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)] ${shakeForm ? 'animate-shake' : ''}`}>
           <div className="border-b border-[#E3E8EE] px-6 py-5 sm:px-8">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -877,6 +882,7 @@ export default function ApplyPage() {
                           maxLength={11}
                           showSuccess={blurredFields.ssn && validateSSN(personal.ssn) && !errors.ssn}
                           autoComplete="off"
+                          counterBelow={true}
                           helper={
                             <span className="inline-flex items-center gap-1 text-xs leading-none text-[#6B7C93]">
                               <Lock className="h-3.5 w-3.5" />
@@ -1194,7 +1200,7 @@ export default function ApplyPage() {
 
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                               {section.rows.map((row) => (
-                                <div key={`${section.title}-${row.label}`} className="rounded-lg bg-[#F6F9FC] px-4 py-3">
+                                <div key={`${section.title}-${row.label}`} className="rounded-xl bg-[#F6F9FC] px-4 py-3">
                                   <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#6B7C93]">{row.label}</p>
                                   <p className={`mt-1 text-sm ${row.missing ? 'text-amber-700' : 'text-[#0A2540]'}`}>
                                     {row.value || 'Missing'}
@@ -1204,7 +1210,7 @@ export default function ApplyPage() {
                             </div>
 
                             {section.issues.length > 0 && (
-                              <div className="mt-4 rounded-lg border border-amber-200 bg-white px-4 py-3 text-sm text-amber-800">
+                              <div className="mt-4 rounded-xl border border-amber-200 bg-white px-4 py-3 text-sm text-amber-800">
                                 {section.issues.join(' ')}
                               </div>
                             )}

@@ -197,7 +197,7 @@ export const createApprovalLetterPDF = (data: ApprovalLetterData, qrCodeDataUrl?
 
         {/* QR Code */}
         {qrCodeDataUrl && (
-          <Image style={styles.qrCode} src={qrCodeDataUrl} alt="Verification QR code" />
+          <Image style={styles.qrCode} src={qrCodeDataUrl} />
         )}
 
         {/* Approval Badge */}

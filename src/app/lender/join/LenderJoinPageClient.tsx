@@ -151,7 +151,7 @@ export default function LenderJoinPageClient() {
     <div className="premium-page bg-white">
       <section className="animate-fade-in-up px-6 py-20 pt-32 md:py-24">
         <div className="mx-auto max-w-4xl">
-          <div className="rounded-[32px] border border-[#E3E8EE] bg-[linear-gradient(180deg,#F9FBFF_0%,#FFFFFF_100%)] px-8 py-12 shadow-[0_24px_80px_rgba(10,37,64,0.08)] sm:px-12">
+          <div className="rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#F9FBFF_0%,#FFFFFF_100%)] px-8 py-12 shadow-[0_24px_80px_rgba(10,37,64,0.08)] sm:px-12">
             <div className="max-w-2xl">
               <span className="inline-flex rounded-full border border-blue-100 bg-blue-50 px-4 py-1 text-sm font-medium text-blue-700">
                 Lender Network
@@ -169,7 +169,7 @@ export default function LenderJoinPageClient() {
                 const Icon = item.icon;
 
                 return (
-                  <div key={item.title} className="premium-card rounded-3xl border border-[#E3E8EE] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
+                  <div key={item.title} className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.05)]">
                     <div className="inline-flex rounded-xl bg-blue-50 p-3">
                       <Icon className="h-10 w-10 text-[#2563EB]" />
                     </div>
@@ -186,7 +186,7 @@ export default function LenderJoinPageClient() {
       <section className="px-6 py-20 md:py-24">
         <div className="mx-auto max-w-4xl">
           {isSuccess ? (
-            <div className="rounded-[28px] border border-blue-100 bg-[linear-gradient(180deg,#EFF6FF_0%,#FFFFFF_100%)] p-10 shadow-[0_24px_60px_rgba(37,99,235,0.12)]">
+            <div className="rounded-xl border border-blue-100 bg-[linear-gradient(180deg,#EFF6FF_0%,#FFFFFF_100%)] p-10 shadow-[0_24px_60px_rgba(37,99,235,0.12)]">
               <span className="inline-flex rounded-full bg-blue-600 px-4 py-1 text-sm font-semibold text-white">
                 Application Submitted
               </span>
@@ -195,7 +195,7 @@ export default function LenderJoinPageClient() {
               </p>
             </div>
           ) : (
-            <div className="premium-card rounded-[28px] border border-[#E3E8EE] bg-white p-8 shadow-[0_24px_60px_rgba(10,37,64,0.08)] sm:p-10">
+            <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-8 shadow-[0_24px_60px_rgba(10,37,64,0.08)] sm:p-10">
               <div className="mb-10">
                 <h2 className="text-2xl font-semibold tracking-tight text-[#0A2540]">Application Form</h2>
                 <p className="mt-3 text-sm leading-6 text-[#425466]">
@@ -204,7 +204,7 @@ export default function LenderJoinPageClient() {
               </div>
 
               <form className="space-y-8" onSubmit={handleSubmit}>
-                <div className="premium-card rounded-3xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                <div className="premium-card rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                   <h3 className="text-lg font-semibold text-[#0A2540]">Company details</h3>
                   <div className="mt-6 grid gap-6 md:grid-cols-2">
                     <div>
@@ -218,7 +218,7 @@ export default function LenderJoinPageClient() {
                   </div>
                 </div>
 
-                <div className="premium-card rounded-3xl border border-[#E3E8EE] bg-white p-6">
+                <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-6">
                   <h3 className="text-lg font-semibold text-[#0A2540]">Primary contact</h3>
                   <div className="mt-6 grid gap-6 md:grid-cols-2">
                     <div>
@@ -229,14 +229,15 @@ export default function LenderJoinPageClient() {
                       <FieldLabel required={true}>Email</FieldLabel>
                       <input required type="email" name="email" value={formData.email} onChange={handleChange} className={inputClassName()} />
                     </div>
-                    <div>
+                    <div className="md:col-span-2">
                       <FieldLabel required={true}>Phone</FieldLabel>
                       <input required type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClassName()} />
+                      <p className="mt-2 text-sm text-[#6B7C93]">Full-width for phone formatting and easier mobile entry.</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="premium-card rounded-3xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                <div className="premium-card rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                   <h3 className="text-lg font-semibold text-[#0A2540]">Lending Criteria</h3>
                   <div className="mt-6 grid gap-6 md:grid-cols-2">
                     <div>
@@ -267,7 +268,7 @@ export default function LenderJoinPageClient() {
                   </div>
                 </div>
 
-                <div className="premium-card rounded-3xl border border-[#E3E8EE] bg-white p-6">
+                <div className="premium-card rounded-xl border border-[#E3E8EE] bg-white p-6">
                   <h3 className="text-lg font-semibold text-[#0A2540]">Loan Parameters</h3>
                   <div className="mt-6 grid gap-6 md:grid-cols-2">
                     <div>
@@ -291,7 +292,7 @@ export default function LenderJoinPageClient() {
                   </div>
                 </div>
 
-                <label className="flex items-start gap-3 rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-4 text-sm text-[#425466]">
+                <label className="flex items-start gap-3 rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-4 text-sm text-[#425466]">
                   <input
                     required
                     type="checkbox"
@@ -304,7 +305,7 @@ export default function LenderJoinPageClient() {
                 </label>
 
                 {errorMessage ? (
-                  <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     {errorMessage}
                   </p>
                 ) : null}
@@ -312,7 +313,7 @@ export default function LenderJoinPageClient() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="premium-button inline-flex min-h-12 w-full items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 sm:mx-auto sm:w-auto sm:min-w-[220px]"
+                  className="premium-button inline-flex min-h-12 w-full items-center justify-center rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 md:mx-auto md:w-auto md:min-w-[220px]"
                 >
                   {isSubmitting ? 'Submitting...' : 'Apply to Join'}
                 </button>

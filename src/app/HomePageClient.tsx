@@ -132,7 +132,7 @@ const faqItems = [
 
 const HeroArtwork = memo(function HeroArtwork() {
   return (
-    <div className="relative mx-auto w-full max-w-[560px] rounded-[2rem] border border-[#E3E8EE] bg-white p-4 [will-change:transform]">
+    <div className="relative mx-auto w-full max-w-[560px] rounded-xl border border-[#E3E8EE] bg-white p-4 [will-change:transform]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(219,234,254,0.85),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(96,165,250,0.2),_transparent_30%)]" />
       <svg
         viewBox="0 0 600 640"
@@ -192,31 +192,51 @@ const HeroArtwork = memo(function HeroArtwork() {
 
 const PhoneMockup = memo(function PhoneMockup() {
   return (
-    <div className="flex justify-center pt-6">
-      <div className="relative h-[380px] w-[200px] rounded-[2rem] border border-[#E3E8EE] bg-white p-4 [will-change:transform]">
-        <div className="absolute left-1/2 top-3 h-4 w-24 -translate-x-1/2 rounded-full bg-[#E3E8EE]" />
-        <div className="mt-6">
-          <div className="mb-4 flex items-center justify-between text-sm font-medium text-[#6B7C93]">
-            <span>Step 2 of 4</span>
-            <span>50%</span>
-          </div>
-          <div className="mb-5 h-1.5 rounded-full bg-[#E3E8EE]">
-            <div className="h-1.5 w-1/2 rounded-full bg-[#2563EB]" />
-          </div>
-          <div className="space-y-3">
-            <div className="h-10 rounded-xl bg-[#F6F9FC]" />
-            <div className="h-10 rounded-xl bg-[#F6F9FC]" />
-            <div className="h-10 rounded-xl bg-[#F6F9FC]" />
-            <div className="grid grid-cols-2 gap-3">
-              <div className="h-10 rounded-xl bg-[#F6F9FC]" />
-              <div className="h-10 rounded-xl bg-[#F6F9FC]" />
+    <div className="pt-6">
+      <div className="rounded-xl border border-[#E3E8EE] bg-white p-5 md:hidden">
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-[#0A2540]">One short application</p>
+          <p className="text-sm leading-6 text-[#425466]">
+            Personal details, address, income, and consent flow in four clear steps.
+          </p>
+          <div className="grid grid-cols-2 gap-3 rounded-xl bg-[#F6F9FC] p-4 text-sm">
+            <div>
+              <p className="text-[#6B7C93]">Steps</p>
+              <p className="mt-1 font-semibold text-[#0A2540]">4 total</p>
             </div>
-            <div className="h-20 rounded-2xl border border-[#E3E8EE] bg-white" />
+            <div>
+              <p className="text-[#6B7C93]">Time</p>
+              <p className="mt-1 font-semibold text-[#0A2540]">~2 min</p>
+            </div>
           </div>
         </div>
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex h-11 items-center justify-center rounded-full bg-[#2563EB] text-sm font-semibold text-white">
-            Continue
+      </div>
+      <div className="relative hidden justify-center pt-0 md:flex">
+        <div className="relative h-[380px] w-[200px] rounded-[2rem] border border-[#E3E8EE] bg-white p-4 [will-change:transform]">
+          <div className="absolute left-1/2 top-3 h-4 w-24 -translate-x-1/2 rounded-full bg-[#E3E8EE]" />
+          <div className="mt-6">
+            <div className="mb-4 flex items-center justify-between text-sm font-medium text-[#6B7C93]">
+              <span>Step 2 of 4</span>
+              <span>50%</span>
+            </div>
+            <div className="mb-5 h-1.5 rounded-full bg-[#E3E8EE]">
+              <div className="h-1.5 w-1/2 rounded-full bg-[#2563EB]" />
+            </div>
+            <div className="space-y-3">
+              <div className="h-10 rounded-xl bg-[#F6F9FC]" />
+              <div className="h-10 rounded-xl bg-[#F6F9FC]" />
+              <div className="h-10 rounded-xl bg-[#F6F9FC]" />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="h-10 rounded-xl bg-[#F6F9FC]" />
+                <div className="h-10 rounded-xl bg-[#F6F9FC]" />
+              </div>
+              <div className="h-20 rounded-xl border border-[#E3E8EE] bg-white" />
+            </div>
+          </div>
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="flex h-11 items-center justify-center rounded-full bg-[#2563EB] text-sm font-semibold text-white">
+              Continue
+            </div>
           </div>
         </div>
       </div>
@@ -226,45 +246,60 @@ const PhoneMockup = memo(function PhoneMockup() {
 
 const OffersMockup = memo(function OffersMockup() {
   return (
-    <div className="relative mt-8 h-[220px] [will-change:transform]">
-      <div className="absolute left-2 top-14 h-[104px] w-[160px] rounded-2xl border border-[#E3E8EE] bg-white p-4 shadow-none">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F6F9FC] text-sm font-semibold text-[#0A2540]">
-            A
-          </div>
+    <div className="mt-8">
+      <div className="rounded-xl border border-[#E3E8EE] bg-white p-5 md:hidden">
+        <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-[#0A2540]">Atlas Bank</p>
-            <p className="text-sm text-[#6B7C93]">72 months</p>
+            <p className="text-sm font-semibold text-[#0A2540]">Best available offer</p>
+            <p className="mt-2 text-4xl font-semibold text-[#0A2540]">3.9%</p>
+            <p className="mt-1 text-sm text-[#425466]">$459/mo for 60 months</p>
+          </div>
+          <div className="rounded-xl bg-[#DBEAFE] px-3 py-2 text-right">
+            <p className="text-xs uppercase tracking-[0.12em] text-[#2563EB]">Top pick</p>
+            <p className="mt-1 text-sm font-semibold text-[#0A2540]">Crest Credit</p>
           </div>
         </div>
-        <p className="text-2xl font-semibold text-[#0A2540]">5.2%</p>
-        <p className="text-sm text-[#425466]">$487/mo</p>
       </div>
-      <div className="absolute left-16 top-7 h-[112px] w-[168px] rounded-2xl border border-[#E3E8EE] border-l-4 border-l-[#2563EB] bg-white p-4 shadow-none">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#DBEAFE] text-sm font-semibold text-[#2563EB]">
-            C
+      <div className="relative hidden h-[220px] md:block [will-change:transform]">
+        <div className="absolute left-2 top-14 h-[104px] w-[160px] rounded-xl border border-[#E3E8EE] bg-white p-4 shadow-none">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F6F9FC] text-sm font-semibold text-[#0A2540]">
+              A
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[#0A2540]">Atlas Bank</p>
+              <p className="text-sm text-[#6B7C93]">72 months</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-[#0A2540]">Crest Credit</p>
-            <p className="text-sm text-[#6B7C93]">60 months</p>
-          </div>
+          <p className="text-2xl font-semibold text-[#0A2540]">5.2%</p>
+          <p className="text-sm text-[#425466]">$487/mo</p>
         </div>
-        <p className="text-2xl font-semibold text-[#0A2540]">3.9%</p>
-        <p className="text-sm text-[#425466]">$459/mo</p>
-      </div>
-      <div className="absolute left-28 top-20 h-[104px] w-[160px] rounded-2xl border border-[#E3E8EE] bg-white p-4 shadow-none">
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F6F9FC] text-sm font-semibold text-[#0A2540]">
-            N
+        <div className="absolute left-16 top-7 h-[112px] w-[168px] rounded-xl border border-[#E3E8EE] border-l-4 border-l-[#2563EB] bg-white p-4 shadow-none">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#DBEAFE] text-sm font-semibold text-[#2563EB]">
+              C
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[#0A2540]">Crest Credit</p>
+              <p className="text-sm text-[#6B7C93]">60 months</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-medium text-[#0A2540]">Northlane</p>
-            <p className="text-sm text-[#6B7C93]">48 months</p>
-          </div>
+          <p className="text-2xl font-semibold text-[#0A2540]">3.9%</p>
+          <p className="text-sm text-[#425466]">$459/mo</p>
         </div>
-        <p className="text-2xl font-semibold text-[#0A2540]">4.4%</p>
-        <p className="text-sm text-[#425466]">$566/mo</p>
+        <div className="absolute left-28 top-20 h-[104px] w-[160px] rounded-xl border border-[#E3E8EE] bg-white p-4 shadow-none">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F6F9FC] text-sm font-semibold text-[#0A2540]">
+              N
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[#0A2540]">Northlane</p>
+              <p className="text-sm text-[#6B7C93]">48 months</p>
+            </div>
+          </div>
+          <p className="text-2xl font-semibold text-[#0A2540]">4.4%</p>
+          <p className="text-sm text-[#425466]">$566/mo</p>
+        </div>
       </div>
     </div>
   );
@@ -273,7 +308,7 @@ const OffersMockup = memo(function OffersMockup() {
 const ApprovalMockup = memo(function ApprovalMockup() {
   return (
     <div className="mt-8 flex justify-center">
-      <div className="w-full max-w-[280px] rounded-[1.5rem] border border-[#BFDBFE] bg-[#EFF6FF] px-6 py-8 text-center [will-change:transform]">
+      <div className="w-full max-w-[280px] rounded-xl border border-[#BFDBFE] bg-[#EFF6FF] px-6 py-8 text-center [will-change:transform]">
         <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#DCFCE7]">
           <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
@@ -292,7 +327,7 @@ const SecurityMockup = memo(function SecurityMockup() {
   return (
     <div className="relative mt-8 flex min-h-[220px] items-center justify-center [will-change:transform]">
       <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F6F9FC]" />
-      <div className="relative flex h-24 w-24 items-center justify-center rounded-[1.5rem] border border-[#E3E8EE] bg-white">
+      <div className="relative flex h-24 w-24 items-center justify-center rounded-xl border border-[#E3E8EE] bg-white">
         <Shield className="h-11 w-11 text-[#2563EB]" />
       </div>
       <div className="absolute left-12 top-12 flex h-10 w-10 items-center justify-center rounded-full border border-[#E3E8EE] bg-white">
@@ -379,7 +414,7 @@ function FaqItem({
         aria-expanded={isOpen}
         aria-controls={panelId}
       >
-        <span className="text-base font-semibold text-[#0A2540]">{question}</span>
+        <span className="text-base font-medium text-[#0A2540]">{question}</span>
         <ChevronDown
           className={`h-5 w-5 flex-shrink-0 text-[#6B7C93] transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
           aria-hidden="true"
@@ -437,7 +472,7 @@ export default function HomePage() {
                 One application. Multiple lenders competing for you. No dealer markup, no hidden fees.
               </p>
             </div>
-            <div className="mt-6 flex flex-col gap-6 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-6">
               <div className="relative inline-flex w-full sm:w-auto">
                 <span
                   aria-hidden="true"
@@ -471,14 +506,14 @@ export default function HomePage() {
             Trusted by leading lenders
           </p>
 
-          <div className="mt-6 hidden items-center justify-center gap-12 text-lg font-semibold text-[#6B7C93] opacity-50 grayscale md:flex">
+          <div className="mt-6 hidden items-center justify-center gap-12 text-xl font-semibold text-[#6B7C93] opacity-60 grayscale md:flex">
             {trustedLenders.map((lender) => (
               <span key={lender}>{lender}</span>
             ))}
           </div>
 
           <div className="mt-6 overflow-hidden md:hidden">
-            <div className="homepage-marquee-track flex min-w-max items-center gap-12 whitespace-nowrap text-lg font-semibold text-[#6B7C93] opacity-50 grayscale">
+            <div className="homepage-marquee-track flex min-w-max items-center gap-12 whitespace-nowrap text-xl font-semibold text-[#6B7C93] opacity-60 grayscale">
               {[...trustedLenders, ...trustedLenders].map((lender, index) => (
                 <span key={`${lender}-${index}`}>{lender}</span>
               ))}
@@ -490,7 +525,7 @@ export default function HomePage() {
       <section role="region" aria-label="Platform stats" className="bg-[#F6F9FC] px-6 py-20 md:py-24">
         <div
           ref={statsSection.ref}
-          className={`mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4 ${statsSection.isInView ? "in-view-visible" : "in-view-section"}`}
+          className={`mx-auto grid max-w-6xl gap-6 sm:grid-cols-2 sm:gap-10 lg:grid-cols-4 ${statsSection.isInView ? "in-view-visible" : "in-view-section"}`}
         >
           {stats.map((stat) => (
             <StatItem key={stat.label} {...stat} />
@@ -510,15 +545,15 @@ export default function HomePage() {
           </div>
 
           <div className="mt-14 space-y-6">
-            <div className="grid gap-6 lg:grid-cols-12">
-              <div className="feature-card-hover stagger-1 h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F7FAFF_100%)] p-8 [will-change:transform] lg:col-span-7">
+            <div className="grid items-stretch gap-6 lg:grid-cols-12">
+              <div className="feature-card-hover stagger-1 h-full min-h-[460px] rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F7FAFF_100%)] p-8 [will-change:transform] lg:col-span-7">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Apply in 2 Minutes</h3>
                 <p className="mt-3 max-w-lg text-[#425466]">
                   A short digital application replaces dealership paperwork, repeat credit checks, and back-office delays.
                 </p>
                 <PhoneMockup />
               </div>
-              <div className="feature-card-hover stagger-2 h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F8FBFF_100%)] p-8 [will-change:transform] lg:col-span-5">
+              <div className="feature-card-hover stagger-2 h-full min-h-[460px] rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F8FBFF_100%)] p-8 [will-change:transform] lg:col-span-5">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Compare Real Offers</h3>
                 <p className="mt-3 max-w-sm text-[#425466]">
                   See rates, terms, and monthly payments at a glance so the best offer is obvious.
@@ -562,7 +597,7 @@ export default function HomePage() {
                       aria-label="Loan amount"
                     />
                   </div>
-                  <div className="mt-10 rounded-3xl bg-[#F6F9FC] p-6">
+                  <div className="mt-10 rounded-xl bg-[#F6F9FC] p-6">
                     <p className="text-sm text-[#6B7C93]">Estimated payment</p>
                     <p className="mt-2 text-4xl font-semibold text-[#0A2540]">${monthlyPayment}/mo</p>
                     <p className="mt-2 text-sm text-[#425466]">72-month example based on your selected amount.</p>
@@ -586,7 +621,7 @@ export default function HomePage() {
                   <p className="mt-3 max-w-xl text-[#425466]">
                     Secure financing first, then take your approval with you to any dealership and focus on the car instead of the finance office.
                   </p>
-                  <div className="mt-8 max-w-md rounded-[1.5rem] border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                  <div className="mt-8 max-w-md rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                     <div className="flex items-center justify-between">
                       <Logo size="sm" />
                       <span className="rounded-full border border-[#E3E8EE] bg-white px-3 py-1.5 text-xs font-medium text-[#425466]">
@@ -617,19 +652,19 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-5">
-                  <div className="rounded-2xl bg-[#F6F9FC] p-5">
+                  <div className="rounded-xl bg-[#F6F9FC] p-5">
                     <p className="text-sm font-medium text-[#0A2540]">Walk in already funded</p>
                     <p className="mt-2 text-sm text-[#425466]">
                       Use your pre-approval as leverage and keep the negotiation focused on price.
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-[#F6F9FC] p-5">
+                  <div className="rounded-xl bg-[#F6F9FC] p-5">
                     <p className="text-sm font-medium text-[#0A2540]">Buy from any seller</p>
                     <p className="mt-2 text-sm text-[#425466]">
                       Shop across dealers and inventory without reapplying every time you change vehicles.
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-[#F6F9FC] p-5">
+                  <div className="rounded-xl bg-[#F6F9FC] p-5">
                     <p className="text-sm font-medium text-[#0A2540]">Avoid finance office pressure</p>
                     <p className="mt-2 text-sm text-[#425466]">
                       You already know your rate, terms, and budget before stepping onto the lot.
@@ -666,7 +701,7 @@ export default function HomePage() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0A2540] text-sm font-semibold text-white">
                     {step.number}
                   </div>
-                  <div className="mt-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F6F9FC]">
+                  <div className="mt-6 flex h-14 w-14 items-center justify-center rounded-xl bg-[#F6F9FC]">
                     <Icon className="h-7 w-7 text-[#2563EB]" />
                   </div>
                   <h3 className="mt-6 text-2xl font-semibold text-[#0A2540]">{step.title}</h3>
@@ -704,7 +739,7 @@ export default function HomePage() {
                 </div>
                 <p className="mt-6 text-lg leading-8 text-[#425466]">&ldquo;{testimonial.quote}&rdquo;</p>
                 <div className="mt-8 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-[#2563EB]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600">
                     {testimonial.name.split(' ').map(w => w[0]).join('')}
                   </div>
                   <div>
@@ -720,7 +755,7 @@ export default function HomePage() {
 
       <section role="region" aria-label="Security and trust" className="px-6 py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <div className="rounded-[2rem] border border-[#E3E8EE] bg-[#F6F9FC] px-6 py-10 md:px-10">
+          <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] px-6 py-10 md:px-10">
             <div className="max-w-2xl">
               <h2 className="text-3xl font-semibold text-[#0A2540] md:text-4xl">Security and trust built into every application</h2>
               <p className="mt-4 text-base leading-7 text-[#425466]">
@@ -733,9 +768,9 @@ export default function HomePage() {
                 const Icon = badge.icon;
 
                 return (
-                  <div key={badge.title} className="rounded-xl border border-[#E3E8EE] bg-white px-6 py-5">
-                    <div className="inline-flex items-center gap-3 rounded-full border border-[#E3E8EE] bg-white px-4 py-2 text-sm font-semibold text-[#0A2540]">
-                      <Icon className="h-4 w-4 text-[#2563EB]" />
+                  <div key={badge.title} className="rounded-xl border border-[#E3E8EE] bg-white px-6 py-4">
+                    <div className="inline-flex items-center gap-3 rounded-full border border-[#E3E8EE] bg-white px-4 py-4 text-sm font-semibold text-[#0A2540]">
+                      <Icon className="h-5 w-5 text-[#2563EB]" />
                       <span>{badge.title}</span>
                     </div>
                     <p className="mt-4 text-sm leading-6 text-[#6B7C93]">{badge.description}</p>
@@ -777,7 +812,7 @@ export default function HomePage() {
       </section>
 
       <section role="region" aria-label="Call to action" className="px-6 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl rounded-3xl bg-[linear-gradient(135deg,#2563EB_0%,#1D4ED8_55%,#0F766E_100%)] px-6 py-20 text-center md:py-24">
+        <div className="mx-auto max-w-6xl rounded-xl bg-[linear-gradient(135deg,#2563EB_0%,#1D4ED8_55%,#0F766E_100%)] px-6 py-20 text-center md:py-24">
           <h2 className="text-4xl font-semibold text-white">Ready to get pre-approved?</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100">
             Takes just 2 minutes. No impact on your credit score.

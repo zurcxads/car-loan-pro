@@ -40,7 +40,7 @@ export default function Footer() {
   return (
     <footer className="relative bg-white before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-[linear-gradient(90deg,transparent,#2563EB,transparent)]">
       <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
+        <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
           <div className="max-w-md">
             <Logo size="md" />
             <p className="mt-4 text-sm leading-relaxed text-[#425466]">
@@ -59,7 +59,7 @@ export default function Footer() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="premium-footer-link text-sm text-[#6B7C93]"
+                        className="premium-footer-link inline-flex min-h-[44px] items-center text-sm text-[#6B7C93]"
                       >
                         {link.label}
                       </Link>
@@ -78,14 +78,14 @@ export default function Footer() {
               Built with security in mind.
             </p>
           </div>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/terms" className="premium-footer-link">
+          <div className="flex flex-wrap gap-3">
+            <Link href="/terms" className="premium-footer-link inline-flex min-h-[44px] items-center">
               Terms
             </Link>
-            <Link href="/privacy" className="premium-footer-link">
+            <Link href="/privacy" className="premium-footer-link inline-flex min-h-[44px] items-center">
               Privacy Policy
             </Link>
-            <Link href="/disclosures" className="premium-footer-link">
+            <Link href="/disclosures" className="premium-footer-link inline-flex min-h-[44px] items-center">
               Disclosures
             </Link>
           </div>
