@@ -507,9 +507,14 @@ export default function HomePage() {
                   </div>
                 </div>
                 <p className="mt-6 text-lg leading-8 text-[#425466]">&ldquo;{testimonial.quote}&rdquo;</p>
-                <div className="mt-8">
-                  <p className="font-semibold text-[#0A2540]">{testimonial.name}</p>
-                  <p className="mt-1 text-sm text-[#6B7C93]">{testimonial.location}</p>
+                <div className="mt-8 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-[#2563EB]">
+                    {testimonial.name.split(' ').map(w => w[0]).join('')}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#0A2540]">{testimonial.name}</p>
+                    <p className="text-sm text-[#6B7C93]">{testimonial.location}</p>
+                  </div>
                 </div>
               </div>
             ))}
