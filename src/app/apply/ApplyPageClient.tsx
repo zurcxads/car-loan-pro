@@ -39,6 +39,14 @@ type ApplyPrefill = {
 };
 
 type StepIndex = 0 | 1 | 2 | 3;
+type FieldKey = string;
+
+const STEP_FIELD_KEYS: Record<StepIndex, FieldKey[]> = {
+  0: ['firstName', 'lastName', 'ssn', 'dob', 'email', 'phone', 'address1', 'city', 'state', 'zip'],
+  1: ['employmentStatus', 'income', 'employerName', 'monthsAtEmployer'],
+  2: ['soft', 'creditCheck', 'tcpa', 'terms', 'privacy', 'esign'],
+  3: ['make', 'model', 'price'],
+};
 
 type ReviewSection = {
   title: string;
@@ -152,22 +160,24 @@ function TextInput({
   label,
   value,
   onChange,
+  onBlur,
   placeholder,
   type = 'text',
   error,
   maxLength,
-  isValid,
+  showSuccess,
   autoComplete,
   helper,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  onBlur?: () => void;
   placeholder?: string;
   type?: string;
   error?: string;
   maxLength?: number;
-  isValid?: boolean;
+  showSuccess?: boolean;
   autoComplete?: string;
   helper?: React.ReactNode;
 }) {
@@ -182,13 +192,14 @@ function TextInput({
           type={type}
           value={value}
           onChange={(event) => onChange(event.target.value)}
+          onBlur={onBlur}
           placeholder={placeholder}
           maxLength={maxLength}
           autoComplete={autoComplete}
           aria-invalid={!!error}
-          className={`min-h-[52px] w-full rounded-xl border bg-white px-4 py-3.5 pr-12 text-base text-[#0A2540] placeholder:text-[#6B7C93] transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${error ? 'border-red-400' : 'border-[#E3E8EE]'}`}
+          className={`premium-input min-h-[52px] w-full rounded-xl border bg-white px-4 py-3.5 pr-12 text-base text-[#0A2540] placeholder:text-[#6B7C93] ${error ? 'premium-input-error border-red-300' : 'border-[#E3E8EE]'}`}
         />
-        {isValid && value && !error && (
+        {showSuccess && (
           <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
             <Check className="h-5 w-5 text-emerald-500" />
           </div>
@@ -202,15 +213,17 @@ function CurrencyInput({
   label,
   value,
   onChange,
+  onBlur,
   error,
-  isValid,
+  showSuccess,
   placeholder,
 }: {
   label: string;
   value: number;
   onChange: (v: number) => void;
+  onBlur?: () => void;
   error?: string;
-  isValid?: boolean;
+  showSuccess?: boolean;
   placeholder?: string;
 }) {
   const inputId = useId();
@@ -229,11 +242,12 @@ function CurrencyInput({
           inputMode="numeric"
           value={displayValue}
           onChange={(event) => onChange(parseCurrencyInput(event.target.value))}
+          onBlur={onBlur}
           placeholder={placeholder}
           aria-invalid={!!error}
-          className={`min-h-[52px] w-full rounded-xl border bg-white py-3.5 pl-8 pr-12 text-base text-[#0A2540] placeholder:text-[#6B7C93] transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${error ? 'border-red-400' : 'border-[#E3E8EE]'}`}
+          className={`premium-input min-h-[52px] w-full rounded-xl border bg-white py-3.5 pl-8 pr-12 text-base text-[#0A2540] placeholder:text-[#6B7C93] ${error ? 'premium-input-error border-red-300' : 'border-[#E3E8EE]'}`}
         />
-        {isValid && value > 0 && !error && (
+        {showSuccess && (
           <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
             <Check className="h-5 w-5 text-emerald-500" />
           </div>
@@ -247,19 +261,21 @@ function Select({
   label,
   value,
   onChange,
+  onBlur,
   options,
   placeholder,
   error,
-  isValid,
+  showSuccess,
   autoFocusNext,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  onBlur?: () => void;
   options: { value: string; label: string }[];
   placeholder?: string;
   error?: string;
-  isValid?: boolean;
+  showSuccess?: boolean;
   autoFocusNext?: boolean;
 }) {
   const selectId = useId();
@@ -290,8 +306,9 @@ function Select({
           id={selectId}
           value={value}
           onChange={handleChange}
+          onBlur={onBlur}
           aria-invalid={!!error}
-          className={`min-h-[52px] w-full appearance-none rounded-xl border bg-white px-4 py-3.5 pr-12 text-base transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${value ? 'text-[#0A2540]' : 'text-[#6B7C93]'} ${error ? 'border-red-400' : 'border-[#E3E8EE]'}`}
+          className={`premium-input min-h-[52px] w-full appearance-none rounded-xl border bg-white px-4 py-3.5 pr-12 text-base ${value ? 'text-[#0A2540]' : 'text-[#6B7C93]'} ${error ? 'premium-input-error border-red-300' : 'border-[#E3E8EE]'}`}
         >
           {placeholder && <option value="">{placeholder}</option>}
           {options.map((option) => (
@@ -301,7 +318,7 @@ function Select({
           ))}
         </select>
         <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center gap-2">
-          {isValid && value && !error && <Check className="h-5 w-5 text-emerald-500" />}
+          {showSuccess && <Check className="h-5 w-5 text-emerald-500" />}
           <ChevronDown className="h-5 w-5 text-[#6B7C93]" />
         </div>
       </div>
@@ -330,7 +347,7 @@ function Checkbox({
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
-        className="mt-0.5 h-5 w-5 rounded border-[#C4CDD5] text-blue-600 focus:ring-2 focus:ring-blue-500/20"
+        className="premium-input mt-0.5 h-5 w-5 rounded border-[#C4CDD5] text-blue-600 accent-blue-600"
       />
       <span className="text-sm leading-6 text-[#425466]">{label}</span>
     </label>
@@ -389,6 +406,8 @@ export default function ApplyPage() {
   const [step, setStep] = useState<StepIndex>(0);
   const [direction, setDirection] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [blurredFields, setBlurredFields] = useState<Record<FieldKey, boolean>>({});
+  const [shakeForm, setShakeForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [isDevMode, setIsDevMode] = useState(showDevTools());
   const [timeEstimate, setTimeEstimate] = useState(2);
@@ -563,7 +582,22 @@ export default function ApplyPage() {
   const validate = (): boolean => {
     const nextErrors = getStepErrors(step);
     setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
+    const isValid = Object.keys(nextErrors).length === 0;
+
+    if (!isValid) {
+      setBlurredFields((current) => ({
+        ...current,
+        ...Object.fromEntries(STEP_FIELD_KEYS[step].map((fieldKey) => [fieldKey, true])),
+      }));
+      setShakeForm(true);
+      window.setTimeout(() => setShakeForm(false), 380);
+    }
+
+    return isValid;
+  };
+
+  const markFieldBlurred = (fieldKey: FieldKey) => {
+    setBlurredFields((current) => ({ ...current, [fieldKey]: true }));
   };
 
   const goToStep = (nextStep: StepIndex) => {
@@ -718,7 +752,7 @@ export default function ApplyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24 font-sans sm:pb-0">
+    <div className="premium-page min-h-screen bg-white pb-24 font-sans sm:pb-0">
       <div className="mx-auto max-w-2xl px-4 pb-16 pt-28 sm:px-6">
         <div className="mb-8 space-y-4">
           {activeOfferLender && (
@@ -786,7 +820,7 @@ export default function ApplyPage() {
           </div>
         </div>
 
-        <div className="rounded-[28px] border border-[#E3E8EE] bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+        <div className={`rounded-[28px] border border-[#E3E8EE] bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)] ${shakeForm ? 'animate-shake' : ''}`}>
           <div className="border-b border-[#E3E8EE] px-6 py-5 sm:px-8">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -818,26 +852,29 @@ export default function ApplyPage() {
                           label="First name *"
                           value={personal.firstName}
                           onChange={(v) => setPersonal((p) => ({ ...p, firstName: v }))}
+                          onBlur={() => markFieldBlurred('firstName')}
                           error={errors.firstName}
-                          isValid={personal.firstName.trim().length > 0}
+                          showSuccess={blurredFields.firstName && personal.firstName.trim().length > 0 && !errors.firstName}
                           autoComplete="given-name"
                         />
                         <TextInput
                           label="Last name *"
                           value={personal.lastName}
                           onChange={(v) => setPersonal((p) => ({ ...p, lastName: v }))}
+                          onBlur={() => markFieldBlurred('lastName')}
                           error={errors.lastName}
-                          isValid={personal.lastName.trim().length > 0}
+                          showSuccess={blurredFields.lastName && personal.lastName.trim().length > 0 && !errors.lastName}
                           autoComplete="family-name"
                         />
                         <TextInput
                           label="Social Security Number *"
                           value={personal.ssn}
                           onChange={(v) => setPersonal((p) => ({ ...p, ssn: formatSSN(v) }))}
+                          onBlur={() => markFieldBlurred('ssn')}
                           placeholder="123-45-6789"
                           error={errors.ssn}
                           maxLength={11}
-                          isValid={validateSSN(personal.ssn)}
+                          showSuccess={blurredFields.ssn && validateSSN(personal.ssn) && !errors.ssn}
                           autoComplete="off"
                           helper={
                             <span className="inline-flex items-center gap-1 text-xs leading-none text-[#6B7C93]">
@@ -851,8 +888,9 @@ export default function ApplyPage() {
                           type="date"
                           value={personal.dob}
                           onChange={(v) => setPersonal((p) => ({ ...p, dob: v }))}
+                          onBlur={() => markFieldBlurred('dob')}
                           error={errors.dob}
-                          isValid={!!personal.dob}
+                          showSuccess={blurredFields.dob && !!personal.dob && !errors.dob}
                           autoComplete="bday"
                         />
                         <TextInput
@@ -860,8 +898,9 @@ export default function ApplyPage() {
                           type="email"
                           value={personal.email}
                           onChange={(v) => setPersonal((p) => ({ ...p, email: v }))}
+                          onBlur={() => markFieldBlurred('email')}
                           error={errors.email}
-                          isValid={personal.email.includes('@')}
+                          showSuccess={blurredFields.email && personal.email.includes('@') && !errors.email}
                           autoComplete="email"
                         />
                         <TextInput
@@ -869,10 +908,11 @@ export default function ApplyPage() {
                           type="tel"
                           value={personal.phone}
                           onChange={(v) => setPersonal((p) => ({ ...p, phone: formatPhone(v) }))}
+                          onBlur={() => markFieldBlurred('phone')}
                           placeholder="(555) 555-1234"
                           error={errors.phone}
                           maxLength={14}
-                          isValid={personal.phone.replace(/\D/g, '').length === 10}
+                          showSuccess={blurredFields.phone && personal.phone.replace(/\D/g, '').length === 10 && !errors.phone}
                           autoComplete="tel"
                         />
                       </div>
@@ -884,8 +924,9 @@ export default function ApplyPage() {
                           label="Street address *"
                           value={address.currentAddressLine1}
                           onChange={(v) => setAddress((a) => ({ ...a, currentAddressLine1: v }))}
+                          onBlur={() => markFieldBlurred('address1')}
                           error={errors.address1}
-                          isValid={address.currentAddressLine1.trim().length > 0}
+                          showSuccess={blurredFields.address1 && address.currentAddressLine1.trim().length > 0 && !errors.address1}
                           autoComplete="address-line1"
                         />
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -893,8 +934,9 @@ export default function ApplyPage() {
                             label="City *"
                             value={address.currentCity}
                             onChange={(v) => setAddress((a) => ({ ...a, currentCity: v }))}
+                            onBlur={() => markFieldBlurred('city')}
                             error={errors.city}
-                            isValid={address.currentCity.trim().length > 0}
+                            showSuccess={blurredFields.city && address.currentCity.trim().length > 0 && !errors.city}
                             autoComplete="address-level2"
                           />
                           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -902,19 +944,21 @@ export default function ApplyPage() {
                               label="State *"
                               value={address.currentState}
                               onChange={(v) => setAddress((a) => ({ ...a, currentState: v }))}
+                              onBlur={() => markFieldBlurred('state')}
                               options={US_STATES}
                               placeholder="Select"
                               error={errors.state}
-                              isValid={!!address.currentState}
+                              showSuccess={blurredFields.state && !!address.currentState && !errors.state}
                               autoFocusNext={true}
                             />
                             <TextInput
                               label="ZIP *"
                               value={address.currentZip}
                               onChange={(v) => setAddress((a) => ({ ...a, currentZip: formatZIP(v) }))}
+                              onBlur={() => markFieldBlurred('zip')}
                               error={errors.zip}
                               maxLength={5}
-                              isValid={address.currentZip.length === 5}
+                              showSuccess={blurredFields.zip && address.currentZip.length === 5 && !errors.zip}
                               autoComplete="postal-code"
                             />
                           </div>
@@ -924,23 +968,26 @@ export default function ApplyPage() {
                             label="Residence type"
                             value={address.residenceType}
                             onChange={(v) => setAddress((a) => ({ ...a, residenceType: v as ResidenceType }))}
+                            onBlur={() => markFieldBlurred('residenceType')}
                             options={[{ value: 'own', label: 'Own' }, { value: 'rent', label: 'Rent' }, { value: 'other', label: 'Other' }]}
-                            isValid={!!address.residenceType}
+                            showSuccess={blurredFields.residenceType && !!address.residenceType}
                           />
                           <CurrencyInput
                             label="Monthly payment"
                             value={address.monthlyHousingPayment}
                             onChange={(v) => setAddress((a) => ({ ...a, monthlyHousingPayment: v }))}
+                            onBlur={() => markFieldBlurred('housingPayment')}
                             placeholder="1,200"
-                            isValid={address.monthlyHousingPayment > 0}
+                            showSuccess={blurredFields.housingPayment && address.monthlyHousingPayment > 0}
                           />
                           <TextInput
                             label="Months at address"
                             value={address.monthsAtCurrentAddress ? String(address.monthsAtCurrentAddress) : ''}
                             onChange={(v) => setAddress((a) => ({ ...a, monthsAtCurrentAddress: Number(v.replace(/[^\d]/g, '')) }))}
+                            onBlur={() => markFieldBlurred('monthsAtAddress')}
                             placeholder="24"
                             type="text"
-                            isValid={address.monthsAtCurrentAddress > 0}
+                            showSuccess={blurredFields.monthsAtAddress && address.monthsAtCurrentAddress > 0}
                           />
                         </div>
                       </div>
@@ -952,9 +999,10 @@ export default function ApplyPage() {
                           label="Estimated credit range"
                           value={estimatedCreditRange}
                           onChange={setEstimatedCreditRange}
+                          onBlur={() => markFieldBlurred('creditRange')}
                           options={CREDIT_RANGE_OPTIONS}
                           placeholder="Select a range"
-                          isValid={!!estimatedCreditRange}
+                          showSuccess={blurredFields.creditRange && !!estimatedCreditRange}
                         />
                         <CurrencyInput
                           label="Target vehicle price"
@@ -963,8 +1011,9 @@ export default function ApplyPage() {
                             setHasVehicle(v > 0);
                             setVehicle((ve) => ({ ...ve, askingPrice: v }));
                           }}
+                          onBlur={() => markFieldBlurred('targetPrice')}
                           placeholder="25,000"
-                          isValid={(vehicle.askingPrice ?? 0) > 0}
+                          showSuccess={blurredFields.targetPrice && (vehicle.askingPrice ?? 0) > 0}
                         />
                       </div>
                     </SectionCard>
@@ -979,6 +1028,7 @@ export default function ApplyPage() {
                           label="Employment status"
                           value={employment.employmentStatus}
                           onChange={(v) => setEmployment((e) => ({ ...e, employmentStatus: v as EmploymentStatus }))}
+                          onBlur={() => markFieldBlurred('employmentStatus')}
                           options={[
                             { value: 'full_time', label: 'Full Time' },
                             { value: 'part_time', label: 'Part Time' },
@@ -986,15 +1036,16 @@ export default function ApplyPage() {
                             { value: 'retired', label: 'Retired' },
                             { value: 'other', label: 'Other' },
                           ]}
-                          isValid={!!employment.employmentStatus}
+                          showSuccess={blurredFields.employmentStatus && !!employment.employmentStatus}
                           autoFocusNext={true}
                         />
                         <CurrencyInput
                           label="Gross monthly income *"
                           value={employment.grossMonthlyIncome}
                           onChange={(v) => setEmployment((e) => ({ ...e, grossMonthlyIncome: v }))}
+                          onBlur={() => markFieldBlurred('income')}
                           error={errors.income}
-                          isValid={employment.grossMonthlyIncome > 0}
+                          showSuccess={blurredFields.income && employment.grossMonthlyIncome > 0 && !errors.income}
                           placeholder="5,000"
                         />
                       </div>
@@ -1006,16 +1057,18 @@ export default function ApplyPage() {
                               label="Employer name"
                               value={employment.employerName || ''}
                               onChange={(v) => setEmployment((e) => ({ ...e, employerName: v }))}
-                              isValid={!!employment.employerName}
+                              onBlur={() => markFieldBlurred('employerName')}
+                              showSuccess={blurredFields.employerName && !!employment.employerName}
                               maxLength={80}
                             />
                             <TextInput
                               label="Months at current employer"
                               value={employment.monthsAtEmployer ? String(employment.monthsAtEmployer) : ''}
                               onChange={(v) => setEmployment((e) => ({ ...e, monthsAtEmployer: Number(v.replace(/[^\d]/g, '')) }))}
+                              onBlur={() => markFieldBlurred('monthsAtEmployer')}
                               placeholder="24"
                               type="text"
-                              isValid={employment.monthsAtEmployer > 0}
+                              showSuccess={blurredFields.monthsAtEmployer && employment.monthsAtEmployer > 0}
                             />
                           </div>
 
@@ -1069,42 +1122,42 @@ export default function ApplyPage() {
                           onChange={(v) => setConsent((c) => ({ ...c, softPullConsent: v }))}
                           label="I consent to a soft credit inquiry to check my credit for pre-qualification."
                         />
-                        {errors.soft && <p className="-mt-1 text-sm text-red-500">{errors.soft}</p>}
+                        {errors.soft && <p className="mt-1 text-sm text-red-500">{errors.soft}</p>}
 
                         <Checkbox
                           checked={consent.hardPullConsent}
                           onChange={(v) => setConsent((c) => ({ ...c, hardPullConsent: v }))}
                           label="I understand that selecting a lender may result in a hard credit inquiry by that lender."
                         />
-                        {errors.creditCheck && <p className="-mt-1 text-sm text-red-500">{errors.creditCheck}</p>}
+                        {errors.creditCheck && <p className="mt-1 text-sm text-red-500">{errors.creditCheck}</p>}
 
                         <Checkbox
                           checked={consent.tcpaConsent}
                           onChange={(v) => setConsent((c) => ({ ...c, tcpaConsent: v }))}
                           label="I consent to receive communications via phone, email, or SMS regarding my application."
                         />
-                        {errors.tcpa && <p className="-mt-1 text-sm text-red-500">{errors.tcpa}</p>}
+                        {errors.tcpa && <p className="mt-1 text-sm text-red-500">{errors.tcpa}</p>}
 
                         <Checkbox
                           checked={consent.termsOfService}
                           onChange={(v) => setConsent((c) => ({ ...c, termsOfService: v }))}
                           label={<>I agree to the <Link href="/terms" target="_blank" onClick={(event) => event.stopPropagation()} className="text-blue-600 underline hover:text-blue-500">Terms of Service</Link>.</>}
                         />
-                        {errors.terms && <p className="-mt-1 text-sm text-red-500">{errors.terms}</p>}
+                        {errors.terms && <p className="mt-1 text-sm text-red-500">{errors.terms}</p>}
 
                         <Checkbox
                           checked={consent.privacyPolicy}
                           onChange={(v) => setConsent((c) => ({ ...c, privacyPolicy: v }))}
                           label={<>I agree to the <Link href="/privacy" target="_blank" onClick={(event) => event.stopPropagation()} className="text-blue-600 underline hover:text-blue-500">Privacy Policy</Link>.</>}
                         />
-                        {errors.privacy && <p className="-mt-1 text-sm text-red-500">{errors.privacy}</p>}
+                        {errors.privacy && <p className="mt-1 text-sm text-red-500">{errors.privacy}</p>}
 
                         <Checkbox
                           checked={consent.eSignConsent}
                           onChange={(v) => setConsent((c) => ({ ...c, eSignConsent: v }))}
                           label="I certify that the information I provided is true and accurate."
                         />
-                        {errors.esign && <p className="-mt-1 text-sm text-red-500">{errors.esign}</p>}
+                        {errors.esign && <p className="mt-1 text-sm text-red-500">{errors.esign}</p>}
                       </div>
                     </SectionCard>
                   </div>
@@ -1210,32 +1263,37 @@ export default function ApplyPage() {
                                   label="Year"
                                   value={String(vehicle.year || new Date().getFullYear())}
                                   onChange={(v) => setVehicle((ve) => ({ ...ve, year: Number(v.replace(/[^\d]/g, '')) }))}
+                                  onBlur={() => markFieldBlurred('year')}
                                   type="text"
+                                  showSuccess={blurredFields.year && !!vehicle.year}
                                 />
                                 <Select
                                   label="Make *"
                                   value={vehicle.make || ''}
                                   onChange={(v) => setVehicle((ve) => ({ ...ve, make: v }))}
+                                  onBlur={() => markFieldBlurred('make')}
                                   options={POPULAR_MAKES.map((make) => ({ value: make, label: make }))}
                                   placeholder="Select make"
                                   error={errors.make}
-                                  isValid={!!vehicle.make}
+                                  showSuccess={blurredFields.make && !!vehicle.make && !errors.make}
                                   autoFocusNext={true}
                                 />
                                 <TextInput
                                   label="Model *"
                                   value={vehicle.model || ''}
                                   onChange={(v) => setVehicle((ve) => ({ ...ve, model: v }))}
+                                  onBlur={() => markFieldBlurred('model')}
                                   error={errors.model}
                                   maxLength={40}
-                                  isValid={!!vehicle.model}
+                                  showSuccess={blurredFields.model && !!vehicle.model && !errors.model}
                                 />
                                 <CurrencyInput
                                   label="Price *"
                                   value={vehicle.askingPrice ?? 0}
                                   onChange={(v) => setVehicle((ve) => ({ ...ve, askingPrice: v }))}
+                                  onBlur={() => markFieldBlurred('price')}
                                   error={errors.price}
-                                  isValid={(vehicle.askingPrice ?? 0) > 0}
+                                  showSuccess={blurredFields.price && (vehicle.askingPrice ?? 0) > 0 && !errors.price}
                                   placeholder="30,000"
                                 />
                               </div>
