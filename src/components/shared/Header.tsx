@@ -9,6 +9,8 @@ import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 const navLinks = [
   { label: "How It Works", href: "/how-it-works" },
+  { label: "Lenders", href: "/lender/join" },
+  { label: "Dealers", href: "/dealer/join" },
   { label: "Resources", href: "/resources" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
@@ -28,8 +30,16 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  const portalRoutes = ["/admin", "/lender", "/dealer", "/dashboard", "/apply", "/results", "/dev"];
-  const isPortal = portalRoutes.some((route) => pathname.startsWith(route));
+  const hiddenPrefixes = ["/admin", "/dashboard", "/apply", "/results", "/dev"];
+  const hiddenExactRoutes = new Set([
+    "/lender",
+    "/lender/login",
+    "/lender/onboard",
+    "/dealer",
+    "/dealer/login",
+    "/dealer/onboard",
+  ]);
+  const isPortal = hiddenExactRoutes.has(pathname) || hiddenPrefixes.some((route) => pathname.startsWith(route));
 
   if (isPortal) return null;
 

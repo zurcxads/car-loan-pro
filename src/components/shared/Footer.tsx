@@ -31,6 +31,8 @@ const footerColumns = [
     title: "Connect",
     links: [
       { label: "Get Pre-Approved", href: "/apply" },
+      { label: "Lender Join", href: "/lender/join" },
+      { label: "Dealer Join", href: "/dealer/join" },
       { label: "Sign In", href: "/login" },
       { label: "Email Us", href: "mailto:hello@autoloanpro.co" },
     ],
