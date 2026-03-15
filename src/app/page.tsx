@@ -18,7 +18,7 @@ import {
 const stats = [
   { value: "2 Min", label: "Avg. approval time" },
   { value: "50+", label: "Partner lenders" },
-  { value: "/bin/bash", label: "Application cost" },
+  { value: "$0", label: "Application cost" },
   { value: "4.9/5", label: "Customer rating" },
 ];
 
@@ -255,40 +255,44 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen bg-white text-[#425466]">
-      <section className="min-h-[85vh] px-6 pb-20 pt-24 md:px-10 md:pb-24">
-        <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
+      <section className="min-h-[85vh] px-6 pb-20 pt-28 md:pb-24 md:pt-32">
+        <div className="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <p className="text-sm font-medium text-[#6B7C93]">
-              2-Minute Application | Real Offers from 50+ Lenders
-            </p>
-            <h1 className="mt-6 text-5xl font-semibold leading-tight text-[#0A2540] md:text-6xl">
-              <span className="block">Pre-Approved in Minutes,</span>
-              <span className="block text-[#6B7C93]">Not Weeks.</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-[#425466]">
-              One application. Multiple lenders competing for you. No dealer markup, no hidden fees.
-            </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+            <div className="space-y-4">
+              <p className="text-sm font-medium text-[#425466]">
+                2-Minute Application | Real Offers from 50+ Lenders
+              </p>
+              <h1 className="text-5xl font-semibold leading-[1.15] text-[#0A2540] md:text-6xl">
+                <span className="block">Pre-Approved in Minutes,</span>
+                <span className="block text-[#6B7C93]">Not Weeks.</span>
+              </h1>
+              <p className="max-w-xl text-lg leading-8 text-[#425466]">
+                One application. Multiple lenders competing for you. No dealer markup, no hidden fees.
+              </p>
+            </div>
+            <div className="mt-6 flex flex-col gap-6 sm:flex-row">
               <Link
                 href="/apply"
-                className="inline-flex items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                className="inline-flex w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 sm:w-auto"
               >
                 Get Pre-Approved
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
               <Link
-                href="/how-it-works"
-                className="inline-flex items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC]"
+                href="#how-it-works"
+                className="inline-flex w-full items-center justify-center rounded-full border border-[#E3E8EE] bg-white px-6 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC] sm:w-auto"
               >
                 See How It Works
               </Link>
             </div>
           </div>
-          <HeroArtwork />
+          <div className="hidden md:block">
+            <HeroArtwork />
+          </div>
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-16 md:px-10">
+      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
         <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.value} className="text-center lg:text-left">
@@ -299,13 +303,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 md:px-10 md:py-24">
-        <div className="mx-auto max-w-7xl">
+      <section className="px-6 py-20 md:py-24">
+        <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <h2 className="text-4xl font-semibold leading-tight text-[#0A2540]">
               Everything you need to get the best auto loan.
             </h2>
-            <p className="mt-4 text-xl text-[#6B7C93]">
+            <p className="mt-4 text-xl text-[#425466]">
               Compare real offers from real lenders — no dealer markup.
             </p>
           </div>
@@ -443,11 +447,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20 md:px-10 md:py-24">
+      <section id="how-it-works" className="bg-[#F6F9FC] px-6 py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <h2 className="text-4xl font-semibold text-[#0A2540]">How it works</h2>
-            <p className="mt-4 text-lg text-[#6B7C93]">
+            <p className="mt-4 text-lg text-[#425466]">
               Three clear steps from application to dealership-ready financing.
             </p>
           </div>
@@ -474,11 +478,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 md:px-10 md:py-24">
+      <section className="px-6 py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <h2 className="text-4xl font-semibold text-[#0A2540]">What customers say</h2>
-            <p className="mt-4 text-lg text-[#6B7C93]">
+            <p className="mt-4 text-lg text-[#425466]">
               Real buyers using pre-approval to shop on their terms.
             </p>
           </div>
@@ -508,8 +512,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mb-16 px-4 md:px-8">
-        <div className="mx-auto max-w-7xl rounded-3xl bg-[#2563EB] px-6 py-16 text-center md:px-10">
+      <section className="px-6 py-20 md:py-24">
+        <div className="mx-auto max-w-6xl rounded-3xl bg-[#2563EB] px-6 py-20 text-center md:py-24">
           <h2 className="text-4xl font-semibold text-white">Ready to get pre-approved?</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100">
             Takes just 2 minutes. No impact on your credit score.
@@ -517,7 +521,7 @@ export default function HomePage() {
           <div className="mt-8">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-blue-50"
+              className="inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#2563EB] transition-colors hover:bg-blue-50 sm:w-auto"
             >
               Start Your Application
               <ArrowRight className="ml-2 h-4 w-4" />
