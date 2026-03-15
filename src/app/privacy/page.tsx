@@ -13,10 +13,10 @@ export default function PrivacyPage() {
       </nav>
 
       <div className="animate-fadeIn max-w-3xl mx-auto px-6 py-16">
-        <h1 className="text-3xl font-bold text-gray-900  mb-2">Privacy Policy</h1>
-        <p className="text-sm text-gray-500  mb-10">Effective Date: March 13, 2026</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
+        <p className="text-sm text-gray-500 mb-10">Effective Date: March 13, 2026</p>
 
-        <div className="prose prose-sm prose-gray  max-w-none space-y-8 text-gray-600  leading-relaxed">
+        <div className="prose prose-sm prose-gray max-w-none space-y-8 text-gray-600 leading-relaxed">
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-3">1. Introduction</h2>
             <p>Auto Loan Pro LLC (&quot;Auto Loan Pro,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) operates an online auto loan marketplace at autoloanpro.co (the &quot;Platform&quot;). This Privacy Policy explains how we collect, use, disclose, and protect your personal information when you use our Platform.</p>

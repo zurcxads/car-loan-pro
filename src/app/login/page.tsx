@@ -80,10 +80,10 @@ function LoginForm() {
 
           {!sent ? (
             <div className="animate-fadeIn">
-                <h2 className="text-lg font-semibold text-gray-900  mb-1">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">
                   {isPortalLogin ? 'Portal Sign In' : 'Access Your Dashboard'}
                 </h2>
-                <p className="text-xs text-gray-500  mb-6">
+                <p className="text-xs text-gray-500 mb-6">
                   {isPortalLogin
                     ? 'Sign in with your portal credentials.'
                     : 'Enter your email and we&apos;ll send you a secure login link. No password needed.'}
@@ -91,27 +91,27 @@ function LoginForm() {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-xs text-gray-500  mb-2 font-medium">Email Address</label>
+                    <label className="block text-xs text-gray-500 mb-2 font-medium">Email Address</label>
                     <input
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
                       placeholder="you@example.com"
                       required
-                      className="w-full px-4 py-3 bg-gray-50  border border-gray-200  rounded-xl text-sm text-gray-900  placeholder-gray-400  focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
                     />
                   </div>
 
                   {isPortalLogin && (
                     <div>
-                      <label className="block text-xs text-gray-500  mb-2 font-medium">Password</label>
+                      <label className="block text-xs text-gray-500 mb-2 font-medium">Password</label>
                       <input
                         type="password"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         placeholder="Enter your password"
                         required
-                        className="w-full px-4 py-3 bg-gray-50  border border-gray-200  rounded-xl text-sm text-gray-900  placeholder-gray-400  focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors duration-200"
                       />
                     </div>
                   )}
@@ -134,7 +134,7 @@ function LoginForm() {
 
                 {!isPortalLogin && (
                   <div className="mt-6 pt-6 border-t border-gray-200">
-                    <p className="text-xs text-gray-500  text-center">
+                    <p className="text-xs text-gray-500 text-center">
                       First time here?{' '}
                       <Link href="/apply" className="text-blue-600 hover:text-blue-500 font-medium">Apply for pre-approval</Link>
                     </p>
@@ -146,11 +146,11 @@ function LoginForm() {
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
                   <Mail className="h-8 w-8 text-blue-600" />
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900  mb-2">Check Your Email</h2>
-                <p className="text-sm text-gray-500  mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">Check Your Email</h2>
+                <p className="text-sm text-gray-500 mb-6">
                   We sent a login link to <strong>{email}</strong>. Click the link in the email to access your dashboard.
                 </p>
-                <p className="text-xs text-gray-400  mb-4">The link expires in 24 hours.</p>
+                <p className="text-xs text-gray-400 mb-4">The link expires in 24 hours.</p>
                 <button
                   onClick={() => setSent(false)}
                   className="text-sm text-blue-600 hover:text-blue-500 font-medium"
@@ -170,10 +170,10 @@ function LoginForm() {
               </svg>
             </div>
             <div>
-              <h3 className="text-xs font-semibold text-gray-900  mb-1">
+              <h3 className="text-xs font-semibold text-gray-900 mb-1">
                 {isPortalLogin ? 'Portal Access' : 'Passwordless & Secure'}
               </h3>
-              <p className="text-xs text-gray-600  leading-relaxed">
+              <p className="text-xs text-gray-600 leading-relaxed">
                 {isPortalLogin
                   ? `Production portal access is validated against Supabase auth. Demo credentials are accepted only in ${isDev() ? 'local development' : 'no environment'}.`
                   : 'We use magic links instead of passwords. It&apos;s faster, more secure, and one less password to remember.'}

@@ -76,13 +76,13 @@ export default function ApplicationManagement() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by ID, name, email, SSN last 4..."
-          className="flex-1 min-w-[250px] px-4 py-2.5 bg-white  border border-gray-200  rounded-xl text-sm text-gray-900  placeholder-gray-400  focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+          className="flex-1 min-w-[250px] px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
         />
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="px-4 py-2.5 text-sm bg-white  border border-gray-200  rounded-xl text-gray-900  focus:outline-none focus:ring-2 focus:ring-blue-600/20 cursor-pointer">
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 cursor-pointer">
           <option value="all">All Statuses</option>
           {statuses.map(s => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
         </select>
-        <select value={stateFilter} onChange={e => setStateFilter(e.target.value)} className="px-4 py-2.5 text-sm bg-white  border border-gray-200  rounded-xl text-gray-900  focus:outline-none focus:ring-2 focus:ring-blue-600/20 cursor-pointer">
+        <select value={stateFilter} onChange={e => setStateFilter(e.target.value)} className="px-4 py-2.5 text-sm bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-600/20 cursor-pointer">
           <option value="all">All States</option>
           {states.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
@@ -94,11 +94,11 @@ export default function ApplicationManagement() {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl bg-white  border border-gray-200  shadow-sm overflow-hidden">
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200  bg-gray-50">
-              <th className="text-left py-3 px-4 text-[10px] text-gray-600  uppercase tracking-wider font-medium">ID</th>
+            <tr className="border-b border-gray-200 bg-gray-50">
+              <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">ID</th>
               <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Borrower</th>
               <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Date</th>
               <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Credit Tier</th>
@@ -113,7 +113,7 @@ export default function ApplicationManagement() {
               <>
                 <tr
                   key={app.id}
-                  className="border-b border-gray-100  hover:bg-gray-50  transition-colors cursor-pointer"
+                  className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
                   onClick={() => toggleRow(app.id)}
                 >
                   <td className="py-3 px-4 font-mono text-xs text-gray-500">{app.id}</td>
@@ -141,7 +141,7 @@ export default function ApplicationManagement() {
                     <td colSpan={8} className="p-6">
                       <div className="grid grid-cols-3 gap-6">
                         <div>
-                          <h4 className="text-xs font-semibold text-gray-900  mb-3">Credit Profile</h4>
+                          <h4 className="text-xs font-semibold text-gray-900 mb-3">Credit Profile</h4>
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
                               <span className="text-gray-600">FICO:</span>
@@ -158,7 +158,7 @@ export default function ApplicationManagement() {
                           </div>
                         </div>
                         <div>
-                          <h4 className="text-xs font-semibold text-gray-900  mb-3">Employment</h4>
+                          <h4 className="text-xs font-semibold text-gray-900 mb-3">Employment</h4>
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
                               <span className="text-gray-600">Income:</span>
@@ -171,7 +171,7 @@ export default function ApplicationManagement() {
                           </div>
                         </div>
                         <div>
-                          <h4 className="text-xs font-semibold text-gray-900  mb-3">Vehicle</h4>
+                          <h4 className="text-xs font-semibold text-gray-900 mb-3">Vehicle</h4>
                           <div className="space-y-2 text-sm">
                             {app.vehicle ? (
                               <>
@@ -201,7 +201,7 @@ export default function ApplicationManagement() {
           <div className="text-center py-12 text-sm text-gray-500">No applications found</div>
         )}
         {filtered.length > 20 && (
-          <div className="p-4 text-center text-xs text-gray-500  border-t border-gray-200">
+          <div className="p-4 text-center text-xs text-gray-500 border-t border-gray-200">
             Showing first 20 of {filtered.length} results
           </div>
         )}

@@ -157,8 +157,8 @@ export default function PlatformOverview() {
 
   if (error) {
     return (
-      <div className="rounded-xl bg-white  border border-gray-200  shadow-sm p-8 text-center">
-        <h3 className="text-sm font-semibold text-gray-900  mb-2">Dashboard unavailable</h3>
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-8 text-center">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">Dashboard unavailable</h3>
         <p className="text-sm text-gray-500">{error}</p>
       </div>
     );
@@ -166,8 +166,8 @@ export default function PlatformOverview() {
 
   if (!summary) {
     return (
-      <div className="rounded-xl bg-white  border border-gray-200  shadow-sm p-8 text-center">
-        <h3 className="text-sm font-semibold text-gray-900  mb-2">No admin data yet</h3>
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-8 text-center">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">No admin data yet</h3>
         <p className="text-sm text-gray-500">Once applications and lender activity are stored in Supabase, metrics will appear here.</p>
       </div>
     );
@@ -176,26 +176,26 @@ export default function PlatformOverview() {
   return (
     <div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="rounded-xl bg-white  border border-gray-200  p-4 shadow-sm">
-          <div className="text-[10px] text-gray-500  uppercase tracking-wider mb-2">Apps Today</div>
+        <div className="rounded-xl bg-white border border-gray-200 p-4 shadow-sm">
+          <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Apps Today</div>
           <TrendIndicator value={summary.appsToday} deltaPercent={12.5} />
         </div>
-        <div className="rounded-xl bg-white  border border-gray-200  p-4 shadow-sm">
-          <div className="text-[10px] text-gray-500  uppercase tracking-wider mb-2">Pending Review</div>
+        <div className="rounded-xl bg-white border border-gray-200 p-4 shadow-sm">
+          <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Pending Review</div>
           <div className="text-2xl font-semibold text-gray-900">{summary.pendingApplications}</div>
         </div>
-        <div className="rounded-xl bg-white  border border-gray-200  p-4 shadow-sm">
-          <div className="text-[10px] text-gray-500  uppercase tracking-wider mb-2">Offers Extended</div>
+        <div className="rounded-xl bg-white border border-gray-200 p-4 shadow-sm">
+          <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Offers Extended</div>
           <TrendIndicator value={summary.offersToday} deltaPercent={8.2} />
         </div>
-        <div className="rounded-xl bg-white  border border-gray-200  p-4 shadow-sm">
-          <div className="text-[10px] text-gray-500  uppercase tracking-wider mb-2">Funded This Week</div>
+        <div className="rounded-xl bg-white border border-gray-200 p-4 shadow-sm">
+          <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Funded This Week</div>
           <TrendIndicator value={summary.fundedThisWeek} deltaPercent={-3.1} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 rounded-xl bg-white  border border-gray-200  shadow-sm p-6">
+        <div className="lg:col-span-2 rounded-xl bg-white border border-gray-200 shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-sm font-semibold text-gray-900">Applications Over Time</h3>
             <span className="text-xs text-gray-500">Last 7 days</span>
@@ -207,8 +207,8 @@ export default function PlatformOverview() {
           )}
         </div>
 
-        <div className="rounded-xl bg-white  border border-gray-200  shadow-sm p-6">
-          <h3 className="text-sm font-semibold text-gray-900  mb-6">Approval Rate</h3>
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-6">Approval Rate</h3>
           <DonutChart
             data={[
               { label: 'Approved', value: summary.avgApprovalRate, color: '#22C55E' },
@@ -220,8 +220,8 @@ export default function PlatformOverview() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="rounded-xl bg-white  border border-gray-200  shadow-sm p-6">
-          <h3 className="text-sm font-semibold text-gray-900  mb-6">Credit Score Distribution</h3>
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-6">Credit Score Distribution</h3>
           {creditScoreDist.some((bucket) => bucket.value > 0) ? (
             <DistributionBars data={creditScoreDist} />
           ) : (
@@ -229,15 +229,15 @@ export default function PlatformOverview() {
           )}
         </div>
 
-        <div className="rounded-xl bg-white  border border-gray-200  shadow-sm p-6">
-          <h3 className="text-sm font-semibold text-gray-900  mb-4">Recent Activity</h3>
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Recent Activity</h3>
           <div className="space-y-3 max-h-[280px] overflow-y-auto">
             {events.slice(0, 10).map((event) => (
               <div key={event.id} className="flex gap-2">
                 <div className={`w-2 h-2 rounded-full ${eventColors[event.type]} mt-1.5 flex-shrink-0`} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-gray-700  leading-relaxed">{event.description}</p>
-                  <p className="text-[10px] text-gray-400  mt-0.5">{formatRelativeTime(event.timestamp)}</p>
+                  <p className="text-xs text-gray-700 leading-relaxed">{event.description}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{formatRelativeTime(event.timestamp)}</p>
                 </div>
               </div>
             ))}
@@ -247,15 +247,15 @@ export default function PlatformOverview() {
           </div>
         </div>
 
-        <div className="rounded-xl bg-white  border border-gray-200  shadow-sm p-6">
-          <h3 className="text-sm font-semibold text-gray-900  mb-6">Revenue (Last 6 Months)</h3>
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-6">Revenue (Last 6 Months)</h3>
           <LineChart data={revenueData} height={200} color="#22C55E" />
         </div>
       </div>
 
       {alerts.filter((alert) => !alert.resolved).length > 0 && (
-        <div className="mt-6 rounded-xl bg-white  border border-gray-200  shadow-sm p-6">
-          <h3 className="text-sm font-semibold text-gray-900  mb-4">Alerts Requiring Action</h3>
+        <div className="mt-6 rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <h3 className="text-sm font-semibold text-gray-900 mb-4">Alerts Requiring Action</h3>
           <div className="space-y-2">
             {alerts.filter((alert) => !alert.resolved).map((alert) => {
               const styles = alertTypeStyles[alert.type];
@@ -263,11 +263,11 @@ export default function PlatformOverview() {
                 <div key={alert.id} className={`rounded-lg bg-gray-50  border ${styles.border} p-3 flex items-start justify-between gap-3`}>
                   <div className="flex-1">
                     <p className={`text-sm ${styles.text}`}>{alert.message}</p>
-                    <p className="text-[10px] text-gray-400  mt-1">{formatRelativeTime(alert.timestamp)}</p>
+                    <p className="text-[10px] text-gray-400 mt-1">{formatRelativeTime(alert.timestamp)}</p>
                   </div>
                   <button
                     onClick={() => dismissAlert(alert.id)}
-                    className="px-3 py-1.5 text-xs bg-white  border border-gray-200  hover:border-gray-300  rounded-lg transition-colors cursor-pointer flex-shrink-0"
+                    className="px-3 py-1.5 text-xs bg-white border border-gray-200 hover:border-gray-300 rounded-lg transition-colors cursor-pointer flex-shrink-0"
                   >
                     {alert.action}
                   </button>

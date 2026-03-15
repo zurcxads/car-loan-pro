@@ -16,7 +16,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50   flex items-center justify-center px-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50 flex items-center justify-center px-6">
       <div className="text-center max-w-2xl animate-fade-in-up">
         {/* Error Illustration */}
         <div className="mb-8 animate-fade-in">
@@ -29,10 +29,10 @@ export default function Error({
 
         {/* Content */}
         <div className="animate-fade-in">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900  mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Something Went Wrong
           </h1>
-          <p className="text-lg text-gray-600  mb-8 max-w-md mx-auto">
+          <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">
             We encountered an unexpected error. Please try again, or return to the homepage.
           </p>
 
@@ -49,7 +49,7 @@ export default function Error({
             </button>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white  hover:bg-gray-50  border border-gray-200  text-gray-700  rounded-xl text-sm font-semibold transition-all hover:shadow active:scale-[0.98]"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold transition-all hover:shadow active:scale-[0.98]"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -68,7 +68,7 @@ export default function Error({
           )}
 
           {/* Help Text */}
-          <div className="mt-12 pt-8 border-t border-gray-200  max-w-md mx-auto">
+          <div className="mt-12 pt-8 border-t border-gray-200 max-w-md mx-auto">
             <p className="text-sm text-gray-500">
               If this problem persists, please contact us at{' '}
               <a href="mailto:hello@autoloanpro.co" className="text-blue-600 hover:text-blue-700 font-medium">

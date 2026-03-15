@@ -29,17 +29,17 @@ export default function ReferralPage() {
       <div className="max-w-5xl mx-auto px-6 py-16">
         {/* Hero */}
         <div className="animate-fadeIn text-center mb-16">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900  mb-4">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-4">
             Refer Friends, Earn Rewards
           </h1>
-          <p className="text-lg text-gray-600  max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Share Auto Loan Pro with friends and family. When they get approved, you both benefit.
           </p>
         </div>
 
         {/* How It Works */}
         <div style={{ animationDelay: '0.1s' }} className="animate-fadeIn opacity-0 mb-16">
-          <h2 className="text-xl font-bold text-gray-900  text-center mb-10">How It Works</h2>
+          <h2 className="text-xl font-bold text-gray-900 text-center mb-10">How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
@@ -86,8 +86,8 @@ export default function ReferralPage() {
                     {item.step}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900  mb-2 mt-4">{item.title}</h3>
-                <p className="text-sm text-gray-600  leading-relaxed">{item.description}</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 mt-4">{item.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{item.description}</p>
               </div>
             ))}
           </div>
@@ -95,10 +95,10 @@ export default function ReferralPage() {
 
         {/* Referral Link Card */}
         <div style={{ animationDelay: '0.3s' }} className="animate-fadeIn opacity-0 mb-16 p-8 rounded-2xl bg-white border border-gray-200 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900  mb-6">Your Referral Link</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">Your Referral Link</h2>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700  mb-2">Referral Code</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Referral Code</label>
             <div className="flex items-center gap-3">
               <input
                 type="text"
@@ -119,7 +119,7 @@ export default function ReferralPage() {
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700  mb-2">Shareable Link</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Shareable Link</label>
             <div className="flex items-center gap-3">
               <input
                 type="text"
@@ -160,7 +160,7 @@ export default function ReferralPage() {
 
         {/* Referrals Tracking */}
         <div style={{ animationDelay: '0.4s' }} className="animate-fadeIn opacity-0 mb-16 p-8 rounded-2xl bg-white border border-gray-200 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900  mb-6">Your Referrals</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">Your Referrals</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="p-6 rounded-xl bg-blue-50 border border-blue-200">
@@ -188,7 +188,7 @@ export default function ReferralPage() {
 
         {/* Terms */}
         <div style={{ animationDelay: '0.5s' }} className="animate-fadeIn opacity-0 p-8 rounded-2xl bg-gray-50 border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900  mb-4">Program Terms</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Program Terms</h2>
           <div className="space-y-3 text-sm text-gray-600">
             <div className="flex gap-2">
               <span className="text-blue-600 mt-0.5">&bull;</span>

@@ -43,8 +43,8 @@ export default function DealerDashboard({ dealerId }: { dealerId: string | null 
 
   if (applications.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200  bg-white  p-8 text-center">
-        <h3 className="text-sm font-semibold text-gray-900  mb-2">No dealer activity yet</h3>
+      <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+        <h3 className="text-sm font-semibold text-gray-900 mb-2">No dealer activity yet</h3>
         <p className="text-sm text-gray-500">Selected consumers and funded deals will appear here once real data exists in Supabase.</p>
       </div>
     );
@@ -97,10 +97,10 @@ export default function DealerDashboard({ dealerId }: { dealerId: string | null 
             <button className="w-full flex items-center gap-3 px-4 py-3 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl transition-colors text-sm font-medium cursor-pointer">
               View All Pre-Approved Shoppers
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50  hover:bg-gray-100  text-gray-700  rounded-xl transition-colors text-sm font-medium cursor-pointer">
+            <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors text-sm font-medium cursor-pointer">
               Manage Leads
             </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50  hover:bg-gray-100  text-gray-700  rounded-xl transition-colors text-sm font-medium cursor-pointer">
+            <button className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl transition-colors text-sm font-medium cursor-pointer">
               View Performance
             </button>
           </div>

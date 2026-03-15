@@ -88,10 +88,10 @@ export default function PortalLayout({
         </nav>
 
         <div className="p-4 border-t border-gray-200">
-          {userName && <div className="text-xs text-gray-500  mb-2 truncate">{userName}</div>}
+          {userName && <div className="text-xs text-gray-500 mb-2 truncate">{userName}</div>}
           <button
             onClick={onLogout}
-            className="w-full px-4 py-2 text-xs text-gray-500  hover:text-gray-900  rounded-lg hover:bg-gray-50  transition-colors duration-200 cursor-pointer text-left"
+            className="w-full px-4 py-2 text-xs text-gray-500 hover:text-gray-900 rounded-lg hover:bg-gray-50 transition-colors duration-200 cursor-pointer text-left"
           >
             Sign Out
           </button>
@@ -99,7 +99,7 @@ export default function PortalLayout({
       </aside>
 
       <div className="flex-1 min-w-0">
-        <div className="border-b border-gray-200  bg-white/95  backdrop-blur-xl sticky top-0 z-30">
+        <div className="border-b border-gray-200 bg-white/95 backdrop-blur-xl sticky top-0 z-30">
           <div className="px-6 h-14 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
@@ -107,7 +107,7 @@ export default function PortalLayout({
                 aria-label="Open portal navigation"
                 aria-expanded={sidebarOpen}
                 aria-controls="portal-navigation-title"
-                className="lg:hidden p-2 -ml-2 text-gray-500  hover:text-gray-900  cursor-pointer"
+                className="lg:hidden p-2 -ml-2 text-gray-500 hover:text-gray-900 cursor-pointer"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
               </button>

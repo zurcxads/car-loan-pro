@@ -19,7 +19,7 @@ export default function ResourcesPage() {
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
             Auto Loan Resources
           </h1>
-          <p className="mt-4 text-lg text-gray-600  font-light">
+          <p className="mt-4 text-lg text-gray-600 font-light">
             Everything you need to know about getting the best auto loan
           </p>
         </div>
@@ -32,18 +32,18 @@ export default function ResourcesPage() {
             <Link
               key={article.slug}
               href={`/resources/${article.slug}`}
-              className="group block p-6 rounded-2xl bg-gray-50  border border-gray-200  hover:shadow-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="group block p-6 rounded-2xl bg-gray-50 border border-gray-200 hover:shadow-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               <div className="flex items-center gap-3 mb-3">
-                <span className="inline-flex px-2.5 py-1 rounded-full bg-blue-50  border border-blue-200  text-blue-600 text-xs font-medium">
+                <span className="inline-flex px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-600 text-xs font-medium">
                   {article.category}
                 </span>
                 <span className="text-xs text-gray-500">{article.readTime}</span>
               </div>
-              <h2 className="text-lg font-semibold text-gray-900  mb-2 group-hover:text-blue-600 transition-colors duration-200">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
                 {article.title}
               </h2>
-              <p className="text-sm text-gray-600  leading-relaxed mb-4">
+              <p className="text-sm text-gray-600 leading-relaxed mb-4">
                 {article.description}
               </p>
               <div className="flex items-center text-sm text-blue-600 font-medium">
@@ -56,7 +56,7 @@ export default function ResourcesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200  py-12 px-6 bg-gray-50">
+      <footer className="border-t border-gray-200 py-12 px-6 bg-gray-50">
         <div className="max-w-5xl mx-auto text-center text-xs text-gray-500">
           Auto Loan Pro is not a lender. Offers are subject to credit approval. NMLS #000000
         </div>

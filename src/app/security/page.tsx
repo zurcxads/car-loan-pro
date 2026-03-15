@@ -79,17 +79,17 @@ export default function SecurityPage() {
             return (
               <div
                 key={index}
-                className="bg-white  rounded-2xl p-6 border border-gray-200  shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-blue-50 rounded-xl flex-shrink-0">
                     <Icon className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900  mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
                       {feature.title}
                     </h3>
-                    <p className="text-sm text-gray-600  leading-relaxed">
+                    <p className="text-sm text-gray-600 leading-relaxed">
                       {feature.description}
                     </p>
                   </div>
@@ -103,13 +103,13 @@ export default function SecurityPage() {
         <div className="space-y-12">
           {/* Who Sees Your Data */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900  mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Who Sees Your Data
             </h2>
-            <div className="bg-white  rounded-2xl p-6 border border-gray-200">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200">
               <div className="space-y-4 text-sm text-gray-700">
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-blue-100  rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Check className="w-4 h-4 text-blue-600" />
                   </div>
                   <div>
@@ -117,7 +117,7 @@ export default function SecurityPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-blue-100  rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Check className="w-4 h-4 text-blue-600" />
                   </div>
                   <div>
@@ -146,14 +146,14 @@ export default function SecurityPage() {
 
           {/* Data Deletion */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900  mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               How to Delete Your Data
             </h2>
-            <div className="bg-white  rounded-2xl p-6 border border-gray-200">
-              <p className="text-sm text-gray-700  mb-4">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200">
+              <p className="text-sm text-gray-700 mb-4">
                 You have the right to request deletion of your personal information at any time. Here's how:
               </p>
-              <ol className="space-y-3 text-sm text-gray-700  list-decimal list-inside">
+              <ol className="space-y-3 text-sm text-gray-700 list-decimal list-inside">
                 <li>Email <strong>privacy@autoloanpro.co</strong> with "Data Deletion Request" in the subject line</li>
                 <li>Include your full name, email, and application ID (if available)</li>
                 <li>We will confirm your identity and process your request within 30 days</li>
@@ -169,11 +169,11 @@ export default function SecurityPage() {
 
           {/* Contact Security Team */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900  mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Contact Our Security Team
             </h2>
-            <div className="bg-white  rounded-2xl p-6 border border-gray-200">
-              <p className="text-sm text-gray-700  mb-4">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200">
+              <p className="text-sm text-gray-700 mb-4">
                 Have questions about our security practices or want to report a concern?
               </p>
               <div className="space-y-2 text-sm">
