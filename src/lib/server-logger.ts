@@ -4,6 +4,8 @@ type ServerErrorContext = {
   route: string;
 };
 
+type ServerLogMetadata = Record<string, unknown>;
+
 function serializeError(error: unknown) {
   if (error instanceof Error) {
     return {
@@ -19,17 +21,33 @@ function serializeError(error: unknown) {
   };
 }
 
-export function logServerError(error: unknown, context: ServerErrorContext) {
+function writeServerLog(level: 'error' | 'warn', message: string, metadata?: ServerLogMetadata) {
   const payload = {
-    context,
-    error: serializeError(error),
-    level: 'error',
+    level,
+    message,
+    metadata,
     timestamp: new Date().toISOString(),
   };
 
   try {
-    process.stderr.write(`[server-error] ${JSON.stringify(payload)}\n`);
+    process.stderr.write(`[server-${level}] ${JSON.stringify(payload)}\n`);
   } catch {
     // Avoid surfacing logging failures to clients.
   }
+}
+
+export const serverLogger = {
+  error(message: string, metadata?: ServerLogMetadata) {
+    writeServerLog('error', message, metadata);
+  },
+  warn(message: string, metadata?: ServerLogMetadata) {
+    writeServerLog('warn', message, metadata);
+  },
+};
+
+export function logServerError(error: unknown, context: ServerErrorContext) {
+  serverLogger.error('Server route error', {
+    context,
+    error: serializeError(error),
+  });
 }

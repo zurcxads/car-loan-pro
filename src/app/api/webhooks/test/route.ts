@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import crypto from 'crypto';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 export async function POST(req: NextRequest) {
   const { error: authError } = await requireAuth('lender');
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
       response: responseBody,
     });
   } catch (error) {
-    console.error('Test webhook error:', error);
+    serverLogger.error('Test webhook error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to send test webhook' },
       { status: 500 }

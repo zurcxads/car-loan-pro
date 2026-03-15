@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Configuration, PlaidApi, PlaidEnvironments, Products, CountryCode } from 'plaid';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments[process.env.PLAID_ENV as keyof typeof PlaidEnvironments] || PlaidEnvironments.sandbox,
@@ -35,7 +36,7 @@ export async function POST() {
       link_token: createTokenResponse.data.link_token,
     });
   } catch (error) {
-    console.error('Error creating Plaid link token:', error);
+    serverLogger.error('Error creating Plaid link token', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to create link token' },
       { status: 500 }

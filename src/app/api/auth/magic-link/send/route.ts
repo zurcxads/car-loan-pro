@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { apiSuccess, apiError } from '@/lib/api-helpers';
 import { generateMagicToken } from '@/lib/magic-link';
 import { magicLinkEmail, sendEmail } from '@/lib/email-templates';
+import { serverLogger } from '@/lib/server-logger';
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     return apiSuccess({ message: 'Magic link sent successfully' });
   } catch (err) {
-    console.error('Magic link send error:', err);
+    serverLogger.error('Magic link send error', { error: err instanceof Error ? err.message : String(err) });
     return apiError('Internal server error', 500);
   }
 }

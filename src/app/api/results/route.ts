@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { apiSuccess, apiError } from '@/lib/api-helpers';
 import { dbGetApplicationByToken, dbGetOffersByApplication } from '@/lib/db';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
+import { serverLogger } from '@/lib/server-logger';
 
 // GET /api/results — get anonymized offers for results page
 export async function GET(req: NextRequest) {
@@ -63,7 +64,7 @@ export async function GET(req: NextRequest) {
       suggestedDownPayment,
     });
   } catch (err) {
-    console.error('Results fetch error:', err);
+    serverLogger.error('Results fetch error', { error: err instanceof Error ? err.message : String(err) });
     return apiError('Failed to fetch results', 500);
   }
 }

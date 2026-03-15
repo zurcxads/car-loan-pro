@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { apiError, requireAuth } from '@/lib/api-helpers';
 import { dbCreateActivityEvent, dbGetApplication, dbUpdateApplication } from '@/lib/db';
 import type { MockApplication } from '@/lib/mock-data';
+import { serverLogger } from '@/lib/server-logger';
 
 const lenderDecisionRequestSchema = z.object({
   applicationId: z.string().min(1),
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
       terms: terms || null,
     });
   } catch (error) {
-    console.error('Lender decision error:', error);
+    serverLogger.error('Lender decision error', { error: error instanceof Error ? error.message : String(error) });
     return apiError('Failed to process lender decision', 500);
   }
 }

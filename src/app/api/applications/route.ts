@@ -8,6 +8,7 @@ import type { MockApplication } from '@/lib/mock-data';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { applicationReceivedEmail, sendEmail } from '@/lib/email-templates';
 import { CONSUMER_SESSION_COOKIE, getConsumerSessionCookieOptions } from '@/lib/consumer-session';
+import { serverLogger } from '@/lib/server-logger';
 
 // GET /api/applications — list all applications
 export async function GET(req: NextRequest) {
@@ -149,7 +150,7 @@ export async function POST(req: NextRequest) {
         const { data: existingUsers, error: listUsersError } = await supabase.auth.admin.listUsers();
 
         if (listUsersError) {
-          console.error('Failed to list Supabase users:', listUsersError);
+          serverLogger.error('Failed to list Supabase users', { error: listUsersError instanceof Error ? listUsersError.message : String(listUsersError) });
         } else {
           const existingUser = existingUsers.users.find(u => u.email === data.personalInfo.email);
 
@@ -167,14 +168,14 @@ export async function POST(req: NextRequest) {
             });
 
             if (signUpError) {
-              console.error('Failed to create Supabase user:', signUpError);
+              serverLogger.error('Failed to create Supabase user', { error: signUpError instanceof Error ? signUpError.message : String(signUpError) });
             } else if (newUser?.user) {
               userId = newUser.user.id;
             }
           }
         }
       } catch (err) {
-        console.error('Supabase user creation error:', err);
+        serverLogger.error('Supabase user creation error', { error: err instanceof Error ? err.message : String(err) });
         // Continue anyway - user can still access via session token
       }
     }
@@ -186,13 +187,13 @@ export async function POST(req: NextRequest) {
       app.id
     );
     sendEmail(emailData).catch(err => {
-      console.error('Failed to send application received email:', err);
+      serverLogger.error('Failed to send application received email', { error: err instanceof Error ? err.message : String(err) });
     });
 
     try {
       await matchLendersAndGenerateOffers(app);
     } catch (matchError) {
-      console.error('Lender matching failed:', matchError);
+      serverLogger.error('Lender matching failed', { error: matchError instanceof Error ? matchError.message : String(matchError) });
     }
 
     const response = NextResponse.json({
@@ -215,7 +216,7 @@ export async function POST(req: NextRequest) {
     return response;
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
-    console.error('Application creation error:', errMsg, err instanceof Error ? err.stack : '');
+    serverLogger.error('Application creation error', { error: err instanceof Error ? err.message : String(err) });
     if (process.env.NODE_ENV === 'development') {
       return apiError(errMsg, 500);
     }

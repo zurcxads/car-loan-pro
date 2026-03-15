@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createApplicationEvent } from '@/lib/application-events';
 import { dbCreateNotification } from '@/lib/db';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
       });
 
     if (uploadError) {
-      console.error('Storage upload error:', uploadError);
+      serverLogger.error('Storage upload error', { error: uploadError instanceof Error ? uploadError.message : String(uploadError) });
       return NextResponse.json(
         { error: 'Failed to upload file to storage' },
         { status: 500 }
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
     if (dbError) {
       // Cleanup storage if DB insert fails
       await supabase.storage.from('documents').remove([storagePath]);
-      console.error('Database insert error:', dbError);
+      serverLogger.error('Database insert error', { error: dbError instanceof Error ? dbError.message : String(dbError) });
       return NextResponse.json(
         { error: 'Failed to save document record' },
         { status: 500 }
@@ -119,7 +120,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ document });
   } catch (error) {
-    console.error('Upload error:', error);
+    serverLogger.error('Upload error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Upload failed' },
       { status: 500 }

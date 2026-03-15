@@ -6,6 +6,7 @@ import { generateCreditProfile } from '@/lib/credit-profile';
 import { dbCreateApplication } from '@/lib/db';
 import { matchLendersAndGenerateOffers } from '@/lib/lender-engine';
 import type { MockApplication } from '@/lib/mock-data';
+import { serverLogger } from '@/lib/server-logger';
 
 export async function POST(req: NextRequest) {
   const devAccess = await verifyDevAccessRequest(req);
@@ -106,7 +107,9 @@ export async function POST(req: NextRequest) {
     }
 
     await matchLendersAndGenerateOffers(application).catch((error: unknown) => {
-      console.error('[DEV] Failed to generate offers for test application:', error);
+      serverLogger.error('[DEV] Failed to generate offers for test application', {
+        error: error instanceof Error ? error.message : String(error),
+      });
     });
 
     const sessionToken = (application as MockApplication & { sessionToken?: string }).sessionToken;
@@ -126,7 +129,9 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error('[DEV] Error creating test application:', error);
+    serverLogger.error('[DEV] Error creating test application', {
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
       { error: 'Failed to create test application' },
       { status: 500 }

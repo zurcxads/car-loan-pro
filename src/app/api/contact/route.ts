@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { apiError, apiSuccess, parseBody } from '@/lib/api-helpers';
 import { useMockData as shouldUseMockData } from '@/lib/env';
+import { serverLogger } from '@/lib/server-logger';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
 const contactSubmissionSchema = z.object({
@@ -38,21 +39,27 @@ export async function POST(request: NextRequest) {
         .insert(submission);
 
       if (insertError) {
-        console.warn('Contact submission fallback:', insertError.message, submission);
+        serverLogger.warn('Contact submission fallback', {
+          error: insertError instanceof Error ? insertError.message : String(insertError),
+          submission,
+        });
       } else {
         return apiSuccess({
           message: `Thanks, ${data.name}. Your message has been received and we'll get back to you within 24 hours.`,
         }, 201);
       }
     } catch (supabaseError) {
-      console.warn('Contact submission fallback:', supabaseError, submission);
+      serverLogger.warn('Contact submission fallback', {
+        error: supabaseError instanceof Error ? supabaseError.message : String(supabaseError),
+        submission,
+      });
     }
 
     return apiSuccess({
       message: `Thanks, ${data.name}. Your message has been received and we'll get back to you within 24 hours.`,
     }, 201);
   } catch (err) {
-    console.error('Contact API error:', err);
+    serverLogger.error('Contact API error', { error: err instanceof Error ? err.message : String(err) });
     return apiError('Failed to submit message', 500);
   }
 }

@@ -7,6 +7,7 @@ import {
   sendEmail,
 } from '@/lib/email-templates';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 export async function POST(req: NextRequest) {
   const { error: authError } = await requireAuth('admin');
@@ -54,7 +55,7 @@ export async function POST(req: NextRequest) {
     const result = await sendEmail(emailData);
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Email send error:', error);
+    serverLogger.error('Email send error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to send email' },
       { status: 500 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 export async function GET(req: NextRequest) {
   const { error: authError } = await requireAuth();
@@ -50,7 +51,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ decoded });
   } catch (error) {
-    console.error('VIN decode error:', error);
+    serverLogger.error('VIN decode error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to decode VIN' },
       { status: 500 }

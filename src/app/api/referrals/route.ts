@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (refError) {
-      console.error('Referrals fetch error:', refError);
+      serverLogger.error('Referrals fetch error', { error: refError instanceof Error ? refError.message : String(refError) });
       return NextResponse.json(
         { error: 'Failed to fetch referrals' },
         { status: 500 }
@@ -63,7 +64,7 @@ export async function GET(req: NextRequest) {
       stats,
     });
   } catch (error) {
-    console.error('Referrals API error:', error);
+    serverLogger.error('Referrals API error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to fetch referrals' },
       { status: 500 }

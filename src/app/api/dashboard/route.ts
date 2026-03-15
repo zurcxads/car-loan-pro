@@ -4,6 +4,7 @@ import { useMockData as shouldUseMockData } from '@/lib/env';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { MOCK_APPLICATIONS } from '@/lib/mock-data';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
+import { serverLogger } from '@/lib/server-logger';
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value;
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (err) {
-    console.error('Dashboard API error:', err);
+    serverLogger.error('Dashboard API error', { error: err instanceof Error ? err.message : String(err) });
     return apiError('Failed to load dashboard', 500);
   }
 }

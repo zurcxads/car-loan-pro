@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { dbGetApplications } from '@/lib/db';
 import { verifyDevAccessRequest } from '@/lib/dev-access';
 import { resetMockTestApplications } from '@/lib/mock-data';
+import { serverLogger } from '@/lib/server-logger';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: { deleted: testApplicationIds.length } });
   } catch (error) {
-    console.error('[DEV] Failed to reset test data:', error);
+    serverLogger.error('[DEV] Failed to reset test data', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json({ success: false, error: 'Failed to reset test data' }, { status: 500 });
   }
 }

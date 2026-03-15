@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,14 +37,14 @@ export async function GET(req: NextRequest) {
       .createSignedUrl(document.storage_path, 60); // 60 seconds
 
     if (urlError || !signedUrlData) {
-      console.error('Failed to generate signed URL:', urlError);
+      serverLogger.error('Failed to generate signed URL', { error: urlError instanceof Error ? urlError.message : String(urlError) });
       return new Response('Failed to generate download link', { status: 500 });
     }
 
     // Redirect to signed URL
     return Response.redirect(signedUrlData.signedUrl);
   } catch (error) {
-    console.error('Download error:', error);
+    serverLogger.error('Download error', { error: error instanceof Error ? error.message : String(error) });
     return new Response('Download failed', { status: 500 });
   }
 }

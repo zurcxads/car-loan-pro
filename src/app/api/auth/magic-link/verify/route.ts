@@ -5,6 +5,7 @@ import {
   CONSUMER_SESSION_COOKIE,
   getConsumerSessionCookieOptions,
 } from '@/lib/consumer-session';
+import { serverLogger } from '@/lib/server-logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +46,7 @@ export async function GET(req: NextRequest) {
 
     return response;
   } catch (err) {
-    console.error('Magic link verification error:', err);
+    serverLogger.error('Magic link verification error', { error: err instanceof Error ? err.message : String(err) });
     return NextResponse.redirect(`${BASE_URL}/login?error=verification_failed`);
   }
 }

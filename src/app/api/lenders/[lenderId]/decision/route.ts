@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, parseBody, requireAuth } from '@/lib/api-helpers';
 import { dbCreateOffer, dbUpdateApplication, dbGetApplication } from '@/lib/db';
+import { serverLogger } from '@/lib/server-logger';
 import { z } from 'zod';
 
 const decisionSchema = z.object({
@@ -71,7 +72,7 @@ export async function POST(
       return apiSuccess({ message: 'Application declined' });
     }
   } catch (err) {
-    console.error('Decision error:', err);
+    serverLogger.error('Decision error', { error: err instanceof Error ? err.message : String(err) });
     return apiError('Failed to process decision', 500);
   }
 }

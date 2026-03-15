@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 export async function GET(req: NextRequest) {
   const { error: authError } = await requireAuth();
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
     const { data: documents, error } = await query;
 
     if (error) {
-      console.error('Fetch documents error:', error);
+      serverLogger.error('Fetch documents error', { error: error instanceof Error ? error.message : String(error) });
       return NextResponse.json(
         { error: 'Failed to fetch documents' },
         { status: 500 }
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ documents });
   } catch (error) {
-    console.error('Documents API error:', error);
+    serverLogger.error('Documents API error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to fetch documents' },
       { status: 500 }
@@ -85,7 +86,7 @@ export async function DELETE(req: NextRequest) {
       .remove([document.storage_path]);
 
     if (storageError) {
-      console.error('Storage delete error:', storageError);
+      serverLogger.error('Storage delete error', { error: storageError instanceof Error ? storageError.message : String(storageError) });
     }
 
     // Delete from database
@@ -95,7 +96,7 @@ export async function DELETE(req: NextRequest) {
       .eq('id', documentId);
 
     if (deleteError) {
-      console.error('Database delete error:', deleteError);
+      serverLogger.error('Database delete error', { error: deleteError instanceof Error ? deleteError.message : String(deleteError) });
       return NextResponse.json(
         { error: 'Failed to delete document' },
         { status: 500 }
@@ -104,7 +105,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete error:', error);
+    serverLogger.error('Delete error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to delete document' },
       { status: 500 }

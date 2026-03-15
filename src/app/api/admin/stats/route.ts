@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 
 // GET /api/admin/stats
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
     });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Failed to fetch stats';
-    console.error('Failed to fetch stats:', error);
+    serverLogger.error('Failed to fetch stats', { error: error instanceof Error ? error.message : String(error) });
     return apiError(message, 500);
   }
 }

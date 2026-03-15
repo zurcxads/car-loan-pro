@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 export async function GET(req: NextRequest) {
   // Require admin authentication
@@ -130,7 +131,7 @@ export async function GET(req: NextRequest) {
       avgAprTrend,
     });
   } catch (error) {
-    console.error('Analytics error:', error);
+    serverLogger.error('Analytics error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },
       { status: 500 }

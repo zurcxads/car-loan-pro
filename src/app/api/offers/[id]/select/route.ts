@@ -3,6 +3,7 @@ import { apiSuccess, apiError, requireAuth } from '@/lib/api-helpers';
 import { dbGetOffer, dbUpdateOffer, dbUpdateApplication, dbGetOffers, dbGetApplication, dbCreateNotification } from '@/lib/db';
 import { createApplicationEvent } from '@/lib/application-events';
 import { sendEmail } from '@/lib/email-templates';
+import { serverLogger } from '@/lib/server-logger';
 
 // POST /api/offers/[id]/select — consumer selects an offer
 export async function POST(
@@ -106,7 +107,7 @@ export async function POST(
     };
 
     sendEmail(offerSelectedEmailContent).catch(err => {
-      console.error('Failed to send offer selected email:', err);
+      serverLogger.error('Failed to send offer selected email', { error: err instanceof Error ? err.message : String(err) });
     });
 
     // Generate approval token for the letter
@@ -122,7 +123,7 @@ export async function POST(
       applicationId: offer.applicationId,
     });
   } catch (error) {
-    console.error('Error selecting offer:', error);
+    serverLogger.error('Error selecting offer', { error: error instanceof Error ? error.message : String(error) });
     return apiError('Failed to select offer', 500);
   }
 }

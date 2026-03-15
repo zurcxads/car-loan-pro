@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import crypto from 'crypto';
 import { requireAuth } from '@/lib/api-helpers';
+import { serverLogger } from '@/lib/server-logger';
 
 export async function GET(req: NextRequest) {
   const { error: authError } = await requireAuth('lender');
@@ -26,7 +27,7 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Webhooks fetch error:', error);
+      serverLogger.error('Webhooks fetch error', { error: error instanceof Error ? error.message : String(error) });
       return NextResponse.json(
         { error: 'Failed to fetch webhooks' },
         { status: 500 }
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ webhooks });
   } catch (error) {
-    console.error('Webhooks API error:', error);
+    serverLogger.error('Webhooks API error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to fetch webhooks' },
       { status: 500 }
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Webhook create error:', error);
+      serverLogger.error('Webhook create error', { error: error instanceof Error ? error.message : String(error) });
       return NextResponse.json(
         { error: 'Failed to create webhook' },
         { status: 500 }
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ webhook });
   } catch (error) {
-    console.error('Webhook create error:', error);
+    serverLogger.error('Webhook create error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to create webhook' },
       { status: 500 }
@@ -121,7 +122,7 @@ export async function PUT(req: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Webhook update error:', error);
+      serverLogger.error('Webhook update error', { error: error instanceof Error ? error.message : String(error) });
       return NextResponse.json(
         { error: 'Failed to update webhook' },
         { status: 500 }
@@ -130,7 +131,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ webhook });
   } catch (error) {
-    console.error('Webhook update error:', error);
+    serverLogger.error('Webhook update error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to update webhook' },
       { status: 500 }
@@ -160,7 +161,7 @@ export async function DELETE(req: NextRequest) {
       .eq('id', id);
 
     if (error) {
-      console.error('Webhook delete error:', error);
+      serverLogger.error('Webhook delete error', { error: error instanceof Error ? error.message : String(error) });
       return NextResponse.json(
         { error: 'Failed to delete webhook' },
         { status: 500 }
@@ -169,7 +170,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Webhook delete error:', error);
+    serverLogger.error('Webhook delete error', { error: error instanceof Error ? error.message : String(error) });
     return NextResponse.json(
       { error: 'Failed to delete webhook' },
       { status: 500 }

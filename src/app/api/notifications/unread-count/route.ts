@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { apiSuccess, apiError, requireAuth } from '@/lib/api-helpers';
 import { dbGetUnreadNotificationCount } from '@/lib/db';
+import { serverLogger } from '@/lib/server-logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
 
     return apiSuccess({ count });
   } catch (error) {
-    console.error('Failed to fetch unread count:', error);
+    serverLogger.error('Failed to fetch unread count', { error: error instanceof Error ? error.message : String(error) });
     return apiError('Failed to fetch unread count', 500);
   }
 }
