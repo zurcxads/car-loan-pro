@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { SkeletonDashboard } from '@/components/shared/Skeleton';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -65,6 +64,7 @@ const STATUS_STYLES: Record<string, string> = {
   approved: 'bg-blue-100 text-blue-700',
   funded: 'bg-emerald-100 text-emerald-700',
   expired: 'bg-gray-200 text-gray-700',
+  cancelled: 'bg-gray-200 text-gray-700',
   declined: 'bg-red-100 text-red-700',
   pending_decision: 'bg-yellow-100 text-yellow-700',
   offers_available: 'bg-green-100 text-green-700',
@@ -77,6 +77,7 @@ const STATUS_LABELS: Record<string, string> = {
   approved: 'Approved',
   funded: 'Funded',
   expired: 'Expired',
+  cancelled: 'Cancelled',
   declined: 'Declined',
   pending_decision: 'Under Review',
   offers_available: 'Offers Ready',
@@ -186,16 +187,17 @@ function formatMessageTime(date: string): string {
 }
 
 function DashboardContent() {
-  const router = useRouter();
   const isDev = showDevTools();
   const cancelDialogRef = useRef<HTMLDivElement>(null);
   const documentsSectionRef = useRef<HTMLElement>(null);
+  const expiringApplicationIdRef = useRef<string | null>(null);
 
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
+  const [expireSubmitting, setExpireSubmitting] = useState(false);
   const [documentRequests, setDocumentRequests] = useState<DocumentRequest[]>([]);
   const [documentsLoading, setDocumentsLoading] = useState(true);
   const [documentsError, setDocumentsError] = useState('');
@@ -306,7 +308,7 @@ function DashboardContent() {
       return;
     }
 
-    if (!application?.id) {
+    if (!application?.id || application.status === 'cancelled' || application.status === 'expired') {
       setDocumentRequests([]);
       setDocumentsLoading(false);
       return;
@@ -333,14 +335,70 @@ function DashboardContent() {
       .finally(() => {
         setDocumentsLoading(false);
       });
-  }, [application?.id, isDev]);
+  }, [application?.id, application?.status, isDev]);
 
   useEffect(() => {
     if (isDev) {
       return;
     }
 
-    if (!application?.id) {
+    if (!application?.id || !application.lockedOfferId || !application.lockedOffer || !application.offerExpiresAt) {
+      return;
+    }
+
+    const expiresAt = new Date(application.offerExpiresAt);
+    if (Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() >= Date.now()) {
+      return;
+    }
+
+    if (expiringApplicationIdRef.current === application.id) {
+      return;
+    }
+
+    expiringApplicationIdRef.current = application.id;
+    setExpireSubmitting(true);
+
+    fetch('/api/offers/expire', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ applicationId: application.id }),
+    })
+      .then(async (response) => {
+        const payload = await response.json() as { success?: boolean };
+
+        if (!response.ok || !payload.success) {
+          throw new Error('Unable to expire offer');
+        }
+
+        setApplication((currentApplication) => {
+          if (!currentApplication || currentApplication.id !== application.id) {
+            return currentApplication;
+          }
+
+          return {
+            ...currentApplication,
+            status: 'expired',
+            lockedOfferId: null,
+            lockedOffer: null,
+            offerLockedAt: null,
+          };
+        });
+      })
+      .catch(() => {
+        expiringApplicationIdRef.current = null;
+        toast.error('Unable to refresh your offer status.');
+      })
+      .finally(() => {
+        setExpireSubmitting(false);
+      });
+  }, [application, isDev]);
+
+  useEffect(() => {
+    if (isDev) {
+      return;
+    }
+
+    if (!application?.id || application.status === 'cancelled' || application.status === 'expired') {
       setMessages([]);
       setMessagesLoading(false);
       return;
@@ -367,7 +425,7 @@ function DashboardContent() {
       .finally(() => {
         setMessagesLoading(false);
       });
-  }, [application?.id, isDev]);
+  }, [application?.id, application?.status, isDev]);
 
   const daysRemaining = useMemo(() => {
     if (!application?.offerExpiresAt) return 0;
@@ -392,10 +450,24 @@ function DashboardContent() {
         return;
       }
 
-      toast.success('Offer cancelled.');
+      toast.success('Offer cancelled');
       setShowCancelModal(false);
-      router.refresh();
-      window.location.reload();
+      setApplication((currentApplication) => {
+        if (!currentApplication) {
+          return currentApplication;
+        }
+
+        return {
+          ...currentApplication,
+          status: 'cancelled',
+          lockedOfferId: null,
+          lockedOffer: null,
+          offerLockedAt: null,
+          offerExpiresAt: null,
+        };
+      });
+      setDocumentRequests([]);
+      setMessages([]);
     } catch {
       toast.error('Unable to complete your request.');
     } finally {
@@ -507,6 +579,9 @@ function DashboardContent() {
   }
 
   const hasLockedOffer = Boolean(application.lockedOfferId && application.lockedOffer);
+  const isExpiredState = application.status === 'expired';
+  const isCancelledState = application.status === 'cancelled';
+  const isReapplyState = isExpiredState || isCancelledState;
   const progressIndex = getProgressIndex(application.status);
   const nextStepsCopy = getNextStepsCopy(application.status);
 
@@ -525,7 +600,11 @@ function DashboardContent() {
           <p className="text-[#6B7C93]">Track your financing progress and manage your application.</p>
         </div>
 
-        {hasLockedOffer ? (
+        {expireSubmitting && hasLockedOffer ? (
+          <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
+            <p className="text-sm text-[#6B7C93]">Refreshing your offer status...</p>
+          </section>
+        ) : hasLockedOffer ? (
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
             <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
               <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -577,13 +656,15 @@ function DashboardContent() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setShowCancelModal(true)}
-                className="inline-flex rounded-xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50"
-              >
-                Cancel Offer
-              </button>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCancelModal(true)}
+                  className="text-sm text-gray-500 underline underline-offset-4 transition-colors hover:text-gray-700"
+                >
+                  Cancel This Offer
+                </button>
+              </div>
             </section>
 
             <div className="space-y-6">
@@ -618,11 +699,17 @@ function DashboardContent() {
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)]">
             <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
               <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Application Status</p>
-              <h2 className="mb-3 text-3xl font-semibold text-[#0A2540]">{STATUS_LABELS[application.status] || 'Application In Progress'}</h2>
+              <h2 className="mb-3 text-3xl font-semibold text-[#0A2540]">
+                {isCancelledState ? 'No active offer. Ready to apply again?' : STATUS_LABELS[application.status] || 'Application In Progress'}
+              </h2>
               <p className="mb-6 text-sm leading-6 text-[#425466]">
-                {application.status === 'offers_available'
-                  ? 'Your offers are ready. Return to results and choose the lender you want to move forward with.'
-                  : 'We are still processing your application and will notify you when the next step is ready.'}
+                {isExpiredState
+                  ? 'This offer has expired. You may submit a new application.'
+                  : isCancelledState
+                    ? 'You can submit a new application whenever you are ready.'
+                    : application.status === 'offers_available'
+                      ? 'Your offers are ready. Return to results and choose the lender you want to move forward with.'
+                      : 'We are still processing your application and will notify you when the next step is ready.'}
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
@@ -641,18 +728,22 @@ function DashboardContent() {
             <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
               <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Actions</p>
               <div className="space-y-3">
-                <Link href="/results" className="block rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-blue-500">
-                  View Offers
-                </Link>
+                {!isReapplyState ? (
+                  <Link href="/results" className="block rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-blue-500">
+                    View Offers
+                  </Link>
+                ) : null}
                 <Link href="/apply" className="block rounded-xl border border-[#D7E3F1] px-4 py-3 text-center text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC]">
-                  Start Another Application
+                  Start New Application
                 </Link>
               </div>
             </section>
           </div>
         )}
 
-        <section className="mt-6 rounded-xl border border-[#E3E8EE] bg-white p-6">
+        {!isReapplyState ? (
+          <>
+            <section className="mt-6 rounded-xl border border-[#E3E8EE] bg-white p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-4">
               <NextStepsIcon status={application.status} />
@@ -671,9 +762,9 @@ function DashboardContent() {
               </button>
             ) : null}
           </div>
-        </section>
+            </section>
 
-        <section ref={documentsSectionRef} className="mt-6 rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
+            <section ref={documentsSectionRef} className="mt-6 rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Documents</p>
@@ -758,9 +849,9 @@ function DashboardContent() {
               })}
             </div>
           )}
-        </section>
+            </section>
 
-        <section className="mt-6 rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
+            <section className="mt-6 rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
           <div className="mb-6">
             <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Messages</p>
             <h2 className="text-2xl font-semibold text-[#0A2540]">Conversation with your lender</h2>
@@ -829,7 +920,9 @@ function DashboardContent() {
               {messageSubmitting ? 'Sending...' : 'Send Message'}
             </button>
           </div>
-        </section>
+            </section>
+          </>
+        ) : null}
       </div>
 
       {showCancelModal && hasLockedOffer && (
@@ -843,17 +936,17 @@ function DashboardContent() {
             onClick={(event) => event.stopPropagation()}
             className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl"
           >
-            <h2 id="cancel-offer-title" className="mb-2 text-2xl font-semibold text-[#0A2540]">Cancel locked offer</h2>
+            <h2 id="cancel-offer-title" className="mb-2 text-2xl font-semibold text-[#0A2540]">Cancel Your Offer</h2>
             <p className="mb-6 text-sm leading-6 text-[#425466]">
-              Cancelling this offer will unlock your application and let you apply again or choose a different offer later.
+              Are you sure you want to cancel your offer with {application.lockedOffer?.lenderName}? This action cannot be undone. You will be able to submit a new application after cancellation.
             </p>
-            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
               <button
                 type="button"
                 onClick={() => setShowCancelModal(false)}
-                className="text-left text-sm font-medium text-[#6B7C93] hover:text-[#0A2540]"
+                className="inline-flex items-center justify-center rounded-xl border border-[#D7E3F1] bg-[#F6F9FC] px-5 py-3 text-sm font-semibold text-[#425466] transition-colors hover:bg-[#EEF4FB]"
               >
-                Go Back
+                Keep My Offer
               </button>
               <button
                 type="button"
@@ -861,7 +954,7 @@ function DashboardContent() {
                 disabled={cancelSubmitting}
                 className="inline-flex items-center justify-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-red-300"
               >
-                {cancelSubmitting ? 'Cancelling...' : 'Cancel Offer'}
+                {cancelSubmitting ? 'Cancelling...' : 'Yes, Cancel Offer'}
               </button>
             </div>
           </div>
