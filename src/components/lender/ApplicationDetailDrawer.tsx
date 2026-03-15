@@ -10,10 +10,11 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 interface Props {
   app: MockApplication;
   onClose: () => void;
-  onApprove: () => void;
-  onDecline: () => void;
-  onCounter: () => void;
-  onRequestDocs: () => void;
+  onApprove?: () => void;
+  onDecline?: () => void;
+  onCounter?: () => void;
+  onRequestDocs?: () => void;
+  footer?: React.ReactNode;
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -34,7 +35,15 @@ function Field({ label, value, className = '' }: { label: string; value: string 
   );
 }
 
-export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDecline, onCounter, onRequestDocs }: Props) {
+export default function ApplicationDetailDrawer({
+  app,
+  onClose,
+  onApprove,
+  onDecline,
+  onCounter,
+  onRequestDocs,
+  footer,
+}: Props) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const offers = MOCK_OFFERS.filter(o => o.applicationId === app.id);
   const lender = { maxLtv: 120, maxDti: 48, minFico: 620 }; // Demo lender params
@@ -218,21 +227,34 @@ export default function ApplicationDetailDrawer({ app, onClose, onApprove, onDec
             )}
           </div>
 
-          {/* Footer actions */}
-          <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex gap-2">
-            <button onClick={onDecline} className="px-4 py-2.5 text-xs border border-red-200 text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
-              Decline
-            </button>
-            <button onClick={onRequestDocs} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
-              Request Docs
-            </button>
-            <button onClick={onCounter} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
-              Counter
-            </button>
-            <button onClick={onApprove} className="flex-1 px-4 py-2.5 text-xs bg-green-600 hover:bg-green-500 rounded-xl transition-colors duration-200 cursor-pointer font-medium text-gray-900">
-              Approve
-            </button>
-          </div>
+          {footer ? (
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4">
+              {footer}
+            </div>
+          ) : onApprove || onDecline || onCounter || onRequestDocs ? (
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex gap-2">
+              {onDecline ? (
+                <button onClick={onDecline} className="px-4 py-2.5 text-xs border border-red-200 text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+                  Decline
+                </button>
+              ) : null}
+              {onRequestDocs ? (
+                <button onClick={onRequestDocs} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+                  Request Docs
+                </button>
+              ) : null}
+              {onCounter ? (
+                <button onClick={onCounter} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+                  Counter
+                </button>
+              ) : null}
+              {onApprove ? (
+                <button onClick={onApprove} className="flex-1 px-4 py-2.5 text-xs bg-green-600 hover:bg-green-500 rounded-xl transition-colors duration-200 cursor-pointer font-medium text-gray-900">
+                  Approve
+                </button>
+              ) : null}
+            </div>
+          ) : null}
         </motion.div>
       </div>
     </AnimatePresence>

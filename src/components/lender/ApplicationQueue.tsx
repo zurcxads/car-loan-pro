@@ -1,115 +1,123 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import { type MockApplication } from '@/lib/mock-data';
-import { formatCurrency, ficoColor } from '@/lib/format-utils';
-import StatusBadge from '@/components/shared/StatusBadge';
+import { useEffect, useMemo, useState } from 'react';
 import ApplicationDetailDrawer from './ApplicationDetailDrawer';
-import { dbGetApplications } from '@/lib/db';
-import { showDevTools } from '@/lib/env';
+import type { MockApplication, MockOffer } from '@/lib/mock-data';
 
-const DecisionModal = dynamic(() => import('./DecisionModal'), { ssr: false });
+type ActiveApplication = {
+  application: MockApplication;
+  lockedOffer: MockOffer;
+};
 
-type StatusFilter = 'all' | 'pending_decision' | 'offers_available' | 'conditional' | 'declined' | 'funded';
-type DecisionAction = 'approve' | 'decline' | 'counter' | 'request_docs';
+type ActiveApplicationsResponse =
+  | { success: true; data: { applications: ActiveApplication[] } }
+  | { success: false; error?: string };
+
+function formatCurrency(value: number | undefined) {
+  if (!value) {
+    return 'Pre-Approval';
+  }
+
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function formatDate(value: string | null | undefined) {
+  if (!value) {
+    return 'Not locked';
+  }
+
+  return new Date(value).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+function maskBorrowerName(app: MockApplication) {
+  const firstInitial = app.borrower.firstName.charAt(0).toUpperCase();
+  const lastInitial = app.borrower.lastName.charAt(0).toUpperCase();
+  return `${firstInitial}*** ${lastInitial}***`;
+}
+
+function getStatusLabel(status: string) {
+  return status
+    .split('_')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
 
 export default function ApplicationQueue({ lenderId }: { lenderId: string | null }) {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter[]>(['all']);
   const [search, setSearch] = useState('');
-  const [selectedApp, setSelectedApp] = useState<MockApplication | null>(null);
-  const [decisionApp, setDecisionApp] = useState<MockApplication | null>(null);
-  const [decisionAction, setDecisionAction] = useState<DecisionAction>('approve');
-  const [apps, setApps] = useState<MockApplication[]>([]);
+  const [selectedApplication, setSelectedApplication] = useState<ActiveApplication | null>(null);
+  const [applications, setApplications] = useState<ActiveApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    async function loadApps() {
+    async function loadApplications() {
       setLoading(true);
       setError('');
 
       try {
         if (!lenderId) {
-          setApps([]);
+          setApplications([]);
           return;
         }
 
-        const response = await fetch(`/api/lenders/${lenderId}/applications`, { cache: 'no-store' });
+        const response = await fetch('/api/lender/applications', { cache: 'no-store' });
         if (!response.ok) {
           throw new Error('Failed to load lender applications');
         }
 
-        const payload = await response.json();
-        setApps(payload.data?.applications || []);
-      } catch (fetchError) {
-        const isDevMode = showDevTools();
-        if (!isDevMode) {
-          setError(fetchError instanceof Error ? fetchError.message : 'Failed to load applications');
-        } else {
-          setApps(await dbGetApplications());
+        const payload = await response.json() as ActiveApplicationsResponse;
+        if (!payload.success) {
+          throw new Error(payload.error || 'Failed to load lender applications');
         }
+
+        setApplications(payload.data.applications);
+      } catch (fetchError) {
+        setError(fetchError instanceof Error ? fetchError.message : 'Failed to load applications');
       } finally {
         setLoading(false);
       }
     }
 
-    loadApps();
+    void loadApplications();
   }, [lenderId]);
 
   const filtered = useMemo(() => {
-    let filteredApps = [...apps];
-    if (!statusFilter.includes('all')) {
-      filteredApps = filteredApps.filter((app) => statusFilter.includes(app.status as StatusFilter));
-    }
+    let filteredApplications = [...applications];
     if (search) {
       const q = search.toLowerCase();
-      filteredApps = filteredApps.filter((app) =>
-        app.id.toLowerCase().includes(q) ||
-        `${app.borrower.firstName} ${app.borrower.lastName}`.toLowerCase().includes(q)
+      filteredApplications = filteredApplications.filter(({ application, lockedOffer }) =>
+        application.id.toLowerCase().includes(q) ||
+        `${application.borrower.firstName} ${application.borrower.lastName}`.toLowerCase().includes(q) ||
+        lockedOffer.lenderName.toLowerCase().includes(q)
       );
     }
-    return filteredApps;
-  }, [apps, statusFilter, search]);
+    return filteredApplications;
+  }, [applications, search]);
 
-  const toggleStatus = (status: StatusFilter) => {
-    if (status === 'all') {
-      setStatusFilter(['all']);
-      return;
+  const lockedTodayCount = applications.filter(({ application }) => {
+    if (!application.offerLockedAt) {
+      return false;
     }
 
-    const next = statusFilter.filter((value) => value !== 'all');
-    if (next.includes(status)) {
-      const removed = next.filter((value) => value !== status);
-      setStatusFilter(removed.length === 0 ? ['all'] : removed);
-    } else {
-      setStatusFilter([...next, status]);
-    }
-  };
+    return new Date(application.offerLockedAt).toDateString() === new Date().toDateString();
+  }).length;
 
-  const openDecision = (app: MockApplication, action: DecisionAction) => {
-    setDecisionApp(app);
-    setDecisionAction(action);
-    setSelectedApp(null);
-  };
-
-  const statusOptions: { key: StatusFilter; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'pending_decision', label: 'Pending' },
-    { key: 'offers_available', label: 'Approved' },
-    { key: 'conditional', label: 'Conditional' },
-    { key: 'declined', label: 'Declined' },
-  ];
-
-  const newToday = apps.filter((app) => new Date(app.submittedAt).toDateString() === new Date().toDateString()).length;
-  const pendingReview = apps.filter((app) => app.status === 'pending_decision').length;
-  const approvedWeek = apps.filter((app) => app.status === 'offers_available' || app.status === 'funded').length;
+  const documentRequestedCount = applications.filter(({ application }) => application.status === 'documents_requested').length;
+  const activeOfferCount = applications.filter(({ lockedOffer }) => lockedOffer.status === 'locked').length;
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="relative w-12 h-12">
-          <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+      <div className="flex items-center justify-center py-24">
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
         </div>
       </div>
     );
@@ -117,143 +125,126 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
 
   if (error) {
     return (
-      <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-8 text-center">
-        <h3 className="text-sm font-semibold text-gray-900 mb-2">Applications unavailable</h3>
-        <p className="text-sm text-gray-500">{error}</p>
+      <div className="rounded-xl border border-[#E3E8EE] bg-white p-8 text-center shadow-sm">
+        <h3 className="mb-2 text-sm font-semibold text-[#0A2540]">Applications unavailable</h3>
+        <p className="text-sm text-[#6B7C93]">{error}</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div className="space-y-8">
+      <div className="grid gap-4 md:grid-cols-4">
         {[
-          { label: 'New Today', value: newToday },
-          { label: 'Pending Review', value: pendingReview },
-          { label: 'Approved This Week', value: approvedWeek },
-          { label: 'Assigned Total', value: apps.length },
-        ].map((metric, index) => (
-          <div key={index} className="rounded-xl bg-white border border-gray-200 p-4 shadow-sm">
-            <div className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">{metric.label}</div>
-            <div className="text-2xl font-semibold text-gray-900">{metric.value}</div>
+          { label: 'Active Applications', value: applications.length },
+          { label: 'Locked Today', value: lockedTodayCount },
+          { label: 'Docs Requested', value: documentRequestedCount },
+          { label: 'Locked Offers', value: activeOfferCount },
+        ].map((metric) => (
+          <div key={metric.label} className="rounded-xl border border-[#E3E8EE] bg-white p-4 shadow-sm">
+            <div className="mb-1 text-[10px] uppercase tracking-[0.18em] text-[#6B7C93]">{metric.label}</div>
+            <div className="text-2xl font-semibold text-[#0A2540]">{metric.value}</div>
           </div>
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="flex gap-2">
-          {statusOptions.map((option) => (
-            <button
-              key={option.key}
-              onClick={() => toggleStatus(option.key)}
-              className={`px-4 py-2 text-sm rounded-xl border transition-colors duration-200 cursor-pointer ${
-                statusFilter.includes(option.key)
-                  ? 'bg-blue-50 border-blue-200 text-blue-600'
-                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-        <div className="flex-1 min-w-[200px]">
+      <section className="rounded-xl border border-[#E3E8EE] bg-white shadow-sm">
+        <div className="border-b border-[#E3E8EE] px-6 py-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Active Applications</p>
+              <h2 className="text-2xl font-semibold text-[#0A2540]">Locked with your lending program</h2>
+            </div>
+            <div className="w-full max-w-md">
+          <label className="sr-only" htmlFor="lender-active-search">Search applications</label>
           <input
+            id="lender-active-search"
             type="text"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by App ID or name..."
-            className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600"
+            placeholder="Search by application, borrower, or lender"
+            className="w-full rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] placeholder:text-[#6B7C93] focus:border-blue-600 focus:outline-none"
           />
         </div>
-        {statusFilter.length > 0 && !statusFilter.includes('all') && (
-          <button onClick={() => setStatusFilter(['all'])} className="text-sm text-gray-600 hover:text-gray-900 cursor-pointer">
-            Clear Filters
-          </button>
-        )}
-      </div>
+          </div>
+          <p className="mt-3 text-sm text-[#6B7C93]">
+            {filtered.length} application{filtered.length === 1 ? '' : 's'} with a locked offer tied to your lender account.
+          </p>
+        </div>
 
-      <div className="mb-4 text-sm text-gray-600">
-        {filtered.length} application{filtered.length !== 1 ? 's' : ''}
-      </div>
-
-      <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-200 bg-gray-50">
-              <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">ID</th>
-              <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Borrower</th>
-              <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Credit Tier</th>
-              <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Amount</th>
-              <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Match Score</th>
-              <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Status</th>
-              <th className="text-left py-3 px-4 text-[10px] text-gray-600 uppercase tracking-wider font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.slice(0, 20).map((app) => {
-              const matchScore = Math.min(95, 60 + (app.credit.ficoScore || 600) / 15);
-              return (
-                <tr key={app.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                  <td className="py-4 px-4 font-mono text-xs text-gray-500">{app.id}</td>
-                  <td className="py-4 px-4">
-                    <div className="text-sm font-medium text-gray-900">{app.borrower.firstName} {app.borrower.lastName.charAt(0)}.</div>
-                    <div className="text-xs text-gray-500">{app.state}</div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <span className={`text-sm font-medium ${ficoColor(app.credit.ficoScore)}`}>
-                      {app.credit.scoreTier.replace(/_/g, ' ')}
-                    </span>
-                  </td>
-                  <td className="py-4 px-4 text-sm font-medium text-gray-900">{app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'}</td>
-                  <td className="py-4 px-4">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden max-w-[60px]">
-                        <div className="h-full bg-blue-600 rounded-full" style={{ width: `${matchScore}%` }} />
-                      </div>
-                      <span className="text-xs font-medium text-gray-700">{Math.round(matchScore)}%</span>
+        <div className="divide-y divide-[#E3E8EE]">
+          {filtered.length === 0 ? (
+            <div className="px-6 py-12 text-center text-sm text-[#6B7C93]">
+              {applications.length === 0 ? 'No active locked applications for this lender yet.' : 'No applications match your search.'}
+            </div>
+          ) : (
+            filtered.map(({ application, lockedOffer }) => (
+              <article key={application.id} className="px-6 py-5">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="grid flex-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.18em] text-[#6B7C93]">Applicant</div>
+                      <div className="mt-1 text-sm font-semibold text-[#0A2540]">{maskBorrowerName(application)}</div>
                     </div>
-                  </td>
-                  <td className="py-4 px-4"><StatusBadge status={app.status} /></td>
-                  <td className="py-4 px-4">
-                    <button onClick={() => setSelectedApp(app)} className="px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors">
-                      Review
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.18em] text-[#6B7C93]">Loan Amount</div>
+                      <div className="mt-1 text-sm font-semibold text-[#0A2540]">{formatCurrency(lockedOffer.approvedAmount || application.loanAmount)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.18em] text-[#6B7C93]">Date Locked</div>
+                      <div className="mt-1 text-sm text-[#0A2540]">{formatDate(application.offerLockedAt || lockedOffer.lockedAt)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.18em] text-[#6B7C93]">Status</div>
+                      <div className="mt-1 text-sm text-[#0A2540]">{getStatusLabel(application.status)}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-[0.18em] text-[#6B7C93]">Offer</div>
+                      <div className="mt-1 text-sm text-[#0A2540]">{lockedOffer.apr.toFixed(2)}% / {lockedOffer.termMonths} mo</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedApplication({ application, lockedOffer })}
+                      className="inline-flex rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+                    >
+                      View Details
                     </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        {filtered.length === 0 && (
-          <div className="text-center py-12 text-sm text-gray-500">
-            {apps.length === 0 ? 'No applications are assigned to this lender yet.' : 'No applications found.'}
-          </div>
-        )}
-        {filtered.length > 20 && (
-          <div className="p-4 text-center text-xs text-gray-500 border-t border-gray-200">
-            Showing first 20 of {filtered.length} results
-          </div>
-        )}
-      </div>
+                  </div>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
+      </section>
 
-      {selectedApp && (
+      <section className="grid gap-4 lg:grid-cols-3">
+        <div className="rounded-xl border border-[#E3E8EE] bg-white p-5 shadow-sm">
+          <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Lender Messaging</p>
+          <p className="text-sm leading-6 text-[#425466]">
+            Open an application to review the full file. Messaging and document actions will appear inside the detail panel.
+          </p>
+        </div>
+        <div className="rounded-xl border border-[#E3E8EE] bg-white p-5 shadow-sm">
+          <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Locked Offer Monitoring</p>
+          <p className="text-sm leading-6 text-[#425466]">
+            This queue only shows consumers who locked your offer, keeping the lender portal focused on active post-selection work.
+          </p>
+        </div>
+        <div className="rounded-xl border border-[#E3E8EE] bg-white p-5 shadow-sm">
+          <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Ownership Control</p>
+          <p className="text-sm leading-6 text-[#425466]">
+            Applications are loaded through lender auth and matched to the locked offer owner before being shown here.
+          </p>
+        </div>
+      </section>
+      {selectedApplication ? (
         <ApplicationDetailDrawer
-          app={selectedApp}
-          onClose={() => setSelectedApp(null)}
-          onApprove={() => openDecision(selectedApp, 'approve')}
-          onDecline={() => openDecision(selectedApp, 'decline')}
-          onCounter={() => openDecision(selectedApp, 'counter')}
-          onRequestDocs={() => openDecision(selectedApp, 'request_docs')}
+          app={selectedApplication.application}
+          onClose={() => setSelectedApplication(null)}
         />
-      )}
-
-      {decisionApp && (
-        <DecisionModal
-          app={decisionApp}
-          action={decisionAction}
-          onClose={() => setDecisionApp(null)}
-        />
-      )}
+      ) : null}
     </div>
   );
 }
