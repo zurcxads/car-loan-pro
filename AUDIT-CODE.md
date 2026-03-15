@@ -118,7 +118,7 @@ This is likely the single biggest avoidable client-bundle cost.
 
 ### Global layout hydration
 
-- [`src/app/layout.tsx`](/home/zurc/Projects/car-loan-pro/src/app/layout.tsx#L64) wraps the entire app in client-only layers: `ErrorBoundary`, `ThemeProvider`, `DevModeProvider`, `Header`, `Providers`, and `CookieConsent`.
+- [`src/app/layout.tsx`](/home/zurc/Projects/car-loan-pro/src/app/layout.tsx#L64) wraps the entire app in client-only layers: `ErrorBoundary`, `DevModeProvider`, `Header`, `Providers`, and `CookieConsent`.
 - [`src/components/providers/SessionProvider.tsx`](/home/zurc/Projects/car-loan-pro/src/components/providers/SessionProvider.tsx#L7) adds viewport resize listeners and `react-hot-toast` globally.
 
 Result: even simple static pages pay for client hydration and global listeners.

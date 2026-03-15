@@ -10,7 +10,7 @@ Overall verdict: fail.
 
 The app has a usable blue-centered design language in several consumer pages, but it is not consistent across the product. The biggest issues are:
 
-1. Dark mode support is largely missing. `next-themes` is wired up, but most routes/components never define dark variants.
+1. Dark mode support is largely missing. Earlier theme infrastructure has been removed, and most routes/components remain light-only.
 2. Typography does not match the stated Inter requirement. The app globally loads IBM Plex Sans instead.
 3. Navigation contains dead links in shared footer content.
 4. Accessibility coverage is thin: very few ARIA hooks, some interactive controls lack labels, and modal semantics/focus management are missing.
@@ -51,7 +51,7 @@ Verdict: Fail.
 
 Evidence:
 
-- Theme infrastructure exists in [`src/app/layout.tsx#L65`](/home/zurc/Projects/car-loan-pro/src/app/layout.tsx#L65) via `next-themes`.
+- The app no longer includes theme-provider infrastructure, and the UI is still implemented as a light-only system.
 - The static sweep found 48 of 50 pages and 35 of 38 components without any `dark:` classes.
 - Example pages with hardcoded light-only surfaces/text:
   - [`src/app/contact/page.tsx#L77`](/home/zurc/Projects/car-loan-pro/src/app/contact/page.tsx#L77)
