@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { MockOffer } from '@/lib/mock-data';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 
 const OfferSelectionModal = dynamic(() => import('@/components/offers/OfferSelectionModal'), {
   ssr: false,
@@ -14,7 +14,7 @@ const OfferSelectionModal = dynamic(() => import('@/components/offers/OfferSelec
 
 function OffersContent() {
   const router = useRouter();
-  const isDev = isDevEnvironment();
+  const isDev = showDevTools();
   const [offers, setOffers] = useState<MockOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<MockOffer | null>(null);

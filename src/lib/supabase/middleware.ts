@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
-import { isDev } from '@/lib/env';
+import { verifyDevAccessRequest } from '@/lib/dev-access';
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -33,8 +33,14 @@ export async function updateSession(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  if ((pathname === '/dev' || pathname.startsWith('/dev/') || pathname.startsWith('/api/dev/')) && !isDev()) {
-    return new NextResponse('Not Found', { status: 404 });
+  if (pathname.startsWith('/dev') && pathname !== '/dev/access' && !pathname.startsWith('/dev/access/')) {
+    const devAccess = await verifyDevAccessRequest(request);
+    if (!devAccess.valid) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/dev/access';
+      url.searchParams.set('redirectTo', pathname);
+      return NextResponse.redirect(url);
+    }
   }
 
   // Get user role from metadata

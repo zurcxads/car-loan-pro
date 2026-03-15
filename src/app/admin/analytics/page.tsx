@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 import { useRouter } from 'next/navigation';
 import PortalLayout from '@/components/shared/PortalLayout';
 
@@ -204,7 +204,7 @@ export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const isDevMode = isDevEnvironment();
+  const isDevMode = showDevTools();
 
   useEffect(() => {
     if (!isAuthenticated && !isLoading && !isDevMode) {
@@ -230,7 +230,7 @@ export default function AnalyticsPage() {
     setLoading(false);
   };
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading || (!isAuthenticated && !isDevMode)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="relative w-12 h-12">

@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import { Check, Clock3 } from 'lucide-react';
 import { SkeletonOfferCards } from '@/components/shared/Skeleton';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 
 interface AnonymizedOffer {
   id: string;
@@ -147,7 +147,7 @@ function ResultsContent() {
   });
   useFocusTrap(showConfirmModal, confirmDialogRef, () => setShowConfirmModal(false));
 
-  const isDev = isDevEnvironment();
+  const isDev = showDevTools();
 
   // Calculate average dealer rate (for comparison)
   const averageDealerRate = 8.5; // Average dealer APR (would be fetched from backend in production)

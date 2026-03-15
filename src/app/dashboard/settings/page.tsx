@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 
 interface UserProfile {
   name: string;
@@ -13,7 +13,7 @@ interface UserProfile {
 
 function SettingsContent() {
   const router = useRouter();
-  const isDev = isDevEnvironment();
+  const isDev = showDevTools();
 
   const [profile, setProfile] = useState<UserProfile>({ name: '', email: '' });
   const [notifications, setNotifications] = useState({

@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 
 interface ReferralStats {
   totalInvites: number;
@@ -26,7 +26,7 @@ interface Referral {
 
 function ReferralsContent() {
   const router = useRouter();
-  const isDev = isDevEnvironment();
+  const isDev = showDevTools();
 
   const [referralUrl, setReferralUrl] = useState('');
   const [stats, setStats] = useState<ReferralStats>({

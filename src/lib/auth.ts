@@ -2,8 +2,8 @@ import { type AuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
-import { isDev } from '@/lib/env';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
+import { isServerDevAccessGranted } from '@/lib/dev-access-server';
 
 const DEV_ONLY_DEMO_PASSWORD = 'AutoLoanPro2026!';
 
@@ -68,8 +68,9 @@ export const authOptions: AuthOptions = {
         void req;
         const email = credentials.email.toLowerCase();
         const isProtectedDemoAccount = DEV_ONLY_DEMO_EMAILS.has(email);
+        const devAccessGranted = await isServerDevAccessGranted();
 
-        if (isProtectedDemoAccount && !isDev()) {
+        if (isProtectedDemoAccount && !devAccessGranted) {
           return null;
         }
 
@@ -107,10 +108,10 @@ export const authOptions: AuthOptions = {
             };
           }
 
-          if (!isDev()) {
+          if (!devAccessGranted) {
             return null;
           }
-        } else if (!isDev()) {
+        } else if (!devAccessGranted) {
           return null;
         }
 
@@ -164,7 +165,7 @@ export const authOptions: AuthOptions = {
     maxAge: 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET || (() => {
-    if (!isDev()) {
+    if (process.env.NODE_ENV !== 'development') {
       throw new Error('NEXTAUTH_SECRET must be set in production');
     }
     // In development, generate a random secret

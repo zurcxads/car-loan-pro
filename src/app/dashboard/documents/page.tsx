@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CreditCard, DollarSign, ShieldCheck, Home } from 'lucide-react';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 
 interface Document {
   id: string;
@@ -25,7 +25,7 @@ const DOCUMENT_TYPES = [
 
 function DocumentsContent() {
   const router = useRouter();
-  const isDev = isDevEnvironment();
+  const isDev = showDevTools();
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   const [documents, setDocuments] = useState<Document[]>([]);

@@ -474,6 +474,30 @@ export function getDealerById(dealerId: string): MockDealer | undefined {
   return MOCK_DEALERS.find(d => d.id === dealerId);
 }
 
+export function resetMockTestApplications(): number {
+  const removableApplicationIds = new Set(
+    MOCK_APPLICATIONS
+      .filter((application) => application.borrower.email.toLowerCase().includes('@test.com'))
+      .map((application) => application.id)
+  );
+
+  if (removableApplicationIds.size === 0) {
+    return 0;
+  }
+
+  const remainingApplications = MOCK_APPLICATIONS.filter(
+    (application) => !removableApplicationIds.has(application.id)
+  );
+  const remainingOffers = MOCK_OFFERS.filter(
+    (offer) => !removableApplicationIds.has(offer.applicationId)
+  );
+
+  MOCK_APPLICATIONS.splice(0, MOCK_APPLICATIONS.length, ...remainingApplications);
+  MOCK_OFFERS.splice(0, MOCK_OFFERS.length, ...remainingOffers);
+
+  return removableApplicationIds.size;
+}
+
 // FCRA Audit Log entries
 export const MOCK_FCRA_LOG = [
   { id: 'FCR-001', borrowerName: 'Marcus Johnson', pullType: 'Soft' as const, bureau: 'TransUnion', dateTime: '2026-03-07T14:31:00Z', purpose: 'Pre-qualification', consentOnFile: true, applicationId: 'APP-001', requestedBy: 'System' },

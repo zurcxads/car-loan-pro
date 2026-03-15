@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 
 interface StatusStep {
   label: string;
@@ -11,7 +11,7 @@ interface StatusStep {
 }
 
 function StatusContent() {
-  const isDev = isDevEnvironment();
+  const isDev = showDevTools();
   const [application, setApplication] = useState<{ id: string; status: string; submittedAt: string; offersReceived: number } | null>(null);
   const [loading, setLoading] = useState(true);
 

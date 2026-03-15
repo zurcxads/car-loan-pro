@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { US_STATES, POPULAR_MAKES } from '@/lib/constants';
 import { apiPost } from '@/lib/api-client';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 import type {
   BorrowerPersonalInfo, AddressInfo, EmploymentInfo, VehicleInfo,
   DealStructure, ConsentInfo, ApplicationType, VehicleCondition,
@@ -376,11 +376,11 @@ export default function ApplyPage() {
   const [direction, setDirection] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [isDevMode, setIsDevMode] = useState(isDevEnvironment());
+  const [isDevMode, setIsDevMode] = useState(showDevTools());
   const [timeEstimate, setTimeEstimate] = useState(2);
 
   useEffect(() => {
-    setIsDevMode(isDevEnvironment());
+    setIsDevMode(showDevTools());
   }, []);
 
   useEffect(() => {

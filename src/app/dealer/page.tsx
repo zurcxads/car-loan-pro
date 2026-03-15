@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
-import { isDev } from '@/lib/env';
 import DealerPortalClient from '@/components/portal/DealerPortalClient';
+import { isServerDevAccessGranted } from '@/lib/dev-access-server';
 
 function getRoleRedirect(role?: string | null) {
   if (role === 'admin') return '/admin';
@@ -14,7 +14,7 @@ function getRoleRedirect(role?: string | null) {
 export const dynamic = 'force-dynamic';
 
 export default async function DealerPage() {
-  if (isDev()) {
+  if (await isServerDevAccessGranted()) {
     return <DealerPortalClient user={{ name: 'Demo Dealer', email: 'dealer@demo.com', entityId: 'DLR-001' }} />;
   }
 

@@ -5,7 +5,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SkeletonDashboard } from '@/components/shared/Skeleton';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 
 interface Application {
   id: string;
@@ -43,7 +43,7 @@ type DashboardApiResponse =
 
 function DashboardContent() {
   const router = useRouter();
-  const isDev = isDevEnvironment();
+  const isDev = showDevTools();
 
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);

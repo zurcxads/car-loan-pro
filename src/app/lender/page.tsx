@@ -1,8 +1,8 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
-import { isDev } from '@/lib/env';
 import LenderPortalClient from '@/components/portal/LenderPortalClient';
+import { isServerDevAccessGranted } from '@/lib/dev-access-server';
 
 function getRoleRedirect(role?: string | null) {
   if (role === 'admin') return '/admin';
@@ -14,7 +14,7 @@ function getRoleRedirect(role?: string | null) {
 export const dynamic = 'force-dynamic';
 
 export default async function LenderPage() {
-  if (isDev()) {
+  if (await isServerDevAccessGranted()) {
     return <LenderPortalClient user={{ name: 'Demo Lender', email: 'lender@demo.com', entityId: 'LND-001' }} />;
   }
 

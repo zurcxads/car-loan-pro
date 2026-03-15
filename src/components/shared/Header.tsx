@@ -28,7 +28,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  const portalRoutes = ["/admin", "/lender", "/dealer", "/dashboard", "/apply", "/results"];
+  const portalRoutes = ["/admin", "/lender", "/dealer", "/dashboard", "/apply", "/results", "/dev"];
   const isPortal = portalRoutes.some((route) => pathname.startsWith(route));
 
   if (isPortal) return null;

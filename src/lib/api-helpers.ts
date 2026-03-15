@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { isDev } from '@/lib/env';
+import { isServerDevAccessGranted } from '@/lib/dev-access-server';
 
 const PROTECTED_DEMO_EMAILS = new Set([
   'admin@autoloanpro.co',
@@ -47,6 +47,25 @@ export async function parseBody<T>(req: NextRequest, schema: z.ZodType<T>): Prom
 
 // Get authenticated session with role check using NextAuth
 export async function requireAuth(requiredRole?: string) {
+  if (await isServerDevAccessGranted()) {
+    const role = requiredRole === 'dealer' || requiredRole === 'lender' || requiredRole === 'admin'
+      ? requiredRole
+      : 'admin';
+
+    return {
+      session: {
+        user: {
+          email: role === 'admin' ? 'admin@autoloanpro.co' : role === 'dealer' ? 'demo@dealer.com' : 'demo@ally.com',
+          entityId: role === 'dealer' ? 'DLR-001' : role === 'lender' ? 'LND-001' : null,
+          id: `dev-${role}`,
+          name: role === 'admin' ? 'Admin (Dev)' : role === 'dealer' ? 'Dealer (Dev)' : 'Lender (Dev)',
+          role,
+        }
+      },
+      error: null,
+    };
+  }
+
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
@@ -56,7 +75,7 @@ export async function requireAuth(requiredRole?: string) {
   const user = session.user as { role: string; id: string; email?: string | null; name?: string | null; entityId?: string | null };
   const normalizedEmail = user.email?.toLowerCase() || '';
 
-  if (!isDev() && PROTECTED_DEMO_EMAILS.has(normalizedEmail)) {
+  if (PROTECTED_DEMO_EMAILS.has(normalizedEmail)) {
     return { session: null, error: apiError('Unauthorized', 401) };
   }
 

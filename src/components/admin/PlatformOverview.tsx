@@ -3,7 +3,7 @@
 import { formatRelativeTime } from '@/lib/format-utils';
 import { useState, useEffect, useMemo } from 'react';
 import { dbGetApplications, dbGetOffers, dbGetActivityEvents, dbGetComplianceAlerts } from '@/lib/db';
-import { isDev as isDevEnvironment } from '@/lib/env';
+import { showDevTools } from '@/lib/env';
 import type { MockApplication, ActivityEvent, ComplianceAlert } from '@/lib/mock-data';
 import { LineChart, DonutChart, DistributionBars, TrendIndicator } from '@/components/shared/charts';
 
@@ -65,7 +65,7 @@ export default function PlatformOverview() {
         setEvents(eventsJson.data || []);
         setAlerts(alertsJson.data || []);
 
-        const isDevMode = isDevEnvironment();
+        const isDevMode = showDevTools();
         if (isDevMode) {
           const [appsData] = await Promise.all([dbGetApplications(), dbGetOffers()]);
           setApps(appsData);
@@ -73,7 +73,7 @@ export default function PlatformOverview() {
           setApps([]);
         }
       } catch (fetchError) {
-        const isDevMode = isDevEnvironment();
+        const isDevMode = showDevTools();
         if (!isDevMode) {
           setError(fetchError instanceof Error ? fetchError.message : 'Failed to load admin dashboard');
         } else {
