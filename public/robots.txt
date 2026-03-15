@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /lender/
+Disallow: /dealer/
+Disallow: /dev/
+Disallow: /dashboard/
+
+Sitemap: https://www.autoloanpro.co/sitemap.xml
