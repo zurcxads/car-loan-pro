@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useId, useState } from "react";
 import Link from "next/link";
 import Logo from "@/components/shared/Logo";
 import {
@@ -18,12 +18,13 @@ import {
 } from "lucide-react";
 import Footer from "@/components/shared/Footer";
 import { useInView } from "@/hooks/useInView";
+import { useCountUp } from "@/hooks/useCountUp";
 
 const stats = [
-  { value: "2 Min", label: "Avg. approval time" },
-  { value: "50+", label: "Partner lenders" },
-  { value: "$0", label: "Application cost" },
-  { value: "4.9/5", label: "Customer rating" },
+  { target: 2, suffix: " Min", label: "Avg. approval time", ariaValue: "2 minutes" },
+  { target: 50, suffix: "+", label: "Partner lenders", ariaValue: "50 plus lenders" },
+  { target: 0, prefix: "$", label: "Application cost", ariaValue: "0 dollars" },
+  { target: 4.9, suffix: "/5", decimals: 1, label: "Customer rating", ariaValue: "4.9 out of 5" },
 ];
 
 const steps = [
@@ -129,9 +130,9 @@ const faqItems = [
   },
 ];
 
-function HeroArtwork() {
+const HeroArtwork = memo(function HeroArtwork() {
   return (
-    <div className="relative mx-auto w-full max-w-[560px] rounded-[2rem] border border-[#E3E8EE] bg-white p-4">
+    <div className="relative mx-auto w-full max-w-[560px] rounded-[2rem] border border-[#E3E8EE] bg-white p-4 [will-change:transform]">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(219,234,254,0.85),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(96,165,250,0.2),_transparent_30%)]" />
       <svg
         viewBox="0 0 600 640"
@@ -187,12 +188,12 @@ function HeroArtwork() {
       </svg>
     </div>
   );
-}
+});
 
-function PhoneMockup() {
+const PhoneMockup = memo(function PhoneMockup() {
   return (
     <div className="flex justify-center pt-6">
-      <div className="relative h-[380px] w-[200px] rounded-[2rem] border border-[#E3E8EE] bg-white p-4">
+      <div className="relative h-[380px] w-[200px] rounded-[2rem] border border-[#E3E8EE] bg-white p-4 [will-change:transform]">
         <div className="absolute left-1/2 top-3 h-4 w-24 -translate-x-1/2 rounded-full bg-[#E3E8EE]" />
         <div className="mt-6">
           <div className="mb-4 flex items-center justify-between text-sm font-medium text-[#6B7C93]">
@@ -221,11 +222,11 @@ function PhoneMockup() {
       </div>
     </div>
   );
-}
+});
 
-function OffersMockup() {
+const OffersMockup = memo(function OffersMockup() {
   return (
-    <div className="relative mt-8 h-[220px]">
+    <div className="relative mt-8 h-[220px] [will-change:transform]">
       <div className="absolute left-2 top-14 h-[104px] w-[160px] rounded-2xl border border-[#E3E8EE] bg-white p-4 shadow-none">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F6F9FC] text-sm font-semibold text-[#0A2540]">
@@ -267,12 +268,12 @@ function OffersMockup() {
       </div>
     </div>
   );
-}
+});
 
-function ApprovalMockup() {
+const ApprovalMockup = memo(function ApprovalMockup() {
   return (
     <div className="mt-8 flex justify-center">
-      <div className="w-full max-w-[280px] rounded-[1.5rem] border border-[#BFDBFE] bg-[#EFF6FF] px-6 py-8 text-center">
+      <div className="w-full max-w-[280px] rounded-[1.5rem] border border-[#BFDBFE] bg-[#EFF6FF] px-6 py-8 text-center [will-change:transform]">
         <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[#DCFCE7]">
           <CheckCircle className="h-8 w-8 text-green-600" />
         </div>
@@ -285,11 +286,11 @@ function ApprovalMockup() {
       </div>
     </div>
   );
-}
+});
 
-function SecurityMockup() {
+const SecurityMockup = memo(function SecurityMockup() {
   return (
-    <div className="relative mt-8 flex min-h-[220px] items-center justify-center">
+    <div className="relative mt-8 flex min-h-[220px] items-center justify-center [will-change:transform]">
       <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F6F9FC]" />
       <div className="relative flex h-24 w-24 items-center justify-center rounded-[1.5rem] border border-[#E3E8EE] bg-white">
         <Shield className="h-11 w-11 text-[#2563EB]" />
@@ -312,6 +313,90 @@ function SecurityMockup() {
       </div>
     </div>
   );
+});
+
+function formatStatValue(value: number, decimals = 0) {
+  return value.toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
+
+const StatItem = memo(function StatItem({
+  target,
+  label,
+  prefix = "",
+  suffix = "",
+  decimals = 0,
+  ariaValue,
+}: {
+  target: number;
+  label: string;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+  ariaValue: string;
+}) {
+  const { ref, value } = useCountUp({ target });
+
+  return (
+    <div className="animate-fade-in-up text-center lg:text-left [will-change:transform]">
+      <p className="text-4xl font-semibold text-[#0A2540]" aria-label={ariaValue}>
+        <span ref={ref}>
+          {prefix}
+          {formatStatValue(value, decimals)}
+          {suffix}
+        </span>
+      </p>
+      <p className="mt-2 text-sm text-[#425466]">{label}</p>
+    </div>
+  );
+});
+
+function FaqItem({
+  answer,
+  index,
+  isOpen,
+  question,
+  onToggle,
+}: {
+  answer: string;
+  index: number;
+  isOpen: boolean;
+  question: string;
+  onToggle: (index: number) => void;
+}) {
+  const panelId = useId();
+  const buttonId = useId();
+
+  return (
+    <div className="border-b border-[#E3E8EE]">
+      <button
+        id={buttonId}
+        type="button"
+        onClick={() => onToggle(index)}
+        className="flex w-full items-center justify-between gap-4 py-5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        aria-expanded={isOpen}
+        aria-controls={panelId}
+      >
+        <span className="text-base font-semibold text-[#0A2540]">{question}</span>
+        <ChevronDown
+          className={`h-5 w-5 flex-shrink-0 text-[#6B7C93] transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
+      </button>
+      <div
+        id={panelId}
+        role="region"
+        aria-labelledby={buttonId}
+        className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+      >
+        <div className="overflow-hidden">
+          <p className="pb-5 pr-10 text-sm leading-7 text-[#425466]">{answer}</p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function HomePage() {
@@ -329,7 +414,15 @@ export default function HomePage() {
 
   return (
     <div className="premium-page min-h-screen bg-white text-[#425466]">
-      <section className="animate-fade-in-up min-h-[85vh] px-6 py-20 pt-28 md:py-24 md:pt-32">
+      <section
+        role="region"
+        aria-label="Hero"
+        className="animate-fade-in-up min-h-[85vh] px-6 py-20 pt-28 md:py-24 md:pt-32"
+        style={{
+          background:
+            "radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(99,102,241,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(37,99,235,0.04) 0%, transparent 50%)",
+        }}
+      >
         <div className="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <div className="space-y-4">
@@ -345,16 +438,22 @@ export default function HomePage() {
               </p>
             </div>
             <div className="mt-6 flex flex-col gap-6 sm:flex-row">
-              <Link
-                href="/apply"
-                className="premium-button inline-flex w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 sm:w-auto"
-              >
-                Get Pre-Approved
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
+              <div className="relative inline-flex w-full sm:w-auto">
+                <span
+                  aria-hidden="true"
+                  className="pulse-ring pointer-events-none absolute inset-0 rounded-full bg-blue-400/20"
+                />
+                <Link
+                  href="/apply"
+                  className="premium-button relative inline-flex w-full items-center justify-center rounded-full bg-[#2563EB] bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(37,99,235,0.18)] hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-500 sm:w-auto"
+                >
+                  Get Pre-Approved
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
               <Link
                 href="#how-it-works"
-                className="premium-button inline-flex w-full items-center justify-center rounded-full border border-[#2563EB] bg-white px-6 py-3 text-sm font-semibold text-[#2563EB] hover:bg-[#F6F9FC] sm:w-auto"
+                className="premium-button inline-flex w-full items-center justify-center rounded-full border border-[#2563EB] bg-white px-6 py-3 text-sm font-semibold text-[#2563EB] hover:bg-blue-50 sm:w-auto"
               >
                 See How It Works
               </Link>
@@ -366,7 +465,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-[#E3E8EE] bg-white px-6 py-8">
+      <section role="region" aria-label="Trusted lenders" className="border-y border-[#E3E8EE] bg-white px-6 py-8">
         <div className="mx-auto max-w-6xl">
           <p className="text-center text-sm font-medium uppercase tracking-[0.18em] text-[#6B7C93]">
             Trusted by leading lenders
@@ -388,21 +487,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
+      <section role="region" aria-label="Platform stats" className="bg-[#F6F9FC] px-6 py-20 md:py-24">
         <div
           ref={statsSection.ref}
           className={`mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4 ${statsSection.isInView ? "in-view-visible" : "in-view-section"}`}
         >
           {stats.map((stat) => (
-            <div key={stat.value} className="animate-fade-in-up text-center lg:text-left">
-              <p className="text-4xl font-semibold text-[#0A2540]">{stat.value}</p>
-              <p className="mt-2 text-sm text-[#425466]">{stat.label}</p>
-            </div>
+            <StatItem key={stat.label} {...stat} />
           ))}
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
+      <section role="region" aria-label="Product features" className="px-6 py-20 md:py-24">
         <div ref={featuresSection.ref} className={`mx-auto max-w-6xl ${featuresSection.isInView ? "in-view-visible" : "in-view-section"}`}>
           <div className="max-w-3xl animate-fade-in-up">
             <h2 className="max-w-[600px] text-4xl font-semibold leading-tight text-[#0A2540]">
@@ -415,14 +511,14 @@ export default function HomePage() {
 
           <div className="mt-14 space-y-6">
             <div className="grid gap-6 lg:grid-cols-12">
-              <div className="feature-card-hover stagger-1 h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F7FAFF_100%)] p-8 lg:col-span-7">
+              <div className="feature-card-hover stagger-1 h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F7FAFF_100%)] p-8 [will-change:transform] lg:col-span-7">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Apply in 2 Minutes</h3>
                 <p className="mt-3 max-w-lg text-[#425466]">
                   A short digital application replaces dealership paperwork, repeat credit checks, and back-office delays.
                 </p>
                 <PhoneMockup />
               </div>
-              <div className="feature-card-hover stagger-2 h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F8FBFF_100%)] p-8 lg:col-span-5">
+              <div className="feature-card-hover stagger-2 h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F8FBFF_100%)] p-8 [will-change:transform] lg:col-span-5">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Compare Real Offers</h3>
                 <p className="mt-3 max-w-sm text-[#425466]">
                   See rates, terms, and monthly payments at a glance so the best offer is obvious.
@@ -432,7 +528,7 @@ export default function HomePage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              <div className="feature-card-hover stagger-1 h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+              <div className="feature-card-hover stagger-1 h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6 [will-change:transform]">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Smart Pre-Approval</h3>
                 <p className="mt-3 text-[#425466]">
                   Know your buying power early so you can shop with financing already lined up.
@@ -440,7 +536,7 @@ export default function HomePage() {
                 <ApprovalMockup />
               </div>
 
-              <div className="feature-card-hover stagger-2 h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+              <div className="feature-card-hover stagger-2 h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6 [will-change:transform]">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Rate Calculator</h3>
                 <p className="mt-3 text-[#425466]">
                   Adjust the amount and preview how small changes affect your estimated monthly payment.
@@ -474,7 +570,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="feature-card-hover stagger-3 h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+              <div className="feature-card-hover stagger-3 h-full rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6 [will-change:transform]">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Bank-Level Security</h3>
                 <p className="mt-3 text-[#425466]">
                   Sensitive data stays protected with encrypted transfer, secure storage, and controlled access.
@@ -483,7 +579,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="feature-card-hover stagger-4 rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-8">
+            <div className="feature-card-hover stagger-4 rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-8 [will-change:transform]">
               <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_auto_0.9fr]">
                 <div>
                   <h3 className="text-2xl font-semibold text-[#0A2540]">Shop Anywhere with Your Pre-Approval</h3>
@@ -546,7 +642,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="how-it-works" className="bg-[#F6F9FC] px-6 py-20 md:py-24">
+      <section
+        id="how-it-works"
+        role="region"
+        aria-label="How it works"
+        className="scroll-offset-section bg-[#F6F9FC] px-6 py-20 md:py-24"
+      >
         <div ref={stepsSection.ref} className={`mx-auto max-w-6xl ${stepsSection.isInView ? "in-view-visible" : "in-view-section"}`}>
           <div className="max-w-2xl">
             <h2 className="text-4xl font-semibold text-[#0A2540]">How it works</h2>
@@ -561,7 +662,7 @@ export default function HomePage() {
               const Icon = step.icon;
 
               return (
-                <div key={step.number} className="step-card-hover relative h-full rounded-xl border border-[#E3E8EE] bg-white p-8">
+                <div key={step.number} className="step-card-hover relative h-full rounded-xl border border-[#E3E8EE] bg-white p-8 [will-change:transform]">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0A2540] text-sm font-semibold text-white">
                     {step.number}
                   </div>
@@ -577,7 +678,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
+      <section role="region" aria-label="Testimonials" className="px-6 py-20 md:py-24">
         <div ref={testimonialsSection.ref} className={`mx-auto max-w-6xl ${testimonialsSection.isInView ? "in-view-visible" : "in-view-section"}`}>
           <div className="max-w-2xl">
             <h2 className="max-w-lg text-4xl font-semibold text-[#0A2540]">What customers&nbsp;say</h2>
@@ -590,13 +691,14 @@ export default function HomePage() {
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.name}
-                className="testimonial-card-hover h-full rounded-xl border border-[#E3E8EE] border-t-2 border-t-blue-600 p-8"
+                className="testimonial-card-hover h-full rounded-xl border border-[#E3E8EE] border-t-2 border-t-blue-600 p-8 [will-change:transform]"
               >
                 <div className="flex items-center justify-between">
-                  <Quote className="h-8 w-8 text-[#2563EB]" />
+                  <Quote className="h-8 w-8 text-[#2563EB]" aria-hidden="true" />
                   <div className="flex items-center gap-1 text-[#2563EB]">
+                    <span className="sr-only">5 out of 5 stars</span>
                     {Array.from({ length: 5 }).map((_, index) => (
-                      <Star key={index} className="h-4 w-4 fill-current" />
+                      <Star key={index} className="h-4 w-4 fill-current" aria-hidden="true" />
                     ))}
                   </div>
                 </div>
@@ -616,7 +718,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
+      <section role="region" aria-label="Security and trust" className="px-6 py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="rounded-[2rem] border border-[#E3E8EE] bg-[#F6F9FC] px-6 py-10 md:px-10">
             <div className="max-w-2xl">
@@ -645,7 +747,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
+      <section
+        id="faq"
+        role="region"
+        aria-label="Frequently asked questions"
+        className="scroll-offset-section px-6 py-20 md:py-24"
+      >
         <div className="mx-auto max-w-4xl">
           <div className="max-w-2xl">
             <h2 className="text-3xl font-semibold text-[#0A2540] md:text-4xl">Frequently asked questions</h2>
@@ -655,37 +762,21 @@ export default function HomePage() {
           </div>
 
           <div className="mt-10 border-t border-[#E3E8EE]">
-            {faqItems.map((item, index) => {
-              const isOpen = openFaqIndex === index;
-
-              return (
-                <div key={item.question} className="border-b border-[#E3E8EE]">
-                  <button
-                    type="button"
-                    onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                    className="flex w-full items-center justify-between gap-4 py-5 text-left"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="text-base font-semibold text-[#0A2540]">{item.question}</span>
-                    <ChevronDown
-                      className={`h-5 w-5 flex-shrink-0 text-[#6B7C93] transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-                    />
-                  </button>
-                  <div
-                    className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="pb-5 pr-10 text-sm leading-7 text-[#425466]">{item.answer}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {faqItems.map((item, index) => (
+              <FaqItem
+                key={item.question}
+                answer={item.answer}
+                index={index}
+                isOpen={openFaqIndex === index}
+                question={item.question}
+                onToggle={(nextIndex) => setOpenFaqIndex(openFaqIndex === nextIndex ? null : nextIndex)}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
+      <section role="region" aria-label="Call to action" className="px-6 py-20 md:py-24">
         <div className="mx-auto max-w-6xl rounded-3xl bg-[linear-gradient(135deg,#2563EB_0%,#1D4ED8_55%,#0F766E_100%)] px-6 py-20 text-center md:py-24">
           <h2 className="text-4xl font-semibold text-white">Ready to get pre-approved?</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100">
@@ -697,7 +788,7 @@ export default function HomePage() {
               className="premium-button inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#2563EB] hover:bg-blue-50 sm:w-auto"
             >
               Start Your Application
-              <ArrowRight className="ml-2 h-4 w-4" />
+              <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         </div>
