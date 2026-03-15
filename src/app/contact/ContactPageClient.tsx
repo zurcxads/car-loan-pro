@@ -100,7 +100,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#425466]">
-      <section className="px-6 py-20 pt-28 md:pt-32">
+      <section className="px-6 py-20 pt-28 md:py-24 md:pt-32">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">
@@ -214,7 +214,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-[#2563EB] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
                     {submitting ? "Sending..." : "Send message"}
                   </button>
@@ -222,7 +222,7 @@ export default function ContactPage() {
               )}
             </div>
 
-            <aside className="flex h-full flex-col gap-6">
+            <aside className="grid h-full auto-rows-fr gap-6 self-start">
               <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
                 <h2 className="text-2xl font-semibold text-[#0A2540]">Contact information</h2>
                 <div className="mt-6 space-y-5">
@@ -291,7 +291,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20">
+      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
         <div className="mx-auto max-w-4xl">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">

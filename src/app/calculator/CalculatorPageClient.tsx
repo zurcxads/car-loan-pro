@@ -148,7 +148,7 @@ export default function CalculatorPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#425466]">
-      <section className="px-6 py-20 pt-28 md:pt-32">
+      <section className="px-6 py-20 pt-28 md:py-24 md:pt-32">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">
@@ -244,14 +244,14 @@ export default function CalculatorPage() {
 
                 <div>
                   <p className="text-sm font-medium text-[#0A2540]">Loan term</p>
-                  <div className="-mx-1 mt-4 flex gap-3 overflow-x-auto px-1 pb-1 scrollbar-hide sm:mx-0 sm:flex-wrap sm:px-0">
+                  <div className="mt-4 flex flex-wrap gap-2">
                     {TERMS.map((term) => (
                       <button
                         key={term}
                         type="button"
                         onClick={() => setTermMonths(term)}
                         aria-pressed={termMonths === term}
-                        className={`inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border px-4 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:px-5 ${
+                        className={`inline-flex min-h-10 shrink-0 items-center justify-center rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
                           termMonths === term
                             ? "border-[#2563EB] bg-[#2563EB] text-white"
                             : "border-[#E3E8EE] bg-white text-[#0A2540] hover:bg-[#F6F9FC]"
@@ -265,7 +265,7 @@ export default function CalculatorPage() {
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-6 self-start">
               <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
                 <p className="text-sm font-medium text-[#2563EB]">Estimated monthly payment</p>
                 <p className="mt-4 text-5xl font-semibold tracking-tight text-[#0A2540]">
@@ -317,7 +317,7 @@ export default function CalculatorPage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20">
+      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">
@@ -376,7 +376,7 @@ export default function CalculatorPage() {
         </div>
       </section>
 
-      <section className="px-6 py-20">
+      <section className="px-6 py-20 md:py-24">
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -433,7 +433,7 @@ export default function CalculatorPage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20">
+      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
         <div className="mx-auto max-w-4xl rounded-[2rem] border border-[#E3E8EE] bg-white p-8 text-center md:p-12">
           <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">
             Ready to see real offers instead of estimates?
