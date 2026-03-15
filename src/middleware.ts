@@ -42,6 +42,12 @@ function isAllowedMutationRequest(request: NextRequest) {
     return true;
   }
 
+  // Allow requests with no Origin AND no Referer (server-to-server, same-origin navigations)
+  // Browsers always send Origin on cross-origin POST/PUT/DELETE
+  if (!origin && !referer) {
+    return true;
+  }
+
   return false;
 }
 
