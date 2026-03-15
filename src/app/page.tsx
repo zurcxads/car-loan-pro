@@ -66,7 +66,7 @@ const testimonials = [
 
 function HeroArtwork() {
   return (
-    <div className="relative mx-auto w-full max-w-[560px] overflow-hidden rounded-[2rem] border border-[#E3E8EE] bg-white p-4">
+    <div className="relative mx-auto w-full max-w-[560px] rounded-[2rem] border border-[#E3E8EE] bg-white p-4">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(219,234,254,0.85),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(96,165,250,0.2),_transparent_30%)]" />
       <svg
         viewBox="0 0 600 640"
@@ -130,7 +130,7 @@ function PhoneMockup() {
       <div className="relative h-[380px] w-[200px] rounded-[2rem] border border-[#E3E8EE] bg-white p-4">
         <div className="absolute left-1/2 top-3 h-4 w-24 -translate-x-1/2 rounded-full bg-[#E3E8EE]" />
         <div className="mt-6">
-          <div className="mb-4 flex items-center justify-between text-[10px] font-medium text-[#6B7C93]">
+          <div className="mb-4 flex items-center justify-between text-sm font-medium text-[#6B7C93]">
             <span>Step 2 of 4</span>
             <span>50%</span>
           </div>
@@ -145,7 +145,7 @@ function PhoneMockup() {
               <div className="h-10 rounded-xl bg-[#F6F9FC]" />
               <div className="h-10 rounded-xl bg-[#F6F9FC]" />
             </div>
-            <div className="h-20 rounded-2xl border border-dashed border-[#E3E8EE] bg-white" />
+            <div className="h-20 rounded-2xl border border-[#E3E8EE] bg-white" />
           </div>
         </div>
         <div className="absolute bottom-4 left-4 right-4">
@@ -161,44 +161,44 @@ function PhoneMockup() {
 function OffersMockup() {
   return (
     <div className="relative mt-8 h-[220px]">
-      <div className="absolute left-2 top-14 h-[104px] w-[160px] rounded-2xl border border-[#E3E8EE] bg-white p-4">
+      <div className="absolute left-2 top-14 h-[104px] w-[160px] rounded-2xl border border-[#E3E8EE] bg-white p-4 shadow-none">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F6F9FC] text-sm font-semibold text-[#0A2540]">
             A
           </div>
           <div>
-            <p className="text-xs font-medium text-[#0A2540]">Atlas Bank</p>
-            <p className="text-[11px] text-[#6B7C93]">72 months</p>
+            <p className="text-sm font-medium text-[#0A2540]">Atlas Bank</p>
+            <p className="text-sm text-[#6B7C93]">72 months</p>
           </div>
         </div>
         <p className="text-2xl font-semibold text-[#0A2540]">5.2%</p>
-        <p className="text-xs text-[#425466]">$487/mo</p>
+        <p className="text-sm text-[#425466]">$487/mo</p>
       </div>
-      <div className="absolute left-16 top-7 h-[112px] w-[168px] rounded-2xl border border-[#E3E8EE] border-l-4 border-l-[#2563EB] bg-white p-4">
+      <div className="absolute left-16 top-7 h-[112px] w-[168px] rounded-2xl border border-[#E3E8EE] border-l-4 border-l-[#2563EB] bg-white p-4 shadow-none">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#DBEAFE] text-sm font-semibold text-[#2563EB]">
             C
           </div>
           <div>
-            <p className="text-xs font-medium text-[#0A2540]">Crest Credit</p>
-            <p className="text-[11px] text-[#6B7C93]">60 months</p>
+            <p className="text-sm font-medium text-[#0A2540]">Crest Credit</p>
+            <p className="text-sm text-[#6B7C93]">60 months</p>
           </div>
         </div>
         <p className="text-2xl font-semibold text-[#0A2540]">3.9%</p>
-        <p className="text-xs text-[#425466]">$459/mo</p>
+        <p className="text-sm text-[#425466]">$459/mo</p>
       </div>
-      <div className="absolute left-28 top-20 h-[104px] w-[160px] rounded-2xl border border-[#E3E8EE] bg-white p-4">
+      <div className="absolute left-28 top-20 h-[104px] w-[160px] rounded-2xl border border-[#E3E8EE] bg-white p-4 shadow-none">
         <div className="mb-4 flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F6F9FC] text-sm font-semibold text-[#0A2540]">
             N
           </div>
           <div>
-            <p className="text-xs font-medium text-[#0A2540]">Northlane</p>
-            <p className="text-[11px] text-[#6B7C93]">48 months</p>
+            <p className="text-sm font-medium text-[#0A2540]">Northlane</p>
+            <p className="text-sm text-[#6B7C93]">48 months</p>
           </div>
         </div>
         <p className="text-2xl font-semibold text-[#0A2540]">4.4%</p>
-        <p className="text-xs text-[#425466]">$566/mo</p>
+        <p className="text-sm text-[#425466]">$566/mo</p>
       </div>
     </div>
   );
@@ -214,7 +214,7 @@ function ApprovalMockup() {
         <p className="text-sm font-medium text-[#6B7C93]">Pre-Approved</p>
         <p className="mt-2 text-4xl font-semibold text-[#0A2540]">$5,000</p>
         <p className="mt-2 text-base font-medium text-[#2563EB]">3.9% APR</p>
-        <div className="mt-6 rounded-full border border-[#BFDBFE] bg-white px-4 py-2 text-xs text-[#425466]">
+        <div className="mt-6 rounded-full border border-[#BFDBFE] bg-white px-4 py-2 text-xs font-medium text-[#425466]">
           Soft pull only
         </div>
       </div>
@@ -224,7 +224,7 @@ function ApprovalMockup() {
 
 function SecurityMockup() {
   return (
-    <div className="relative mt-8 flex min-h-[220px] items-center justify-center overflow-hidden">
+    <div className="relative mt-8 flex min-h-[220px] items-center justify-center">
       <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F6F9FC]" />
       <div className="relative flex h-24 w-24 items-center justify-center rounded-[1.5rem] border border-[#E3E8EE] bg-white">
         <Shield className="h-11 w-11 text-[#2563EB]" />
@@ -316,14 +316,14 @@ export default function HomePage() {
 
           <div className="mt-14 space-y-6">
             <div className="grid gap-6 lg:grid-cols-12">
-              <div className="rounded-xl border border-[#E3E8EE] p-8 lg:col-span-7">
+              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md lg:col-span-7">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Apply in 2 Minutes</h3>
                 <p className="mt-3 max-w-lg text-[#425466]">
                   A short digital application replaces dealership paperwork, repeat credit checks, and back-office delays.
                 </p>
                 <PhoneMockup />
               </div>
-              <div className="rounded-xl border border-[#E3E8EE] p-8 lg:col-span-5">
+              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md lg:col-span-5">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Compare Real Offers</h3>
                 <p className="mt-3 max-w-sm text-[#425466]">
                   See rates, terms, and monthly payments at a glance so the best offer is obvious.
@@ -333,7 +333,7 @@ export default function HomePage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              <div className="rounded-xl border border-[#E3E8EE] p-8">
+              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Smart Pre-Approval</h3>
                 <p className="mt-3 text-[#425466]">
                   Know your buying power early so you can shop with financing already lined up.
@@ -341,7 +341,7 @@ export default function HomePage() {
                 <ApprovalMockup />
               </div>
 
-              <div className="rounded-xl border border-[#E3E8EE] p-8">
+              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Rate Calculator</h3>
                 <p className="mt-3 text-[#425466]">
                   Adjust the amount and preview how small changes affect your estimated monthly payment.
@@ -375,7 +375,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#E3E8EE] p-8">
+              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Bank-Level Security</h3>
                 <p className="mt-3 text-[#425466]">
                   Sensitive data stays protected with encrypted transfer, secure storage, and controlled access.
@@ -384,7 +384,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E3E8EE] p-8">
+            <div className="rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md">
               <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_auto_0.9fr]">
                 <div>
                   <h3 className="text-2xl font-semibold text-[#0A2540]">Shop Anywhere with Your Pre-Approval</h3>
@@ -394,7 +394,7 @@ export default function HomePage() {
                   <div className="mt-8 max-w-md rounded-[1.5rem] border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                     <div className="flex items-center justify-between">
                       <Logo size="sm" />
-                      <span className="rounded-full border border-[#E3E8EE] bg-white px-3 py-1 text-xs font-medium text-[#6B7C93]">
+                      <span className="rounded-full border border-[#E3E8EE] bg-white px-3 py-1.5 text-xs font-medium text-[#425466]">
                         Pre-Approval
                       </span>
                     </div>
@@ -457,12 +457,12 @@ export default function HomePage() {
           </div>
 
           <div className="relative mt-14 grid gap-10 lg:grid-cols-3">
-            <div className="absolute left-[16.66%] right-[16.66%] top-10 hidden border-t border-dashed border-[#CBD5E1] lg:block" />
+            <div className="absolute left-[16.66%] right-[16.66%] top-10 hidden border-t border-[#E3E8EE] lg:block" />
             {steps.map((step) => {
               const Icon = step.icon;
 
               return (
-                <div key={step.number} className="relative rounded-xl border border-[#E3E8EE] bg-white p-8">
+                <div key={step.number} className="relative h-full rounded-xl border border-[#E3E8EE] bg-white p-8 transition-shadow hover:shadow-md">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0A2540] text-sm font-semibold text-white">
                     {step.number}
                   </div>
@@ -491,7 +491,7 @@ export default function HomePage() {
             {testimonials.map((testimonial) => (
               <div
                 key={testimonial.name}
-                className="rounded-xl border border-[#E3E8EE] border-t-4 border-t-[#2563EB] p-8"
+                className="h-full rounded-xl border border-[#E3E8EE] border-t-2 border-t-blue-600 p-8"
               >
                 <div className="flex items-center justify-between">
                   <Quote className="h-8 w-8 text-[#2563EB]" />
