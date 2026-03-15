@@ -82,7 +82,7 @@ export default function UnderwritingRules() {
         <span className="text-gray-500">{label}</span>
         <span className="font-semibold text-blue-600">{value}{suffix || ''}</span>
       </div>
-      <input type="range" min={min} max={max} value={value} onChange={e => onChange(Number(e.target.value))} className="w-full cursor-pointer" />
+      <input type="range" min={min} max={max} value={value} onChange={e => onChange(Number(e.target.value))} className="w-full cursor-pointer" aria-label={label} />
       <div className="flex justify-between text-[10px] text-gray-400 mt-1"><span>{min}</span><span>{max}</span></div>
     </div>
   );
@@ -123,12 +123,12 @@ export default function UnderwritingRules() {
           <h3 className="text-sm font-semibold mb-6">Loan Amounts</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-gray-500 mb-1.5">Min Loan Amount ($)</label>
-              <input type="number" value={minLoan} onChange={e => setMinLoan(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
+              <label htmlFor="min-loan-amount" className="block text-xs text-gray-500 mb-1.5">Min Loan Amount ($)</label>
+              <input id="min-loan-amount" type="number" value={minLoan} onChange={e => setMinLoan(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1.5">Max Loan Amount ($)</label>
-              <input type="number" value={maxLoan} onChange={e => setMaxLoan(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
+              <label htmlFor="max-loan-amount" className="block text-xs text-gray-500 mb-1.5">Max Loan Amount ($)</label>
+              <input id="max-loan-amount" type="number" value={maxLoan} onChange={e => setMaxLoan(Number(e.target.value))} className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-600/50" />
             </div>
           </div>
         </div>
