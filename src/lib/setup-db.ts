@@ -3,6 +3,7 @@
 // Usage: import and call setupDatabase() from a server-side API route
 
 import { createClient } from '@supabase/supabase-js';
+import { serverLogger } from './server-logger';
 
 export async function setupDatabase() {
   // Use service role key for admin operations
@@ -189,7 +190,7 @@ export async function setupDatabase() {
     const { error: lendersError } = await supabase.from('lenders').insert(lenders);
 
     if (lendersError) {
-      console.error('Error inserting lenders:', lendersError);
+      serverLogger.error('Error inserting lenders', { error: lendersError instanceof Error ? lendersError.message : String(lendersError) });
       throw lendersError;
     }
 
@@ -198,7 +199,7 @@ export async function setupDatabase() {
       message: 'Database schema applied and seeded with 6 lenders',
     };
   } catch (error) {
-    console.error('Database setup error:', error);
+    serverLogger.error('Database setup error', { error: error instanceof Error ? error.message : String(error) });
     throw error;
   }
 }

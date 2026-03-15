@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { serverLogger } from '@/lib/server-logger';
 
 export interface MagicLinkToken {
   id: string;
@@ -41,13 +42,13 @@ export async function generateMagicToken(
       });
 
     if (error) {
-      console.error('Failed to create magic link:', error);
+      serverLogger.error('Failed to create magic link', { error: error instanceof Error ? error.message : String(error) });
       return { token: '', error: 'Failed to generate magic link' };
     }
 
     return { token };
   } catch (err) {
-    console.error('Magic link generation error:', err);
+    serverLogger.error('Magic link generation error', { error: err instanceof Error ? err.message : String(err) });
     return { token: '', error: 'Internal error' };
   }
 }
@@ -95,7 +96,7 @@ export async function verifyMagicToken(
       email: magicLink.email,
     };
   } catch (err) {
-    console.error('Magic link verification error:', err);
+    serverLogger.error('Magic link verification error', { error: err instanceof Error ? err.message : String(err) });
     return null;
   }
 }
@@ -113,6 +114,6 @@ export async function cleanupExpiredMagicLinks(): Promise<void> {
       .delete()
       .lt('expires_at', now);
   } catch (err) {
-    console.error('Failed to cleanup expired magic links:', err);
+    serverLogger.error('Failed to cleanup expired magic links', { error: err instanceof Error ? err.message : String(err) });
   }
 }

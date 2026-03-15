@@ -11,6 +11,7 @@ import {
   CONSUMER_SESSION_COOKIE,
   getConsumerSessionCookieOptions,
 } from '@/lib/consumer-session';
+import { serverLogger } from '@/lib/server-logger';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { z } from 'zod';
 
@@ -113,7 +114,7 @@ export async function handleOfferSelection(req: NextRequest) {
 
     return response;
   } catch (err) {
-    console.error('Offer selection error:', err);
+    serverLogger.error('Offer selection error', { error: err instanceof Error ? err.message : String(err) });
     return apiError('Failed to select offer', 500);
   }
 }

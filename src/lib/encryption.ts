@@ -1,4 +1,5 @@
 import type * as NodeCrypto from 'crypto';
+import { serverLogger } from './server-logger';
 
 const ENCRYPTION_PREFIX = 'enc:v1';
 const IV_LENGTH = 12;
@@ -20,7 +21,7 @@ function getEncryptionKey(key: string | undefined): Buffer | null {
 
   const normalizedKey = key.trim();
   if (!/^[0-9a-fA-F]{64}$/.test(normalizedKey)) {
-    console.warn('ENCRYPTION_KEY must be a 32-byte hex string. Falling back to plaintext handling.');
+    serverLogger.warn('ENCRYPTION_KEY must be a 32-byte hex string. Falling back to plaintext handling.');
     return null;
   }
 

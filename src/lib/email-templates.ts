@@ -1,9 +1,10 @@
 /**
  * Email templates for Auto Loan Pro
  *
- * These will be sent via Resend once the API key is configured.
- * For now, they log to console in dev mode.
+ * These are sent via Resend when the API key is configured.
  */
+
+import { serverLogger } from './server-logger';
 
 export interface EmailData {
   to: string;
@@ -309,7 +310,7 @@ export function rateExpiringEmail(
 }
 
 /**
- * Send email via Resend or log to console in dev mode
+ * Send email via Resend when configured
  */
 export async function sendEmail(emailData: EmailData): Promise<{ success: boolean; error?: string }> {
   // Check if Resend API key is configured
@@ -337,13 +338,13 @@ export async function sendEmail(emailData: EmailData): Promise<{ success: boolea
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('Resend API error:', error);
+      serverLogger.error('Resend API error', { error });
       return { success: false, error: 'Failed to send email' };
     }
 
     return { success: true };
   } catch (err) {
-    console.error('Email send error:', err);
+    serverLogger.error('Email send error', { error: err instanceof Error ? err.message : String(err) });
     return { success: false, error: 'Internal error' };
   }
 }

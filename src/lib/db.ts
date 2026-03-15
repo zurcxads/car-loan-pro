@@ -4,6 +4,7 @@
 import { useMockData as shouldUseMockData } from './env';
 import { decrypt, encrypt } from './encryption';
 import { isSupabaseConfigured, getServiceClient } from './supabase';
+import { serverLogger } from './server-logger';
 import {
   MOCK_APPLICATIONS, MOCK_OFFERS, MOCK_LENDERS, MOCK_DEALERS,
   MOCK_DEALS, MOCK_ACTIVITY_EVENTS, MOCK_COMPLIANCE_ALERTS,
@@ -124,10 +125,9 @@ export async function dbCreateApplication(app: Partial<MockApplication>): Promis
       });
     }
 
-    console.error(
-      `[db] Application insert failed (${variant.label}):`,
-      JSON.stringify({ msg: error?.message, details: error?.details, hint: error?.hint, code: error?.code })
-    );
+    serverLogger.error(`[db] Application insert failed (${variant.label})`, {
+      error: JSON.stringify({ msg: error?.message, details: error?.details, hint: error?.hint, code: error?.code }),
+    });
   }
 
   return null;

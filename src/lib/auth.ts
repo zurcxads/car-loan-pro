@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { createClient } from '@supabase/supabase-js';
 import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { isServerDevAccessGranted } from '@/lib/dev-access-server';
+import { serverLogger } from '@/lib/server-logger';
 
 const DEV_ONLY_DEMO_PASSWORD = 'AutoLoanPro2026!';
 
@@ -95,7 +96,7 @@ export const authOptions: AuthOptions = {
             await supabase.auth.signOut();
 
             if (userError) {
-              console.error('Supabase user lookup error:', userError);
+              serverLogger.error('Supabase user lookup error', { error: userError instanceof Error ? userError.message : String(userError) });
               return null;
             }
 

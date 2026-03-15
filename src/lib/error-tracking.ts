@@ -15,6 +15,25 @@
 
 import { supabase, isSupabaseConfigured } from './supabase';
 
+function writeErrorTrackingLog(level: 'error' | 'warn', message: string, metadata?: Record<string, unknown>) {
+  if (typeof window !== 'undefined') {
+    return;
+  }
+
+  const payload = {
+    level,
+    message,
+    metadata,
+    timestamp: new Date().toISOString(),
+  };
+
+  try {
+    process.stderr.write(`[error-tracking] ${JSON.stringify(payload)}\n`);
+  } catch {
+    // Ignore logging failures.
+  }
+}
+
 // In-memory rate limiter: max 10 errors per minute per session
 const rateLimits = new Map<string, { count: number; resetAt: number }>();
 
@@ -75,20 +94,11 @@ export async function captureError(
 
   // Rate limiting
   if (isRateLimited(sessionId)) {
-    console.warn('[Error Tracking] Rate limit exceeded, dropping error');
     return;
   }
 
   const errorMessage = typeof error === 'string' ? error : error.message;
   const stack = typeof error === 'string' ? undefined : error.stack;
-
-  // Always log to console in development
-  if (process.env.NODE_ENV === 'development') {
-    console.error('[Error Tracking]', errorMessage, {
-      stack,
-      context,
-    });
-  }
 
   // Send to Supabase in production (if configured)
   if (process.env.NODE_ENV === 'production' && isSupabaseConfigured()) {
@@ -102,7 +112,11 @@ export async function captureError(
         context: context || {},
       });
     } catch (insertError) {
-      console.error('[Error Tracking] Failed to log error to Supabase:', insertError);
+      writeErrorTrackingLog('error', '[Error Tracking] Failed to log error to Supabase', {
+        context,
+        error: insertError instanceof Error ? insertError.message : String(insertError),
+        stack,
+      });
     }
   }
 }

@@ -2,6 +2,7 @@
 // Creates and tracks lifecycle events for applications
 
 import { useMockData as shouldUseMockData } from './env';
+import { serverLogger } from './server-logger';
 import { supabase, isSupabaseConfigured } from './supabase';
 
 export interface ApplicationEvent {
@@ -56,7 +57,7 @@ export async function createApplicationEvent(
     .single();
 
   if (error) {
-    console.error('Failed to create application event:', error);
+    serverLogger.error('Failed to create application event', { error: error instanceof Error ? error.message : String(error) });
     return null;
   }
 
@@ -79,7 +80,7 @@ export async function getApplicationEvents(applicationId: string): Promise<Appli
     .order('created_at', { ascending: true });
 
   if (error) {
-    console.error('Failed to fetch application events:', error);
+    serverLogger.error('Failed to fetch application events', { error: error instanceof Error ? error.message : String(error) });
     return [];
   }
 

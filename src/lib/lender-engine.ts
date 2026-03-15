@@ -5,6 +5,7 @@ import { dbGetLenders, dbCreateOffer, dbUpdateApplication, dbCreateNotification 
 import { createApplicationEvent } from './application-events';
 import type { MockApplication, MockLender } from './mock-data';
 import { offersReadyEmail, sendEmail } from './email-templates';
+import { serverLogger } from './server-logger';
 
 interface MatchResult {
   matched: boolean;
@@ -93,7 +94,7 @@ export async function matchLendersAndGenerateOffers(application: MockApplication
       dashboardUrl
     );
     sendEmail(emailData).catch(err => {
-      console.error('Failed to send offers ready email:', err);
+      serverLogger.error('Failed to send offers ready email', { error: err instanceof Error ? err.message : String(err) });
     });
   }
 
