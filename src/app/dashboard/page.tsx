@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { SkeletonDashboard } from '@/components/shared/Skeleton';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { showDevTools } from '@/lib/env';
-import type { DocumentRequest } from '@/lib/types';
+import type { DocumentRequest, Message } from '@/lib/types';
 
 type LockedOffer = {
   id: string;
@@ -45,6 +45,10 @@ interface Application {
 
 type DocumentRequestsApiResponse =
   | { success: true; data: { documentRequests: DocumentRequest[]; note?: string } }
+  | { success: false; error?: string };
+
+type MessagesApiResponse =
+  | { success: true; data: { messages: Message[] } }
   | { success: false; error?: string };
 
 type DashboardPayload = {
@@ -124,6 +128,13 @@ function mergeDocumentRequest(
   ));
 }
 
+function formatMessageTime(date: string): string {
+  return new Date(date).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+}
+
 function DashboardContent() {
   const router = useRouter();
   const isDev = showDevTools();
@@ -138,6 +149,11 @@ function DashboardContent() {
   const [documentsLoading, setDocumentsLoading] = useState(true);
   const [documentsError, setDocumentsError] = useState('');
   const [uploadingRequestId, setUploadingRequestId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(true);
+  const [messagesError, setMessagesError] = useState('');
+  const [messageDraft, setMessageDraft] = useState('');
+  const [messageSubmitting, setMessageSubmitting] = useState(false);
 
   useFocusTrap(showCancelModal, cancelDialogRef, () => setShowCancelModal(false));
 
@@ -192,7 +208,26 @@ function DashboardContent() {
           },
         },
       ]);
+      setMessages([
+        {
+          id: 'message-1',
+          applicationId: 'APP-DEV-001',
+          senderId: 'lender-demo',
+          senderRole: 'lender',
+          content: 'Please upload your most recent pay stub so we can finish underwriting.',
+          createdAt: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+        },
+        {
+          id: 'message-2',
+          applicationId: 'APP-DEV-001',
+          senderId: 'consumer:APP-DEV-001',
+          senderRole: 'consumer',
+          content: 'I can upload that today. Do you need both pages?',
+          createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+        },
+      ]);
       setDocumentsLoading(false);
+      setMessagesLoading(false);
       setLoading(false);
       return;
     }
@@ -246,6 +281,40 @@ function DashboardContent() {
       })
       .finally(() => {
         setDocumentsLoading(false);
+      });
+  }, [application?.id, isDev]);
+
+  useEffect(() => {
+    if (isDev) {
+      return;
+    }
+
+    if (!application?.id) {
+      setMessages([]);
+      setMessagesLoading(false);
+      return;
+    }
+
+    setMessagesLoading(true);
+    setMessagesError('');
+
+    fetch(`/api/messages?applicationId=${encodeURIComponent(application.id)}`, {
+      cache: 'no-store',
+    })
+      .then((response) => response.json().then((payload: MessagesApiResponse) => ({ response, payload })))
+      .then(({ response, payload }) => {
+        if (!response.ok || !payload.success) {
+          setMessagesError(payload.success ? 'Failed to load messages' : payload.error || 'Failed to load messages');
+          return;
+        }
+
+        setMessages(payload.data.messages);
+      })
+      .catch(() => {
+        setMessagesError('Failed to load messages');
+      })
+      .finally(() => {
+        setMessagesLoading(false);
       });
   }, [application?.id, isDev]);
 
@@ -316,6 +385,43 @@ function DashboardContent() {
       toast.error('Unable to upload document.');
     } finally {
       setUploadingRequestId(null);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!application?.id || !messageDraft.trim()) {
+      return;
+    }
+
+    setMessageSubmitting(true);
+
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          applicationId: application.id,
+          content: messageDraft.trim(),
+        }),
+      });
+
+      const payload = await response.json() as
+        | { success: true; data: { message: Message } }
+        | { success: false; error?: string };
+
+      if (!response.ok || !payload.success) {
+        toast.error(payload.success ? 'Unable to send message.' : payload.error || 'Unable to send message.');
+        return;
+      }
+
+      setMessages((currentMessages) => [...currentMessages, payload.data.message]);
+      setMessageDraft('');
+    } catch {
+      toast.error('Unable to send message.');
+    } finally {
+      setMessageSubmitting(false);
     }
   };
 
@@ -585,6 +691,77 @@ function DashboardContent() {
               })}
             </div>
           )}
+        </section>
+
+        <section className="mt-6 rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
+          <div className="mb-6">
+            <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Messages</p>
+            <h2 className="text-2xl font-semibold text-[#0A2540]">Conversation with your lender</h2>
+          </div>
+
+          {messagesLoading ? (
+            <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-6 text-sm text-[#6B7C93]">
+              Loading messages...
+            </div>
+          ) : messagesError ? (
+            <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-6 text-sm text-[#6B7C93]">
+              {messagesError}
+            </div>
+          ) : messages.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-[#E3E8EE] bg-[#F6F9FC] px-4 py-8 text-center text-sm text-[#6B7C93]">
+              No messages yet. Your lender will reach out here if they need anything.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((message) => {
+                const isConsumerMessage = message.senderRole === 'consumer';
+
+                return (
+                  <div
+                    key={message.id}
+                    className={`flex ${isConsumerMessage ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm sm:max-w-[70%] ${
+                        isConsumerMessage
+                          ? 'bg-blue-600 text-white'
+                          : 'border border-[#E3E8EE] bg-[#F6F9FC] text-[#0A2540]'
+                      }`}
+                    >
+                      <p className="leading-6">{message.content}</p>
+                      <p className={`mt-2 text-xs ${isConsumerMessage ? 'text-blue-100' : 'text-[#6B7C93]'}`}>
+                        {formatMessageTime(message.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="mt-6 flex flex-col gap-3 border-t border-[#E3E8EE] pt-6 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <label htmlFor="dashboard-message" className="mb-2 block text-sm font-medium text-[#0A2540]">
+                Send a message
+              </label>
+              <textarea
+                id="dashboard-message"
+                value={messageDraft}
+                onChange={(event) => setMessageDraft(event.target.value)}
+                placeholder="Type your message"
+                rows={3}
+                className="w-full rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] outline-none transition focus:border-blue-600"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => void handleSendMessage()}
+              disabled={messageSubmitting || !messageDraft.trim()}
+              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-300"
+            >
+              {messageSubmitting ? 'Sending...' : 'Send Message'}
+            </button>
+          </div>
         </section>
       </div>
 
