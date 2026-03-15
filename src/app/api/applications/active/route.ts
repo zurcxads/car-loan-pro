@@ -3,6 +3,7 @@ import { apiError, apiSuccess } from '@/lib/api-helpers';
 import { dbGetApplicationByToken, dbGetOffer } from '@/lib/db';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 import { serverLogger } from '@/lib/server-logger';
+import { normalizeApplicationStatus } from '@/lib/application-status';
 
 const ACTIVE_LOCKED_STATUSES = new Set(['offer_accepted', 'documents_requested', 'under_review']);
 
@@ -22,7 +23,9 @@ export async function GET(request: NextRequest) {
       return apiSuccess({ hasActive: false });
     }
 
-    if (!ACTIVE_LOCKED_STATUSES.has(application.status)) {
+    const normalizedStatus = normalizeApplicationStatus(application.status);
+
+    if (!ACTIVE_LOCKED_STATUSES.has(normalizedStatus)) {
       return apiSuccess({ hasActive: false });
     }
 
@@ -40,7 +43,7 @@ export async function GET(request: NextRequest) {
       hasActive: true,
       application: {
         id: application.id,
-        status: application.status,
+        status: normalizedStatus,
         offerExpiresAt: application.offerExpiresAt,
         lockedOffer: {
           id: offer.id,

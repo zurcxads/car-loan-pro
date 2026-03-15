@@ -2,18 +2,22 @@
 
 const statusStyles: Record<string, string> = {
   // Application statuses
-  pending_decision: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
-  offers_available: 'bg-green-500/15 text-green-400 border-green-500/25',
-  conditional: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
+  draft: 'bg-slate-500/15 text-slate-400 border-slate-500/25',
+  submitted: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
+  processing: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
+  offers_ready: 'bg-green-500/15 text-green-400 border-green-500/25',
+  offer_accepted: 'bg-green-500/15 text-green-400 border-green-500/25',
+  documents_requested: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
+  under_review: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
+  approved: 'bg-green-500/15 text-green-400 border-green-500/25',
   funded: 'bg-green-500/15 text-green-400 border-green-500/25',
   declined: 'bg-red-500/15 text-red-400 border-red-500/25',
+  cancelled: 'bg-gray-500/15 text-gray-400 border-gray-500/25',
   // Offer statuses
-  approved: 'bg-green-500/15 text-green-400 border-green-500/25',
   selected: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
   expired: 'bg-gray-500/15 text-gray-400 border-gray-500/25',
   pending: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
   // Deal statuses
-  submitted: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
   lender_review: 'bg-amber-500/15 text-amber-400 border-amber-500/25',
   approved_for_funding: 'bg-green-500/15 text-green-400 border-green-500/25',
   wire_sent: 'bg-green-500/15 text-green-400 border-green-500/25',
@@ -29,16 +33,20 @@ const statusStyles: Record<string, string> = {
 };
 
 const statusLabels: Record<string, string> = {
-  pending_decision: 'Pending',
-  offers_available: 'Offers Available',
-  conditional: 'Conditional',
+  draft: 'Draft',
+  submitted: 'Submitted',
+  processing: 'Processing',
+  offers_ready: 'Offers Ready',
+  offer_accepted: 'Offer Accepted',
+  documents_requested: 'Documents Requested',
+  under_review: 'Under Review',
+  approved: 'Approved',
   funded: 'Funded',
   declined: 'Declined',
-  approved: 'Approved',
+  cancelled: 'Cancelled',
   selected: 'Selected',
   expired: 'Expired',
   pending: 'Pending',
-  submitted: 'Submitted',
   lender_review: 'Lender Review',
   approved_for_funding: 'Approved',
   wire_sent: 'Wire Sent',

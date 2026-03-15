@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
       dtiPercent,
       ptiPercent,
       hasVehicle,
-      status: 'pending_decision',
+      status: 'processing',
       state: data.addressInfo.currentState,
       submittedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

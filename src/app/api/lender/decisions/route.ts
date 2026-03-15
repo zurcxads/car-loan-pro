@@ -15,10 +15,10 @@ const statusByAction: Record<
   z.infer<typeof lenderDecisionRequestSchema>['action'],
   MockApplication['status']
 > = {
-  approve: 'offers_available',
+  approve: 'offers_ready',
   decline: 'declined',
-  counter: 'conditional',
-  request_docs: 'pending_decision',
+  counter: 'under_review',
+  request_docs: 'documents_requested',
 };
 
 export async function POST(req: NextRequest) {

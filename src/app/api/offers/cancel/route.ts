@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       return apiError('Unable to process request', 500);
     }
 
-    return apiSuccess({ success: true });
+    return apiSuccess({ success: true, status: 'cancelled' });
   } catch (routeError) {
     serverLogger.error('Offer cancel route failed', {
       error: routeError instanceof Error ? routeError.message : String(routeError),

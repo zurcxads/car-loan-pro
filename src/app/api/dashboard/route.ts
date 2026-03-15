@@ -5,6 +5,8 @@ import { getServiceClient, isSupabaseConfigured } from '@/lib/supabase';
 import { MOCK_APPLICATIONS, MOCK_OFFERS } from '@/lib/mock-data';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 import { serverLogger } from '@/lib/server-logger';
+import { normalizeApplicationStatus } from '@/lib/application-status';
+import { checkOfferExpiration, expireOffer } from '@/lib/offer-expiration';
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get(CONSUMER_SESSION_COOKIE)?.value;
@@ -20,6 +22,17 @@ export async function GET(request: NextRequest) {
         return apiError('Session expired or invalid', 401);
       }
 
+      const expiration = checkOfferExpiration(app);
+      if (app.lockedOfferId && expiration.expired) {
+        const updatedApplication = await expireOffer(app.id);
+        if (updatedApplication) {
+          app.status = updatedApplication.status;
+          app.lockedOfferId = updatedApplication.lockedOfferId ?? null;
+          app.offerLockedAt = updatedApplication.offerLockedAt ?? null;
+          app.offerExpiresAt = updatedApplication.offerExpiresAt ?? null;
+        }
+      }
+
       const lockedOffer = app.lockedOfferId
         ? MOCK_OFFERS.find((offer) => offer.id === app.lockedOfferId) ?? null
         : null;
@@ -27,7 +40,7 @@ export async function GET(request: NextRequest) {
       return apiSuccess({
         application: {
           id: app.id,
-          status: app.status,
+          status: normalizeApplicationStatus(app.status),
           borrower: app.borrower,
           loanAmount: app.loanAmount,
           hasVehicle: app.hasVehicle,
@@ -67,6 +80,22 @@ export async function GET(request: NextRequest) {
       return apiError('Session expired or invalid', 401);
     }
 
+    const expiration = checkOfferExpiration({
+      id: application.id as string,
+      lockedOfferId: application.locked_offer_id as string | null,
+      offerExpiresAt: application.offer_expires_at as string | null,
+    });
+
+    if ((application.locked_offer_id as string | null) && expiration.expired) {
+      const updatedApplication = await expireOffer(application.id as string);
+      if (updatedApplication) {
+        application.status = updatedApplication.status;
+        application.locked_offer_id = updatedApplication.lockedOfferId ?? null;
+        application.offer_locked_at = updatedApplication.offerLockedAt ?? null;
+        application.offer_expires_at = updatedApplication.offerExpiresAt ?? null;
+      }
+    }
+
     const offerLookupId = application.locked_offer_id as string | null;
     const offerQuery = offerLookupId
       ? supabase.from('offers').select('*').eq('id', offerLookupId).maybeSingle()
@@ -86,7 +115,7 @@ export async function GET(request: NextRequest) {
     return apiSuccess({
       application: {
         id: application.id,
-        status: application.status,
+        status: normalizeApplicationStatus(String(application.status)),
         borrower: application.borrower,
         loanAmount: application.loan_amount,
         hasVehicle: application.has_vehicle ?? false,

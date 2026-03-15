@@ -6,7 +6,7 @@ import { logServerError } from '@/lib/server-logger';
 import { z } from 'zod';
 
 const updateApplicationSchema = z.object({
-  status: z.enum(['pending_decision', 'offers_available', 'conditional', 'funded', 'declined']).optional(),
+  status: z.enum(['draft', 'submitted', 'processing', 'offers_ready', 'offer_accepted', 'documents_requested', 'under_review', 'approved', 'funded', 'expired', 'declined', 'cancelled']).optional(),
   notes: z.string().max(1000).optional(),
   offersReceived: z.number().int().min(0).optional(),
 });

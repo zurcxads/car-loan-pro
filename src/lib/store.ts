@@ -148,7 +148,7 @@ export function getLenders() {
 
 // --- Sample Data ---
 function getSampleApplications(): Application[] {
-  const statuses: ApplicationStatus[] = ['submitted', 'decisioned', 'funded', 'draft'];
+  const statuses: ApplicationStatus[] = ['submitted', 'processing', 'funded', 'draft'];
   const names = [
     { first: 'Maria', last: 'Garcia' },
     { first: 'James', last: 'Wilson' },

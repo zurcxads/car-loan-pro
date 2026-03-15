@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
         status: 'expired',
         lockedOfferId: null,
         offerLockedAt: null,
+        offerExpiresAt: null,
       }),
     ]);
 

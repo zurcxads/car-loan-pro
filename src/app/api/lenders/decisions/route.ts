@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
       // Update application
       await dbUpdateApplication(data.applicationId, {
-        status: 'offers_available',
+        status: 'offers_ready',
         offersReceived: (app.offersReceived || 0) + 1,
       } as Record<string, unknown>);
 

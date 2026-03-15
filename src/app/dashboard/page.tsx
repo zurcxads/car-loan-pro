@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { SkeletonDashboard } from '@/components/shared/Skeleton';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { showDevTools } from '@/lib/env';
-import type { DocumentRequest, Message } from '@/lib/types';
+import type { ApplicationStatus, DocumentRequest, Message } from '@/lib/types';
 
 type LockedOffer = {
   id: string;
@@ -20,7 +20,7 @@ type LockedOffer = {
 
 interface Application {
   id: string;
-  status: string;
+  status: ApplicationStatus;
   borrower: {
     firstName: string;
     lastName: string;
@@ -58,54 +58,66 @@ type DashboardApiResponse =
   | { success: true; data: DashboardPayload }
   | { success: false; error?: string };
 
-const STATUS_STYLES: Record<string, string> = {
+const STATUS_STYLES: Record<ApplicationStatus, string> = {
+  draft: 'bg-slate-100 text-slate-700',
+  submitted: 'bg-sky-100 text-sky-700',
+  processing: 'bg-amber-100 text-amber-700',
+  offers_ready: 'bg-emerald-100 text-emerald-700',
   offer_accepted: 'bg-emerald-100 text-emerald-700',
   documents_requested: 'bg-orange-100 text-orange-700',
+  under_review: 'bg-orange-100 text-orange-700',
   approved: 'bg-blue-100 text-blue-700',
   funded: 'bg-emerald-100 text-emerald-700',
   expired: 'bg-gray-200 text-gray-700',
   cancelled: 'bg-gray-200 text-gray-700',
   declined: 'bg-red-100 text-red-700',
-  pending_decision: 'bg-yellow-100 text-yellow-700',
-  offers_available: 'bg-green-100 text-green-700',
-  conditional: 'bg-yellow-100 text-yellow-700',
 };
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS: Record<ApplicationStatus, string> = {
+  draft: 'Draft',
+  submitted: 'Submitted',
+  processing: 'Processing',
+  offers_ready: 'Offers Ready',
   offer_accepted: 'Active',
   documents_requested: 'Documents Needed',
+  under_review: 'Under Review',
   approved: 'Approved',
   funded: 'Funded',
   expired: 'Expired',
   cancelled: 'Cancelled',
   declined: 'Declined',
-  pending_decision: 'Under Review',
-  offers_available: 'Offers Ready',
-  conditional: 'Under Review',
 };
 
 const PROGRESS_STEPS = ['Applied', 'Offer Selected', 'Documents', 'Approved', 'Funded'];
 
-function getProgressIndex(status: string): number {
+function getProgressIndex(status: ApplicationStatus): number {
   switch (status) {
     case 'funded':
       return 4;
     case 'approved':
       return 3;
+    case 'under_review':
     case 'documents_requested':
       return 2;
     case 'offer_accepted':
+    case 'offers_ready':
       return 1;
+    case 'processing':
+    case 'submitted':
+      return 0;
     default:
       return 0;
   }
 }
 
-function getNextStepsCopy(status: string): string {
+function getNextStepsCopy(status: ApplicationStatus): string {
   switch (status) {
     case 'offer_accepted':
     case 'submitted':
+    case 'processing':
       return 'Your lender is reviewing your application. You will be notified when they need additional information or make a decision.';
+    case 'offers_ready':
+      return 'Your offers are ready. Return to results and choose the lender you want to move forward with.';
     case 'documents_requested':
       return 'Your lender has requested documents. Please upload them in the Documents section below to keep your application moving.';
     case 'under_review':
@@ -123,7 +135,7 @@ function getNextStepsCopy(status: string): string {
   }
 }
 
-function NextStepsIcon({ status }: { status: string }) {
+function NextStepsIcon({ status }: { status: ApplicationStatus }) {
   if (status === 'documents_requested') {
     return (
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-orange-600">
@@ -144,7 +156,7 @@ function NextStepsIcon({ status }: { status: string }) {
     );
   }
 
-  if (status === 'declined' || status === 'expired') {
+  if (status === 'declined' || status === 'expired' || status === 'cancelled') {
     return (
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-500">
         <svg aria-hidden="true" viewBox="0 0 20 20" className="h-5 w-5 fill-current">
@@ -427,6 +439,20 @@ function DashboardContent() {
       });
   }, [application?.id, application?.status, isDev]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const toastMessage = window.sessionStorage.getItem('dashboard-toast');
+    if (!toastMessage) {
+      return;
+    }
+
+    toast.success(toastMessage);
+    window.sessionStorage.removeItem('dashboard-toast');
+  }, []);
+
   const daysRemaining = useMemo(() => {
     if (!application?.offerExpiresAt) return 0;
     const diff = new Date(application.offerExpiresAt).getTime() - Date.now();
@@ -450,24 +476,8 @@ function DashboardContent() {
         return;
       }
 
-      toast.success('Offer cancelled');
-      setShowCancelModal(false);
-      setApplication((currentApplication) => {
-        if (!currentApplication) {
-          return currentApplication;
-        }
-
-        return {
-          ...currentApplication,
-          status: 'cancelled',
-          lockedOfferId: null,
-          lockedOffer: null,
-          offerLockedAt: null,
-          offerExpiresAt: null,
-        };
-      });
-      setDocumentRequests([]);
-      setMessages([]);
+      window.sessionStorage.setItem('dashboard-toast', 'Offer cancelled. You may now apply again.');
+      window.location.reload();
     } catch {
       toast.error('Unable to complete your request.');
     } finally {
@@ -584,6 +594,7 @@ function DashboardContent() {
   const isReapplyState = isExpiredState || isCancelledState;
   const progressIndex = getProgressIndex(application.status);
   const nextStepsCopy = getNextStepsCopy(application.status);
+  const expirationWarningClass = daysRemaining <= 1 ? 'text-red-600' : daysRemaining <= 3 ? 'text-orange-600' : 'text-[#6B7C93]';
 
   return (
     <div className="min-h-screen bg-[#F6F9FC]">
@@ -611,10 +622,10 @@ function DashboardContent() {
                 <div>
                   <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Locked Offer</p>
                   <h2 className="text-3xl font-semibold text-[#0A2540]">{application.lockedOffer?.lenderName}</h2>
-                  <p className="mt-2 text-sm text-[#6B7C93]">Offer expires in {daysRemaining} day{daysRemaining === 1 ? '' : 's'}.</p>
+                  <p className={`mt-2 text-sm font-medium ${expirationWarningClass}`}>Offer expires in {daysRemaining} day{daysRemaining === 1 ? '' : 's'}.</p>
                 </div>
-                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[application.status] || 'bg-gray-100 text-gray-700'}`}>
-                  {STATUS_LABELS[application.status] || application.status}
+                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[application.status]}`}>
+                  {STATUS_LABELS[application.status]}
                 </span>
               </div>
 
@@ -656,13 +667,13 @@ function DashboardContent() {
                 </div>
               </div>
 
-              <div className="pt-2">
+              <div className="border-t border-[#E3E8EE] pt-6">
                 <button
                   type="button"
                   onClick={() => setShowCancelModal(true)}
-                  className="text-sm text-gray-500 underline underline-offset-4 transition-colors hover:text-gray-700"
+                  className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100"
                 >
-                  Cancel This Offer
+                  Cancel Offer
                 </button>
               </div>
             </section>
@@ -707,7 +718,7 @@ function DashboardContent() {
                   ? 'This offer has expired. You may submit a new application.'
                   : isCancelledState
                     ? 'You can submit a new application whenever you are ready.'
-                    : application.status === 'offers_available'
+                    : application.status === 'offers_ready'
                       ? 'Your offers are ready. Return to results and choose the lender you want to move forward with.'
                       : 'We are still processing your application and will notify you when the next step is ready.'}
               </p>
@@ -936,10 +947,12 @@ function DashboardContent() {
             onClick={(event) => event.stopPropagation()}
             className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl"
           >
-            <h2 id="cancel-offer-title" className="mb-2 text-2xl font-semibold text-[#0A2540]">Cancel Your Offer</h2>
-            <p className="mb-6 text-sm leading-6 text-[#425466]">
-              Are you sure you want to cancel your offer with {application.lockedOffer?.lenderName}? This action cannot be undone. You will be able to submit a new application after cancellation.
-            </p>
+            <h2 id="cancel-offer-title" className="mb-2 text-2xl font-semibold text-[#0A2540]">Cancel Offer</h2>
+            <div className="mb-6 space-y-3 text-sm leading-6 text-[#425466]">
+              <p>Are you sure you want to cancel this offer?</p>
+              <p>You will lose your locked-in rate with {application.lockedOffer?.lenderName}.</p>
+              <p>You will be able to submit a new application immediately.</p>
+            </div>
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
               <button
                 type="button"
@@ -954,7 +967,7 @@ function DashboardContent() {
                 disabled={cancelSubmitting}
                 className="inline-flex items-center justify-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-red-300"
               >
-                {cancelSubmitting ? 'Cancelling...' : 'Yes, Cancel Offer'}
+                {cancelSubmitting ? 'Cancelling...' : 'Cancel Offer'}
               </button>
             </div>
           </div>

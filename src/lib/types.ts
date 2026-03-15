@@ -1,7 +1,19 @@
 // Core types based on PRD database schema
 
 export type UserRole = 'consumer' | 'dealer' | 'lender' | 'admin';
-export type ApplicationStatus = 'draft' | 'submitted' | 'decisioned' | 'expired' | 'funded';
+export type ApplicationStatus =
+  | 'draft'
+  | 'submitted'
+  | 'processing'
+  | 'offers_ready'
+  | 'offer_accepted'
+  | 'documents_requested'
+  | 'under_review'
+  | 'approved'
+  | 'funded'
+  | 'expired'
+  | 'declined'
+  | 'cancelled';
 export type ApplicationType = 'new_vehicle' | 'used_vehicle' | 'refinance' | 'private_party';
 export type VehicleCondition = 'new' | 'used' | 'certified_pre_owned';
 export type ResidenceType = 'own' | 'rent' | 'other';

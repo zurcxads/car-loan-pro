@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     if (!offer) return apiError('Offer not found', 404);
 
     // Update application status
-    await dbUpdateApplication(data.applicationId, { status: 'conditional' as const } as Record<string, unknown>);
+    await dbUpdateApplication(data.applicationId, { status: 'under_review' as const } as Record<string, unknown>);
 
     // Get full app for response
     return apiSuccess({ offer, application });

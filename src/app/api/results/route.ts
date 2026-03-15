@@ -4,6 +4,7 @@ import { dbGetApplicationByToken, dbGetOffersByApplication } from '@/lib/db';
 import { CONSUMER_SESSION_COOKIE } from '@/lib/consumer-session';
 import { consumerPasswordIsSet, findSupabaseUserByEmail } from '@/lib/consumer-auth';
 import { serverLogger } from '@/lib/server-logger';
+import { normalizeApplicationStatus } from '@/lib/application-status';
 
 // GET /api/results — get anonymized offers for results page
 export async function GET(req: NextRequest) {
@@ -29,7 +30,7 @@ export async function GET(req: NextRequest) {
       return apiSuccess({
         application: {
           id: application.id,
-          status: application.status,
+          status: normalizeApplicationStatus(application.status),
           offersReceived: application.offersReceived || 0,
           hasVehicle: application.hasVehicle,
           passwordConfigured,
@@ -62,7 +63,7 @@ export async function GET(req: NextRequest) {
     return apiSuccess({
         application: {
           id: application.id,
-          status: application.status,
+          status: normalizeApplicationStatus(application.status),
           offersReceived: application.offersReceived || offers.length,
           hasVehicle: application.hasVehicle,
           passwordConfigured,

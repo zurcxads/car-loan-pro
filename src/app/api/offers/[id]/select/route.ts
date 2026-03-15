@@ -38,9 +38,9 @@ export async function POST(
       .map(o => dbUpdateOffer(o.id, { status: 'declined' }));
     await Promise.all(updatePromises);
 
-    // Update application status to pre_approved
+    // Update application status to offers ready
     await dbUpdateApplication(offer.applicationId, {
-      status: 'offers_available', // Keep as offers_available but consumer has selected one
+      status: 'offers_ready',
     });
 
     // Create application event

@@ -9,7 +9,9 @@ import toast from 'react-hot-toast';
 import { Check, Clock3 } from 'lucide-react';
 import { SkeletonOfferCards } from '@/components/shared/Skeleton';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { normalizeApplicationStatus } from '@/lib/application-status';
 import { showDevTools } from '@/lib/env';
+import type { ApplicationStatus } from '@/lib/types';
 
 interface AnonymizedOffer {
   id: string;
@@ -131,7 +133,7 @@ function ResultsContent() {
   const [offers, setOffers] = useState<AnonymizedOffer[]>([]);
   const [loading, setLoading] = useState(true);
   const [applicationId, setApplicationId] = useState<string | null>(null);
-  const [applicationStatus, setApplicationStatus] = useState<string>('pending_decision');
+  const [applicationStatus, setApplicationStatus] = useState<ApplicationStatus>('processing');
   const [term, setTerm] = useState(60);
   const [downPayment, setDownPayment] = useState(0);
   const [calculating, setCalculating] = useState(false);
@@ -255,7 +257,7 @@ function ResultsContent() {
 
         const payload = response.data;
         const nextOffers = payload.offers || [];
-        const nextStatus = payload.application?.status || 'pending_decision';
+        const nextStatus = normalizeApplicationStatus(payload.application?.status || 'processing');
         const nextPasswordConfigured = payload.application?.passwordConfigured ?? false;
 
         if (cancelled) return;
@@ -266,7 +268,7 @@ function ResultsContent() {
         setOffers(nextOffers);
         setDownPayment(payload.suggestedDownPayment || 0);
 
-        if (nextOffers.length === 0 && nextStatus === 'pending_decision' && attempts < 5) {
+        if (nextOffers.length === 0 && nextStatus === 'processing' && attempts < 5) {
           attempts += 1;
           retryTimer = setTimeout(loadResults, 1000);
           return;
@@ -513,8 +515,8 @@ function ResultsContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
         <div className="max-w-md w-full bg-white rounded-2xl border border-gray-200 p-8 text-center">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${applicationStatus === 'pending_decision' ? 'bg-blue-100' : 'bg-yellow-100'}`}>
-            {applicationStatus === 'pending_decision' ? (
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${applicationStatus === 'processing' ? 'bg-blue-100' : 'bg-yellow-100'}`}>
+            {applicationStatus === 'processing' ? (
               <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -525,15 +527,15 @@ function ResultsContent() {
             )}
           </div>
           <h2 className="text-lg font-semibold text-gray-900 mb-2">
-            {applicationStatus === 'pending_decision' ? 'Still Matching Lenders' : 'No Offers Available'}
+            {applicationStatus === 'processing' ? 'Still Matching Lenders' : 'No Offers Available'}
           </h2>
           <p className="text-sm text-gray-600 mb-6">
-            {applicationStatus === 'pending_decision'
+            {applicationStatus === 'processing'
               ? 'Your application was submitted successfully. We are still finalizing your offers.'
               : 'We could not find matching offers at this time. Our team will review your application manually.'}
           </p>
           <Link href="/" className="inline-flex px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-            {applicationStatus === 'pending_decision' ? 'Return to Home' : 'Return Home'}
+            {applicationStatus === 'processing' ? 'Return to Home' : 'Return Home'}
           </Link>
         </div>
       </div>
