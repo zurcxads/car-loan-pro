@@ -62,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${sansFont.variable} font-sans bg-white text-gray-900 antialiased`}>
         <a
           href="#main-content"
-          className="skip-link focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+          className="skip-link sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-[100] focus-visible:rounded-xl focus-visible:bg-[#111827] focus-visible:px-4 focus-visible:py-3 focus-visible:text-white focus-visible:font-semibold focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
         >
           Skip to main content
         </a>
