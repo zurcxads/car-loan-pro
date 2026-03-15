@@ -148,7 +148,7 @@ export default function CalculatorPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#425466]">
-      <section className="px-6 pb-20 pt-28 md:pb-24 md:pt-32">
+      <section className="px-6 py-20 pt-28 md:pt-32">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">
@@ -163,7 +163,7 @@ export default function CalculatorPage() {
             </p>
           </div>
 
-          <div className="mt-16 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="mt-16 grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr]">
             <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
               <div className="sr-only" aria-live="polite">
                 Estimated monthly payment {formatCurrencyFull(results.monthly)} at {interestRate.toFixed(2)} percent APR.
@@ -244,14 +244,14 @@ export default function CalculatorPage() {
 
                 <div>
                   <p className="text-sm font-medium text-[#0A2540]">Loan term</p>
-                  <div className="mt-4 flex flex-wrap gap-3">
+                  <div className="-mx-1 mt-4 flex gap-3 overflow-x-auto px-1 pb-1 scrollbar-hide sm:mx-0 sm:flex-wrap sm:px-0">
                     {TERMS.map((term) => (
                       <button
                         key={term}
                         type="button"
                         onClick={() => setTermMonths(term)}
                         aria-pressed={termMonths === term}
-                        className={`inline-flex min-h-11 items-center justify-center rounded-full border px-5 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+                        className={`inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border px-4 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:px-5 ${
                           termMonths === term
                             ? "border-[#2563EB] bg-[#2563EB] text-white"
                             : "border-[#E3E8EE] bg-white text-[#0A2540] hover:bg-[#F6F9FC]"
@@ -317,7 +317,7 @@ export default function CalculatorPage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
+      <section className="bg-[#F6F9FC] px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">
@@ -376,7 +376,7 @@ export default function CalculatorPage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
+      <section className="px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -433,7 +433,7 @@ export default function CalculatorPage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
+      <section className="bg-[#F6F9FC] px-6 py-20">
         <div className="mx-auto max-w-4xl rounded-[2rem] border border-[#E3E8EE] bg-white p-8 text-center md:p-12">
           <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">
             Ready to see real offers instead of estimates?

@@ -38,12 +38,11 @@ export default function ForgotPasswordPageClient() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F9FC] px-6 py-16 text-[#0A2540]">
-      <div className="mx-auto flex min-h-[calc(100vh-8rem)] w-full max-w-md items-center justify-center">
+    <div className="flex min-h-[calc(100vh-5rem)] items-center bg-[#F6F9FC] px-6 py-10 text-[#0A2540]">
+      <div className="mx-auto flex w-full max-w-md items-center justify-center">
         <div className="w-full rounded-[28px] border border-[#E3E8EE] bg-white p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-blue-600">Auto Loan Pro</p>
-            <h1 className="mt-6 text-3xl font-semibold tracking-tight text-[#0A2540]">Reset your password</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-[#0A2540]">Reset your password</h1>
             <p className="mt-3 text-sm leading-6 text-slate-600">
               Enter the email tied to your application and we&apos;ll send you a secure reset link.
             </p>

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
+import Footer from '@/components/shared/Footer';
 import { articles } from '@/data/articles';
 import { createPageMetadata } from '@/lib/page-metadata';
 
@@ -14,7 +15,7 @@ export default function ResourcesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="pt-28 pb-16 px-6">
+      <section className="px-6 py-20 pt-28">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
             Auto Loan Resources
@@ -26,13 +27,15 @@ export default function ResourcesPage() {
       </section>
 
       {/* Article Grid */}
-      <section className="pb-24 px-6">
+      <section className="px-6 py-20">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          {articles.map((article) => (
+          {articles.map((article, index) => (
             <Link
               key={article.slug}
               href={`/resources/${article.slug}`}
-              className="group block p-6 rounded-2xl bg-gray-50 border border-gray-200 hover:shadow-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className={`group block rounded-2xl border border-gray-200 bg-gray-50 p-6 transition-all duration-200 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
+                articles.length % 2 === 1 && index === articles.length - 1 ? 'md:col-span-2' : ''
+              }`}
             >
               <div className="flex items-center gap-3 mb-3">
                 <span className="inline-flex px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-600 text-xs font-medium">
@@ -55,12 +58,7 @@ export default function ResourcesPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-12 px-6 bg-gray-50">
-        <div className="max-w-5xl mx-auto text-center text-xs text-gray-500">
-          Auto Loan Pro is not a lender. Offers are subject to credit approval. NMLS #000000
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

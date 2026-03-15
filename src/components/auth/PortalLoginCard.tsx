@@ -65,8 +65,8 @@ export default function PortalLoginCard({
   }
 
   return (
-    <div className="min-h-screen bg-white px-6 py-16">
-      <div className="mx-auto flex max-w-md flex-col justify-center">
+    <div className="flex min-h-[calc(100vh-5rem)] items-center bg-white px-6 py-10">
+      <div className="mx-auto flex w-full max-w-md flex-col justify-center">
         <div className="rounded-[28px] border border-[#E3E8EE] bg-white p-8 shadow-[0_12px_40px_rgba(10,37,64,0.08)]">
           <div className="mb-8 flex flex-col items-center text-center">
             <Logo size="md" />

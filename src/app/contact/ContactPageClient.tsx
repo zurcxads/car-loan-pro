@@ -100,7 +100,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#425466]">
-      <section className="px-6 pb-20 pt-28 md:pb-24 md:pt-32">
+      <section className="px-6 py-20 pt-28 md:pt-32">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">
@@ -115,7 +115,7 @@ export default function ContactPage() {
             </p>
           </div>
 
-          <div className="mt-16 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="mt-16 grid items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
               <div className="sr-only" aria-live="polite">
                 {submitted
@@ -222,7 +222,7 @@ export default function ContactPage() {
               )}
             </div>
 
-            <aside className="space-y-6">
+            <aside className="flex h-full flex-col gap-6">
               <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-8">
                 <h2 className="text-2xl font-semibold text-[#0A2540]">Contact information</h2>
                 <div className="mt-6 space-y-5">
@@ -291,7 +291,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
+      <section className="bg-[#F6F9FC] px-6 py-20">
         <div className="mx-auto max-w-4xl">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">

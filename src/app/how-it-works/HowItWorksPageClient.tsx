@@ -85,7 +85,7 @@ export default function HowItWorksPage() {
 
   return (
     <div className="min-h-screen bg-white text-[#425466]">
-      <section className="px-6 pb-20 pt-28 md:pb-24 md:pt-32">
+      <section className="px-6 py-20 pt-28 md:pt-32">
         <div className="mx-auto grid max-w-6xl gap-16 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="max-w-2xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">
@@ -143,7 +143,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
+      <section className="bg-[#F6F9FC] px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">
@@ -154,7 +154,7 @@ export default function HowItWorksPage() {
             </p>
           </div>
 
-          <div className="mt-16 space-y-6">
+          <div className="mt-14 space-y-5">
             {processSteps.map((step, index) => {
               const Icon = step.icon;
               const isExpanded = expandedStep === index;
@@ -169,8 +169,8 @@ export default function HowItWorksPage() {
                   )}
 
                   <div className="rounded-xl border border-[#E3E8EE] bg-white p-8">
-                    <div className="flex flex-col gap-6 md:flex-row md:items-start">
-                      <div className="flex items-center gap-4 md:w-64 md:flex-col md:items-start md:gap-6">
+                    <div className="grid gap-6 md:grid-cols-[220px_minmax(0,1fr)] md:items-start">
+                      <div className="flex items-start gap-4 md:flex-col md:gap-6">
                         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F6F9FC] text-[#2563EB]">
                           <Icon className="h-8 w-8" />
                         </div>
@@ -222,7 +222,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
+      <section className="px-6 py-20">
         <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#E3E8EE] bg-white p-8 md:p-12">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
@@ -230,16 +230,16 @@ export default function HowItWorksPage() {
                 Why the process works better before you visit a dealer
               </h2>
             </div>
-            <div className="grid gap-6 sm:grid-cols-3">
-              <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+            <div className="grid gap-6 sm:grid-cols-3 sm:items-stretch">
+              <div className="flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                 <p className="text-3xl font-semibold text-[#0A2540]">2 min</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#425466]">Average time to complete the application flow.</p>
               </div>
-              <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+              <div className="flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                 <p className="text-3xl font-semibold text-[#0A2540]">1 view</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#425466]">One place to compare the financing details that matter.</p>
               </div>
-              <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+              <div className="flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
                 <p className="text-3xl font-semibold text-[#0A2540]">0 markup</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#425466]">A process designed to keep dealer-added financing noise out of the way.</p>
               </div>
@@ -248,7 +248,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
+      <section className="bg-[#F6F9FC] px-6 py-20">
         <div className="mx-auto max-w-6xl text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-[#0A2540] sm:text-4xl">
             Ready to see your financing options?

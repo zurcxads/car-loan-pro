@@ -93,8 +93,8 @@ function LoginCard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F9FC] px-6 py-16 text-[#0A2540]">
-      <div className="mx-auto flex min-h-[calc(100vh-8rem)] w-full max-w-md items-center justify-center">
+    <div className="flex min-h-[calc(100vh-5rem)] items-center bg-[#F6F9FC] px-6 py-10 text-[#0A2540]">
+      <div className="mx-auto flex w-full max-w-md items-center justify-center">
         <div className="w-full rounded-[28px] border border-[#E3E8EE] bg-white p-8 shadow-[0_24px_80px_rgba(15,23,42,0.08)]">
           <Link href="/" className="text-sm font-semibold tracking-[0.16em] text-blue-600 uppercase">
             Auto Loan Pro
@@ -109,7 +109,7 @@ function LoginCard() {
             </p>
           </div>
 
-          <div className="mt-8 flex rounded-full border border-[#E3E8EE] bg-[#F6F9FC] p-1">
+          <div className="mt-8 flex rounded-full border border-[#E3E8EE] bg-white p-1 shadow-[inset_0_0_0_1px_rgba(227,232,238,0.8)]">
             <button
               type="button"
               onClick={() => {
@@ -119,7 +119,7 @@ function LoginCard() {
               className={`flex-1 rounded-full px-4 py-2.5 text-sm font-medium transition ${
                 mode === 'magic'
                   ? 'bg-white text-[#0A2540] shadow-sm'
-                  : 'text-slate-500'
+                  : 'bg-transparent text-slate-500'
               }`}
             >
               Magic Link
@@ -134,7 +134,7 @@ function LoginCard() {
               className={`flex-1 rounded-full px-4 py-2.5 text-sm font-medium transition ${
                 mode === 'password'
                   ? 'bg-white text-[#0A2540] shadow-sm'
-                  : 'text-slate-500'
+                  : 'bg-transparent text-slate-500'
               }`}
             >
               Password
@@ -242,7 +242,7 @@ function LoginCard() {
             </form>
           )}
 
-          <div className="mt-8 rounded-[24px] border border-[#E3E8EE] bg-[#F6F9FC] p-5">
+          <div className="mt-8 border-t border-[#E3E8EE] pt-6 text-center">
             <p className="text-sm leading-6 text-slate-600">
               New here?{' '}
               <Link href="/apply" className="font-medium text-blue-600">

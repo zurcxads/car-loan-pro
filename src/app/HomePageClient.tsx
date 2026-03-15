@@ -14,6 +14,7 @@ import {
   Star,
   Quote,
 } from "lucide-react";
+import Footer from "@/components/shared/Footer";
 
 const stats = [
   { value: "2 Min", label: "Avg. approval time" },
@@ -259,7 +260,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white text-[#425466]">
-      <section className="min-h-[85vh] px-6 pb-20 pt-28 md:pb-24 md:pt-32">
+      <section className="min-h-[85vh] px-6 py-20 pt-28 md:pt-32">
         <div className="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <div className="space-y-4">
@@ -296,21 +297,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#F6F9FC] px-6 py-20 md:py-24">
+      <section className="bg-[#F6F9FC] px-6 py-20">
         <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.value} className="text-center lg:text-left">
               <p className="text-4xl font-semibold text-[#0A2540]">{stat.value}</p>
-              <p className="mt-2 text-sm text-[#6B7C93]">{stat.label}</p>
+              <p className="mt-2 text-sm text-[#425466]">{stat.label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
+      <section className="px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
-            <h2 className="text-4xl font-semibold leading-tight text-[#0A2540]">
+            <h2 className="max-w-2xl text-4xl font-semibold leading-tight text-[#0A2540]">
               Everything you need to get the best auto loan.
             </h2>
             <p className="mt-4 text-xl text-[#425466]">
@@ -320,14 +321,14 @@ export default function HomePage() {
 
           <div className="mt-14 space-y-6">
             <div className="grid gap-6 lg:grid-cols-12">
-              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md lg:col-span-7">
+              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F7FAFF_100%)] p-8 transition-shadow hover:shadow-md lg:col-span-7">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Apply in 2 Minutes</h3>
                 <p className="mt-3 max-w-lg text-[#425466]">
                   A short digital application replaces dealership paperwork, repeat credit checks, and back-office delays.
                 </p>
                 <PhoneMockup />
               </div>
-              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md lg:col-span-5">
+              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F8FBFF_100%)] p-8 transition-shadow hover:shadow-md lg:col-span-5">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Compare Real Offers</h3>
                 <p className="mt-3 max-w-sm text-[#425466]">
                   See rates, terms, and monthly payments at a glance so the best offer is obvious.
@@ -337,7 +338,7 @@ export default function HomePage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md">
+              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-8 transition-shadow hover:shadow-md">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Smart Pre-Approval</h3>
                 <p className="mt-3 text-[#425466]">
                   Know your buying power early so you can shop with financing already lined up.
@@ -345,7 +346,7 @@ export default function HomePage() {
                 <ApprovalMockup />
               </div>
 
-              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md">
+              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-8 transition-shadow hover:shadow-md">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Rate Calculator</h3>
                 <p className="mt-3 text-[#425466]">
                   Adjust the amount and preview how small changes affect your estimated monthly payment.
@@ -379,7 +380,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="h-full rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md">
+              <div className="h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FFFFFF_0%,#F7FBFA_100%)] p-8 transition-shadow hover:shadow-md">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Bank-Level Security</h3>
                 <p className="mt-3 text-[#425466]">
                   Sensitive data stays protected with encrypted transfer, secure storage, and controlled access.
@@ -388,7 +389,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#E3E8EE] p-8 transition-shadow hover:shadow-md">
+            <div className="rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-8 transition-shadow hover:shadow-md">
               <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_auto_0.9fr]">
                 <div>
                   <h3 className="text-2xl font-semibold text-[#0A2540]">Shop Anywhere with Your Pre-Approval</h3>
@@ -451,7 +452,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="how-it-works" className="bg-[#F6F9FC] px-6 py-20 md:py-24">
+      <section id="how-it-works" className="bg-[#F6F9FC] px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <h2 className="text-4xl font-semibold text-[#0A2540]">How it works</h2>
@@ -482,10 +483,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
+      <section className="px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
-            <h2 className="text-4xl font-semibold text-[#0A2540]">What customers say</h2>
+            <h2 className="max-w-lg text-4xl font-semibold text-[#0A2540]">What customers say</h2>
             <p className="mt-4 text-lg text-[#425466]">
               Real buyers using pre-approval to shop on their terms.
             </p>
@@ -516,8 +517,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl rounded-3xl bg-[#2563EB] px-6 py-20 text-center md:py-24">
+      <section className="px-6 py-20">
+        <div className="mx-auto max-w-6xl rounded-3xl bg-[linear-gradient(135deg,#2563EB_0%,#1D4ED8_55%,#0F766E_100%)] px-6 py-20 text-center">
           <h2 className="text-4xl font-semibold text-white">Ready to get pre-approved?</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-blue-100">
             Takes just 2 minutes. No impact on your credit score.
@@ -533,6 +534,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }
