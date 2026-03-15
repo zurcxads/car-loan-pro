@@ -15,43 +15,41 @@ export default function ResourcesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="px-6 py-20 pt-28">
+      <section className="px-6 py-20 pt-28 md:py-24 md:pt-32">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-3xl font-bold tracking-tight text-[#0A2540] sm:text-4xl">
             Auto Loan Resources
           </h1>
-          <p className="mt-4 text-lg text-gray-600 font-light">
+          <p className="mt-4 text-lg font-light text-[#425466]">
             Everything you need to know about getting the best auto loan
           </p>
         </div>
       </section>
 
       {/* Article Grid */}
-      <section className="px-6 py-20">
-        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-          {articles.map((article, index) => (
+      <section className="px-6 py-20 md:py-24">
+        <div className="mx-auto grid max-w-6xl grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+          {articles.map((article) => (
             <Link
               key={article.slug}
               href={`/resources/${article.slug}`}
-              className={`group block rounded-2xl border border-gray-200 bg-gray-50 p-6 transition-all duration-200 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
-                articles.length % 2 === 1 && index === articles.length - 1 ? 'md:col-span-2' : ''
-              }`}
+              className="group block rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-6 transition-all duration-200 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
-              <div className="flex items-center gap-3 mb-3">
-                <span className="inline-flex px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-600 text-xs font-medium">
+              <div className="mb-3 flex items-center gap-3">
+                <span className="inline-flex rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600">
                   {article.category}
                 </span>
-                <span className="text-xs text-gray-500">{article.readTime}</span>
+                <span className="text-xs text-[#6B7C93]">{article.readTime}</span>
               </div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors duration-200">
+              <h2 className="mb-2 text-lg font-semibold text-[#0A2540] transition-colors duration-200 group-hover:text-blue-600">
                 {article.title}
               </h2>
-              <p className="text-sm text-gray-600 leading-relaxed mb-4">
+              <p className="mb-4 text-sm leading-relaxed text-[#425466]">
                 {article.description}
               </p>
-              <div className="flex items-center text-sm text-blue-600 font-medium">
+              <div className="flex items-center text-sm font-medium text-blue-600">
                 Read article
-                <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" />
+                <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
               </div>
             </Link>
           ))}
