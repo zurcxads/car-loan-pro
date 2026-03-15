@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, Suspense } from 'react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { SkeletonDashboard } from '@/components/shared/Skeleton';
+import { SkeletonDashboard, SkeletonText } from '@/components/shared/Skeleton';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { showDevTools } from '@/lib/env';
 import type { ApplicationStatus, DocumentRequest, Message } from '@/lib/types';
@@ -560,14 +560,20 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="border-b border-gray-200 bg-white">
+      <div className="min-h-screen bg-[#F6F9FC]" aria-busy="true" aria-live="polite">
+        <div className="border-b border-[#E3E8EE] bg-white">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
-            <div className="text-sm text-gray-500">Loading...</div>
+            <Link href="/" className="text-lg font-semibold tracking-tight text-[#0A2540]">Auto Loan Pro</Link>
+            <div className="w-28">
+              <SkeletonText width="w-full" className="h-4" />
+            </div>
           </div>
         </div>
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+          <div className="mb-6 max-w-sm">
+            <SkeletonText width="w-32" className="mb-3 h-4" />
+            <SkeletonText width="w-full" className="h-10" />
+          </div>
           <SkeletonDashboard />
         </div>
       </div>

@@ -479,7 +479,7 @@ function ResultsContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50" aria-live="polite">
+      <div className="min-h-screen bg-gray-50" aria-busy="true" aria-live="polite">
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
             <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg">Auto Loan Pro</Link>
@@ -488,11 +488,7 @@ function ResultsContent() {
         </div>
 
         <div className="max-w-6xl mx-auto px-6 py-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
+          <div className="mb-12 text-center animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-sm font-medium mb-6">
               <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
               Analyzing your application...
@@ -503,7 +499,7 @@ function ResultsContent() {
             <p className="text-gray-600 text-lg">
               Matching you with lenders in our network
             </p>
-          </motion.div>
+          </div>
 
           <SkeletonOfferCards count={3} />
         </div>

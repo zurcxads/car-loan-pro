@@ -1,14 +1,34 @@
 "use client";
 
-export function SkeletonText({ className = '', width = 'w-full' }: { className?: string; width?: string }) {
+type SkeletonTextProps = {
+  className?: string;
+  width?: string;
+};
+
+type SkeletonAvatarProps = {
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+};
+
+type SkeletonCardProps = {
+  className?: string;
+  height?: string;
+};
+
+function baseSkeletonClassName(className = ''): string {
+  return `animate-pulse bg-[#F6F9FC] ${className}`.trim();
+}
+
+export function SkeletonText({ className = '', width = 'w-full' }: SkeletonTextProps) {
   return (
-    <div className={`relative h-4 ${width} bg-gray-200 rounded overflow-hidden ${className}`}>
-      <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
-    </div>
+    <div
+      aria-hidden="true"
+      className={`${baseSkeletonClassName(`h-4 ${width} rounded`)} ${className}`.trim()}
+    />
   );
 }
 
-export function SkeletonAvatar({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
+export function SkeletonAvatar({ className = '', size = 'md' }: SkeletonAvatarProps) {
   const sizeClasses = {
     sm: 'w-8 h-8',
     md: 'w-10 h-10',
@@ -16,15 +36,16 @@ export function SkeletonAvatar({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
   };
 
   return (
-    <div className={`relative ${sizeClasses[size]} bg-gray-200 rounded-full overflow-hidden flex-shrink-0`}>
-      <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
-    </div>
+    <div
+      aria-hidden="true"
+      className={`${baseSkeletonClassName(`${sizeClasses[size]} rounded-full flex-shrink-0`)} ${className}`.trim()}
+    />
   );
 }
 
-export function SkeletonCard({ className = '' }: { className?: string }) {
+export function SkeletonCard({ className = '', height = 'min-h-[300px]' }: SkeletonCardProps) {
   return (
-    <div className={`bg-white rounded-2xl border border-gray-200 p-6 ${className}`}>
+    <div className={`rounded-xl border border-[#E3E8EE] bg-white p-6 ${height} ${className}`}>
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-center gap-3 flex-1">
           <SkeletonAvatar size="md" />
@@ -51,9 +72,7 @@ export function SkeletonCard({ className = '' }: { className?: string }) {
       </div>
 
       <div className="mt-6">
-        <div className="relative h-12 w-full bg-gray-200 rounded-xl overflow-hidden">
-          <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
-        </div>
+        <div aria-hidden="true" className={baseSkeletonClassName('h-12 w-full rounded-xl')} />
       </div>
     </div>
   );
