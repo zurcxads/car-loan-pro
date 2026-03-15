@@ -124,8 +124,9 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Lender portal — requires lender role
-  if (pathname.startsWith('/lender')) {
+  // Lender portal — requires lender role (except public pages)
+  const publicLenderPages = ['/lender/login', '/lender/join', '/lender/onboard'];
+  if (pathname.startsWith('/lender') && !publicLenderPages.some(p => pathname === p || pathname.startsWith(p + '/'))) {
     if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = '/lender/login';
@@ -139,8 +140,9 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  // Dealer portal — requires dealer role
-  if (pathname.startsWith('/dealer')) {
+  // Dealer portal — requires dealer role (except public pages)
+  const publicDealerPages = ['/dealer/login', '/dealer/join', '/dealer/onboard'];
+  if (pathname.startsWith('/dealer') && !publicDealerPages.some(p => pathname === p || pathname.startsWith(p + '/'))) {
     if (!user) {
       const url = request.nextUrl.clone();
       url.pathname = '/dealer/login';
