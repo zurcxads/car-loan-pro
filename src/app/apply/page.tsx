@@ -1,13 +1,20 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { useState, useEffect, useRef, useId } from 'react';
 import { useRouter, useSearchParams, type ReadonlyURLSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Check } from 'lucide-react';
+import {
+  Check,
+  ChevronDown,
+  CreditCard,
+  Loader2,
+  Lock,
+  Pencil,
+  ShieldCheck,
+} from 'lucide-react';
 import { US_STATES, POPULAR_MAKES } from '@/lib/constants';
 import { apiPost } from '@/lib/api-client';
 import { isDev as isDevEnvironment } from '@/lib/env';
@@ -29,6 +36,15 @@ type ApplyPrefill = {
   name: string;
   creditRange: string;
   loanAmount: number | null;
+};
+
+type StepIndex = 0 | 1 | 2 | 3;
+
+type ReviewSection = {
+  title: string;
+  stepIndex: StepIndex;
+  rows: { label: string; value: string; missing?: boolean }[];
+  issues: string[];
 };
 
 function normalizeCreditRangeParam(value: string): string {
@@ -53,185 +69,302 @@ function getApplyPrefill(searchParams: ReadonlyURLSearchParams): ApplyPrefill | 
   return { name, creditRange, loanAmount };
 }
 
-function Field({ error, children }: { error?: string; children: React.ReactNode }) {
+function formatCurrencyDisplay(value: number): string {
+  return value > 0 ? value.toLocaleString('en-US') : '';
+}
+
+function parseCurrencyInput(value: string): number {
+  const digits = value.replace(/[^\d]/g, '');
+  return digits ? Number(digits) : 0;
+}
+
+function Label({
+  htmlFor,
+  children,
+  helper,
+}: {
+  htmlFor?: string;
+  children: React.ReactNode;
+  helper?: React.ReactNode;
+}) {
   return (
-    <div>
+    <div className="mb-1.5 flex items-center justify-between gap-3">
+      <label htmlFor={htmlFor} className="block text-sm font-medium text-[#0A2540]">
+        {children}
+      </label>
+      {helper}
+    </div>
+  );
+}
+
+function Field({
+  error,
+  count,
+  maxLength,
+  children,
+}: {
+  error?: string;
+  count?: number;
+  maxLength?: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
       {children}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-1.5 mt-1.5"
-          aria-live="assertive"
-        >
-          <svg className="w-3 h-3 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-          </svg>
-          <p className="text-xs text-red-500">{error}</p>
-        </motion.div>
-      )}
+      <div className="flex min-h-[20px] items-start justify-between gap-2">
+        {error ? (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-sm text-red-500"
+            aria-live="assertive"
+          >
+            {error}
+          </motion.p>
+        ) : (
+          <span />
+        )}
+        {typeof maxLength === 'number' && typeof count === 'number' && (
+          <span className="text-xs text-[#6B7C93]">
+            {count}/{maxLength}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
 
-function FloatingLabelInput({ label, value, onChange, placeholder, type = 'text', error, maxLength, isValid, showEncrypted, datalistId }: {
-  label: string; value: string; onChange: (v: string) => void; placeholder?: string; type?: string; error?: string; maxLength?: number; isValid?: boolean; showEncrypted?: boolean; datalistId?: string;
-}) {
-  const [isFocused, setIsFocused] = useState(false);
-  const inputId = useId();
-  const hasValue = value && value.length > 0;
-  const shouldFloat = isFocused || hasValue;
-
-  return (
-    <div className="relative">
-      <input
-        id={inputId}
-        type={type}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        placeholder={shouldFloat ? placeholder : ''}
-        maxLength={maxLength}
-        list={datalistId}
-        aria-label={label.replace(/\s*\*$/, '')}
-        aria-invalid={!!error}
-        className={`w-full px-4 pt-6 pb-2 min-h-[44px] rounded-xl border bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-all duration-200 peer ${error ? 'border-red-400' : 'border-gray-200'}`}
-      />
-      <motion.label
-        htmlFor={inputId}
-        initial={false}
-        animate={{
-          top: shouldFloat ? '8px' : '50%',
-          translateY: shouldFloat ? '0%' : '-50%',
-          fontSize: shouldFloat ? '0.65rem' : '0.875rem',
-          color: error ? '#ef4444' : (isFocused ? '#2563eb' : '#6b7280')
-        }}
-        transition={{ duration: 0.2 }}
-        className="absolute left-4 pointer-events-none font-medium"
-      >
-        {label}
-      </motion.label>
-      {showEncrypted && (
-        <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-xs text-gray-500 ">
-          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-          </svg>
-          <span>Encrypted</span>
-        </div>
-      )}
-      {isValid && hasValue && !error && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
-            <Check className="h-3 w-3 text-white" />
-          </motion.div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Input({ value, onChange, placeholder, type = 'text', error, maxLength, isValid }: {
-  value: string; onChange: (v: string) => void; placeholder?: string; type?: string; error?: boolean; maxLength?: number; isValid?: boolean;
+function TextInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  type = 'text',
+  error,
+  maxLength,
+  isValid,
+  autoComplete,
+  helper,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  error?: string;
+  maxLength?: number;
+  isValid?: boolean;
+  autoComplete?: string;
+  helper?: React.ReactNode;
 }) {
   const inputId = useId();
 
   return (
-    <div className="relative">
-      <input id={inputId} type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength}
-        aria-label={placeholder || type}
-        aria-invalid={!!error}
-        className={`w-full px-4 py-3.5 min-h-[44px] rounded-xl border bg-gray-50 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors duration-200 ${error ? 'border-red-400' : 'border-gray-200'}`} />
-      {isValid && value && !error && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
-            <Check className="h-3 w-3 text-white" />
-          </motion.div>
-        </div>
-      )}
-    </div>
+    <Field error={error} count={value.length} maxLength={maxLength}>
+      <Label htmlFor={inputId} helper={helper}>{label}</Label>
+      <div className="relative">
+        <input
+          id={inputId}
+          type={type}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
+          maxLength={maxLength}
+          autoComplete={autoComplete}
+          aria-invalid={!!error}
+          className={`min-h-[52px] w-full rounded-xl border bg-white px-4 py-3.5 pr-12 text-base text-[#0A2540] placeholder:text-[#6B7C93] transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${error ? 'border-red-400' : 'border-[#E3E8EE]'}`}
+        />
+        {isValid && value && !error && (
+          <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+            <Check className="h-5 w-5 text-emerald-500" />
+          </div>
+        )}
+      </div>
+    </Field>
   );
 }
 
-function Select({ value, onChange, options, placeholder, error, autoFocusNext, label }: {
-  value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; placeholder?: string; error?: boolean; autoFocusNext?: boolean; label: string;
+function CurrencyInput({
+  label,
+  value,
+  onChange,
+  error,
+  isValid,
+  placeholder,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  error?: string;
+  isValid?: boolean;
+  placeholder?: string;
+}) {
+  const inputId = useId();
+  const displayValue = formatCurrencyDisplay(value);
+
+  return (
+    <Field error={error}>
+      <Label htmlFor={inputId}>{label}</Label>
+      <div className="relative">
+        <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-base text-[#6B7C93]">
+          $
+        </div>
+        <input
+          id={inputId}
+          type="text"
+          inputMode="numeric"
+          value={displayValue}
+          onChange={(event) => onChange(parseCurrencyInput(event.target.value))}
+          placeholder={placeholder}
+          aria-invalid={!!error}
+          className={`min-h-[52px] w-full rounded-xl border bg-white py-3.5 pl-8 pr-12 text-base text-[#0A2540] placeholder:text-[#6B7C93] transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${error ? 'border-red-400' : 'border-[#E3E8EE]'}`}
+        />
+        {isValid && value > 0 && !error && (
+          <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+            <Check className="h-5 w-5 text-emerald-500" />
+          </div>
+        )}
+      </div>
+    </Field>
+  );
+}
+
+function Select({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+  error,
+  isValid,
+  autoFocusNext,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  placeholder?: string;
+  error?: string;
+  isValid?: boolean;
+  autoFocusNext?: boolean;
 }) {
   const selectId = useId();
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange(e.target.value);
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange(event.target.value);
 
-    // Auto-advance: find next input field and scroll to it
-    if (autoFocusNext && e.target.value) {
-      setTimeout(() => {
-        const currentField = e.target.closest('.space-y-5, .grid')?.parentElement;
-        if (currentField) {
-          const allInputs = Array.from(document.querySelectorAll('input, select, textarea'));
-          const currentIndex = allInputs.indexOf(e.target);
-          const nextInput = allInputs[currentIndex + 1] as HTMLElement;
-          if (nextInput) {
-            nextInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            nextInput.focus();
-          }
+    if (autoFocusNext && event.target.value) {
+      window.setTimeout(() => {
+        const focusables = Array.from(
+          document.querySelectorAll<HTMLElement>('input, select, textarea, button')
+        ).filter((element) => !element.hasAttribute('disabled') && element.tabIndex !== -1);
+        const currentIndex = focusables.indexOf(event.target);
+        const nextFocusable = focusables[currentIndex + 1];
+        if (nextFocusable) {
+          nextFocusable.focus();
+          nextFocusable.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-      }, 150);
+      }, 120);
     }
   };
 
   return (
-    <>
-      <label htmlFor={selectId} className="sr-only">{label}</label>
-      <select
-        id={selectId}
-        value={value}
-        onChange={handleChange}
-        aria-label={label}
-        aria-invalid={!!error}
-        className={`w-full px-4 py-3.5 min-h-[44px] rounded-xl border bg-gray-50 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 transition-colors duration-200 cursor-pointer ${error ? 'border-red-400' : 'border-gray-200'} ${!value ? 'text-gray-500' : 'text-gray-900'}`}
-      >
-        {placeholder && <option value="">{placeholder}</option>}
-        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select>
-    </>
+    <Field error={error}>
+      <Label htmlFor={selectId}>{label}</Label>
+      <div className="relative">
+        <select
+          id={selectId}
+          value={value}
+          onChange={handleChange}
+          aria-invalid={!!error}
+          className={`min-h-[52px] w-full appearance-none rounded-xl border bg-white px-4 py-3.5 pr-12 text-base transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${value ? 'text-[#0A2540]' : 'text-[#6B7C93]'} ${error ? 'border-red-400' : 'border-[#E3E8EE]'}`}
+        >
+          {placeholder && <option value="">{placeholder}</option>}
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center gap-2">
+          {isValid && value && !error && <Check className="h-5 w-5 text-emerald-500" />}
+          <ChevronDown className="h-5 w-5 text-[#6B7C93]" />
+        </div>
+      </div>
+    </Field>
   );
 }
 
-function Checkbox({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string | React.ReactNode }) {
+function Checkbox({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string | React.ReactNode;
+}) {
   const checkboxId = useId();
 
   return (
-    <div className="flex items-start gap-3 min-h-[44px]">
+    <label
+      htmlFor={checkboxId}
+      className="flex min-h-[44px] cursor-pointer items-start gap-3 rounded-xl border border-[#E3E8EE] bg-white p-4 transition-colors hover:border-blue-300"
+    >
       <input
         id={checkboxId}
         type="checkbox"
         checked={checked}
-        onChange={e => onChange(e.target.checked)}
-        className="mt-1 h-5 w-5 rounded border-gray-300 text-blue-600 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-0.5 h-5 w-5 rounded border-[#C4CDD5] text-blue-600 focus:ring-2 focus:ring-blue-500/20"
       />
-      <label htmlFor={checkboxId} className="cursor-pointer text-sm text-gray-700  leading-relaxed py-0.5">
-        {label}
-      </label>
-    </div>
+      <span className="text-sm leading-6 text-[#425466]">{label}</span>
+    </label>
   );
 }
 
-function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+function Toggle({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+}) {
   const labelId = useId();
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between gap-4 rounded-xl border border-[#E3E8EE] bg-white p-4">
+      <span id={labelId} className="text-sm font-medium text-[#0A2540]">{label}</span>
       <button
         type="button"
         role="switch"
         aria-checked={checked}
         aria-labelledby={labelId}
         onClick={() => onChange(!checked)}
-        className={`relative w-10 h-[22px] rounded-full transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${checked ? 'bg-blue-600' : 'bg-gray-400'}`}
+        className={`relative h-7 w-12 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${checked ? 'bg-blue-600' : 'bg-[#C4CDD5]'}`}
       >
-        <div className={`absolute top-[3px] w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${checked ? 'translate-x-[22px]' : 'translate-x-[3px]'}`} />
+        <span
+          className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${checked ? 'translate-x-6' : 'translate-x-1'}`}
+        />
       </button>
-      <span id={labelId} className="text-sm text-gray-700 ">{label}</span>
     </div>
+  );
+}
+
+function SectionCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-4 rounded-xl bg-[#F6F9FC] p-6">
+      <h3 className="text-sm font-semibold text-[#0A2540]">{title}</h3>
+      {children}
+    </section>
   );
 }
 
@@ -239,19 +372,19 @@ export default function ApplyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const hasAppliedSearchPrefill = useRef(false);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState<StepIndex>(0);
+  const [direction, setDirection] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [isDevMode, setIsDevMode] = useState(isDevEnvironment());
-  const [timeEstimate, setTimeEstimate] = useState(2); // minutes remaining
+  const [timeEstimate, setTimeEstimate] = useState(2);
 
   useEffect(() => {
     setIsDevMode(isDevEnvironment());
   }, []);
 
-  // Calculate time estimate based on step
   useEffect(() => {
-    const estimates = [2, 1.5, 1, 0.5]; // minutes per step
+    const estimates = [2, 1.5, 1, 0.5];
     setTimeEstimate(estimates[step] || 0.5);
   }, [step]);
 
@@ -266,6 +399,7 @@ export default function ApplyPage() {
   const [hasVehicle, setHasVehicle] = useState(false);
   const [estimatedCreditRange, setEstimatedCreditRange] = useState('');
   const targetVehiclePrice = vehicle.askingPrice ?? 0;
+  const progress = ((step + 1) / STEP_NAMES.length) * 100;
 
   useEffect(() => {
     if (hasAppliedSearchPrefill.current) return;
@@ -300,7 +434,6 @@ export default function ApplyPage() {
     hasAppliedSearchPrefill.current = true;
   }, [searchParams]);
 
-  // Auto-fill with test data in dev mode
   useEffect(() => {
     if (isDevMode && step === 0 && !personal.firstName && !hasAppliedSearchPrefill.current) {
       import('@/lib/test-data').then(({ TEST_PERSONAL_INFO, TEST_ADDRESS_INFO, TEST_EMPLOYMENT_INFO, TEST_VEHICLE_INFO, TEST_DEAL_STRUCTURE, TEST_CONSENT }) => {
@@ -314,23 +447,20 @@ export default function ApplyPage() {
     }
   }, [isDevMode, step, personal.firstName]);
 
-  // Format phone as (XXX) XXX-XXXX
   const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, '');
+    const digits = value.replace(/\D/g, '').slice(0, 10);
     if (digits.length <= 3) return digits;
     if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
     return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
   };
 
-  // Format SSN as XXX-XX-XXXX
   const formatSSN = (value: string) => {
-    const digits = value.replace(/\D/g, '');
+    const digits = value.replace(/\D/g, '').slice(0, 9);
     if (digits.length <= 3) return digits;
     if (digits.length <= 5) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
     return `${digits.slice(0, 3)}-${digits.slice(3, 5)}-${digits.slice(5, 9)}`;
   };
 
-  // Format ZIP as XXXXX
   const formatZIP = (value: string) => {
     return value.replace(/\D/g, '').slice(0, 5);
   };
@@ -343,58 +473,71 @@ export default function ApplyPage() {
     return true;
   };
 
-  const validate = (): boolean => {
+  const getStepErrors = (targetStep: StepIndex): Record<string, string> => {
     if (isDevMode) {
-      setErrors({});
-      return true;
+      return {};
     }
 
-    const e: Record<string, string> = {};
-    if (step === 0) {
-      // Step 1: About You (Personal + Address)
-      if (!personal.firstName.trim()) e.firstName = 'Please enter your first name';
-      if (!personal.lastName.trim()) e.lastName = 'Please enter your last name';
-      if (!personal.ssn || personal.ssn.replace(/\D/g, '').length !== 9) e.ssn = 'Please enter a valid 9-digit SSN';
-      if (!personal.dob) e.dob = 'Please enter your date of birth';
+    const nextErrors: Record<string, string> = {};
+
+    if (targetStep === 0) {
+      if (!personal.firstName.trim()) nextErrors.firstName = 'Please enter your first name';
+      if (!personal.lastName.trim()) nextErrors.lastName = 'Please enter your last name';
+      if (!personal.ssn || personal.ssn.replace(/\D/g, '').length !== 9) nextErrors.ssn = 'Please enter a valid 9-digit SSN';
+      if (!personal.dob) nextErrors.dob = 'Please enter your date of birth';
       else {
         const age = Math.floor((new Date().getTime() - new Date(personal.dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-        if (age < 18) e.dob = 'You must be at least 18 years old';
+        if (age < 18) nextErrors.dob = 'You must be at least 18 years old';
       }
-      if (!personal.email.includes('@')) e.email = 'Please enter a valid email address';
-      if (!personal.phone || personal.phone.replace(/\D/g, '').length < 10) e.phone = 'Please enter a 10-digit phone number';
-      if (!address.currentAddressLine1.trim()) e.address1 = 'Please enter your street address';
-      if (!address.currentCity.trim()) e.city = 'Please enter your city';
-      if (!address.currentState) e.state = 'Please select your state';
-      if (!address.currentZip || address.currentZip.length < 5) e.zip = 'Please enter a valid 5-digit ZIP code';
-    } else if (step === 1) {
-      // Step 2: Income & Employment
-      if (!employment.grossMonthlyIncome || employment.grossMonthlyIncome <= 0) e.income = 'Please enter your monthly income';
-      else if (employment.grossMonthlyIncome < 1000) e.income = 'Minimum monthly income is $1,000';
-    } else if (step === 2) {
-      // Step 3: Credit Consent
-      if (!consent.softPullConsent) e.soft = 'You must consent to a soft credit pull to proceed';
-      if (!consent.hardPullConsent) e.creditCheck = 'You must acknowledge the hard credit inquiry';
-      if (!consent.tcpaConsent) e.tcpa = 'You must consent to receive communications';
-      if (!consent.termsOfService) e.terms = 'You must agree to the Terms of Service';
-      if (!consent.privacyPolicy) e.privacy = 'You must agree to the Privacy Policy';
-      if (!consent.eSignConsent) e.esign = 'You must certify that the information is accurate';
-    } else if (step === 3) {
-      // Step 4: Review & Submit (validate vehicle if present)
+      if (!personal.email.includes('@')) nextErrors.email = 'Please enter a valid email address';
+      if (!personal.phone || personal.phone.replace(/\D/g, '').length < 10) nextErrors.phone = 'Please enter a 10-digit phone number';
+      if (!address.currentAddressLine1.trim()) nextErrors.address1 = 'Please enter your street address';
+      if (!address.currentCity.trim()) nextErrors.city = 'Please enter your city';
+      if (!address.currentState) nextErrors.state = 'Please select your state';
+      if (!address.currentZip || address.currentZip.length < 5) nextErrors.zip = 'Please enter a valid 5-digit ZIP code';
+    } else if (targetStep === 1) {
+      if (!employment.grossMonthlyIncome || employment.grossMonthlyIncome <= 0) nextErrors.income = 'Please enter your monthly income';
+      else if (employment.grossMonthlyIncome < 1000) nextErrors.income = 'Minimum monthly income is $1,000';
+    } else if (targetStep === 2) {
+      if (!consent.softPullConsent) nextErrors.soft = 'You must consent to a soft credit pull to proceed';
+      if (!consent.hardPullConsent) nextErrors.creditCheck = 'You must acknowledge the hard credit inquiry';
+      if (!consent.tcpaConsent) nextErrors.tcpa = 'You must consent to receive communications';
+      if (!consent.termsOfService) nextErrors.terms = 'You must agree to the Terms of Service';
+      if (!consent.privacyPolicy) nextErrors.privacy = 'You must agree to the Privacy Policy';
+      if (!consent.eSignConsent) nextErrors.esign = 'You must certify that the information is accurate';
+    } else if (targetStep === 3) {
       if (hasVehicle) {
-        if (!vehicle.make) e.make = 'Please select the vehicle make';
-        if (!vehicle.model?.trim()) e.model = 'Please enter the vehicle model';
-        if (!vehicle.askingPrice || vehicle.askingPrice <= 0) e.price = 'Please enter the vehicle price';
+        if (!vehicle.make) nextErrors.make = 'Please select the vehicle make';
+        if (!vehicle.model?.trim()) nextErrors.model = 'Please enter the vehicle model';
+        if (!vehicle.askingPrice || vehicle.askingPrice <= 0) nextErrors.price = 'Please enter the vehicle price';
       }
     }
-    setErrors(e);
-    return Object.keys(e).length === 0;
+
+    return nextErrors;
   };
 
-  const next = () => { if (isDevMode || validate()) setStep(s => Math.min(s + 1, 3)); };
-  const back = () => setStep(s => Math.max(s - 1, 0));
+  const validate = (): boolean => {
+    const nextErrors = getStepErrors(step);
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const goToStep = (nextStep: StepIndex) => {
+    setDirection(nextStep > step ? 1 : -1);
+    setStep(nextStep);
+  };
+
+  const next = () => {
+    if (isDevMode || validate()) {
+      goToStep(Math.min(step + 1, 3) as StepIndex);
+    }
+  };
+
+  const back = () => {
+    goToStep(Math.max(step - 1, 0) as StepIndex);
+  };
 
   const submitApplication = async () => {
-    // Dev mode: skip EVERYTHING, go straight to results
     if (isDevMode) {
       setSubmitting(true);
       router.push('/results');
@@ -449,571 +592,666 @@ export default function ApplyPage() {
     }
   };
 
+  const reviewSections: ReviewSection[] = [
+    {
+      title: 'Personal information',
+      stepIndex: 0,
+      rows: [
+        { label: 'Full name', value: `${personal.firstName} ${personal.lastName}`.trim(), missing: !personal.firstName.trim() || !personal.lastName.trim() },
+        { label: 'SSN', value: personal.ssn ? `***-**-${personal.ssn.replace(/\D/g, '').slice(-4)}` : '', missing: !validateSSN(personal.ssn) },
+        { label: 'Date of birth', value: personal.dob, missing: !personal.dob },
+        { label: 'Email', value: personal.email, missing: !personal.email.includes('@') },
+        { label: 'Phone', value: personal.phone, missing: personal.phone.replace(/\D/g, '').length !== 10 },
+      ],
+      issues: Object.values(getStepErrors(0)).filter((message, index, list) => list.indexOf(message) === index),
+    },
+    {
+      title: 'Address',
+      stepIndex: 0,
+      rows: [
+        { label: 'Street', value: address.currentAddressLine1, missing: !address.currentAddressLine1.trim() },
+        { label: 'City', value: address.currentCity, missing: !address.currentCity.trim() },
+        { label: 'State', value: address.currentState, missing: !address.currentState },
+        { label: 'ZIP', value: address.currentZip, missing: address.currentZip.length !== 5 },
+        { label: 'Residence', value: address.residenceType.replace('_', ' '), missing: false },
+        { label: 'Housing payment', value: address.monthlyHousingPayment ? `$${address.monthlyHousingPayment.toLocaleString()}` : 'Not provided', missing: false },
+      ],
+      issues: [getStepErrors(0).address1, getStepErrors(0).city, getStepErrors(0).state, getStepErrors(0).zip].filter(Boolean) as string[],
+    },
+    {
+      title: 'Income & employment',
+      stepIndex: 1,
+      rows: [
+        { label: 'Employment status', value: employment.employmentStatus.replace(/_/g, ' '), missing: false },
+        { label: 'Gross monthly income', value: employment.grossMonthlyIncome ? `$${employment.grossMonthlyIncome.toLocaleString()}` : '', missing: !employment.grossMonthlyIncome || employment.grossMonthlyIncome <= 0 },
+        { label: 'Employer', value: employment.employerName || 'Not provided', missing: false },
+        { label: 'Months at employer', value: employment.monthsAtEmployer ? String(employment.monthsAtEmployer) : 'Not provided', missing: false },
+      ],
+      issues: Object.values(getStepErrors(1)),
+    },
+    {
+      title: 'Credit consent',
+      stepIndex: 2,
+      rows: [
+        { label: 'Soft pull consent', value: consent.softPullConsent ? 'Accepted' : 'Missing', missing: !consent.softPullConsent },
+        { label: 'Lender hard inquiry notice', value: consent.hardPullConsent ? 'Accepted' : 'Missing', missing: !consent.hardPullConsent },
+        { label: 'Communications consent', value: consent.tcpaConsent ? 'Accepted' : 'Missing', missing: !consent.tcpaConsent },
+        { label: 'Terms, privacy, e-sign', value: consent.termsOfService && consent.privacyPolicy && consent.eSignConsent ? 'Accepted' : 'Missing items', missing: !(consent.termsOfService && consent.privacyPolicy && consent.eSignConsent) },
+      ],
+      issues: Object.values(getStepErrors(2)),
+    },
+  ];
+
+  if (hasVehicle || estimatedCreditRange || targetVehiclePrice) {
+    reviewSections.push({
+      title: 'Vehicle & loan preferences',
+      stepIndex: 3,
+      rows: [
+        { label: 'Estimated credit range', value: CREDIT_RANGE_OPTIONS.find((option) => option.value === estimatedCreditRange)?.label || 'Not provided', missing: false },
+        { label: 'Vehicle year', value: hasVehicle ? String(vehicle.year || '') : 'Not provided', missing: false },
+        { label: 'Make', value: hasVehicle ? vehicle.make || '' : 'Not provided', missing: hasVehicle && !vehicle.make },
+        { label: 'Model', value: hasVehicle ? vehicle.model || '' : 'Not provided', missing: hasVehicle && !vehicle.model?.trim() },
+        { label: 'Target price', value: targetVehiclePrice > 0 ? `$${targetVehiclePrice.toLocaleString()}` : 'Not provided', missing: hasVehicle && targetVehiclePrice <= 0 },
+      ],
+      issues: Object.values(getStepErrors(3)),
+    });
+  }
+
   if (submitting) {
     return (
-      <div className="min-h-screen flex items-center justify-center" aria-live="polite">
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-          <div className="relative w-16 h-16 mx-auto mb-8">
-            <div className="absolute inset-0 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
-            <div className="absolute inset-2 rounded-full border-2 border-blue-400 border-b-transparent animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+      <div className="flex min-h-screen items-center justify-center bg-white" aria-live="polite">
+        <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="space-y-4 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#F6F9FC]">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900  mb-2">Analyzing your application...</h2>
-          <p className="text-sm text-gray-600 ">Matching you with lenders in our network</p>
+          <div className="space-y-1">
+            <h2 className="text-xl font-semibold text-[#0A2540]">Analyzing your application...</h2>
+            <p className="text-sm text-[#6B7C93]">Matching you with lenders in our network.</p>
+          </div>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 ">
-      <div className="border-b border-gray-200  bg-white/95  backdrop-blur-xl sticky top-0 z-40">
-        <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900  focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg">Auto Loan Pro</Link>
-          <div className="flex items-center gap-2 sm:gap-3">
-            {isDevMode && (
-              <span className="text-xs text-yellow-600 bg-yellow-50 px-2.5 py-0.5 rounded-full font-medium border border-yellow-200">
-                Auto-filled
-              </span>
-            )}
-            <span className="hidden sm:flex items-center gap-1.5 text-xs text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full font-medium border border-blue-200">
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Takes about 2 minutes. No credit score impact.
-            </span>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-600  font-medium hidden sm:inline">~{timeEstimate} min left</span>
-              <span className="text-xs text-gray-600  font-medium">Step {step + 1}/4</span>
+    <div className="min-h-screen bg-white font-sans">
+      <div className="mx-auto max-w-2xl px-4 pt-28 pb-16 sm:px-6">
+        <div className="mb-8 space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="hidden text-sm font-medium text-[#6B7C93] sm:block">Step {step + 1} of 4</p>
+              <h1 className="text-2xl font-semibold tracking-tight text-[#0A2540]">{STEP_NAMES[step]}</h1>
+            </div>
+            <div className="hidden items-center gap-3 sm:flex">
+              {isDevMode && (
+                <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                  Auto-filled
+                </span>
+              )}
+              <span className="text-sm text-[#6B7C93]">~{timeEstimate} min left</span>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-4 sm:pt-8">
-        <h1 className="sr-only">Auto Loan Application</h1>
-        <div className="sr-only" aria-live="polite">
-          {`Application step ${step + 1} of 4: ${STEP_NAMES[step]}`}
-        </div>
-        <div className="flex gap-1.5 sm:gap-2 mb-2">
-          {STEP_NAMES.map((_, i) => (
-            <div key={i} className="h-1 flex-1 rounded-full overflow-hidden bg-gray-200 ">
+          <div className="space-y-2">
+            <div className="h-[3px] w-full overflow-hidden rounded-full bg-[#E3E8EE]">
               <motion.div
                 initial={false}
-                animate={{
-                  width: i < step ? '100%' : i === step ? '100%' : '0%',
-                  backgroundColor: i < step ? '#10b981' : i === step ? '#2563eb' : '#e5e7eb'
-                }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
-                className="h-full rounded-full"
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.35, ease: 'easeInOut' }}
+                className="h-full rounded-full bg-blue-600"
               />
             </div>
-          ))}
+            <div className="flex items-center justify-between sm:hidden">
+              <span className="text-sm font-medium text-[#0A2540]">{STEP_NAMES[step]}</span>
+              {isDevMode && (
+                <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">
+                  Auto-filled
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="sr-only" aria-live="polite">
+            {`Application step ${step + 1} of 4: ${STEP_NAMES[step]}`}
+          </div>
         </div>
-        <div className="sm:hidden flex items-center justify-center gap-1.5 text-xs text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full font-medium border border-blue-200 mx-auto w-fit mb-4">
-          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-          About 2 min. No credit impact.
+
+        <div className="rounded-[28px] border border-[#E3E8EE] bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+          <div className="border-b border-[#E3E8EE] px-6 py-5 sm:px-8">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium text-[#0A2540]">Auto Loan Pro application</p>
+                <p className="text-sm text-[#6B7C93]">Complete your application in a few secure steps.</p>
+              </div>
+              <div className="inline-flex items-center gap-2 text-sm text-[#425466]">
+                <ShieldCheck className="h-4 w-4 text-emerald-500" />
+                256-bit encrypted
+              </div>
+            </div>
+          </div>
+
+          <div className="px-6 py-6 sm:px-8 sm:py-8">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={step}
+                custom={direction}
+                initial={{ opacity: 0, x: direction > 0 ? 28 : -28 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: direction > 0 ? -28 : 28 }}
+                transition={{ duration: 0.28, ease: 'easeOut' }}
+              >
+                {step === 0 && (
+                  <div className="space-y-6">
+                    <SectionCard title="Personal details">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <TextInput
+                          label="First name *"
+                          value={personal.firstName}
+                          onChange={(v) => setPersonal((p) => ({ ...p, firstName: v }))}
+                          error={errors.firstName}
+                          isValid={personal.firstName.trim().length > 0}
+                          autoComplete="given-name"
+                        />
+                        <TextInput
+                          label="Last name *"
+                          value={personal.lastName}
+                          onChange={(v) => setPersonal((p) => ({ ...p, lastName: v }))}
+                          error={errors.lastName}
+                          isValid={personal.lastName.trim().length > 0}
+                          autoComplete="family-name"
+                        />
+                        <TextInput
+                          label="Social Security Number *"
+                          value={personal.ssn}
+                          onChange={(v) => setPersonal((p) => ({ ...p, ssn: formatSSN(v) }))}
+                          placeholder="123-45-6789"
+                          error={errors.ssn}
+                          maxLength={11}
+                          isValid={validateSSN(personal.ssn)}
+                          autoComplete="off"
+                          helper={
+                            <span className="inline-flex items-center gap-1 text-xs text-[#6B7C93]">
+                              <Lock className="h-3.5 w-3.5" />
+                              256-bit encrypted
+                            </span>
+                          }
+                        />
+                        <TextInput
+                          label="Date of birth *"
+                          type="date"
+                          value={personal.dob}
+                          onChange={(v) => setPersonal((p) => ({ ...p, dob: v }))}
+                          error={errors.dob}
+                          isValid={!!personal.dob}
+                          autoComplete="bday"
+                        />
+                        <TextInput
+                          label="Email address *"
+                          type="email"
+                          value={personal.email}
+                          onChange={(v) => setPersonal((p) => ({ ...p, email: v }))}
+                          error={errors.email}
+                          isValid={personal.email.includes('@')}
+                          autoComplete="email"
+                        />
+                        <TextInput
+                          label="Phone number *"
+                          type="tel"
+                          value={personal.phone}
+                          onChange={(v) => setPersonal((p) => ({ ...p, phone: formatPhone(v) }))}
+                          placeholder="(555) 555-1234"
+                          error={errors.phone}
+                          maxLength={14}
+                          isValid={personal.phone.replace(/\D/g, '').length === 10}
+                          autoComplete="tel"
+                        />
+                      </div>
+                    </SectionCard>
+
+                    <SectionCard title="Address">
+                      <div className="space-y-4">
+                        <TextInput
+                          label="Street address *"
+                          value={address.currentAddressLine1}
+                          onChange={(v) => setAddress((a) => ({ ...a, currentAddressLine1: v }))}
+                          error={errors.address1}
+                          isValid={address.currentAddressLine1.trim().length > 0}
+                          autoComplete="address-line1"
+                        />
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                          <TextInput
+                            label="City *"
+                            value={address.currentCity}
+                            onChange={(v) => setAddress((a) => ({ ...a, currentCity: v }))}
+                            error={errors.city}
+                            isValid={address.currentCity.trim().length > 0}
+                            autoComplete="address-level2"
+                          />
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                            <Select
+                              label="State *"
+                              value={address.currentState}
+                              onChange={(v) => setAddress((a) => ({ ...a, currentState: v }))}
+                              options={US_STATES}
+                              placeholder="Select"
+                              error={errors.state}
+                              isValid={!!address.currentState}
+                              autoFocusNext={true}
+                            />
+                            <TextInput
+                              label="ZIP *"
+                              value={address.currentZip}
+                              onChange={(v) => setAddress((a) => ({ ...a, currentZip: formatZIP(v) }))}
+                              error={errors.zip}
+                              maxLength={5}
+                              isValid={address.currentZip.length === 5}
+                              autoComplete="postal-code"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                          <Select
+                            label="Residence type"
+                            value={address.residenceType}
+                            onChange={(v) => setAddress((a) => ({ ...a, residenceType: v as ResidenceType }))}
+                            options={[{ value: 'own', label: 'Own' }, { value: 'rent', label: 'Rent' }, { value: 'other', label: 'Other' }]}
+                            isValid={!!address.residenceType}
+                          />
+                          <CurrencyInput
+                            label="Monthly payment"
+                            value={address.monthlyHousingPayment}
+                            onChange={(v) => setAddress((a) => ({ ...a, monthlyHousingPayment: v }))}
+                            placeholder="1,200"
+                            isValid={address.monthlyHousingPayment > 0}
+                          />
+                          <TextInput
+                            label="Months at address"
+                            value={address.monthsAtCurrentAddress ? String(address.monthsAtCurrentAddress) : ''}
+                            onChange={(v) => setAddress((a) => ({ ...a, monthsAtCurrentAddress: Number(v.replace(/[^\d]/g, '')) }))}
+                            placeholder="24"
+                            type="text"
+                            isValid={address.monthsAtCurrentAddress > 0}
+                          />
+                        </div>
+                      </div>
+                    </SectionCard>
+
+                    <SectionCard title="Loan preferences">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <Select
+                          label="Estimated credit range"
+                          value={estimatedCreditRange}
+                          onChange={setEstimatedCreditRange}
+                          options={CREDIT_RANGE_OPTIONS}
+                          placeholder="Select a range"
+                          isValid={!!estimatedCreditRange}
+                        />
+                        <CurrencyInput
+                          label="Target vehicle price"
+                          value={vehicle.askingPrice ?? 0}
+                          onChange={(v) => {
+                            setHasVehicle(v > 0);
+                            setVehicle((ve) => ({ ...ve, askingPrice: v }));
+                          }}
+                          placeholder="25,000"
+                          isValid={(vehicle.askingPrice ?? 0) > 0}
+                        />
+                      </div>
+                    </SectionCard>
+                  </div>
+                )}
+
+                {step === 1 && (
+                  <div className="space-y-6">
+                    <SectionCard title="Income & employment">
+                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <Select
+                          label="Employment status"
+                          value={employment.employmentStatus}
+                          onChange={(v) => setEmployment((e) => ({ ...e, employmentStatus: v as EmploymentStatus }))}
+                          options={[
+                            { value: 'full_time', label: 'Full Time' },
+                            { value: 'part_time', label: 'Part Time' },
+                            { value: 'self_employed', label: 'Self Employed' },
+                            { value: 'retired', label: 'Retired' },
+                            { value: 'other', label: 'Other' },
+                          ]}
+                          isValid={!!employment.employmentStatus}
+                          autoFocusNext={true}
+                        />
+                        <CurrencyInput
+                          label="Gross monthly income *"
+                          value={employment.grossMonthlyIncome}
+                          onChange={(v) => setEmployment((e) => ({ ...e, grossMonthlyIncome: v }))}
+                          error={errors.income}
+                          isValid={employment.grossMonthlyIncome > 0}
+                          placeholder="5,000"
+                        />
+                      </div>
+
+                      {(employment.employmentStatus === 'full_time' || employment.employmentStatus === 'part_time') && (
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <TextInput
+                              label="Employer name"
+                              value={employment.employerName || ''}
+                              onChange={(v) => setEmployment((e) => ({ ...e, employerName: v }))}
+                              isValid={!!employment.employerName}
+                              maxLength={80}
+                            />
+                            <TextInput
+                              label="Months at current employer"
+                              value={employment.monthsAtEmployer ? String(employment.monthsAtEmployer) : ''}
+                              onChange={(v) => setEmployment((e) => ({ ...e, monthsAtEmployer: Number(v.replace(/[^\d]/g, '')) }))}
+                              placeholder="24"
+                              type="text"
+                              isValid={employment.monthsAtEmployer > 0}
+                            />
+                          </div>
+
+                          <AnimatePresence>
+                            {employment.monthsAtEmployer > 0 && employment.monthsAtEmployer < 24 && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.22, ease: 'easeOut' }}
+                                className="overflow-hidden"
+                              >
+                                <div className="space-y-4 rounded-xl border border-[#E3E8EE] bg-white p-4">
+                                  <p className="text-sm font-medium text-[#0A2540]">Previous employer</p>
+                                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                    <TextInput
+                                      label="Previous employer name"
+                                      value={employment.prevEmployerName || ''}
+                                      onChange={(v) => setEmployment((e) => ({ ...e, prevEmployerName: v }))}
+                                      maxLength={80}
+                                    />
+                                    <TextInput
+                                      label="Months at previous employer"
+                                      value={employment.prevMonthsAtEmployer ? String(employment.prevMonthsAtEmployer) : ''}
+                                      onChange={(v) => setEmployment((e) => ({ ...e, prevMonthsAtEmployer: Number(v.replace(/[^\d]/g, '')) }))}
+                                      placeholder="18"
+                                      type="text"
+                                    />
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      )}
+                    </SectionCard>
+                  </div>
+                )}
+
+                {step === 2 && (
+                  <div className="space-y-6">
+                    <SectionCard title="Credit authorization">
+                      <div className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700">
+                        <CreditCard className="h-4 w-4" />
+                        Soft pull only - won't affect your credit
+                      </div>
+
+                      <div className="space-y-3">
+                        <Checkbox
+                          checked={consent.softPullConsent}
+                          onChange={(v) => setConsent((c) => ({ ...c, softPullConsent: v }))}
+                          label="I consent to a soft credit inquiry to check my credit for pre-qualification."
+                        />
+                        {errors.soft && <p className="-mt-1 text-sm text-red-500">{errors.soft}</p>}
+
+                        <Checkbox
+                          checked={consent.hardPullConsent}
+                          onChange={(v) => setConsent((c) => ({ ...c, hardPullConsent: v }))}
+                          label="I understand that selecting a lender may result in a hard credit inquiry by that lender."
+                        />
+                        {errors.creditCheck && <p className="-mt-1 text-sm text-red-500">{errors.creditCheck}</p>}
+
+                        <Checkbox
+                          checked={consent.tcpaConsent}
+                          onChange={(v) => setConsent((c) => ({ ...c, tcpaConsent: v }))}
+                          label="I consent to receive communications via phone, email, or SMS regarding my application."
+                        />
+                        {errors.tcpa && <p className="-mt-1 text-sm text-red-500">{errors.tcpa}</p>}
+
+                        <Checkbox
+                          checked={consent.termsOfService}
+                          onChange={(v) => setConsent((c) => ({ ...c, termsOfService: v }))}
+                          label={<>I agree to the <Link href="/terms" target="_blank" onClick={(event) => event.stopPropagation()} className="text-blue-600 underline hover:text-blue-500">Terms of Service</Link>.</>}
+                        />
+                        {errors.terms && <p className="-mt-1 text-sm text-red-500">{errors.terms}</p>}
+
+                        <Checkbox
+                          checked={consent.privacyPolicy}
+                          onChange={(v) => setConsent((c) => ({ ...c, privacyPolicy: v }))}
+                          label={<>I agree to the <Link href="/privacy" target="_blank" onClick={(event) => event.stopPropagation()} className="text-blue-600 underline hover:text-blue-500">Privacy Policy</Link>.</>}
+                        />
+                        {errors.privacy && <p className="-mt-1 text-sm text-red-500">{errors.privacy}</p>}
+
+                        <Checkbox
+                          checked={consent.eSignConsent}
+                          onChange={(v) => setConsent((c) => ({ ...c, eSignConsent: v }))}
+                          label="I certify that the information I provided is true and accurate."
+                        />
+                        {errors.esign && <p className="-mt-1 text-sm text-red-500">{errors.esign}</p>}
+                      </div>
+                    </SectionCard>
+                  </div>
+                )}
+
+                {step === 3 && (
+                  <div className="space-y-6">
+                    <SectionCard title="Review your application">
+                      <div className="space-y-4">
+                        {reviewSections.map((section) => (
+                          <div
+                            key={section.title}
+                            className={`rounded-xl border p-5 ${section.issues.length > 0 ? 'border-amber-300 bg-amber-50/60' : 'border-[#E3E8EE] bg-white'}`}
+                          >
+                            <div className="mb-4 flex items-start justify-between gap-4">
+                              <div>
+                                <h4 className="text-sm font-semibold text-[#0A2540]">{section.title}</h4>
+                                {section.issues.length > 0 ? (
+                                  <p className="mt-1 text-sm text-amber-700">Review this section before submitting.</p>
+                                ) : (
+                                  <p className="mt-1 text-sm text-[#6B7C93]">Looks complete.</p>
+                                )}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => goToStep(section.stepIndex)}
+                                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#E3E8EE] px-4 py-2 text-sm font-medium text-[#0A2540] transition-all hover:bg-[#F6F9FC]"
+                              >
+                                <Pencil className="h-4 w-4" />
+                                Edit
+                              </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                              {section.rows.map((row) => (
+                                <div key={`${section.title}-${row.label}`} className="rounded-lg bg-[#F6F9FC] px-4 py-3">
+                                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-[#6B7C93]">{row.label}</p>
+                                  <p className={`mt-1 text-sm ${row.missing ? 'text-amber-700' : 'text-[#0A2540]'}`}>
+                                    {row.value || 'Missing'}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+
+                            {section.issues.length > 0 && (
+                              <div className="mt-4 rounded-lg border border-amber-200 bg-white px-4 py-3 text-sm text-amber-800">
+                                {section.issues.join(' ')}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </SectionCard>
+
+                    <SectionCard title="Optional additions">
+                      <div className="space-y-4">
+                        <Toggle checked={hasCoBorrower} onChange={setHasCoBorrower} label="Add a co-borrower" />
+
+                        <AnimatePresence>
+                          {hasCoBorrower && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.22, ease: 'easeOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="grid grid-cols-1 gap-4 rounded-xl border border-[#E3E8EE] bg-white p-4 sm:grid-cols-2">
+                                <TextInput label="First name" value={coPersonal.firstName} onChange={(v) => setCoPersonal((p) => ({ ...p, firstName: v }))} />
+                                <TextInput label="Last name" value={coPersonal.lastName} onChange={(v) => setCoPersonal((p) => ({ ...p, lastName: v }))} />
+                                <TextInput
+                                  label="SSN"
+                                  value={coPersonal.ssn}
+                                  onChange={(v) => setCoPersonal((p) => ({ ...p, ssn: formatSSN(v) }))}
+                                  placeholder="123-45-6789"
+                                  maxLength={11}
+                                  helper={
+                                    <span className="inline-flex items-center gap-1 text-xs text-[#6B7C93]">
+                                      <Lock className="h-3.5 w-3.5" />
+                                      Encrypted
+                                    </span>
+                                  }
+                                />
+                                <TextInput label="Date of birth" type="date" value={coPersonal.dob} onChange={(v) => setCoPersonal((p) => ({ ...p, dob: v }))} />
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        <Toggle checked={hasVehicle} onChange={setHasVehicle} label="I have a specific vehicle in mind" />
+
+                        <AnimatePresence>
+                          {hasVehicle && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.22, ease: 'easeOut' }}
+                              className="overflow-hidden"
+                            >
+                              <div className="grid grid-cols-1 gap-4 rounded-xl border border-[#E3E8EE] bg-white p-4 sm:grid-cols-2">
+                                <TextInput
+                                  label="Year"
+                                  value={String(vehicle.year || new Date().getFullYear())}
+                                  onChange={(v) => setVehicle((ve) => ({ ...ve, year: Number(v.replace(/[^\d]/g, '')) }))}
+                                  type="text"
+                                />
+                                <Select
+                                  label="Make *"
+                                  value={vehicle.make || ''}
+                                  onChange={(v) => setVehicle((ve) => ({ ...ve, make: v }))}
+                                  options={POPULAR_MAKES.map((make) => ({ value: make, label: make }))}
+                                  placeholder="Select make"
+                                  error={errors.make}
+                                  isValid={!!vehicle.make}
+                                  autoFocusNext={true}
+                                />
+                                <TextInput
+                                  label="Model *"
+                                  value={vehicle.model || ''}
+                                  onChange={(v) => setVehicle((ve) => ({ ...ve, model: v }))}
+                                  error={errors.model}
+                                  maxLength={40}
+                                  isValid={!!vehicle.model}
+                                />
+                                <CurrencyInput
+                                  label="Price *"
+                                  value={vehicle.askingPrice ?? 0}
+                                  onChange={(v) => setVehicle((ve) => ({ ...ve, askingPrice: v }))}
+                                  error={errors.price}
+                                  isValid={(vehicle.askingPrice ?? 0) > 0}
+                                  placeholder="30,000"
+                                />
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </SectionCard>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <div className="border-t border-[#E3E8EE] px-6 py-4 sm:px-8">
+            <div className="flex items-center gap-2 text-sm text-[#6B7C93]">
+              <ShieldCheck className="h-4 w-4 text-emerald-500" />
+              Bank-grade encryption and secure lender routing
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-8 pb-24 sm:pb-8">
-        <AnimatePresence mode="wait">
-          <motion.div key={step} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.25 }}
-            className="rounded-2xl bg-white  border border-gray-200  shadow-sm p-4 sm:p-8">
+      <div className="fixed inset-x-0 bottom-0 border-t border-[#E3E8EE] bg-white px-6 py-3 sm:hidden">
+        <div className={`mx-auto grid max-w-2xl gap-3 ${step > 0 ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          {step > 0 && (
+            <button
+              type="button"
+              onClick={back}
+              className="min-h-[52px] w-full rounded-full border border-[#E3E8EE] bg-white px-8 py-3.5 text-base font-medium text-[#0A2540] transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Back
+            </button>
+          )}
+          {step === 3 ? (
+            <button
+              type="button"
+              onClick={submitApplication}
+              disabled={submitting}
+              className="inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
+              Submit Application
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={next}
+              className="min-h-[52px] w-full rounded-full bg-blue-600 px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-blue-500"
+            >
+              Next
+            </button>
+          )}
+        </div>
+      </div>
 
-            {/* STEP 1: About You (Personal + Address) */}
-            {step === 0 && (
-              <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900  mb-6">About You</h2>
-
-                {/* Personal Info */}
-                <div className="grid md:grid-cols-2 gap-5">
-                  <Field error={errors.firstName}>
-                    <FloatingLabelInput
-                      label="First Name *"
-                      value={personal.firstName}
-                      onChange={v => setPersonal(p => ({ ...p, firstName: v }))}
-                      error={errors.firstName}
-                      isValid={personal.firstName.trim().length > 0}
-                    />
-                  </Field>
-                  <Field error={errors.lastName}>
-                    <FloatingLabelInput
-                      label="Last Name *"
-                      value={personal.lastName}
-                      onChange={v => setPersonal(p => ({ ...p, lastName: v }))}
-                      error={errors.lastName}
-                      isValid={personal.lastName.trim().length > 0}
-                    />
-                  </Field>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-5">
-                  <Field error={errors.ssn}>
-                    <FloatingLabelInput
-                      label="Social Security Number *"
-                      value={personal.ssn}
-                      onChange={v => setPersonal(p => ({ ...p, ssn: formatSSN(v) }))}
-                      placeholder="XXX-XX-XXXX"
-                      maxLength={11}
-                      error={errors.ssn}
-                      isValid={validateSSN(personal.ssn)}
-                      showEncrypted={true}
-                    />
-                  </Field>
-                  <Field error={errors.dob}>
-                    <FloatingLabelInput
-                      label="Date of Birth *"
-                      type="date"
-                      value={personal.dob}
-                      onChange={v => setPersonal(p => ({ ...p, dob: v }))}
-                      error={errors.dob}
-                      isValid={!!personal.dob}
-                    />
-                  </Field>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-5">
-                  <Field error={errors.email}>
-                    <FloatingLabelInput
-                      label="Email Address *"
-                      type="email"
-                      value={personal.email}
-                      onChange={v => setPersonal(p => ({ ...p, email: v }))}
-                      error={errors.email}
-                      isValid={personal.email.includes('@')}
-                    />
-                  </Field>
-                  <Field error={errors.phone}>
-                    <FloatingLabelInput
-                      label="Phone Number *"
-                      type="tel"
-                      value={personal.phone}
-                      onChange={v => setPersonal(p => ({ ...p, phone: formatPhone(v) }))}
-                      placeholder="(XXX) XXX-XXXX"
-                      error={errors.phone}
-                      isValid={personal.phone.replace(/\D/g, '').length === 10}
-                    />
-                  </Field>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-5">
-                  <Field>
-                    <Select
-                      value={estimatedCreditRange}
-                      onChange={setEstimatedCreditRange}
-                      options={CREDIT_RANGE_OPTIONS}
-                      placeholder="Estimated Credit Range"
-                      label="Estimated credit range"
-                    />
-                  </Field>
-                  <Field>
-                    <FloatingLabelInput
-                      label="Target Vehicle Price ($)"
-                      type="number"
-                      value={vehicle.askingPrice ? String(vehicle.askingPrice) : ''}
-                      onChange={v => {
-                        const askingPrice = Number(v);
-                        setHasVehicle(askingPrice > 0);
-                        setVehicle(ve => ({ ...ve, askingPrice }));
-                      }}
-                      placeholder="25000"
-                    />
-                  </Field>
-                </div>
-
-                {/* Address */}
-                <div className="pt-6 mt-6 border-t border-gray-200 ">
-                  <h3 className="text-sm font-medium text-gray-900  mb-5">Current Address</h3>
-
-                  <div className="space-y-5">
-                    <Field error={errors.address1}>
-                      <FloatingLabelInput
-                        label="Street Address *"
-                        value={address.currentAddressLine1}
-                        onChange={v => setAddress(a => ({ ...a, currentAddressLine1: v }))}
-                        error={errors.address1}
-                        isValid={address.currentAddressLine1.trim().length > 0}
-                        datalistId="cities-list"
-                      />
-                      <datalist id="cities-list">
-                        <option value="123 Main St" />
-                        <option value="456 Oak Ave" />
-                        <option value="789 Pine Rd" />
-                      </datalist>
-                    </Field>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
-                      <div className="col-span-1 sm:col-span-2 md:col-span-2">
-                        <Field error={errors.city}>
-                          <FloatingLabelInput
-                            label="City *"
-                            value={address.currentCity}
-                            onChange={v => setAddress(a => ({ ...a, currentCity: v }))}
-                            error={errors.city}
-                            isValid={address.currentCity.trim().length > 0}
-                          />
-                        </Field>
-                      </div>
-                      <Field error={errors.state}>
-                        <Select
-                          value={address.currentState}
-                          onChange={v => setAddress(a => ({ ...a, currentState: v }))}
-                          options={US_STATES}
-                          placeholder="Select"
-                          error={!!errors.state}
-                          label="State"
-                        />
-                      </Field>
-                      <Field error={errors.zip}>
-                        <FloatingLabelInput
-                          label="ZIP *"
-                          value={address.currentZip}
-                          onChange={v => setAddress(a => ({ ...a, currentZip: formatZIP(v) }))}
-                          maxLength={5}
-                          error={errors.zip}
-                          isValid={address.currentZip.length === 5}
-                        />
-                      </Field>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                      <Field>
-                        <Select
-                          value={address.residenceType}
-                          onChange={v => setAddress(a => ({ ...a, residenceType: v as ResidenceType }))}
-                          options={[{ value: 'own', label: 'Own' }, { value: 'rent', label: 'Rent' }, { value: 'other', label: 'Other' }]}
-                          label="Residence type"
-                        />
-                      </Field>
-                      <Field>
-                        <FloatingLabelInput
-                          label="Monthly Payment ($)"
-                          type="number"
-                          value={address.monthlyHousingPayment ? String(address.monthlyHousingPayment) : ''}
-                          onChange={v => setAddress(a => ({ ...a, monthlyHousingPayment: Number(v) }))}
-                          placeholder="1200"
-                        />
-                      </Field>
-                      <Field>
-                        <FloatingLabelInput
-                          label="Months at Address"
-                          type="number"
-                          value={address.monthsAtCurrentAddress ? String(address.monthsAtCurrentAddress) : ''}
-                          onChange={v => setAddress(a => ({ ...a, monthsAtCurrentAddress: Number(v) }))}
-                          placeholder="24"
-                        />
-                      </Field>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 2: Income & Employment */}
-            {step === 1 && (
-              <div className="space-y-5">
-                <h2 className="text-lg font-semibold text-gray-900  mb-6">Income & Employment</h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <Field>
-                    <Select
-                      value={employment.employmentStatus}
-                      onChange={v => setEmployment(e => ({ ...e, employmentStatus: v as EmploymentStatus }))}
-                      options={[
-                        { value: 'full_time', label: 'Full Time' },
-                        { value: 'part_time', label: 'Part Time' },
-                        { value: 'self_employed', label: 'Self Employed' },
-                        { value: 'retired', label: 'Retired' },
-                        { value: 'other', label: 'Other' }
-                      ]}
-                      label="Employment status"
-                    />
-                  </Field>
-                  <Field error={errors.income}>
-                    <FloatingLabelInput
-                      label="Gross Monthly Income *"
-                      type="number"
-                      value={employment.grossMonthlyIncome ? String(employment.grossMonthlyIncome) : ''}
-                      onChange={v => setEmployment(e => ({ ...e, grossMonthlyIncome: Number(v) }))}
-                      placeholder="5000"
-                      error={errors.income}
-                      isValid={employment.grossMonthlyIncome > 0}
-                    />
-                  </Field>
-                </div>
-
-                {(employment.employmentStatus === 'full_time' || employment.employmentStatus === 'part_time') && (
-                  <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <Field>
-                        <FloatingLabelInput
-                          label="Employer Name"
-                          value={employment.employerName || ''}
-                          onChange={v => setEmployment(e => ({ ...e, employerName: v }))}
-                          isValid={!!employment.employerName}
-                        />
-                      </Field>
-                      <Field>
-                        <FloatingLabelInput
-                          label="Months at Current Employer"
-                          type="number"
-                          value={employment.monthsAtEmployer ? String(employment.monthsAtEmployer) : ''}
-                          onChange={v => setEmployment(e => ({ ...e, monthsAtEmployer: Number(v) }))}
-                        />
-                      </Field>
-                    </div>
-
-                    {/* Previous Employer Section - Animated */}
-                    <AnimatePresence>
-                      {employment.monthsAtEmployer > 0 && employment.monthsAtEmployer < 24 && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pt-6 border-t border-gray-200  space-y-5">
-                            <h3 className="text-sm font-medium text-blue-600">Previous Employer</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                              <Field>
-                                <FloatingLabelInput
-                                  label="Previous Employer Name"
-                                  value={employment.prevEmployerName || ''}
-                                  onChange={v => setEmployment(e => ({ ...e, prevEmployerName: v }))}
-                                />
-                              </Field>
-                              <Field>
-                                <FloatingLabelInput
-                                  label="Months at Previous Employer"
-                                  type="number"
-                                  value={employment.prevMonthsAtEmployer ? String(employment.prevMonthsAtEmployer) : ''}
-                                  onChange={v => setEmployment(e => ({ ...e, prevMonthsAtEmployer: Number(v) }))}
-                                />
-                              </Field>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </>
-                )}
-              </div>
-            )}
-
-            {/* STEP 3: Credit Consent */}
-            {step === 2 && (
-              <div className="space-y-5">
-                <h2 className="text-lg font-semibold text-gray-900  mb-2">Credit Consent</h2>
-                <p className="text-sm text-gray-600  mb-6">
-                  We&apos;ll use a soft credit pull to match you with lenders. This won&apos;t affect your credit score.
-                </p>
-
-                <div className="space-y-5 bg-gray-50  rounded-xl p-5 border border-gray-200 ">
-                  <Checkbox
-                    checked={consent.softPullConsent}
-                    onChange={v => setConsent(c => ({ ...c, softPullConsent: v }))}
-                    label="I consent to a soft credit inquiry to check my credit for pre-qualification."
-                  />
-                  {errors.soft && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
-
-                  <Checkbox
-                    checked={consent.hardPullConsent}
-                    onChange={v => setConsent(c => ({ ...c, hardPullConsent: v }))}
-                    label="I understand that selecting a lender may result in a hard credit inquiry by that lender."
-                  />
-                  {errors.creditCheck && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
-
-                  <Checkbox
-                    checked={consent.tcpaConsent}
-                    onChange={v => setConsent(c => ({ ...c, tcpaConsent: v }))}
-                    label="I consent to receive communications via phone, email, or SMS regarding my application."
-                  />
-                  {errors.tcpa && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
-
-                  <Checkbox
-                    checked={consent.termsOfService}
-                    onChange={v => setConsent(c => ({ ...c, termsOfService: v }))}
-                    label={<>I agree to the <Link href="/terms" target="_blank" onClick={(event) => event.stopPropagation()} className="text-blue-600 hover:text-blue-500 underline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm">Terms of Service</Link></>}
-                  />
-                  {errors.terms && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
-
-                  <Checkbox
-                    checked={consent.privacyPolicy}
-                    onChange={v => setConsent(c => ({ ...c, privacyPolicy: v }))}
-                    label={<>I agree to the <Link href="/privacy" target="_blank" onClick={(event) => event.stopPropagation()} className="text-blue-600 hover:text-blue-500 underline focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm">Privacy Policy</Link></>}
-                  />
-                  {errors.privacy && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
-
-                  <Checkbox
-                    checked={consent.eSignConsent}
-                    onChange={v => setConsent(c => ({ ...c, eSignConsent: v }))}
-                    label="I certify that the information I provided is true and accurate."
-                  />
-                  {errors.esign && <p className="text-xs text-red-500 -mt-3 ml-8" aria-live="assertive">Required</p>}
-                </div>
-
-                <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-5">
-                  <div className="flex gap-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-semibold text-gray-900  mb-2">What You&apos;re Agreeing To</h3>
-                      <p className="text-xs text-gray-600  leading-relaxed">
-                        We&apos;ll perform a soft credit check to show you personalized offers. This does NOT impact your credit score. Only when you select a specific lender and proceed will there be a hard inquiry.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 4: Review & Submit */}
-            {step === 3 && (
-              <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900  mb-6">Review & Submit</h2>
-
-                {/* Summary Cards */}
-                <div className="space-y-4">
-                  <div className="bg-gray-50  rounded-xl border border-gray-200  p-5">
-                    <h3 className="text-xs font-medium text-gray-500  mb-3">Personal Information</h3>
-                    <p className="text-sm text-gray-900  font-medium">{personal.firstName} {personal.lastName}</p>
-                    <p className="text-sm text-gray-600 ">{personal.email}</p>
-                    <p className="text-sm text-gray-600 ">{personal.phone}</p>
-                  </div>
-
-                  <div className="bg-gray-50  rounded-xl border border-gray-200  p-5">
-                    <h3 className="text-xs font-medium text-gray-500  mb-3">Address</h3>
-                    <p className="text-sm text-gray-900 ">{address.currentAddressLine1}</p>
-                    <p className="text-sm text-gray-600 ">{address.currentCity}, {address.currentState} {address.currentZip}</p>
-                  </div>
-
-                  <div className="bg-gray-50  rounded-xl border border-gray-200  p-5">
-                    <h3 className="text-xs font-medium text-gray-500  mb-3">Income</h3>
-                    <p className="text-sm text-gray-900  font-medium">${employment.grossMonthlyIncome.toLocaleString()} / month</p>
-                    {employment.employerName && <p className="text-sm text-gray-600 ">{employment.employerName}</p>}
-                  </div>
-
-                  {(estimatedCreditRange || targetVehiclePrice) && (
-                    <div className="bg-gray-50  rounded-xl border border-gray-200  p-5">
-                      <h3 className="text-xs font-medium text-gray-500  mb-3">Loan Preferences</h3>
-                      {estimatedCreditRange && (
-                        <p className="text-sm text-gray-900 ">
-                          Estimated Credit Range: {CREDIT_RANGE_OPTIONS.find((option) => option.value === estimatedCreditRange)?.label || estimatedCreditRange}
-                        </p>
-                      )}
-                      {targetVehiclePrice > 0 && (
-                        <p className="text-sm text-gray-600 ">Target Vehicle Price: ${targetVehiclePrice.toLocaleString()}</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Co-Borrower Toggle */}
-                <div className="pt-6 border-t border-gray-200 ">
-                  <Toggle checked={hasCoBorrower} onChange={v => setHasCoBorrower(v)} label="Add a co-borrower" />
-
-                  <AnimatePresence>
-                    {hasCoBorrower && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="mt-5 space-y-5">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <Field>
-                              <FloatingLabelInput label="First Name" value={coPersonal.firstName} onChange={v => setCoPersonal(p => ({ ...p, firstName: v }))} />
-                            </Field>
-                            <Field>
-                              <FloatingLabelInput label="Last Name" value={coPersonal.lastName} onChange={v => setCoPersonal(p => ({ ...p, lastName: v }))} />
-                            </Field>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <Field>
-                              <FloatingLabelInput label="SSN" value={coPersonal.ssn} onChange={v => setCoPersonal(p => ({ ...p, ssn: formatSSN(v) }))} placeholder="XXX-XX-XXXX" maxLength={11} showEncrypted={true} />
-                            </Field>
-                            <Field>
-                              <FloatingLabelInput label="Date of Birth" type="date" value={coPersonal.dob} onChange={v => setCoPersonal(p => ({ ...p, dob: v }))} />
-                            </Field>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Vehicle Toggle */}
-                <div className="pt-6 border-t border-gray-200 ">
-                  <Toggle checked={hasVehicle} onChange={v => setHasVehicle(v)} label="I have a specific vehicle in mind" />
-
-                  <AnimatePresence>
-                    {hasVehicle && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="mt-5 space-y-5">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
-                            <Field>
-                              <FloatingLabelInput label="Year" type="number" value={String(vehicle.year || new Date().getFullYear())} onChange={v => setVehicle(ve => ({ ...ve, year: Number(v) }))} />
-                            </Field>
-                            <Field error={errors.make}>
-                              <Select value={vehicle.make || ''} onChange={v => setVehicle(ve => ({ ...ve, make: v }))} options={POPULAR_MAKES.map(m => ({ value: m, label: m }))} placeholder="Select" error={!!errors.make} autoFocusNext={true} label="Vehicle make" />
-                            </Field>
-                            <Field error={errors.model}>
-                              <FloatingLabelInput label="Model *" value={vehicle.model || ''} onChange={v => setVehicle(ve => ({ ...ve, model: v }))} placeholder="Camry" error={errors.model} />
-                            </Field>
-                            <Field error={errors.price}>
-                              <FloatingLabelInput label="Price *" type="number" value={vehicle.askingPrice ? String(vehicle.askingPrice) : ''} onChange={v => setVehicle(ve => ({ ...ve, askingPrice: Number(v) }))} placeholder="30000" error={errors.price} />
-                            </Field>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Bottom Navigation - Sticky on Mobile with Backdrop Blur */}
-        <div className="fixed md:static bottom-0 left-0 right-0 bg-white/95  backdrop-blur-xl border-t border-gray-200  md:border-0 md:bg-transparent md:md:backdrop-blur-none shadow-lg md:shadow-none safe-bottom z-30">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-0 md:mt-8 md:pb-12 flex justify-between items-center gap-3">
-            {step > 0 ? (
-              <button onClick={back} className="px-4 sm:px-6 py-3 min-h-[44px] text-sm text-gray-700  hover:text-gray-900  border border-gray-200  hover:border-gray-300  rounded-xl transition-colors duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                Back
-              </button>
-            ) : <div />}
-
-            {step === 3 ? (
-              <button
-                onClick={submitApplication}
-                disabled={submitting}
-                className="flex-1 sm:flex-none px-6 sm:px-8 py-3 min-h-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-50 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-              >
-                Submit Application
-              </button>
-            ) : (
-              <button
-                onClick={next}
-                className="flex-1 sm:flex-none px-6 sm:px-8 py-3 min-h-[44px] text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-colors duration-200 cursor-pointer shadow-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-              >
-                Next Step
-              </button>
-            )}
-          </div>
+      <div className="hidden sm:block">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-6 pb-10">
+          {step > 0 ? (
+            <button
+              type="button"
+              onClick={back}
+              className="min-h-[52px] rounded-full border border-[#E3E8EE] bg-white px-8 py-3.5 text-base font-medium text-[#0A2540] transition-all hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Back
+            </button>
+          ) : (
+            <div />
+          )}
+          {step === 3 ? (
+            <button
+              type="button"
+              onClick={submitApplication}
+              disabled={submitting}
+              className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-blue-600 px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {submitting ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
+              Submit Application
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={next}
+              className="min-h-[52px] rounded-full bg-blue-600 px-8 py-3.5 text-base font-medium text-white transition-all hover:bg-blue-500"
+            >
+              Next Step
+            </button>
+          )}
         </div>
       </div>
     </div>
