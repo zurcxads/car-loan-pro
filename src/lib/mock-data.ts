@@ -1,8 +1,17 @@
 // Central mock data store — all applications, offers, lenders, dealers
 // Matches PRD Section 2 exactly
 
-export type MockAppStatus = 'pending_decision' | 'offers_available' | 'conditional' | 'funded' | 'declined';
-export type MockOfferStatus = 'approved' | 'conditional' | 'declined' | 'selected';
+export type MockAppStatus =
+  | 'pending_decision'
+  | 'offers_available'
+  | 'offer_accepted'
+  | 'documents_requested'
+  | 'approved'
+  | 'conditional'
+  | 'funded'
+  | 'expired'
+  | 'declined';
+export type MockOfferStatus = 'available' | 'approved' | 'conditional' | 'declined' | 'selected' | 'locked' | 'expired';
 export type LenderTierType = 'prime' | 'near_prime' | 'subprime';
 
 export interface MockApplication {
@@ -67,6 +76,9 @@ export interface MockApplication {
   ptiPercent?: number;
   hasVehicle: boolean;
   status: MockAppStatus;
+  lockedOfferId?: string | null;
+  offerLockedAt?: string | null;
+  offerExpiresAt?: string | null;
   state: string;
   submittedAt: string;
   updatedAt: string;
@@ -86,6 +98,7 @@ export interface MockOffer {
   approvedAmount: number;
   maxApprovedAmount?: number; // For no-vehicle pre-approvals
   status: MockOfferStatus;
+  lockedAt?: string | null;
   conditions: string[];
   decisionAt: string;
   expiresAt: string;

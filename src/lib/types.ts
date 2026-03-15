@@ -8,7 +8,7 @@ export type ResidenceType = 'own' | 'rent' | 'other';
 export type EmploymentStatus = 'full_time' | 'part_time' | 'self_employed' | 'retired' | 'other';
 export type IncomeType = 'employment' | 'self_employed' | 'retirement' | 'disability' | 'ssi' | 'child_support' | 'other';
 export type LenderTier = 'prime' | 'near_prime' | 'subprime' | 'specialty';
-export type OfferStatus = 'pending' | 'approved' | 'conditional' | 'declined' | 'expired' | 'selected';
+export type OfferStatus = 'pending' | 'available' | 'approved' | 'conditional' | 'declined' | 'expired' | 'selected' | 'locked';
 export type CreditPullType = 'soft' | 'hard';
 
 // Step 1: Personal Info

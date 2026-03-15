@@ -47,6 +47,20 @@ type ReviewSection = {
   issues: string[];
 };
 
+type ActiveOfferResponse =
+  | {
+      success: true;
+      data: {
+        hasActive: boolean;
+        application?: {
+          lockedOffer: {
+            lenderName: string;
+          };
+        };
+      };
+    }
+  | { success: false; error?: string };
+
 function normalizeCreditRangeParam(value: string): string {
   const normalizedValue = value.trim().toLowerCase().replace(/[\s-]+/g, '_');
   return CREDIT_RANGE_OPTIONS.some((option) => option.value === normalizedValue) ? normalizedValue : '';
@@ -378,6 +392,7 @@ export default function ApplyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [isDevMode, setIsDevMode] = useState(showDevTools());
   const [timeEstimate, setTimeEstimate] = useState(2);
+  const [activeOfferLender, setActiveOfferLender] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = 'Apply for Pre-Approval — Auto Loan Pro';
@@ -385,6 +400,31 @@ export default function ApplyPage() {
 
   useEffect(() => {
     setIsDevMode(showDevTools());
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadActiveOffer = async () => {
+      try {
+        const response = await fetch('/api/applications/active', { cache: 'no-store' });
+        const payload = (await response.json()) as ActiveOfferResponse;
+
+        if (cancelled || !payload.success || !payload.data.hasActive) {
+          return;
+        }
+
+        setActiveOfferLender(payload.data.application?.lockedOffer.lenderName || null);
+      } catch {
+        // Keep apply flow available if this warning check fails.
+      }
+    };
+
+    loadActiveOffer();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -681,6 +721,15 @@ export default function ApplyPage() {
     <div className="min-h-screen bg-white font-sans">
       <div className="mx-auto max-w-2xl px-4 pt-28 pb-16 sm:px-6">
         <div className="mb-8 space-y-4">
+          {activeOfferLender && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              You have an active offer with {activeOfferLender}. Cancel it to apply again.{' '}
+              <Link href="/dashboard" className="font-semibold text-blue-600 hover:text-blue-500">
+                Go to dashboard
+              </Link>
+              .
+            </div>
+          )}
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="hidden text-sm font-medium text-[#6B7C93] sm:block">Step {step + 1} of 4</p>

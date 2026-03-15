@@ -1,11 +1,22 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState, Suspense } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 import { SkeletonDashboard } from '@/components/shared/Skeleton';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { showDevTools } from '@/lib/env';
+
+type LockedOffer = {
+  id: string;
+  lenderName: string;
+  apr: number;
+  monthlyPayment: number;
+  approvedAmount: number;
+  termMonths: number;
+  status: string;
+};
 
 interface Application {
   id: string;
@@ -20,17 +31,15 @@ interface Application {
   hasVehicle: boolean;
   offersReceived: number;
   submittedAt: string;
+  offerLockedAt?: string | null;
+  offerExpiresAt?: string | null;
+  lockedOfferId?: string | null;
   vehicle?: {
     year: number;
     make: string;
     model: string;
   };
-  selectedOffer?: {
-    id: string;
-    lenderName: string;
-    apr: number;
-    approvedAmount: number;
-  } | null;
+  lockedOffer?: LockedOffer | null;
 }
 
 type DashboardPayload = {
@@ -41,80 +50,163 @@ type DashboardApiResponse =
   | { success: true; data: DashboardPayload }
   | { success: false; error?: string };
 
+const STATUS_STYLES: Record<string, string> = {
+  offer_accepted: 'bg-emerald-100 text-emerald-700',
+  documents_requested: 'bg-orange-100 text-orange-700',
+  approved: 'bg-blue-100 text-blue-700',
+  funded: 'bg-emerald-100 text-emerald-700',
+  expired: 'bg-gray-200 text-gray-700',
+  declined: 'bg-red-100 text-red-700',
+  pending_decision: 'bg-yellow-100 text-yellow-700',
+  offers_available: 'bg-green-100 text-green-700',
+  conditional: 'bg-yellow-100 text-yellow-700',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  offer_accepted: 'Active',
+  documents_requested: 'Documents Needed',
+  approved: 'Approved',
+  funded: 'Funded',
+  expired: 'Expired',
+  declined: 'Declined',
+  pending_decision: 'Under Review',
+  offers_available: 'Offers Ready',
+  conditional: 'Under Review',
+};
+
+const PROGRESS_STEPS = ['Applied', 'Offer Selected', 'Documents', 'Approved', 'Funded'];
+
+function getProgressIndex(status: string): number {
+  switch (status) {
+    case 'funded':
+      return 4;
+    case 'approved':
+      return 3;
+    case 'documents_requested':
+      return 2;
+    case 'offer_accepted':
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+function getNextStepsCopy(status: string): string {
+  switch (status) {
+    case 'documents_requested':
+      return 'Your lender has requested documents. Upload them below.';
+    case 'approved':
+      return 'Congratulations! Visit your lender to finalize your loan.';
+    case 'offer_accepted':
+    default:
+      return 'Your lender will review your application. You will be notified when they need additional information.';
+  }
+}
+
 function DashboardContent() {
   const router = useRouter();
   const isDev = showDevTools();
+  const cancelDialogRef = useRef<HTMLDivElement>(null);
 
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [daysRemaining, setDaysRemaining] = useState(30);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelSubmitting, setCancelSubmitting] = useState(false);
 
-  // Calculate days remaining for pre-approval expiration
-  useEffect(() => {
-    if (application) {
-      const submittedDate = new Date(application.submittedAt);
-      const expirationDate = new Date(submittedDate);
-      expirationDate.setDate(expirationDate.getDate() + 30);
-      const today = new Date();
-      const diffTime = expirationDate.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      setDaysRemaining(Math.max(0, diffDays));
-    }
-  }, [application]);
+  useFocusTrap(showCancelModal, cancelDialogRef, () => setShowCancelModal(false));
 
   useEffect(() => {
-    // Dev mode: show mock data
     if (isDev) {
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 18);
       setApplication({
         id: 'APP-DEV-001',
-        status: 'conditional',
-        borrower: {
-          firstName: 'John',
-          lastName: 'Smith',
-        },
+        status: 'offer_accepted',
+        borrower: { firstName: 'John', lastName: 'Smith' },
         loanAmount: 32000,
         hasVehicle: false,
         offersReceived: 3,
         submittedAt: new Date().toISOString(),
-        selectedOffer: {
+        lockedOfferId: 'demo-1',
+        offerLockedAt: new Date().toISOString(),
+        offerExpiresAt: expiresAt.toISOString(),
+        lockedOffer: {
           id: 'demo-1',
           lenderName: 'Capital Auto Finance',
           apr: 4.2,
+          monthlyPayment: 465,
           approvedAmount: 32000,
+          termMonths: 60,
+          status: 'locked',
         },
       });
       setLoading(false);
       return;
     }
 
-    // Fetch application data
-    fetch('/api/dashboard')
-      .then(res => res.json())
+    fetch('/api/dashboard', { cache: 'no-store' })
+      .then((res) => res.json())
       .then((response: DashboardApiResponse) => {
         if (!response.success) {
           setError(response.error || 'Failed to load dashboard');
-        } else {
-          setApplication(response.data.application);
+          return;
         }
-        setLoading(false);
+
+        setApplication(response.data.application);
       })
       .catch(() => {
         setError('Failed to load dashboard');
+      })
+      .finally(() => {
         setLoading(false);
       });
-  }, [router, isDev]);
+  }, [isDev]);
+
+  const daysRemaining = useMemo(() => {
+    if (!application?.offerExpiresAt) return 0;
+    const diff = new Date(application.offerExpiresAt).getTime() - Date.now();
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  }, [application?.offerExpiresAt]);
+
+  const handleCancelOffer = async () => {
+    if (!application?.lockedOffer) return;
+
+    setCancelSubmitting(true);
+    try {
+      const response = await fetch('/api/offers/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ offerId: application.lockedOffer.id }),
+      });
+      const payload = (await response.json()) as { success?: boolean };
+
+      if (!response.ok || !payload.success) {
+        toast.error('Unable to complete your request.');
+        return;
+      }
+
+      toast.success('Offer cancelled.');
+      setShowCancelModal(false);
+      router.refresh();
+      window.location.reload();
+    } catch {
+      toast.error('Unable to complete your request.');
+    } finally {
+      setCancelSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <div className="border-b border-gray-200 bg-white">
+          <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
             <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
             <div className="text-sm text-gray-500">Loading...</div>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
           <SkeletonDashboard />
         </div>
       </div>
@@ -123,16 +215,11 @@ function DashboardContent() {
 
   if (error || !application) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
-        <div className="max-w-md w-full bg-white rounded-2xl border border-gray-200 p-8 text-center">
-          <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">Session Expired</h2>
-          <p className="text-sm text-gray-500 mb-6">Your session has expired or the link is invalid.</p>
-          <Link href="/apply" className="inline-flex px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-6">
+        <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center">
+          <h2 className="mb-2 text-lg font-semibold text-gray-900">Session Expired</h2>
+          <p className="mb-6 text-sm text-gray-500">Your session has expired or the link is invalid.</p>
+          <Link href="/apply" className="inline-flex rounded-xl bg-blue-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500">
             Start New Application
           </Link>
         </div>
@@ -140,376 +227,200 @@ function DashboardContent() {
     );
   }
 
-  const statusColors: Record<string, string> = {
-    'pending_decision': 'bg-yellow-100 text-yellow-700',
-    'offers_available': 'bg-green-100 text-green-700',
-    'conditional': 'bg-blue-100 text-blue-700',
-    'funded': 'bg-green-100 text-green-700',
-    'declined': 'bg-red-100 text-red-700',
-  };
-
-  const statusLabels: Record<string, string> = {
-    'pending_decision': 'Under Review',
-    'offers_available': 'Offers Ready',
-    'conditional': 'Offer Selected',
-    'funded': 'Funded',
-    'declined': 'Declined',
-  };
-
-  const progressWidth = application.status === 'funded'
-    ? '100%'
-    : application.status === 'conditional'
-      ? '75%'
-      : application.status === 'offers_available'
-        ? '50%'
-        : application.status === 'declined'
-          ? '25%'
-          : '25%';
+  const hasLockedOffer = Boolean(application.lockedOfferId && application.lockedOffer);
+  const progressIndex = getProgressIndex(application.status);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="text-lg font-semibold tracking-tight text-gray-900">Auto Loan Pro</Link>
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex text-sm text-gray-500">
-              Application {application.id}
-            </div>
-            <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
-          </div>
+    <div className="min-h-screen bg-[#F6F9FC]">
+      <div className="sticky top-0 z-40 border-b border-[#E3E8EE] bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <Link href="/" className="text-lg font-semibold tracking-tight text-[#0A2540]">Auto Loan Pro</Link>
+          <div className="text-sm text-[#6B7C93]">Application {application.id}</div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <div className="animate-fadeIn">
-          {/* Welcome */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome back, {application.borrower.firstName}
-            </h1>
-            <p className="text-gray-600">Track your pre-approval and manage your application</p>
-          </div>
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+        <div className="mb-8">
+          <h1 className="mb-2 text-3xl font-semibold tracking-tight text-[#0A2540]">Welcome back, {application.borrower.firstName}</h1>
+          <p className="text-[#6B7C93]">Track your financing progress and manage your application.</p>
+        </div>
 
-          {/* Status Hero Card */}
-          <div style={{ animationDelay: '0.1s' }} className="animate-fadeIn opacity-0 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 mb-8 text-white shadow-xl">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+        {hasLockedOffer ? (
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(320px,1fr)]">
+            <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
+              <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Locked Offer</p>
+                  <h2 className="text-3xl font-semibold text-[#0A2540]">{application.lockedOffer?.lenderName}</h2>
+                  <p className="mt-2 text-sm text-[#6B7C93]">Offer expires in {daysRemaining} day{daysRemaining === 1 ? '' : 's'}.</p>
+                </div>
+                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[application.status] || 'bg-gray-100 text-gray-700'}`}>
+                  {STATUS_LABELS[application.status] || application.status}
+                </span>
+              </div>
+
+              <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
+                  <div className="mb-1 text-xs uppercase tracking-wide text-[#6B7C93]">APR</div>
+                  <div className="text-2xl font-semibold text-[#0A2540]">{application.lockedOffer?.apr.toFixed(2)}%</div>
+                </div>
+                <div className="rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
+                  <div className="mb-1 text-xs uppercase tracking-wide text-[#6B7C93]">Monthly Payment</div>
+                  <div className="text-2xl font-semibold text-[#0A2540]">${application.lockedOffer?.monthlyPayment.toLocaleString()}</div>
+                </div>
+                <div className="rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
+                  <div className="mb-1 text-xs uppercase tracking-wide text-[#6B7C93]">Loan Amount</div>
+                  <div className="text-2xl font-semibold text-[#0A2540]">${application.lockedOffer?.approvedAmount.toLocaleString()}</div>
+                </div>
+                <div className="rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
+                  <div className="mb-1 text-xs uppercase tracking-wide text-[#6B7C93]">Term</div>
+                  <div className="text-2xl font-semibold text-[#0A2540]">{application.lockedOffer?.termMonths} months</div>
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <div className="mb-4 flex items-center justify-between">
+                  {PROGRESS_STEPS.map((step, index) => (
+                    <div key={step} className="flex flex-1 flex-col items-center text-center">
+                      <div className={`mb-2 flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold ${index <= progressIndex ? 'bg-blue-600 text-white' : 'bg-[#E3E8EE] text-[#6B7C93]'}`}>
+                        {index + 1}
+                      </div>
+                      <div className={`text-xs font-medium ${index <= progressIndex ? 'text-[#0A2540]' : 'text-[#6B7C93]'}`}>{step}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="relative h-2 rounded-full bg-[#E3E8EE]">
+                  <div
+                    className="absolute left-0 top-0 h-2 rounded-full bg-blue-600 transition-all"
+                    style={{ width: `${(progressIndex / (PROGRESS_STEPS.length - 1)) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(true)}
+                className="inline-flex rounded-xl border border-red-200 px-4 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-50"
+              >
+                Cancel Offer
+              </button>
+            </section>
+
+            <div className="space-y-6">
+              <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+                <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Next Steps</p>
+                <h2 className="mb-3 text-2xl font-semibold text-[#0A2540]">What happens now</h2>
+                <p className="text-sm leading-6 text-[#425466]">{getNextStepsCopy(application.status)}</p>
+              </section>
+
+              <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+                <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Application Summary</p>
+                <div className="space-y-3 text-sm text-[#425466]">
+                  <div className="flex items-center justify-between">
+                    <span>Submitted</span>
+                    <span className="font-medium text-[#0A2540]">{new Date(application.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                   </div>
-                  <div>
-                    <div className="text-sm text-blue-100 mb-0.5">Your Pre-Approval</div>
-                    <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-white/20 border border-white/30">
-                      {statusLabels[application.status] || application.status}
+                  <div className="flex items-center justify-between">
+                    <span>Vehicle</span>
+                    <span className="font-medium text-[#0A2540]">
+                      {application.hasVehicle && application.vehicle
+                        ? `${application.vehicle.year} ${application.vehicle.make} ${application.vehicle.model}`
+                        : 'Open vehicle search'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Offer Expiration</span>
+                    <span className="font-medium text-[#0A2540]">
+                      {application.offerExpiresAt
+                        ? new Date(application.offerExpiresAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                        : 'Unavailable'}
                     </span>
                   </div>
                 </div>
-
-                <div className="mb-6">
-                  <div className="text-5xl font-bold mb-2">
-                    {application.loanAmount ? `$${application.loanAmount.toLocaleString()}` : 'Up to $35,000'}
-                  </div>
-                  <div className="text-blue-100 text-sm">
-                    {application.hasVehicle
-                      ? `${application.vehicle?.year} ${application.vehicle?.make} ${application.vehicle?.model}`
-                      : 'Pre-approved for any vehicle'}
-                  </div>
-                </div>
-
-                {!application.hasVehicle && (
-                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 mb-4">
-                    <p className="text-sm text-white">
-                      <strong>Blank Check Pre-Approval</strong> — Shop at any dealer with confidence. Your rate is locked for {daysRemaining} days.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex-shrink-0">
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 text-center">
-                  <div className="text-sm text-blue-100 mb-2">Expires in</div>
-                  <div className="text-4xl font-bold mb-1">{daysRemaining}</div>
-                  <div className="text-sm text-blue-100">days</div>
-                  <div className="mt-4 text-xs text-blue-200">
-                    {new Date(new Date(application.submittedAt).getTime() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </div>
-                </div>
-              </div>
+              </section>
             </div>
           </div>
-
-          {/* Status Timeline */}
-          <div style={{ animationDelay: '0.2s' }} className="animate-fadeIn opacity-0 bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Application Progress</h2>
-            <div className="relative">
-              {/* Progress bar background */}
-              <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200" />
-              <div className="absolute top-5 left-0 h-0.5 bg-blue-600 transition-all duration-500" style={{ width: progressWidth }} />
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 relative">
-                {[
-                  { label: 'Applied', completed: true },
-                  { label: 'Matched', completed: application.status !== 'pending_decision' && application.status !== 'declined' },
-                  { label: 'Pre-Approved', completed: application.status === 'conditional' || application.status === 'funded' },
-                  { label: 'Documents', completed: application.status === 'funded' },
-                ].map((step, i) => (
-                  <div key={i} className="flex flex-col items-center text-center">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg mb-2 border-2 transition-all ${
-                      step.completed
-                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg scale-110'
-                        : 'bg-white border-gray-300 text-gray-400'
-                    }`}>
-                      {step.completed ? (
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <div className="w-2 h-2 rounded-full bg-gray-400" />
-                      )}
-                    </div>
-                    <div className={`text-xs font-medium ${step.completed ? 'text-gray-900' : 'text-gray-400'}`}>
-                      {step.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* What's Next Section */}
-          <div style={{ animationDelay: '0.3s' }} className="animate-fadeIn opacity-0 bg-gradient-to-br from-green-50 to-blue-50 border border-green-200 rounded-2xl p-6 mb-8">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-base font-semibold text-gray-900 mb-2">What&apos;s Next?</h3>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  {!application.hasVehicle && (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">→</span>
-                        <span><strong>Find your vehicle:</strong> Visit any dealer or browse online listings</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">→</span>
-                        <span><strong>Show your letter:</strong> Download your pre-approval letter to present at the dealer</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">→</span>
-                        <span><strong>Finalize your loan:</strong> Once you choose a vehicle, we&apos;ll complete your funding</span>
-                      </li>
-                    </>
-                  )}
-                  {application.hasVehicle && application.status !== 'funded' && (
-                    <>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">→</span>
-                        <span><strong>Upload documents:</strong> Provide proof of income and insurance</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">→</span>
-                        <span><strong>Final approval:</strong> We&apos;re reviewing your application (2-3 business days)</span>
-                      </li>
-                    </>
-                  )}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Activity Feed */}
-          <div style={{ animationDelay: '0.4s' }} className="animate-fadeIn opacity-0 bg-white rounded-2xl border border-gray-200 p-6 mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
-            <div className="space-y-4">
-              <div className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+        ) : (
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)]">
+            <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
+              <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Application Status</p>
+              <h2 className="mb-3 text-3xl font-semibold text-[#0A2540]">{STATUS_LABELS[application.status] || 'Application In Progress'}</h2>
+              <p className="mb-6 text-sm leading-6 text-[#425466]">
+                {application.status === 'offers_available'
+                  ? 'Your offers are ready. Return to results and choose the lender you want to move forward with.'
+                  : 'We are still processing your application and will notify you when the next step is ready.'}
+              </p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
+                  <div className="mb-1 text-xs uppercase tracking-wide text-[#6B7C93]">Offers Received</div>
+                  <div className="text-2xl font-semibold text-[#0A2540]">{application.offersReceived}</div>
                 </div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900 mb-0.5">
-                    {application.selectedOffer ? 'Offer Selected' : 'Application Update'}
+                <div className="rounded-2xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
+                  <div className="mb-1 text-xs uppercase tracking-wide text-[#6B7C93]">Loan Request</div>
+                  <div className="text-2xl font-semibold text-[#0A2540]">
+                    {application.loanAmount ? `$${application.loanAmount.toLocaleString()}` : 'Pending'}
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {application.selectedOffer
-                      ? `You selected ${application.selectedOffer.lenderName} at ${application.selectedOffer.apr}% APR`
-                      : 'Your dashboard is connected to your active application session'}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">2 hours ago</div>
                 </div>
               </div>
-              <div className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                    <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900 mb-0.5">Offers Ready</div>
-                  <div className="text-xs text-gray-500">{application.offersReceived} personalized offers available to review</div>
-                  <div className="text-xs text-gray-400 mt-1">1 day ago</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900 mb-0.5">Application Submitted</div>
-                  <div className="text-xs text-gray-500">Your application has been received and is under review</div>
-                  <div className="text-xs text-gray-400 mt-1">{new Date(application.submittedAt).toLocaleDateString()}</div>
-                </div>
-              </div>
-            </div>
-          </div>
+            </section>
 
-          {/* Quick Actions Grid - Single column on mobile */}
-          <div style={{ animationDelay: '0.5s' }} className="animate-fadeIn opacity-0">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* View Offers */}
-              <Link
-                href="/results"
-                className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-blue-400 hover:shadow-lg transition-all group"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  {application.offersReceived > 0 && (
-                    <span className="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full border border-green-200">
-                      {application.offersReceived} New
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-1.5">View Offers</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  {application.offersReceived > 0
-                    ? application.selectedOffer
-                      ? 'Review the offers tied to your current pre-approval'
-                      : 'Compare rates and terms from multiple lenders'
-                    : 'Check back soon for personalized offers'}
-                </p>
-              </Link>
-
-              {/* Approval Letter */}
-              <Link
-                href="/dashboard/approval-letter"
-                className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-green-400 hover:shadow-lg transition-all group"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-1.5">
-                  {application.hasVehicle ? 'Approval Letter' : 'Pre-Approval Letter'}
-                </h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  Download PDF to present at dealerships
-                </p>
-              </Link>
-
-              {/* Documents */}
-              <Link
-                href="/dashboard/documents"
-                className="block bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-purple-400 hover:shadow-lg transition-all group"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-md">
-                    <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <span className="px-2.5 py-1 bg-yellow-100 text-yellow-700 text-xs font-semibold rounded-full border border-yellow-200">
-                    Optional
-                  </span>
-                </div>
-                <h3 className="text-base font-semibold text-gray-900 mb-1.5">Upload Documents</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  Speed up approval with proof of income
-                </p>
-              </Link>
-
-              {/* Add Vehicle (if pre-approval without vehicle) */}
-              {!application.hasVehicle && (
-                <Link
-                  href="/dashboard/add-vehicle"
-                  className="block bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl border-2 border-blue-600 p-5 hover:from-blue-500 hover:to-blue-600 hover:shadow-xl transition-all group md:col-span-2 lg:col-span-1"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:bg-white/30 transition-all shadow-md">
-                      <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                    </div>
-                    <span className="px-2.5 py-1 bg-white/20 text-white text-xs font-semibold rounded-full border border-white/30">
-                      New
-                    </span>
-                  </div>
-                  <h3 className="text-base font-semibold text-white mb-1.5">Add Vehicle Info</h3>
-                  <p className="text-xs text-blue-100 leading-relaxed">
-                    Found your car? Add details to finalize loan
-                  </p>
+            <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
+              <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Actions</p>
+              <div className="space-y-3">
+                <Link href="/results" className="block rounded-xl bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-blue-500">
+                  View Offers
                 </Link>
-              )}
-            </div>
+                <Link href="/apply" className="block rounded-xl border border-[#D7E3F1] px-4 py-3 text-center text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC]">
+                  Start Another Application
+                </Link>
+              </div>
+            </section>
           </div>
+        )}
+      </div>
 
-          {/* Help Section */}
-          <div className="mt-8 bg-blue-50 border border-blue-100 rounded-2xl p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">Need Help?</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  If you have questions about your application or need assistance, we&apos;re here to help.
-                </p>
-                <div className="flex gap-4 text-sm">
-                  <a href="mailto:support@autoloanpro.co" className="text-blue-600 hover:text-blue-700 font-medium">
-                    Email Support
-                  </a>
-                  <Link href="/" className="text-blue-600 hover:text-blue-700 font-medium">
-                    Visit Help Center
-                  </Link>
-                </div>
-              </div>
+      {showCancelModal && hasLockedOffer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6 backdrop-blur-sm" onClick={() => setShowCancelModal(false)} role="presentation">
+          <div
+            ref={cancelDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cancel-offer-title"
+            tabIndex={-1}
+            onClick={(event) => event.stopPropagation()}
+            className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl"
+          >
+            <h2 id="cancel-offer-title" className="mb-2 text-2xl font-semibold text-[#0A2540]">Cancel locked offer</h2>
+            <p className="mb-6 text-sm leading-6 text-[#425466]">
+              Cancelling this offer will unlock your application and let you apply again or choose a different offer later.
+            </p>
+            <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(false)}
+                className="text-left text-sm font-medium text-[#6B7C93] hover:text-[#0A2540]"
+              >
+                Go Back
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelOffer}
+                disabled={cancelSubmitting}
+                className="inline-flex items-center justify-center rounded-xl bg-red-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-red-300"
+              >
+                {cancelSubmitting ? 'Cancelling...' : 'Cancel Offer'}
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
-export default function ConsumerDashboard() {
+export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-gray-500">Loading dashboard...</div></div>}>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[#F6F9FC] text-[#6B7C93]">Loading...</div>}>
       <DashboardContent />
     </Suspense>
   );

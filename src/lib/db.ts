@@ -517,6 +517,9 @@ function mapDbToApp(row: Record<string, unknown>): MockApplication {
     ptiPercent: row.pti_percent ? Number(row.pti_percent) : undefined,
     hasVehicle: (row.has_vehicle as boolean) ?? false,
     status: row.status as MockApplication['status'],
+    lockedOfferId: (row.locked_offer_id as string | null) ?? undefined,
+    offerLockedAt: (row.offer_locked_at as string | null) ?? undefined,
+    offerExpiresAt: (row.offer_expires_at as string | null) ?? undefined,
     state: row.state as string,
     submittedAt: row.submitted_at as string,
     updatedAt: row.updated_at as string || new Date().toISOString(),
@@ -547,6 +550,9 @@ function mapAppToDb(app: Partial<MockApplication>): Record<string, unknown> {
   if (app.ptiPercent !== undefined) dbRow.pti_percent = app.ptiPercent;
   if (app.hasVehicle !== undefined) dbRow.has_vehicle = app.hasVehicle;
   if (app.status !== undefined) dbRow.status = app.status;
+  if ('lockedOfferId' in app) dbRow.locked_offer_id = app.lockedOfferId ?? null;
+  if ('offerLockedAt' in app) dbRow.offer_locked_at = app.offerLockedAt ?? null;
+  if ('offerExpiresAt' in app) dbRow.offer_expires_at = app.offerExpiresAt ?? null;
   if (app.state !== undefined) dbRow.state = app.state;
   if (app.submittedAt !== undefined) dbRow.submitted_at = app.submittedAt;
   if (app.updatedAt !== undefined) dbRow.updated_at = app.updatedAt;
@@ -619,7 +625,9 @@ function mapDbToOffer(row: Record<string, unknown>): MockOffer {
     termMonths: Number(row.term_months || 0),
     monthlyPayment: Number(row.monthly_payment || 0),
     approvedAmount: Number(row.approved_amount || 0),
+    maxApprovedAmount: row.max_approved_amount ? Number(row.max_approved_amount) : undefined,
     status: row.status as MockOffer['status'],
+    lockedAt: (row.locked_at as string | null) ?? undefined,
     conditions: (row.conditions as string[]) || [],
     decisionAt: row.decision_at as string,
     expiresAt: row.expires_at as string,
@@ -636,7 +644,9 @@ function mapOfferToDb(offer: Partial<MockOffer>): Record<string, unknown> {
   if (offer.termMonths !== undefined) dbRow.term_months = offer.termMonths;
   if (offer.monthlyPayment !== undefined) dbRow.monthly_payment = offer.monthlyPayment;
   if (offer.approvedAmount !== undefined) dbRow.approved_amount = offer.approvedAmount;
+  if (offer.maxApprovedAmount !== undefined) dbRow.max_approved_amount = offer.maxApprovedAmount;
   if (offer.status !== undefined) dbRow.status = offer.status;
+  if ('lockedAt' in offer) dbRow.locked_at = offer.lockedAt ?? null;
   if (offer.conditions !== undefined) dbRow.conditions = offer.conditions;
   if (offer.decisionAt !== undefined) dbRow.decision_at = offer.decisionAt;
   if (offer.expiresAt !== undefined) dbRow.expires_at = offer.expiresAt;

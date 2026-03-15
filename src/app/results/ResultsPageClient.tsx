@@ -15,6 +15,7 @@ interface AnonymizedOffer {
   id: string;
   label: string; // "Offer A", "Offer B", "Offer C"
   lenderId: string;
+  lenderName: string;
   apr: number;
   baseApr: number;
   monthlyPayment: number;
@@ -129,6 +130,7 @@ function ResultsContent() {
 
   const [offers, setOffers] = useState<AnonymizedOffer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [applicationId, setApplicationId] = useState<string | null>(null);
   const [applicationStatus, setApplicationStatus] = useState<string>('pending_decision');
   const [term, setTerm] = useState(60);
   const [downPayment, setDownPayment] = useState(0);
@@ -142,6 +144,7 @@ function ResultsContent() {
   const [savingPassword, setSavingPassword] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<AnonymizedOffer | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [sortBy, setSortBy] = useState<'best_rate' | 'lowest_payment' | 'highest_amount'>('best_rate');
   const [compareMode, setCompareMode] = useState(false);
   const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
@@ -172,6 +175,7 @@ function ResultsContent() {
           id: 'demo-1',
           label: 'Offer A',
           lenderId: 'LND-001',
+          lenderName: 'Capital Auto Finance',
           apr: 4.2,
           baseApr: 4.2,
           monthlyPayment: 465,
@@ -191,6 +195,7 @@ function ResultsContent() {
           id: 'demo-2',
           label: 'Offer B',
           lenderId: 'LND-002',
+          lenderName: 'Summit Lending Group',
           apr: 5.8,
           baseApr: 5.8,
           monthlyPayment: 398,
@@ -210,6 +215,7 @@ function ResultsContent() {
           id: 'demo-3',
           label: 'Offer C',
           lenderId: 'LND-003',
+          lenderName: 'Northstar Auto Credit',
           apr: 7.1,
           baseApr: 7.1,
           monthlyPayment: 542,
@@ -254,6 +260,7 @@ function ResultsContent() {
 
         if (cancelled) return;
 
+        setApplicationId(payload.application?.id || null);
         setApplicationStatus(nextStatus);
         setPasswordConfigured(nextPasswordConfigured);
         setOffers(nextOffers);
@@ -376,6 +383,7 @@ function ResultsContent() {
 
   const handleSelectClick = (offer: AnonymizedOffer) => {
     setSelectedOffer(offer);
+    setAcceptTerms(false);
     setShowConfirmModal(true);
   };
 
@@ -426,45 +434,43 @@ function ResultsContent() {
   };
 
   const handleConfirmSelection = async () => {
-    if (!selectedOffer) return;
+    if (!selectedOffer || !applicationId) return;
 
-    setShowConfirmModal(false);
     setCalculating(true);
 
     // Dev mode: skip API, go to dashboard
     if (isDev) {
       setTimeout(() => {
+        toast.success('Offer locked in successfully.');
         router.push('/dashboard');
       }, 1500);
       return;
     }
 
     try {
-      const res = await fetch('/api/offers/select', {
+      const res = await fetch('/api/offers/lock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           offerId: selectedOffer.id,
-          selectedTerm: term,
-          selectedDownPayment: downPayment,
+          applicationId,
         }),
       });
 
       const data = await res.json();
 
       if (!data.success) {
-        toast.error(data.error || 'Failed to select offer');
+        toast.error('Unable to complete your request.');
         setCalculating(false);
         return;
       }
 
-      // Use the refreshed consumer-session cookie for dashboard access.
-      toast.success(`Pre-approved with ${data.data?.lenderName || 'your lender'}!`);
+      toast.success('Offer locked in successfully.');
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push(data.data?.redirectTo || '/dashboard');
       }, 1500);
     } catch {
-      toast.error('Failed to select offer');
+      toast.error('Unable to complete your request.');
       setCalculating(false);
     }
   };
@@ -1086,55 +1092,83 @@ function ResultsContent() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl"
+              className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl"
             >
-              <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h2 id="confirm-offer-title" className="text-2xl font-bold text-gray-900 mb-2">Confirm Your Selection</h2>
+              <div className="mb-6">
+                <h2 id="confirm-offer-title" className="text-2xl font-bold text-gray-900 mb-2">Lock In This Offer</h2>
                 <p className="text-sm text-gray-600">
-                  Proceeding with <strong>{selectedOffer.label}</strong> at <strong>{calculatePayment(selectedOffer, term, downPayment) > 0 ?
-                    `${((selectedOffer.rateTiers.find(t => t.termMonths === term)?.rateMin || 0) + (selectedOffer.rateTiers.find(t => t.termMonths === term)?.rateMax || 0)) / 2}` :
-                    selectedOffer.apr}% APR</strong>.
+                  Review the terms before you continue with {selectedOffer.lenderName}.
                 </p>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Monthly Payment:</span>
-                  <span className="font-semibold text-gray-900">${calculatePayment(selectedOffer, term, downPayment).toLocaleString()}</span>
+              <div className="mb-6 rounded-2xl border border-blue-100 bg-gradient-to-br from-white to-blue-50 p-5">
+                <div className="mb-4 flex items-start justify-between gap-4">
+                  <div>
+                    <div className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Selected Lender</div>
+                    <div className="mt-1 text-xl font-semibold text-[#0A2540]">{selectedOffer.lenderName}</div>
+                  </div>
+                  <div className="rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
+                    {selectedOffer.label}
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Term:</span>
-                  <span className="font-semibold text-gray-900">{term} months</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Down Payment:</span>
-                  <span className="font-semibold text-gray-900">${downPayment.toLocaleString()}</span>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="rounded-xl border border-blue-100 bg-white p-4">
+                    <div className="mb-1 text-xs uppercase tracking-wide text-gray-500">APR</div>
+                    <div className="text-xl font-semibold text-[#0A2540]">
+                      {(((selectedOffer.rateTiers.find((tier) => tier.termMonths === term)?.rateMin || selectedOffer.apr) +
+                        (selectedOffer.rateTiers.find((tier) => tier.termMonths === term)?.rateMax || selectedOffer.apr)) / 2).toFixed(2)}%
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-blue-100 bg-white p-4">
+                    <div className="mb-1 text-xs uppercase tracking-wide text-gray-500">Monthly Payment</div>
+                    <div className="text-xl font-semibold text-[#0A2540]">${calculatePayment(selectedOffer, term, downPayment).toLocaleString()}</div>
+                  </div>
+                  <div className="rounded-xl border border-blue-100 bg-white p-4">
+                    <div className="mb-1 text-xs uppercase tracking-wide text-gray-500">Term</div>
+                    <div className="text-xl font-semibold text-[#0A2540]">{term} months</div>
+                  </div>
+                  <div className="rounded-xl border border-blue-100 bg-white p-4">
+                    <div className="mb-1 text-xs uppercase tracking-wide text-gray-500">Loan Amount</div>
+                    <div className="text-xl font-semibold text-[#0A2540]">${(selectedOffer.maxApprovedAmount || selectedOffer.approvedAmount).toLocaleString()}</div>
+                  </div>
                 </div>
               </div>
 
-              <p className="text-xs text-gray-600 mb-6 text-center">
-                This will reveal the lender and generate your pre-approval letter. You can review it before proceeding to finalize.
-              </p>
+              <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 text-sm text-gray-700">
+                <p className="mb-3">By selecting this offer, you agree to proceed exclusively with {selectedOffer.lenderName} for this auto loan.</p>
+                <p className="mb-3">You may only have one active offer at a time.</p>
+                <p className="mb-3">You cannot submit a new application until this offer expires or is cancelled.</p>
+                <p>This offer is valid for 30 days from today.</p>
+              </div>
 
-              <div className="flex gap-3">
+              <label className="mb-6 flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <input
+                  type="checkbox"
+                  checked={acceptTerms}
+                  onChange={(event) => setAcceptTerms(event.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-700">I understand and accept these terms</span>
+              </label>
+
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <button
                   type="button"
-                  onClick={() => setShowConfirmModal(false)}
-                  className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition-colors active:scale-[0.98] transition-transform focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  onClick={() => {
+                    setShowConfirmModal(false);
+                    setAcceptTerms(false);
+                  }}
+                  className="text-left text-sm font-medium text-gray-600 hover:text-gray-900"
                 >
                   Go Back
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmSelection}
-                  className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.98] transition-transform focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  disabled={!acceptTerms || calculating}
+                  className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
-                  Confirm
+                  {calculating ? 'Confirming...' : 'Confirm Selection'}
                 </button>
               </div>
             </motion.div>

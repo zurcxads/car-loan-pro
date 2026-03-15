@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
       id: offer.id,
       label: `Offer ${String.fromCharCode(65 + index)}`, // A, B, C
       lenderId: offer.lenderId || '', // Keep for backend reference
+      lenderName: offer.lenderName,
       apr: offer.apr,
       baseApr: offer.apr,
       monthlyPayment: offer.monthlyPayment,
