@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { apiError, apiSuccess, parseBody, requireAuth } from '@/lib/api-helpers';
+import { sendDocumentsRequestedEmail } from '@/lib/consumer-notifications';
 import { dbUpdateApplication } from '@/lib/db';
 import { getLenderActiveApplication } from '@/lib/lender-applications';
 import { serverLogger } from '@/lib/server-logger';
@@ -71,6 +72,20 @@ export async function POST(request: NextRequest) {
 
     if (!updatedApplication) {
       return apiError('Failed to create document requests', 500);
+    }
+
+    const emailResult = await sendDocumentsRequestedEmail(
+      ownedApplication.application.borrower.email,
+      data.docTypes,
+      data.deadline,
+      `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`
+    );
+
+    if (!emailResult.success) {
+      serverLogger.error('Failed to send consumer documents requested email', {
+        applicationId: data.applicationId,
+        email: ownedApplication.application.borrower.email,
+      });
     }
 
     return apiSuccess({

@@ -2,7 +2,9 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { apiError, requireAuth } from '@/lib/api-helpers';
 import { normalizeApplicationMetadata } from '@/lib/application-metadata';
-import { dbCreateActivityEvent, dbGetApplication, dbUpdateApplication, dbUpdateOffer } from '@/lib/db';
+import { sendOfferApprovedEmail, sendOfferDeclinedEmail } from '@/lib/consumer-notifications';
+import { dbCreateActivityEvent, dbUpdateApplication, dbUpdateOffer } from '@/lib/db';
+import { getLenderActiveApplication } from '@/lib/lender-applications';
 import type { MockApplication } from '@/lib/mock-data';
 import { serverLogger } from '@/lib/server-logger';
 
@@ -25,7 +27,6 @@ const statusByAction: Record<
 export async function POST(req: NextRequest) {
   const { session, error: authError } = await requireAuth('lender');
   if (authError) return authError;
-  void session;
 
   const body = await req.json().catch(() => null);
   const parsed = lenderDecisionRequestSchema.safeParse(body);
@@ -35,9 +36,15 @@ export async function POST(req: NextRequest) {
   }
 
   const { applicationId, action, terms } = parsed.data;
+  const lenderId = session?.user.entityId;
+
+  if (!lenderId) {
+    return apiError('Lender account is missing an entity ID', 403);
+  }
 
   try {
-    const application = await dbGetApplication(applicationId);
+    const ownedApplication = await getLenderActiveApplication(lenderId, applicationId);
+    const application = ownedApplication?.application;
 
     if (!application) {
       return apiError('Application not found', 404);
@@ -90,12 +97,34 @@ export async function POST(req: NextRequest) {
     }
 
     const termsSummary = terms ? ` Terms: ${JSON.stringify(terms)}.` : '';
+    const lenderName = ownedApplication?.lockedOffer.lenderName || session?.user.name || 'Your lender';
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`;
 
     await dbCreateActivityEvent({
       type: action === 'decline' ? 'declined' : 'system',
       timestamp: new Date().toISOString(),
       description: `${session?.user.name || 'Lender'} set ${applicationId} to ${action}.${termsSummary}`,
     });
+
+    if (action === 'approve') {
+      const emailResult = await sendOfferApprovedEmail(application.borrower.email, lenderName, dashboardUrl);
+      if (!emailResult.success) {
+        serverLogger.error('Failed to send consumer approval email', {
+          applicationId,
+          email: application.borrower.email,
+        });
+      }
+    }
+
+    if (action === 'decline') {
+      const emailResult = await sendOfferDeclinedEmail(application.borrower.email, dashboardUrl);
+      if (!emailResult.success) {
+        serverLogger.error('Failed to send consumer decline email', {
+          applicationId,
+          email: application.borrower.email,
+        });
+      }
+    }
 
     return Response.json({
       success: true,

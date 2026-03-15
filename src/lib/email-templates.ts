@@ -344,6 +344,125 @@ export function rateExpiringEmail(
   };
 }
 
+export function consumerOfferExpiringEmail(
+  email: string,
+  daysRemaining: number,
+  lenderName: string,
+  dashboardUrl: string
+): EmailData {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Your Offer Expires Soon</h2>
+      <p style="color: #374151; line-height: 1.6;">
+        Your offer from <strong>${lenderName}</strong> expires in <strong>${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}</strong>.
+      </p>
+      <p style="color: #374151; line-height: 1.6;">
+        Review the latest details and complete your next step before the offer window closes.
+      </p>
+      <p style="text-align: center;">
+        <a href="${dashboardUrl}" class="button">View Dashboard</a>
+      </p>
+    </div>
+  `;
+
+  return {
+    to: email,
+    subject: `Your ${lenderName} Offer Expires in ${daysRemaining} Day${daysRemaining !== 1 ? 's' : ''}`,
+    html: emailWrapper(content),
+  };
+}
+
+export function consumerDocumentsRequestedEmail(
+  email: string,
+  docTypes: string[],
+  deadline: string,
+  dashboardUrl: string
+): EmailData {
+  const docList = docTypes.map((docType) => `<li>${docType.replace(/_/g, ' ')}</li>`).join('');
+  const formattedDeadline = new Date(deadline).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Documents Needed</h2>
+      <p style="color: #374151; line-height: 1.6;">
+        Your lender requested a few documents to keep your application moving.
+      </p>
+      <ul style="color: #374151; line-height: 1.8; padding-left: 24px;">
+        ${docList}
+      </ul>
+      <p style="color: #374151; line-height: 1.6;">
+        Please upload everything by <strong>${formattedDeadline}</strong>.
+      </p>
+      <p style="text-align: center;">
+        <a href="${dashboardUrl}" class="button">View Dashboard</a>
+      </p>
+    </div>
+  `;
+
+  return {
+    to: email,
+    subject: 'Documents Requested for Your Application',
+    html: emailWrapper(content),
+  };
+}
+
+export function consumerOfferApprovedEmail(
+  email: string,
+  lenderName: string,
+  dashboardUrl: string
+): EmailData {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Your Application Is Approved</h2>
+      <p style="color: #374151; line-height: 1.6;">
+        <strong>${lenderName}</strong> approved your application.
+      </p>
+      <p style="color: #374151; line-height: 1.6;">
+        Your dashboard has the latest status and next-step guidance.
+      </p>
+      <p style="text-align: center;">
+        <a href="${dashboardUrl}" class="button">View Dashboard</a>
+      </p>
+    </div>
+  `;
+
+  return {
+    to: email,
+    subject: 'Your Auto Loan Pro Application Was Approved',
+    html: emailWrapper(content),
+  };
+}
+
+export function consumerOfferDeclinedEmail(
+  email: string,
+  dashboardUrl: string
+): EmailData {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Application Update</h2>
+      <p style="color: #374151; line-height: 1.6;">
+        Your application status has been updated.
+      </p>
+      <p style="color: #374151; line-height: 1.6;">
+        Visit your dashboard to review the latest details and available next steps.
+      </p>
+      <p style="text-align: center;">
+        <a href="${dashboardUrl}" class="button">View Dashboard</a>
+      </p>
+    </div>
+  `;
+
+  return {
+    to: email,
+    subject: 'Your Auto Loan Pro Application Status Changed',
+    html: emailWrapper(content),
+  };
+}
+
 /**
  * Send email via Resend when configured
  */
