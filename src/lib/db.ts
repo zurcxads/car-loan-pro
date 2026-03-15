@@ -438,9 +438,9 @@ function serializeBorrower(
 }
 
 function deserializeBorrower(
-  borrower: Record<string, unknown> | null | undefined
+  borrower: unknown
 ): MockApplication['borrower'] {
-  const parsedBorrower = (borrower ?? {}) as MockApplication['borrower'];
+  const parsedBorrower = (typeof borrower === 'object' && borrower !== null ? borrower : {}) as MockApplication['borrower'];
 
   if (!parsedBorrower.ssn) {
     return parsedBorrower;
