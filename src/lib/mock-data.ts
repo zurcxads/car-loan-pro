@@ -2,7 +2,12 @@
 // Matches PRD Section 2 exactly
 
 export type MockAppStatus =
+  | 'draft'
+  | 'submitted'
+  | 'processing'
   | 'pending_decision'
+  | 'offers_ready'
+  | 'under_review'
   | 'offers_available'
   | 'offer_accepted'
   | 'documents_requested'
