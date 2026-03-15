@@ -216,6 +216,9 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
     console.error('Application creation error:', errMsg, err instanceof Error ? err.stack : '');
+    if (process.env.NODE_ENV === 'development') {
+      return apiError(errMsg, 500);
+    }
     return apiError('Failed to create application', 500);
   }
 }
