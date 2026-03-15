@@ -2,6 +2,7 @@
 // Falls back to mock data when Supabase is not configured
 
 import { useMockData as shouldUseMockData } from './env';
+import { decrypt, encrypt } from './encryption';
 import { isSupabaseConfigured, getServiceClient } from './supabase';
 import {
   MOCK_APPLICATIONS, MOCK_OFFERS, MOCK_LENDERS, MOCK_DEALERS,
@@ -369,9 +370,10 @@ export async function dbGetPlatformStats() {
 
 // --- Applications ---
 function mapDbToApp(row: Record<string, unknown>): MockApplication {
+  const borrower = deserializeBorrower(row.borrower);
   const app = {
     id: row.id as string,
-    borrower: row.borrower as MockApplication['borrower'],
+    borrower,
     employment: row.employment as MockApplication['employment'],
     credit: row.credit as MockApplication['credit'],
     vehicle: row.vehicle as MockApplication['vehicle'],
@@ -401,7 +403,7 @@ function mapDbToApp(row: Record<string, unknown>): MockApplication {
 function mapAppToDb(app: Partial<MockApplication>): Record<string, unknown> {
   const dbRow: Record<string, unknown> = {};
   if (app.id !== undefined) dbRow.id = app.id;
-  if (app.borrower !== undefined) dbRow.borrower = app.borrower;
+  if (app.borrower !== undefined) dbRow.borrower = serializeBorrower(app.borrower);
   if (app.employment !== undefined) dbRow.employment = app.employment;
   if (app.credit !== undefined) dbRow.credit = app.credit;
   if (app.vehicle !== undefined) dbRow.vehicle = app.vehicle;
@@ -419,6 +421,35 @@ function mapAppToDb(app: Partial<MockApplication>): Record<string, unknown> {
   if (app.offersReceived !== undefined) dbRow.offers_received = app.offersReceived;
   if (app.flags !== undefined) dbRow.flags = app.flags;
   return dbRow;
+}
+
+function serializeBorrower(
+  borrower: MockApplication['borrower']
+): MockApplication['borrower'] {
+  const ssn = borrower.ssn
+    ? encrypt(borrower.ssn, process.env.ENCRYPTION_KEY)
+    : borrower.ssn;
+
+  // Handles PII encryption at rest for borrower SSNs.
+  return {
+    ...borrower,
+    ssn,
+  };
+}
+
+function deserializeBorrower(
+  borrower: Record<string, unknown> | null | undefined
+): MockApplication['borrower'] {
+  const parsedBorrower = (borrower ?? {}) as MockApplication['borrower'];
+
+  if (!parsedBorrower.ssn) {
+    return parsedBorrower;
+  }
+
+  return {
+    ...parsedBorrower,
+    ssn: decrypt(parsedBorrower.ssn, process.env.ENCRYPTION_KEY),
+  };
 }
 
 function buildLegacyApplicationInsert(appRow: Record<string, unknown>): Record<string, unknown> {
