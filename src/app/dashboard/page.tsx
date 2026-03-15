@@ -102,14 +102,64 @@ function getProgressIndex(status: string): number {
 
 function getNextStepsCopy(status: string): string {
   switch (status) {
-    case 'documents_requested':
-      return 'Your lender has requested documents. Upload them below.';
-    case 'approved':
-      return 'Congratulations! Visit your lender to finalize your loan.';
     case 'offer_accepted':
+    case 'submitted':
+      return 'Your lender is reviewing your application. You will be notified when they need additional information or make a decision.';
+    case 'documents_requested':
+      return 'Your lender has requested documents. Please upload them in the Documents section below to keep your application moving.';
+    case 'under_review':
+      return 'Your documents are being reviewed. We will notify you when a decision is made.';
+    case 'approved':
+      return 'Your loan has been approved. Contact your lender to finalize the paperwork and complete your purchase.';
+    case 'funded':
+      return 'Your loan has been funded. Thank you for using Auto Loan Pro.';
+    case 'declined':
+      return 'Unfortunately, this offer was declined. You may submit a new application.';
+    case 'expired':
+      return 'This offer has expired. You may submit a new application.';
     default:
-      return 'Your lender will review your application. You will be notified when they need additional information.';
+      return 'Review your offers and select one to proceed.';
   }
+}
+
+function NextStepsIcon({ status }: { status: string }) {
+  if (status === 'documents_requested') {
+    return (
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-orange-600">
+        <svg aria-hidden="true" viewBox="0 0 20 20" className="h-5 w-5 fill-current">
+          <path d="M10 1.75a8.25 8.25 0 1 0 0 16.5 8.25 8.25 0 0 0 0-16.5Zm0 4a1 1 0 0 1 1 1v3.75a1 1 0 1 1-2 0V6.75a1 1 0 0 1 1-1Zm0 8a1.125 1.125 0 1 1 0-2.25 1.125 1.125 0 0 1 0 2.25Z" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (status === 'approved' || status === 'funded') {
+    return (
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+        <svg aria-hidden="true" viewBox="0 0 20 20" className="h-5 w-5 fill-current">
+          <path d="M16.704 5.29a1 1 0 0 1 .006 1.414l-7.2 7.26a1 1 0 0 1-1.42 0L4.79 10.66a1 1 0 0 1 1.414-1.414l2.596 2.596 6.493-6.546a1 1 0 0 1 1.41-.006Z" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (status === 'declined' || status === 'expired') {
+    return (
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-500">
+        <svg aria-hidden="true" viewBox="0 0 20 20" className="h-5 w-5 fill-current">
+          <path d="M10 1.75a8.25 8.25 0 1 0 0 16.5 8.25 8.25 0 0 0 0-16.5ZM6.97 6.97a.75.75 0 0 1 1.06 0L10 8.94l1.97-1.97a.75.75 0 1 1 1.06 1.06L11.06 10l1.97 1.97a.75.75 0 1 1-1.06 1.06L10 11.06l-1.97 1.97a.75.75 0 1 1-1.06-1.06L8.94 10 6.97 8.03a.75.75 0 0 1 0-1.06Z" />
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="h-5 w-5 fill-current">
+        <path d="M10 1.75a8.25 8.25 0 1 0 0 16.5 8.25 8.25 0 0 0 0-16.5Zm0 4a1 1 0 0 1 1 1v.25a1 1 0 1 1-2 0v-.25a1 1 0 0 1 1-1Zm1 8.5H9a1 1 0 1 1 0-2h.25V9.5H9a1 1 0 1 1 0-2h1a1 1 0 0 1 1 1v3.75A1 1 0 0 1 11 14.25Z" />
+      </svg>
+    </div>
+  );
 }
 
 function formatDocumentType(type: string): string {
@@ -139,6 +189,7 @@ function DashboardContent() {
   const router = useRouter();
   const isDev = showDevTools();
   const cancelDialogRef = useRef<HTMLDivElement>(null);
+  const documentsSectionRef = useRef<HTMLElement>(null);
 
   const [application, setApplication] = useState<Application | null>(null);
   const [loading, setLoading] = useState(true);
@@ -457,6 +508,7 @@ function DashboardContent() {
 
   const hasLockedOffer = Boolean(application.lockedOfferId && application.lockedOffer);
   const progressIndex = getProgressIndex(application.status);
+  const nextStepsCopy = getNextStepsCopy(application.status);
 
   return (
     <div className="min-h-screen bg-[#F6F9FC]">
@@ -536,12 +588,6 @@ function DashboardContent() {
 
             <div className="space-y-6">
               <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
-                <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Next Steps</p>
-                <h2 className="mb-3 text-2xl font-semibold text-[#0A2540]">What happens now</h2>
-                <p className="text-sm leading-6 text-[#425466]">{getNextStepsCopy(application.status)}</p>
-              </section>
-
-              <section className="rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
                 <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Application Summary</p>
                 <div className="space-y-3 text-sm text-[#425466]">
                   <div className="flex items-center justify-between">
@@ -606,7 +652,28 @@ function DashboardContent() {
           </div>
         )}
 
-        <section className="mt-6 rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
+        <section className="mt-6 rounded-xl border border-[#E3E8EE] bg-white p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-4">
+              <NextStepsIcon status={application.status} />
+              <div>
+                <h2 className="text-lg font-semibold text-[#0A2540]">Next Steps</h2>
+                <p className="mt-2 text-sm leading-6 text-[#425466]">{nextStepsCopy}</p>
+              </div>
+            </div>
+            {application.status === 'documents_requested' ? (
+              <button
+                type="button"
+                onClick={() => documentsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-[#D7E3F1] px-4 py-3 text-sm font-semibold text-[#0A2540] transition-colors hover:bg-[#F6F9FC]"
+              >
+                View Documents
+              </button>
+            ) : null}
+          </div>
+        </section>
+
+        <section ref={documentsSectionRef} className="mt-6 rounded-[28px] border border-[#E3E8EE] bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.06)] sm:p-8">
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="mb-2 text-sm font-medium uppercase tracking-[0.18em] text-blue-600">Documents</p>
