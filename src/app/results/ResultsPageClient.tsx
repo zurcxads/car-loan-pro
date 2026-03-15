@@ -611,6 +611,13 @@ function ResultsContent() {
               You just saved ~15 hours
             </div>
           </motion.div>
+
+          <p className="mt-5 text-sm text-gray-600">
+            Already have an account?{' '}
+            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+              Sign in
+            </Link>
+          </p>
         </motion.div>
 
         {/* Interactive Controls */}

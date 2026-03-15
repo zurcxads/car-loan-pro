@@ -4,7 +4,7 @@ import { createPageMetadata } from '@/lib/page-metadata';
 import ResetPasswordPageClient from './ResetPasswordPageClient';
 
 export const metadata: Metadata = createPageMetadata({
-  title: 'Reset Password',
+  title: 'Set New Password — Auto Loan Pro',
   description: 'Set a new password for your Auto Loan Pro dashboard.',
   path: '/reset-password',
   noIndex: true,

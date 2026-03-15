@@ -243,13 +243,12 @@ function LoginCard() {
           )}
 
           <div className="mt-8 rounded-[24px] border border-[#E3E8EE] bg-[#F6F9FC] p-5">
-            <p className="text-sm font-medium text-[#0A2540]">New here?</p>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              Complete your application first, then use the email link or set a password from your results page.
+            <p className="text-sm leading-6 text-slate-600">
+              New here?{' '}
+              <Link href="/apply" className="font-medium text-blue-600">
+                Apply now
+              </Link>
             </p>
-            <Link href="/apply" className="mt-4 inline-flex text-sm font-medium text-blue-600">
-              Start an application
-            </Link>
           </div>
         </div>
       </div>

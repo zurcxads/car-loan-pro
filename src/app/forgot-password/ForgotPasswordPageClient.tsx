@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function ForgotPasswordPageClient() {
   const [email, setEmail] = useState('');
@@ -85,6 +86,12 @@ export default function ForgotPasswordPageClient() {
               </button>
             </form>
           )}
+
+          <div className="mt-6 text-center">
+            <Link href="/login" className="text-sm font-medium text-blue-600">
+              Back to login
+            </Link>
+          </div>
         </div>
       </div>
     </div>

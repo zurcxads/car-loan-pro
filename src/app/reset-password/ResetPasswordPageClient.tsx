@@ -1,5 +1,6 @@
 "use client";
 
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
@@ -125,6 +126,12 @@ export default function ResetPasswordPageClient() {
               </button>
             </form>
           )}
+
+          <div className="mt-6 text-center">
+            <Link href="/login" className="text-sm font-medium text-blue-600">
+              Back to login
+            </Link>
+          </div>
         </div>
       </div>
     </div>

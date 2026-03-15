@@ -6,20 +6,21 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import Logo from "./Logo";
 import { useFocusTrap } from "@/hooks/useFocusTrap";
+import { CONSUMER_SESSION_COOKIE } from "@/lib/consumer-session";
 
-const navLinks = [
+const baseNavLinks = [
   { label: "How It Works", href: "/how-it-works" },
   { label: "Lenders", href: "/lender/join" },
   { label: "Dealers", href: "/dealer/join" },
   { label: "Resources", href: "/resources" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
-  { label: "Sign In", href: "/login" },
 ];
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hasConsumerSession, setHasConsumerSession] = useState(false);
   const pathname = usePathname();
   const mobileDialogRef = useRef<HTMLDivElement>(null);
 
@@ -29,6 +30,13 @@ export default function Header() {
     const handler = () => setScrolled(window.scrollY > 16);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  useEffect(() => {
+    const hasSession = document.cookie
+      .split("; ")
+      .some((entry) => entry.startsWith(`${CONSUMER_SESSION_COOKIE}=`));
+    setHasConsumerSession(hasSession);
   }, []);
 
   const hiddenPrefixes = ["/admin", "/dashboard", "/apply", "/results", "/dev"];
@@ -45,6 +53,10 @@ export default function Header() {
   if (isPortal) return null;
 
   const isActive = (href: string) => pathname === href;
+  const authLink = hasConsumerSession
+    ? { label: "Dashboard", href: "/dashboard" }
+    : { label: "Sign In", href: "/login" };
+  const navLinks = [...baseNavLinks, authLink];
 
   return (
     <>
