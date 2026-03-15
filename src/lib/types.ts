@@ -33,6 +33,24 @@ export type DocumentRequestType =
   | 'other';
 export type DocumentRequestStatus = 'pending' | 'uploaded' | 'reviewed' | 'approved' | 'rejected';
 export type MessageSenderRole = 'consumer' | 'lender' | 'admin';
+export type ApplicationNotificationType = 'documents_uploaded';
+
+export interface ApplicationNotification {
+  id: string;
+  type: ApplicationNotificationType;
+  applicationId: string;
+  message: string;
+  createdAt: string;
+  readAt?: string | null;
+}
+
+export interface ApplicationMetadata {
+  counterOffer?: {
+    terms: Record<string, unknown>;
+    updatedAt: string;
+  };
+  notifications?: ApplicationNotification[];
+}
 
 // Step 1: Personal Info
 export interface BorrowerPersonalInfo {

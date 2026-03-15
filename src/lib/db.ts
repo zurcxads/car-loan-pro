@@ -528,6 +528,7 @@ function mapDbToApp(row: Record<string, unknown>): MockApplication {
     flags: (row.flags as string[]) || [],
     documentRequests: (row.document_requests as MockApplication['documentRequests']) || [],
     messages: (row.messages as MockApplication['messages']) || [],
+    metadata: (row.metadata as MockApplication['metadata']) || undefined,
   };
 
   // Include session token if present (used for consumer dashboard access)
@@ -563,6 +564,7 @@ function mapAppToDb(app: Partial<MockApplication>): Record<string, unknown> {
   if (app.flags !== undefined) dbRow.flags = app.flags;
   if (app.documentRequests !== undefined) dbRow.document_requests = app.documentRequests;
   if (app.messages !== undefined) dbRow.messages = app.messages;
+  if (app.metadata !== undefined) dbRow.metadata = app.metadata;
   return dbRow;
 }
 

@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { apiError, requireAuth } from '@/lib/api-helpers';
-import { dbCreateActivityEvent, dbGetApplication, dbUpdateApplication } from '@/lib/db';
+import { normalizeApplicationMetadata } from '@/lib/application-metadata';
+import { dbCreateActivityEvent, dbGetApplication, dbUpdateApplication, dbUpdateOffer } from '@/lib/db';
 import type { MockApplication } from '@/lib/mock-data';
 import { serverLogger } from '@/lib/server-logger';
 
@@ -15,7 +16,7 @@ const statusByAction: Record<
   z.infer<typeof lenderDecisionRequestSchema>['action'],
   MockApplication['status']
 > = {
-  approve: 'offers_ready',
+  approve: 'approved',
   decline: 'declined',
   counter: 'under_review',
   request_docs: 'documents_requested',
@@ -46,10 +47,42 @@ export async function POST(req: NextRequest) {
     const nextFlags = action === 'request_docs'
       ? Array.from(new Set([...application.flags, 'docs_requested']))
       : application.flags.filter((flag) => flag !== 'docs_requested');
+    const applicationMetadata = normalizeApplicationMetadata(application.metadata);
+    const nextMetadata = (() => {
+      if (action === 'counter') {
+        return {
+          ...applicationMetadata,
+          counterOffer: {
+            terms: terms ?? {},
+            updatedAt: new Date().toISOString(),
+          },
+        };
+      }
+
+      if (!applicationMetadata.counterOffer) {
+        return applicationMetadata;
+      }
+
+      return {
+        ...applicationMetadata,
+        counterOffer: undefined,
+      };
+    })();
+
+    if (action === 'decline' && application.lockedOfferId) {
+      await dbUpdateOffer(application.lockedOfferId, {
+        status: 'declined',
+        lockedAt: null,
+      });
+    }
 
     const updatedApplication = await dbUpdateApplication(applicationId, {
       status: nextStatus,
       flags: nextFlags,
+      lockedOfferId: action === 'decline' ? null : application.lockedOfferId,
+      offerLockedAt: action === 'decline' ? null : application.offerLockedAt,
+      offerExpiresAt: action === 'decline' ? null : application.offerExpiresAt,
+      metadata: nextMetadata,
     });
 
     if (!updatedApplication) {

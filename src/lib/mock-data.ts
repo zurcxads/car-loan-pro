@@ -93,6 +93,7 @@ export interface MockApplication {
   flags: string[];
   documentRequests?: import('./types').DocumentRequest[];
   messages?: import('./types').Message[];
+  metadata?: import('./types').ApplicationMetadata;
 }
 
 export interface MockOffer {
