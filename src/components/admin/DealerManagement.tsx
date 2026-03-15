@@ -1,12 +1,33 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MOCK_DEALERS, type MockDealer } from '@/lib/mock-data';
 import { formatCurrency } from '@/lib/format-utils';
 
 export default function DealerManagement() {
-  const [dealers] = useState(MOCK_DEALERS);
+  const [dealers, setDealers] = useState(MOCK_DEALERS);
   const [selectedDealer, setSelectedDealer] = useState<MockDealer | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadDealers() {
+      try {
+        const response = await fetch('/api/admin/dealers');
+        const json = (await response.json()) as { success?: boolean; data?: { dealers?: MockDealer[] } };
+
+        if (mounted && json.success && json.data?.dealers) {
+          setDealers(json.data.dealers);
+        }
+      } catch {}
+    }
+
+    void loadDealers();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   if (selectedDealer) {
     return (

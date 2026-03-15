@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MOCK_ADVERSE_ACTIONS, MOCK_FCRA_LOG } from '@/lib/mock-data';
 import { formatDate, formatDateTime, daysUntil } from '@/lib/format-utils';
 import StatusBadge from '@/components/shared/StatusBadge';
@@ -10,7 +10,36 @@ type SubTab = 'adverse' | 'fcra' | 'ecoa';
 export default function ComplianceCenter() {
   const [subTab, setSubTab] = useState<SubTab>('adverse');
   const [adverseActions, setAdverseActions] = useState(MOCK_ADVERSE_ACTIONS.map(a => ({ ...a, status: a.status as string })));
+  const [fcraLog, setFcraLog] = useState(MOCK_FCRA_LOG);
   const [pullTypeFilter, setPullTypeFilter] = useState('all');
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadComplianceData() {
+      try {
+        const response = await fetch('/api/admin/compliance');
+        const json = (await response.json()) as {
+          success?: boolean;
+          data?: {
+            adverseActions?: typeof MOCK_ADVERSE_ACTIONS;
+            fcraLog?: typeof MOCK_FCRA_LOG;
+          };
+        };
+
+        if (mounted && json.success && json.data) {
+          setAdverseActions((json.data.adverseActions ?? MOCK_ADVERSE_ACTIONS).map((action) => ({ ...action, status: action.status as string })));
+          setFcraLog(json.data.fcraLog ?? MOCK_FCRA_LOG);
+        }
+      } catch {}
+    }
+
+    void loadComplianceData();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const markSent = (id: string) => {
     setAdverseActions(prev => prev.map(a => a.id === id ? { ...a, status: 'sent' as const } : a));
@@ -18,7 +47,7 @@ export default function ComplianceCenter() {
 
   const exportCSV = () => {
     const headers = ['Log ID', 'Borrower', 'Pull Type', 'Bureau', 'Date/Time', 'Purpose', 'Consent', 'App ID', 'Requested By'];
-    const rows = MOCK_FCRA_LOG.map(l => [l.id, l.borrowerName, l.pullType, l.bureau, l.dateTime, l.purpose, l.consentOnFile ? 'Y' : 'N', l.applicationId, l.requestedBy]);
+    const rows = fcraLog.map(l => [l.id, l.borrowerName, l.pullType, l.bureau, l.dateTime, l.purpose, l.consentOnFile ? 'Y' : 'N', l.applicationId, l.requestedBy]);
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -29,7 +58,7 @@ export default function ComplianceCenter() {
     URL.revokeObjectURL(url);
   };
 
-  const filteredFCRA = pullTypeFilter === 'all' ? MOCK_FCRA_LOG : MOCK_FCRA_LOG.filter(l => l.pullType === pullTypeFilter);
+  const filteredFCRA = pullTypeFilter === 'all' ? fcraLog : fcraLog.filter(l => l.pullType === pullTypeFilter);
 
   return (
     <div>

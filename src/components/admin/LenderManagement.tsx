@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MOCK_LENDERS, type MockLender } from '@/lib/mock-data';
 import { formatCurrency } from '@/lib/format-utils';
 import StatusBadge from '@/components/shared/StatusBadge';
@@ -9,6 +9,27 @@ import { BarChart as SimpleBarChart } from '@/components/shared/charts';
 export default function LenderManagement() {
   const [lenders, setLenders] = useState(MOCK_LENDERS);
   const [selectedLender, setSelectedLender] = useState<MockLender | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadLenders() {
+      try {
+        const response = await fetch('/api/admin/lenders');
+        const json = (await response.json()) as { success?: boolean; data?: { lenders?: MockLender[] } };
+
+        if (mounted && json.success && json.data?.lenders) {
+          setLenders(json.data.lenders);
+        }
+      } catch {}
+    }
+
+    void loadLenders();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const toggleActive = (id: string) => {
     setLenders(prev => prev.map(l => l.id === id ? { ...l, isActive: !l.isActive } : l));

@@ -1,22 +1,70 @@
 "use client";
 
-import { useState } from 'react';
-import { MOCK_DEALERS } from '@/lib/mock-data';
+import { useEffect, useState } from 'react';
+import { MOCK_DEALERS, type MockDealer } from '@/lib/mock-data';
 
 export default function DealerSettings() {
-  const dealer = MOCK_DEALERS[0]; // AutoMax Houston
-  const [name, setName] = useState(dealer.name);
-  const [address, setAddress] = useState(dealer.address);
-  const [city, setCity] = useState(dealer.city);
-  const [state, setState] = useState(dealer.state);
-  const [zip, setZip] = useState(dealer.zip);
-  const [phone, setPhone] = useState(dealer.phone);
-  const [website, setWebsite] = useState(dealer.website);
-  const [teamMembers] = useState(dealer.teamMembers);
+  const [dealers, setDealers] = useState<MockDealer[]>(MOCK_DEALERS);
+  const fallbackDealer = dealers[0] ?? MOCK_DEALERS[0];
+  const [dealer, setDealer] = useState(MOCK_DEALERS[0]);
+  const [name, setName] = useState(MOCK_DEALERS[0].name);
+  const [address, setAddress] = useState(MOCK_DEALERS[0].address);
+  const [city, setCity] = useState(MOCK_DEALERS[0].city);
+  const [state, setState] = useState(MOCK_DEALERS[0].state);
+  const [zip, setZip] = useState(MOCK_DEALERS[0].zip);
+  const [phone, setPhone] = useState(MOCK_DEALERS[0].phone);
+  const [website, setWebsite] = useState(MOCK_DEALERS[0].website);
+  const [teamMembers, setTeamMembers] = useState(MOCK_DEALERS[0].teamMembers);
   const [smsAlerts, setSmsAlerts] = useState(true);
-  const [emailDigest, setEmailDigest] = useState('daily');
-  const [smsPhone, setSmsPhone] = useState('(713) 555-0100');
+  const [emailDigest, setEmailDigest] = useState<'daily' | 'weekly' | 'off'>('daily');
+  const [smsPhone, setSmsPhone] = useState(MOCK_DEALERS[0].phone);
   const [saved, setSaved] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadSettings() {
+      try {
+        const response = await fetch('/api/dealers/settings');
+        const json = (await response.json()) as {
+          success?: boolean;
+          data?: {
+            dealer?: MockDealer;
+            notifications?: {
+              smsAlerts?: boolean;
+              emailDigest?: 'daily' | 'weekly' | 'off';
+              smsPhone?: string;
+            };
+          };
+        };
+
+        if (mounted && json.success && json.data?.dealer) {
+          setDealers([json.data.dealer]);
+          setSmsAlerts(json.data.notifications?.smsAlerts ?? true);
+          setEmailDigest(json.data.notifications?.emailDigest ?? 'daily');
+          setSmsPhone(json.data.notifications?.smsPhone ?? json.data.dealer.phone);
+        }
+      } catch {}
+    }
+
+    void loadSettings();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    setDealer(fallbackDealer);
+    setName(fallbackDealer.name);
+    setAddress(fallbackDealer.address);
+    setCity(fallbackDealer.city);
+    setState(fallbackDealer.state);
+    setZip(fallbackDealer.zip);
+    setPhone(fallbackDealer.phone);
+    setWebsite(fallbackDealer.website);
+    setTeamMembers(fallbackDealer.teamMembers);
+  }, [fallbackDealer]);
 
   const save = (section: string) => {
     setSaved(section);
@@ -88,7 +136,7 @@ export default function DealerSettings() {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-700">Email digest</span>
-            <select value={emailDigest} onChange={e => setEmailDigest(e.target.value)} className="px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none cursor-pointer">
+            <select value={emailDigest} onChange={e => setEmailDigest(e.target.value as 'daily' | 'weekly' | 'off')} className="px-3 py-1.5 text-xs bg-gray-50 border border-gray-200 rounded-lg focus:outline-none cursor-pointer">
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
               <option value="off">Off</option>

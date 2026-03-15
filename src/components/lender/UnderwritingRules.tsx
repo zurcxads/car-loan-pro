@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import { MOCK_LENDERS } from '@/lib/mock-data';
+import { useEffect, useState } from 'react';
+import { MOCK_LENDERS, type MockLender } from '@/lib/mock-data';
 
 interface RateTier {
   ficoMin: number;
@@ -11,25 +11,62 @@ interface RateTier {
 }
 
 export default function UnderwritingRules() {
-  const lender = MOCK_LENDERS[0]; // Demo: Ally Financial
-  const [minFico, setMinFico] = useState(lender.minFico);
-  const [maxLtv, setMaxLtv] = useState(lender.maxLtv);
-  const [maxDti, setMaxDti] = useState(lender.maxDti);
-  const [maxPti, setMaxPti] = useState(lender.maxPti);
-  const [minLoan, setMinLoan] = useState(lender.minLoanAmount);
-  const [maxLoan, setMaxLoan] = useState(lender.maxLoanAmount);
-  const [maxAge, setMaxAge] = useState(lender.maxVehicleAge);
-  const [maxMileage, setMaxMileage] = useState(lender.maxMileage);
-  const [acceptCPO, setAcceptCPO] = useState(lender.acceptsCPO);
-  const [acceptPP, setAcceptPP] = useState(lender.acceptsPrivateParty);
-  const [acceptITIN, setAcceptITIN] = useState(lender.acceptsITIN);
-  const [rateTiers] = useState<RateTier[]>(lender.rateTiers);
+  const [lenders, setLenders] = useState<MockLender[]>(MOCK_LENDERS);
+  const fallbackLender = lenders[0] ?? MOCK_LENDERS[0];
+  const [minFico, setMinFico] = useState(MOCK_LENDERS[0].minFico);
+  const [maxLtv, setMaxLtv] = useState(MOCK_LENDERS[0].maxLtv);
+  const [maxDti, setMaxDti] = useState(MOCK_LENDERS[0].maxDti);
+  const [maxPti, setMaxPti] = useState(MOCK_LENDERS[0].maxPti);
+  const [minLoan, setMinLoan] = useState(MOCK_LENDERS[0].minLoanAmount);
+  const [maxLoan, setMaxLoan] = useState(MOCK_LENDERS[0].maxLoanAmount);
+  const [maxAge, setMaxAge] = useState(MOCK_LENDERS[0].maxVehicleAge);
+  const [maxMileage, setMaxMileage] = useState(MOCK_LENDERS[0].maxMileage);
+  const [acceptCPO, setAcceptCPO] = useState(MOCK_LENDERS[0].acceptsCPO);
+  const [acceptPP, setAcceptPP] = useState(MOCK_LENDERS[0].acceptsPrivateParty);
+  const [acceptITIN, setAcceptITIN] = useState(MOCK_LENDERS[0].acceptsITIN);
+  const [rateTiers, setRateTiers] = useState<RateTier[]>(MOCK_LENDERS[0].rateTiers);
   const [saved, setSaved] = useState(false);
 
   const [changeHistory] = useState([
     { by: 'System', date: '2026-03-01', field: 'Min FICO', oldVal: '600', newVal: '620' },
     { by: 'Admin', date: '2026-02-15', field: 'Max LTV', oldVal: '125%', newVal: '120%' },
   ]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadLenders() {
+      try {
+        const response = await fetch('/api/admin/lenders');
+        const json = (await response.json()) as { success?: boolean; data?: { lenders?: MockLender[] } };
+
+        if (mounted && json.success && json.data?.lenders) {
+          setLenders(json.data.lenders);
+        }
+      } catch {}
+    }
+
+    void loadLenders();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    setMinFico(fallbackLender.minFico);
+    setMaxLtv(fallbackLender.maxLtv);
+    setMaxDti(fallbackLender.maxDti);
+    setMaxPti(fallbackLender.maxPti);
+    setMinLoan(fallbackLender.minLoanAmount);
+    setMaxLoan(fallbackLender.maxLoanAmount);
+    setMaxAge(fallbackLender.maxVehicleAge);
+    setMaxMileage(fallbackLender.maxMileage);
+    setAcceptCPO(fallbackLender.acceptsCPO);
+    setAcceptPP(fallbackLender.acceptsPrivateParty);
+    setAcceptITIN(fallbackLender.acceptsITIN);
+    setRateTiers(fallbackLender.rateTiers);
+  }, [fallbackLender]);
 
   const save = () => {
     localStorage.setItem('clp_lender_rules', JSON.stringify({

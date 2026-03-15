@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import { MOCK_LENDERS, MOCK_DEALERS } from '@/lib/mock-data';
+import { useEffect, useState } from 'react';
+import { MOCK_LENDERS, MOCK_DEALERS, type MockDealer, type MockLender } from '@/lib/mock-data';
 import { formatCurrency } from '@/lib/format-utils';
 import { StackedBarChart, TrendIndicator } from '@/components/shared/charts';
 
@@ -16,9 +16,39 @@ const monthlyRevenue = [
 
 export default function RevenueBilling() {
   const [range, setRange] = useState('month');
+  const [lenders, setLenders] = useState<MockLender[]>(MOCK_LENDERS);
+  const [dealers, setDealers] = useState<MockDealer[]>(MOCK_DEALERS);
 
-  const totalReferral = MOCK_LENDERS.reduce((s, l) => s + l.totalReferralFeesOwed, 0);
-  const totalSubscription = MOCK_DEALERS.reduce((s, d) => s + d.planPrice, 0);
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadBillingData() {
+      try {
+        const response = await fetch('/api/admin/billing');
+        const json = (await response.json()) as {
+          success?: boolean;
+          data?: {
+            lenders?: MockLender[];
+            dealers?: MockDealer[];
+          };
+        };
+
+        if (mounted && json.success && json.data) {
+          setLenders(json.data.lenders ?? MOCK_LENDERS);
+          setDealers(json.data.dealers ?? MOCK_DEALERS);
+        }
+      } catch {}
+    }
+
+    void loadBillingData();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const totalReferral = lenders.reduce((s, l) => s + l.totalReferralFeesOwed, 0);
+  const totalSubscription = dealers.reduce((s, d) => s + d.planPrice, 0);
   const mrr = totalSubscription;
   const totalRevenue = totalReferral + totalSubscription;
   const ytdRevenue = monthlyRevenue.reduce((s, m) => s + m.total, 0);
@@ -108,7 +138,7 @@ export default function RevenueBilling() {
                 </tr>
               </thead>
               <tbody>
-                {MOCK_LENDERS.map(l => (
+                {lenders.map(l => (
                   <tr key={l.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                     <td className="py-3 px-4 font-medium text-gray-900">{l.name}</td>
                     <td className="py-3 px-4 text-gray-600">{Math.round(l.totalFundedVolume / 30000)}</td>
@@ -135,7 +165,7 @@ export default function RevenueBilling() {
                 </tr>
               </thead>
               <tbody>
-                {MOCK_DEALERS.map(d => (
+                {dealers.map(d => (
                   <tr key={d.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                     <td className="py-3 px-4 font-medium text-gray-900">{d.name}</td>
                     <td className="py-3 px-4 text-gray-700">{d.plan}</td>

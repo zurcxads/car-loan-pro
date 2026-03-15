@@ -1,39 +1,12 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { MOCK_APPLICATIONS } from '@/lib/mock-data';
 import { formatCurrency } from '@/lib/format-utils';
+import { MOCK_APPLICATIONS, type MockApplication } from '@/lib/mock-data';
+import type { DealerLead, LeadStatus } from '@/lib/portal-data';
 
-type LeadStatus = 'new' | 'contacted' | 'qualified' | 'sold' | 'lost';
 type Filter = 'all' | 'new' | 'contacted' | 'qualified' | 'sold' | 'lost';
-
-interface Lead {
-  id: string;
-  name: string;
-  phone: string;
-  email: string;
-  approvalAmount: number;
-  creditTier: string;
-  vehicle?: string;
-  status: LeadStatus;
-  lastContact?: string;
-  assignedTo?: string;
-  notes?: string;
-}
-
-const MOCK_LEADS: Lead[] = MOCK_APPLICATIONS.slice(0, 12).map((app, i) => ({
-  id: app.id,
-  name: `${app.borrower.firstName} ${app.borrower.lastName}`,
-  phone: '(555) 123-4567',
-  email: app.borrower.email,
-  approvalAmount: app.loanAmount || 25000,
-  creditTier: app.credit.scoreTier,
-  vehicle: app.vehicle ? `${app.vehicle.year} ${app.vehicle.make} ${app.vehicle.model}` : undefined,
-  status: ['new', 'contacted', 'qualified', 'sold', 'lost'][i % 5] as LeadStatus,
-  lastContact: i % 3 === 0 ? '2 hours ago' : undefined,
-  assignedTo: i % 2 === 0 ? 'You' : 'Sarah M.',
-}));
 
 const statusColors: Record<LeadStatus, string> = {
   new: 'border-blue-200 bg-blue-100 text-blue-700',
@@ -45,8 +18,55 @@ const statusColors: Record<LeadStatus, string> = {
 
 export default function LeadManagement() {
   const [filter, setFilter] = useState<Filter>('all');
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [leads, setLeads] = useState<Lead[]>(MOCK_LEADS);
+  const [selectedLead, setSelectedLead] = useState<DealerLead | null>(null);
+  const [applications, setApplications] = useState<MockApplication[]>(MOCK_APPLICATIONS);
+  const [leadStatuses, setLeadStatuses] = useState<Record<string, LeadStatus>>(
+    Object.fromEntries(MOCK_APPLICATIONS.map((application, index) => [application.id, (['new', 'contacted', 'qualified', 'sold', 'lost'] as LeadStatus[])[index % 5]])),
+  );
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadApplications() {
+      try {
+        const response = await fetch('/api/dealers/applications');
+        const json = (await response.json()) as { success?: boolean; data?: MockApplication[] };
+
+        if (mounted && json.success && json.data) {
+          setApplications(json.data);
+          setLeadStatuses((prev) => {
+            const next = { ...prev };
+            json.data?.forEach((application, index) => {
+              if (!next[application.id]) {
+                next[application.id] = (['new', 'contacted', 'qualified', 'sold', 'lost'] as LeadStatus[])[index % 5];
+              }
+            });
+            return next;
+          });
+        }
+      } catch {
+      }
+    }
+
+    void loadApplications();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const leads = useMemo<DealerLead[]>(() => applications.map((application, index) => ({
+    id: application.id,
+    name: `${application.borrower.firstName} ${application.borrower.lastName}`,
+    phone: application.borrower.phone || '(555) 123-4567',
+    email: application.borrower.email,
+    approvalAmount: application.loanAmount || 25000,
+    creditTier: application.credit.scoreTier,
+    vehicle: application.vehicle ? `${application.vehicle.year} ${application.vehicle.make} ${application.vehicle.model}` : undefined,
+    status: leadStatuses[application.id] ?? (['new', 'contacted', 'qualified', 'sold', 'lost'] as LeadStatus[])[index % 5],
+    lastContact: index % 3 === 0 ? '2 hours ago' : undefined,
+    assignedTo: index % 2 === 0 ? 'You' : 'Sarah M.',
+  })), [applications, leadStatuses]);
 
   const filteredLeads = useMemo(() => {
     if (filter === 'all') return leads;
@@ -54,7 +74,7 @@ export default function LeadManagement() {
   }, [leads, filter]);
 
   const updateLeadStatus = (leadId: string, status: LeadStatus) => {
-    setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status } : l));
+    setLeadStatuses((prev) => ({ ...prev, [leadId]: status }));
     if (selectedLead?.id === leadId) {
       setSelectedLead(prev => prev ? { ...prev, status } : null);
     }
