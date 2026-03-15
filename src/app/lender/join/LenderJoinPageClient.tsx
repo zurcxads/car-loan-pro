@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { LayoutDashboard, Shield, Users } from 'lucide-react';
+import { useToast } from '@/components/shared/ToastProvider';
 
 const ficoOptions = ['500', '550', '600', '620', '640', '660', '680', '700', '720'] as const;
 const termOptions = ['24', '36', '48', '60', '72', '84'] as const;
@@ -77,6 +78,7 @@ function inputClassName() {
 }
 
 export default function LenderJoinPageClient() {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<LenderFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -128,13 +130,18 @@ export default function LenderJoinPageClient() {
 
       const payload = (await response.json()) as ApiResponse;
       if (!response.ok || payload.success !== true) {
-        setErrorMessage(payload.error || 'Unable to submit application.');
+        const errorMessage = payload.error || 'Unable to submit application.';
+        setErrorMessage(errorMessage);
+        toast({ type: 'error', message: errorMessage });
         return;
       }
 
       setIsSuccess(true);
+      toast({ type: 'success', message: 'Lender application submitted successfully.' });
     } catch {
-      setErrorMessage('Unable to submit application.');
+      const errorMessage = 'Unable to submit application.';
+      setErrorMessage(errorMessage);
+      toast({ type: 'error', message: errorMessage });
     } finally {
       setIsSubmitting(false);
     }

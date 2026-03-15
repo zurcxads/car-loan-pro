@@ -6,6 +6,7 @@ import DevModeBanner from "@/components/dev/DevModeBanner";
 import CookieConsent from "@/components/shared/CookieConsent";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import Header from "@/components/shared/Header";
+import ToastProvider from "@/components/shared/ToastProvider";
 import "./globals.css";
 
 const sansFont = localFont({
@@ -67,12 +68,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <ErrorBoundary>
           <DevModeProvider>
-            <DevModeBanner />
-            <Header />
             <Providers>
-              <main id="main-content" role="main" tabIndex={-1}>
-                {children}
-              </main>
+              <ToastProvider>
+                <DevModeBanner />
+                <Header />
+                <main id="main-content" role="main" tabIndex={-1}>
+                  {children}
+                </main>
+              </ToastProvider>
             </Providers>
             <CookieConsent />
           </DevModeProvider>

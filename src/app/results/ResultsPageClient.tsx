@@ -5,9 +5,9 @@ import { useState, useEffect, Suspense, useId, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
 import { Check, Clock3 } from 'lucide-react';
 import { SkeletonOfferCards } from '@/components/shared/Skeleton';
+import { useToast } from '@/components/shared/ToastProvider';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { normalizeApplicationStatus } from '@/lib/application-status';
 import { showDevTools } from '@/lib/env';
@@ -126,6 +126,7 @@ function Tooltip({ content }: { content: string }) {
 
 function ResultsContent() {
   const router = useRouter();
+  const { toast } = useToast();
   const compareDialogRef = useRef<HTMLDivElement>(null);
   const confirmDialogRef = useRef<HTMLDivElement>(null);
   const downPaymentInputId = 'results-down-payment';
@@ -250,7 +251,7 @@ function ResultsContent() {
         const response: ResultsApiResponse = await res.json();
 
         if (!response.success) {
-          toast.error(response.error || 'Failed to load offers');
+          toast({ type: 'error', message: response.error || 'Failed to load offers' });
           router.push('/apply');
           return;
         }
@@ -282,7 +283,7 @@ function ResultsContent() {
         }
       } catch {
         if (!cancelled) {
-          toast.error('Failed to load offers');
+          toast({ type: 'error', message: 'Failed to load offers' });
           router.push('/apply');
         }
       }
@@ -443,7 +444,7 @@ function ResultsContent() {
     // Dev mode: skip API, go to dashboard
     if (isDev) {
       setTimeout(() => {
-        toast.success('Offer locked in successfully.');
+        toast({ type: 'success', message: 'Offer locked in successfully.' });
         router.push('/dashboard');
       }, 1500);
       return;
@@ -462,17 +463,17 @@ function ResultsContent() {
       const data = await res.json();
 
       if (!data.success) {
-        toast.error('Unable to complete your request.');
+        toast({ type: 'error', message: 'Unable to complete your request.' });
         setCalculating(false);
         return;
       }
 
-      toast.success('Offer locked in successfully.');
+      toast({ type: 'success', message: 'Offer locked in successfully.' });
       setTimeout(() => {
         router.push(data.data?.redirectTo || '/dashboard');
       }, 1500);
     } catch {
-      toast.error('Unable to complete your request.');
+      toast({ type: 'error', message: 'Unable to complete your request.' });
       setCalculating(false);
     }
   };

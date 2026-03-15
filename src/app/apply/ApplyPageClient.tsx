@@ -5,7 +5,6 @@ import { useState, useEffect, useRef, useId } from 'react';
 import { useRouter, useSearchParams, type ReadonlyURLSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
 import {
   Check,
   ChevronDown,
@@ -15,6 +14,7 @@ import {
   Pencil,
   ShieldCheck,
 } from 'lucide-react';
+import { useToast } from '@/components/shared/ToastProvider';
 import { US_STATES, POPULAR_MAKES } from '@/lib/constants';
 import { apiPost } from '@/lib/api-client';
 import { showDevTools } from '@/lib/env';
@@ -401,6 +401,7 @@ function SectionCard({
 
 export default function ApplyPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const hasAppliedSearchPrefill = useRef(false);
   const [step, setStep] = useState<StepIndex>(0);
@@ -656,7 +657,7 @@ export default function ApplyPage() {
     const { data, error } = await apiPost<{ id: string }>('/api/applications', payload);
 
     if (error) {
-      toast.error(error);
+      toast({ type: 'error', message: error });
       setSubmitting(false);
       return;
     }
@@ -665,7 +666,7 @@ export default function ApplyPage() {
       const appData = data as { id: string };
       localStorage.setItem('clp_current_app_id', appData.id);
 
-      toast.success('Application submitted! Finding your best rates...');
+      toast({ type: 'success', message: 'Application submitted. Finding your best rates...' });
       setTimeout(() => router.push('/results'), 2500);
     }
   };

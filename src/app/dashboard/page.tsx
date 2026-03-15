@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, Suspense } from 'react';
 import Link from 'next/link';
-import toast from 'react-hot-toast';
 import { SkeletonDashboard, SkeletonText } from '@/components/shared/Skeleton';
+import { persistToast, useToast } from '@/components/shared/ToastProvider';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { showDevTools } from '@/lib/env';
 import type { ApplicationStatus, DocumentRequest, Message } from '@/lib/types';
@@ -200,6 +200,7 @@ function formatMessageTime(date: string): string {
 
 function DashboardContent() {
   const isDev = showDevTools();
+  const { toast } = useToast();
   const cancelDialogRef = useRef<HTMLDivElement>(null);
   const documentsSectionRef = useRef<HTMLElement>(null);
   const expiringApplicationIdRef = useRef<string | null>(null);
@@ -301,6 +302,7 @@ function DashboardContent() {
       .then((res) => res.json())
       .then((response: DashboardApiResponse) => {
         if (!response.success) {
+          toast({ type: 'error', message: response.error || 'Failed to load dashboard' });
           setError(response.error || 'Failed to load dashboard');
           return;
         }
@@ -308,12 +310,13 @@ function DashboardContent() {
         setApplication(response.data.application);
       })
       .catch(() => {
+        toast({ type: 'error', message: 'Failed to load dashboard' });
         setError('Failed to load dashboard');
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [isDev]);
+  }, [isDev, toast]);
 
   useEffect(() => {
     if (isDev) {
@@ -342,12 +345,13 @@ function DashboardContent() {
         setDocumentRequests(payload.data.documentRequests);
       })
       .catch(() => {
+        toast({ type: 'error', message: 'Failed to load documents' });
         setDocumentsError('Failed to load documents');
       })
       .finally(() => {
         setDocumentsLoading(false);
       });
-  }, [application?.id, application?.status, isDev]);
+  }, [application?.id, application?.status, isDev, toast]);
 
   useEffect(() => {
     if (isDev) {
@@ -398,12 +402,12 @@ function DashboardContent() {
       })
       .catch(() => {
         expiringApplicationIdRef.current = null;
-        toast.error('Unable to refresh your offer status.');
+        toast({ type: 'error', message: 'Unable to refresh your offer status.' });
       })
       .finally(() => {
         setExpireSubmitting(false);
       });
-  }, [application, isDev]);
+  }, [application, isDev, toast]);
 
   useEffect(() => {
     if (isDev) {
@@ -432,26 +436,13 @@ function DashboardContent() {
         setMessages(payload.data.messages);
       })
       .catch(() => {
+        toast({ type: 'error', message: 'Failed to load messages' });
         setMessagesError('Failed to load messages');
       })
       .finally(() => {
         setMessagesLoading(false);
       });
-  }, [application?.id, application?.status, isDev]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const toastMessage = window.sessionStorage.getItem('dashboard-toast');
-    if (!toastMessage) {
-      return;
-    }
-
-    toast.success(toastMessage);
-    window.sessionStorage.removeItem('dashboard-toast');
-  }, []);
+  }, [application?.id, application?.status, isDev, toast]);
 
   const daysRemaining = useMemo(() => {
     if (!application?.offerExpiresAt) return 0;
@@ -472,14 +463,14 @@ function DashboardContent() {
       const payload = (await response.json()) as { success?: boolean };
 
       if (!response.ok || !payload.success) {
-        toast.error('Unable to complete your request.');
+        toast({ type: 'error', message: 'Unable to complete your request.' });
         return;
       }
 
-      window.sessionStorage.setItem('dashboard-toast', 'Offer cancelled. You may now apply again.');
+      persistToast({ type: 'success', message: 'Offer cancelled. You may now apply again.' });
       window.location.reload();
     } catch {
-      toast.error('Unable to complete your request.');
+      toast({ type: 'error', message: 'Unable to complete your request.' });
     } finally {
       setCancelSubmitting(false);
     }
@@ -508,14 +499,17 @@ function DashboardContent() {
         | { success: false; error?: string };
 
       if (!response.ok || !payload.success || !payload.data.documentRequest) {
-        toast.error(payload.success ? 'Unable to upload document.' : payload.error || 'Unable to upload document.');
+        toast({
+          type: 'error',
+          message: payload.success ? 'Unable to upload document.' : payload.error || 'Unable to upload document.',
+        });
         return;
       }
 
       setDocumentRequests((currentRequests) => mergeDocumentRequest(currentRequests, payload.data.documentRequest as DocumentRequest));
-      toast.success(payload.data.note || 'Document uploaded successfully.');
+      toast({ type: 'success', message: payload.data.note || 'Document uploaded successfully.' });
     } catch {
-      toast.error('Unable to upload document.');
+      toast({ type: 'error', message: 'Unable to upload document.' });
     } finally {
       setUploadingRequestId(null);
     }
@@ -545,14 +539,17 @@ function DashboardContent() {
         | { success: false; error?: string };
 
       if (!response.ok || !payload.success) {
-        toast.error(payload.success ? 'Unable to send message.' : payload.error || 'Unable to send message.');
+        toast({
+          type: 'error',
+          message: payload.success ? 'Unable to send message.' : payload.error || 'Unable to send message.',
+        });
         return;
       }
 
       setMessages((currentMessages) => [...currentMessages, payload.data.message]);
       setMessageDraft('');
     } catch {
-      toast.error('Unable to send message.');
+      toast({ type: 'error', message: 'Unable to send message.' });
     } finally {
       setMessageSubmitting(false);
     }

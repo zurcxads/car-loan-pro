@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Building2, Clock, Plug } from 'lucide-react';
+import { useToast } from '@/components/shared/ToastProvider';
 import { US_STATES } from '@/lib/us-states';
 
 const monthlySalesOptions = ['1-10', '11-25', '26-50', '51-100', '100+'] as const;
@@ -76,6 +77,7 @@ function inputClassName() {
 }
 
 export default function DealerJoinPageClient() {
+  const { toast } = useToast();
   const [formData, setFormData] = useState<DealerFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -111,7 +113,9 @@ export default function DealerJoinPageClient() {
     event.preventDefault();
 
     if (formData.vehicleTypes.length === 0) {
-      setErrorMessage('Select at least one vehicle type.');
+      const errorMessage = 'Select at least one vehicle type.';
+      setErrorMessage(errorMessage);
+      toast({ type: 'error', message: errorMessage });
       return;
     }
 
@@ -142,13 +146,18 @@ export default function DealerJoinPageClient() {
 
       const payload = (await response.json()) as ApiResponse;
       if (!response.ok || payload.success !== true) {
-        setErrorMessage(payload.error || 'Unable to submit application.');
+        const errorMessage = payload.error || 'Unable to submit application.';
+        setErrorMessage(errorMessage);
+        toast({ type: 'error', message: errorMessage });
         return;
       }
 
       setIsSuccess(true);
+      toast({ type: 'success', message: 'Dealer application submitted successfully.' });
     } catch {
-      setErrorMessage('Unable to submit application.');
+      const errorMessage = 'Unable to submit application.';
+      setErrorMessage(errorMessage);
+      toast({ type: 'error', message: errorMessage });
     } finally {
       setIsSubmitting(false);
     }

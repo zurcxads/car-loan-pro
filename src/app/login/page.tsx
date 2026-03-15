@@ -3,6 +3,7 @@
 import { Suspense, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { persistToast, useToast } from '@/components/shared/ToastProvider';
 
 type LoginMode = 'magic' | 'password';
 
@@ -14,6 +15,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 function LoginCard() {
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<LoginMode>('magic');
   const [email, setEmail] = useState('');
@@ -47,13 +49,18 @@ function LoginCard() {
       };
 
       if (!response.ok || payload.success === false) {
-        setFormError(payload.error ?? 'We could not send a sign-in link. Please try again.');
+        const errorMessage = payload.error ?? 'We could not send a sign-in link. Please try again.';
+        setFormError(errorMessage);
+        toast({ type: 'error', message: errorMessage });
         return;
       }
 
       setSent(true);
+      toast({ type: 'success', message: 'Secure sign-in link sent to your email.' });
     } catch {
-      setFormError('We could not send a sign-in link. Please try again.');
+      const errorMessage = 'We could not send a sign-in link. Please try again.';
+      setFormError(errorMessage);
+      toast({ type: 'error', message: errorMessage });
     } finally {
       setSubmitting(false);
     }
@@ -80,13 +87,18 @@ function LoginCard() {
       };
 
       if (!response.ok || payload.success !== true || !payload.redirectTo) {
-        setFormError(payload.error ?? 'Invalid credentials');
+        const errorMessage = payload.error ?? 'Invalid credentials';
+        setFormError(errorMessage);
+        toast({ type: 'error', message: errorMessage });
         return;
       }
 
+      persistToast({ type: 'success', message: 'Signed in successfully.' });
       window.location.href = payload.redirectTo;
     } catch {
-      setFormError('Invalid credentials');
+      const errorMessage = 'Invalid credentials';
+      setFormError(errorMessage);
+      toast({ type: 'error', message: errorMessage });
     } finally {
       setSubmitting(false);
     }

@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Check, ChevronDown, Mail, MapPin, Phone } from "lucide-react";
 import Footer from "@/components/shared/Footer";
+import { useToast } from "@/components/shared/ToastProvider";
 
 const faqs = [
   {
@@ -40,6 +41,7 @@ type ContactApiResponse =
   | { success: false; error?: string };
 
 export default function ContactPage() {
+  const { toast } = useToast();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("General");
@@ -91,8 +93,17 @@ export default function ContactPage() {
       setEmail("");
       setSubject("General");
       setMessage("");
+      toast({
+        type: "success",
+        message: result.data?.message || "Your message has been sent successfully.",
+      });
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : "Failed to send your message.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to send your message.";
+      setSubmitError(errorMessage);
+      toast({
+        type: "error",
+        message: errorMessage,
+      });
     } finally {
       setSubmitting(false);
     }
