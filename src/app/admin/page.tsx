@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import AdminPortalClient from '@/components/portal/AdminPortalClient';
 import { isServerDevAccessGranted } from '@/lib/dev-access-server';
 import { getServerAuthSession } from '@/lib/api-helpers';
+import { listPartnerApplications } from '@/lib/partner-applications';
 
 function getRoleRedirect(role?: string | null) {
   if (role === 'lender') return '/lender';
@@ -13,8 +14,15 @@ function getRoleRedirect(role?: string | null) {
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
+  const pendingApplications = await listPartnerApplications({ status: 'pending' });
+
   if (await isServerDevAccessGranted()) {
-    return <AdminPortalClient user={{ name: 'Admin (Dev)', email: 'admin@autoloanpro.co', entityId: null }} />;
+    return (
+      <AdminPortalClient
+        pendingApplications={pendingApplications}
+        user={{ name: 'Admin (Dev)', email: 'admin@autoloanpro.co', entityId: null }}
+      />
+    );
   }
 
   const session = await getServerAuthSession();
@@ -28,5 +36,10 @@ export default async function AdminPage() {
     redirect(getRoleRedirect(user.role));
   }
 
-  return <AdminPortalClient user={{ name: user.name, email: user.email, entityId: null }} />;
+  return (
+    <AdminPortalClient
+      pendingApplications={pendingApplications}
+      user={{ name: user.name, email: user.email, entityId: null }}
+    />
+  );
 }
