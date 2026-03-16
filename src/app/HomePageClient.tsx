@@ -2,7 +2,6 @@
 
 import { memo, useEffect, useId, useState } from "react";
 import Link from "next/link";
-import Logo from "@/components/shared/Logo";
 import {
   FileText,
   BarChart3,
