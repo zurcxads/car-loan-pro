@@ -697,14 +697,14 @@ export default function HomePage() {
               const Icon = step.icon;
 
               return (
-                <div key={step.number} className="step-card-hover relative h-full rounded-xl border border-[#E3E8EE] bg-white p-8 [will-change:transform]">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0A2540] text-sm font-semibold text-white">
+                <div key={step.number} className="step-card-hover relative h-full rounded-xl border border-[#E3E8EE] bg-white p-8 text-center md:text-left [will-change:transform]">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#0A2540] text-sm font-semibold text-white md:mx-0">
                     {step.number}
                   </div>
-                  <div className="mt-6 flex h-14 w-14 items-center justify-center rounded-xl bg-[#F6F9FC]">
+                  <div className="mx-auto mt-4 flex h-14 w-14 items-center justify-center rounded-xl bg-[#F6F9FC] md:mx-0">
                     <Icon className="h-7 w-7 text-[#2563EB]" />
                   </div>
-                  <h3 className="mt-6 text-2xl font-semibold text-[#0A2540]">{step.title}</h3>
+                  <h3 className="mt-4 text-2xl font-semibold text-[#0A2540]">{step.title}</h3>
                   <p className="mt-3 leading-7 text-[#425466]">{step.description}</p>
                 </div>
               );
