@@ -97,16 +97,26 @@ main:focus {
 /* Custom range - larger thumb for mobile touch */
 input[type="range"] {
   -webkit-appearance: none; appearance: none;
-  height: 8px; border-radius: 4px; background: #E5E7EB; outline: none;
+  height: 8px; border-radius: 9999px; background: #E3E8EE; outline: none;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  -webkit-appearance: none; appearance: none;
+  height: 8px; border-radius: 9999px; background: transparent;
+}
+input[type="range"]::-moz-range-track {
+  height: 8px; border-radius: 9999px; background: transparent;
 }
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--blue); cursor: pointer; border: 3px solid white; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #2563EB; cursor: pointer; border: 3px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  margin-top: -8px;
 }
 input[type="range"]::-moz-range-thumb {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--blue); cursor: pointer; border: 3px solid white; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #2563EB; cursor: pointer; border: 3px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 input[type="range"]:focus-visible::-webkit-slider-thumb {
   box-shadow:

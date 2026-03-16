@@ -596,16 +596,12 @@ export default function HomePage() {
                 <p className="mt-3 text-[#425466]">
                   Adjust the amount and preview how small changes affect your estimated monthly payment.
                 </p>
-                <div className="mt-10">
+                <div className="mt-8">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-[#6B7C93]">Loan amount</span>
                     <span className="font-semibold text-[#0A2540]">${loanAmount.toLocaleString()}</span>
                   </div>
-                  <div className="relative mt-5 h-2 rounded-full bg-[#E3E8EE]">
-                    <div
-                      className="absolute inset-y-0 left-0 rounded-full bg-[#2563EB]"
-                      style={{ width: `${((loanAmount - 10000) / 40000) * 100}%` }}
-                    />
+                  <div className="mt-4">
                     <input
                       type="range"
                       min={10000}
@@ -613,7 +609,10 @@ export default function HomePage() {
                       step={1000}
                       value={loanAmount}
                       onChange={(event) => setLoanAmount(Number(event.target.value))}
-                      className="absolute -top-2 h-6 w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-runnable-track]:appearance-none [&::-webkit-slider-runnable-track]:bg-transparent [&::-moz-range-track]:bg-transparent [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:bg-[#2563EB] [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-white [&::-moz-range-thumb]:bg-[#2563EB]"
+                      className="w-full"
+                      style={{
+                        background: `linear-gradient(to right, #2563EB 0%, #2563EB ${((loanAmount - 10000) / 40000) * 100}%, #E3E8EE ${((loanAmount - 10000) / 40000) * 100}%, #E3E8EE 100%)`,
+                      }}
                       aria-label="Loan amount"
                     />
                   </div>
