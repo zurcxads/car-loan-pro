@@ -384,15 +384,15 @@ input[type="range"]:focus-visible::-moz-range-thumb {
 
 .in-view-section {
   opacity: 0;
-  transform: translateY(1rem);
+  transform: translateY(0.5rem);
 }
 
 .in-view-visible {
   opacity: 1;
   transform: translateY(0);
   transition:
-    opacity 700ms ease,
-    transform 700ms ease;
+    opacity 400ms ease,
+    transform 400ms ease;
 }
 
 .toast-enter {
