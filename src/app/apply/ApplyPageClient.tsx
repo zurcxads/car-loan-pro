@@ -759,8 +759,19 @@ export default function ApplyPage() {
 
   return (
     <div className="premium-page min-h-screen bg-white pb-24 font-sans sm:pb-0">
-      <div className="mx-auto max-w-2xl px-4 pb-16 pt-28 sm:px-6">
-        <div className="mb-8 space-y-4">
+      <div className="mx-auto max-w-2xl px-4 pb-16 pt-20 sm:px-6">
+        <div className="mb-6 rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#2563EB]">
+              <ShieldCheck className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[#0A2540]">Auto Loan Pro</p>
+              <p className="text-xs text-[#6B7C93]">Secure application — 256-bit encrypted</p>
+            </div>
+          </div>
+        </div>
+        <div className="mb-6 space-y-4">
           {activeOfferLender && (
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
               You have an active offer with {activeOfferLender}. Cancel it to apply again.{' '}
