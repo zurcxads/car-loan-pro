@@ -8,8 +8,11 @@ import {
   CheckCircle2,
   ChevronDown,
   CircleDollarSign,
+  Clock,
+  Eye,
   FileText,
   ShieldCheck,
+  XCircle,
 } from "lucide-react";
 import Footer from "@/components/shared/Footer";
 import { useInView } from "@/hooks/useInView";
@@ -231,14 +234,23 @@ export default function HowItWorksPage() {
             </div>
             <div className="grid auto-rows-fr gap-6 sm:grid-cols-3">
               <div className="premium-card flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                  <Clock className="h-5 w-5 text-[#2563EB]" />
+                </div>
                 <p className="text-3xl font-semibold text-[#0A2540]">2 min</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#425466]">Average time to complete the application flow.</p>
               </div>
               <div className="premium-card flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                  <Eye className="h-5 w-5 text-[#2563EB]" />
+                </div>
                 <p className="text-3xl font-semibold text-[#0A2540]">1 view</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#425466]">One place to compare the financing details that matter.</p>
               </div>
               <div className="premium-card flex h-full flex-col rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                  <XCircle className="h-5 w-5 text-[#2563EB]" />
+                </div>
                 <p className="text-3xl font-semibold text-[#0A2540]">0 markup</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#425466]">A process designed to keep dealer-added financing noise out of the way.</p>
               </div>
