@@ -11,12 +11,12 @@ export const metadata: Metadata = createPageMetadata({
 
 export default function AccessibilityPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="bg-gray-900 text-white">
-        <div className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-4">Accessibility Statement</h1>
-          <p className="text-xl text-gray-300">
+      <div className="border-b border-[#E3E8EE] bg-[#F6F9FC]">
+        <div className="mx-auto max-w-4xl px-4 pb-10 pt-28 sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-semibold text-[#0A2540]">Accessibility Statement</h1>
+          <p className="mt-4 text-lg text-[#425466]">
             Auto Loan Pro is committed to ensuring digital accessibility for people with disabilities.
             We are continually improving the user experience for everyone.
           </p>
@@ -24,7 +24,7 @@ export default function AccessibilityPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         {/* Commitment */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
