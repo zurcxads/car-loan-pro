@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { requireAuth } from '@/lib/api-helpers';
+import { sendOfferDeclinedEmail } from '@/lib/consumer-notifications';
 import { getServiceClient } from '@/lib/db';
 import {
   buildLenderDecisionMetadata,
@@ -89,6 +90,20 @@ export async function POST(
 
     if (!updatedApplication) {
       return Response.json({ success: false, error: 'Unable to process lender decision.' }, { status: 500 });
+    }
+
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard`;
+    const emailResult = await sendOfferDeclinedEmail(
+      ownedApplication.application.borrower.email,
+      dashboardUrl
+    );
+
+    if (!emailResult.success) {
+      serverLogger.error('Failed to send consumer decline email', {
+        applicationId,
+        email: ownedApplication.application.borrower.email,
+        route: ROUTE_PATH,
+      });
     }
 
     return Response.json({
