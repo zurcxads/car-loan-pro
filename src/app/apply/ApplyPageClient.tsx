@@ -759,8 +759,8 @@ export default function ApplyPage() {
 
   return (
     <div className="premium-page min-h-screen bg-white pb-24 font-sans sm:pb-0">
-      <div className="mx-auto max-w-2xl px-4 pb-16 pt-16 sm:px-6">
-        <div className="sticky top-14 z-30 -mx-4 border-b border-[#E3E8EE] bg-white/95 px-4 pb-4 pt-3 backdrop-blur-sm sm:-mx-6 sm:px-6">
+      <div className="mx-auto max-w-2xl px-4 pb-16 pt-2 sm:px-6">
+        <div className="sticky top-0 z-30 -mx-4 border-b border-[#E3E8EE] bg-white/95 px-4 pb-4 pt-3 backdrop-blur-sm sm:-mx-6 sm:px-6">
         <div className="mb-3 flex items-center justify-between">
           <Link href="/" className="text-sm font-medium text-[#0A2540]">
             Auto Loan <span className="font-bold text-[#2563EB]">Pro</span>
