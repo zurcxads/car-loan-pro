@@ -148,7 +148,7 @@ export default function CalculatorPage() {
 
   return (
     <div className="premium-page min-h-screen bg-white text-[#425466]">
-      <section className="animate-fade-in-up px-6 py-20 pt-28 md:py-24 md:pt-32">
+      <section className="animate-fade-in-up px-6 pb-10 pt-24 md:pb-14 md:pt-32">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-3xl">
             <div className="inline-flex items-center rounded-full border border-[#E3E8EE] bg-[#F6F9FC] px-4 py-2 text-sm font-medium text-[#0A2540]">

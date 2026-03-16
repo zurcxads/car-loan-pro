@@ -15,19 +15,19 @@ export default function ResourcesPage() {
   return (
     <div className="premium-page min-h-screen bg-white">
       {/* Hero */}
-      <section className="animate-fade-in-up px-6 py-20 pt-28 md:py-24 md:pt-32">
-        <div className="max-w-3xl mx-auto text-center">
+      <section className="animate-fade-in-up px-6 pb-6 pt-24 md:pb-10 md:pt-32">
+        <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-3xl font-bold tracking-tight text-[#0A2540] sm:text-4xl">
             Auto Loan Resources
           </h1>
-          <p className="mt-4 text-lg font-light text-[#425466]">
+          <p className="mt-3 text-lg font-light text-[#425466]">
             Everything you need to know about getting the best auto loan
           </p>
         </div>
       </section>
 
       {/* Article Grid */}
-      <section className="px-6 py-20 md:py-24">
+      <section className="px-6 pb-20 pt-6 md:pb-24 md:pt-10">
         <div className="mx-auto grid max-w-6xl grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
           {articles.map((article) => (
             <Link
