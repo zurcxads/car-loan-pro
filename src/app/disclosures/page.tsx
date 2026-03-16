@@ -53,7 +53,7 @@ export default function DisclosuresHubPage() {
         </div>
       </nav>
 
-      <div className="animate-fadeIn max-w-4xl mx-auto px-6 py-16">
+      <div className="animate-fadeIn max-w-4xl mx-auto px-6 pb-16 pt-24">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">Disclosures & Legal Information</h1>
         <p className="text-base text-gray-600 mb-12 max-w-2xl">
           Auto Loan Pro is committed to transparency and compliance with federal and state consumer protection laws.

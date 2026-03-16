@@ -26,7 +26,7 @@ export default function ReferralPage() {
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-6 py-16">
+      <div className="max-w-5xl mx-auto px-6 pb-16 pt-24">
         {/* Hero */}
         <div className="animate-fadeIn text-center mb-16">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 mb-4">

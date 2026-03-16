@@ -12,7 +12,7 @@ export default function PrivacyPage() {
         </div>
       </nav>
 
-      <div className="animate-fadeIn max-w-3xl mx-auto px-6 py-16">
+      <div className="animate-fadeIn max-w-3xl mx-auto px-6 pb-16 pt-24">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
         <p className="text-sm text-gray-500 mb-10">Effective Date: March 13, 2026</p>
 

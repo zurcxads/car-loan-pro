@@ -118,7 +118,7 @@ export default function LenderOnboardPage() {
         </div>
       </nav>
 
-      <div className="max-w-3xl mx-auto px-6 py-16">
+      <div className="max-w-3xl mx-auto px-6 pb-16 pt-24">
         {/* Header */}
         <div className="text-center mb-12 animate-fade-in-up">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-3">

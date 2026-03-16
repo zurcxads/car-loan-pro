@@ -149,7 +149,7 @@ export default function LenderJoinPageClient() {
 
   return (
     <div className="premium-page bg-white">
-      <section className="animate-fade-in-up px-6 py-20 pt-32 md:py-24">
+      <section className="animate-fade-in-up px-6 pb-10 pt-24 md:pb-14 md:pt-32">
         <div className="mx-auto max-w-4xl">
           <div className="rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#F9FBFF_0%,#FFFFFF_100%)] px-8 py-12 shadow-[0_24px_80px_rgba(10,37,64,0.08)] sm:px-12">
             <div className="max-w-2xl">

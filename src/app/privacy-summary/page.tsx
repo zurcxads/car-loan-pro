@@ -99,7 +99,7 @@ export default function PrivacySummaryPage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto px-4 pb-16 pt-24 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-4">Privacy Policy (Plain English)</h1>
           <p className="text-xl text-blue-100 max-w-3xl">
             We believe privacy policies should be readable by humans, not just lawyers.
@@ -109,7 +109,7 @@ export default function PrivacySummaryPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 pb-16 pt-24 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           {sections.map((section, index) => {
             const Icon = section.icon;

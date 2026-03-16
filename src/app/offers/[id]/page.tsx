@@ -136,7 +136,7 @@ export default function OfferDetailPage() {
         )}
       </nav>
 
-      <section className="pt-32 pb-16 px-6">
+      <section className="pt-24 pb-10 px-6 md:pt-32 md:pb-14">
         <div className="max-w-4xl mx-auto">
           {/* Success Banner */}
           <div className="animate-fadeIn rounded-2xl bg-green-50 border border-green-200 p-8 text-center mb-8">

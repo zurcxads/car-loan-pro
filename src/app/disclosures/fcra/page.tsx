@@ -12,7 +12,7 @@ export default function FCRADisclosurePage() {
         </div>
       </nav>
 
-      <div className="animate-fadeIn max-w-3xl mx-auto px-6 py-16">
+      <div className="animate-fadeIn max-w-3xl mx-auto px-6 pb-16 pt-24">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Fair Credit Reporting Act Disclosure</h1>
         <p className="text-sm text-gray-500 mb-10">Your Rights Under the FCRA</p>
 

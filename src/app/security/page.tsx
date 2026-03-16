@@ -57,7 +57,7 @@ export default function SecurityPage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Header */}
       <div className="bg-blue-600 text-white">
-        <div className="max-w-5xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto px-4 pb-16 pt-24 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-3 bg-white/10 rounded-xl">
               <Shield className="w-8 h-8" />
@@ -71,7 +71,7 @@ export default function SecurityPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-4 pb-16 pt-24 sm:px-6 lg:px-8">
         {/* Security Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
           {securityFeatures.map((feature, index) => {

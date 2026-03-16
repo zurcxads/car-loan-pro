@@ -98,7 +98,7 @@ export default function ArticlePage({ params }: Props) {
         </nav>
 
         {/* Article + Sidebar */}
-        <div className="pt-28 pb-24 px-6">
+        <div className="pt-24 pb-10 px-6 md:pt-32 md:pb-14">
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col lg:flex-row gap-12">
               {/* Main Article */}
