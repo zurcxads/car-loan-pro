@@ -469,27 +469,27 @@ export default function HomePage() {
       <section
         role="region"
         aria-label="Hero"
-        className="animate-fade-in-up min-h-[85vh] px-6 py-20 pt-28 md:py-24 md:pt-32"
+        className="animate-fade-in-up min-h-[85vh] px-6 pb-20 pt-24 md:pb-24 md:pt-32"
         style={{
           background:
             "radial-gradient(ellipse at 20% 50%, rgba(37,99,235,0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(99,102,241,0.06) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(37,99,235,0.04) 0%, transparent 50%)",
         }}
       >
         <div className="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
+          <div className="text-center lg:text-left">
             <div className="space-y-4">
               <p className="text-sm font-medium text-[#425466]">
                 2-Minute Application | Real Offers from 50+ Lenders
               </p>
-              <h1 className="text-5xl font-semibold leading-[1.15] text-[#0A2540] md:text-6xl">
+              <h1 className="text-4xl font-semibold leading-[1.15] text-[#0A2540] sm:text-5xl md:text-6xl">
                 <span className="block">Pre-Approved in Minutes,</span>
                 <span className="block text-[#6B7C93]">Not Weeks.</span>
               </h1>
-              <p className="max-w-xl text-lg leading-8 text-[#425466]">
+              <p className="mx-auto max-w-xl text-lg leading-8 text-[#425466] lg:mx-0">
                 One application. Multiple lenders competing for you. No dealer markup, no hidden fees.
               </p>
             </div>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:gap-6">
+            <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6 lg:justify-start">
               <div className="relative inline-flex w-full sm:w-auto">
                 <span
                   aria-hidden="true"
