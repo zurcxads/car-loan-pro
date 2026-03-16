@@ -2,7 +2,11 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { apiError, requireAuth } from '@/lib/api-helpers';
 import { normalizeApplicationMetadata } from '@/lib/application-metadata';
-import { sendOfferApprovedEmail, sendOfferDeclinedEmail } from '@/lib/consumer-notifications';
+import {
+  sendDocumentsRequestedEmail,
+  sendOfferApprovedEmail,
+  sendOfferDeclinedEmail,
+} from '@/lib/consumer-notifications';
 import { dbCreateActivityEvent, dbUpdateApplication, dbUpdateOffer } from '@/lib/db';
 import { getLenderActiveApplication } from '@/lib/lender-applications';
 import type { MockApplication } from '@/lib/mock-data';
@@ -23,6 +27,49 @@ const statusByAction: Record<
   counter: 'under_review',
   request_docs: 'documents_requested',
 };
+
+type RequestDocsEmailDetails = {
+  deadline: string;
+  docTypes: string[];
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function getRequestDocsEmailDetails(
+  terms: Record<string, unknown> | undefined,
+  application: MockApplication
+): RequestDocsEmailDetails | null {
+  if (terms) {
+    const docTypes = Array.isArray(terms.docTypes)
+      ? terms.docTypes.filter((docType): docType is string => typeof docType === 'string' && docType.length > 0)
+      : [];
+    const deadline = typeof terms.deadline === 'string' ? terms.deadline : null;
+
+    if (docTypes.length > 0 && deadline && !Number.isNaN(new Date(deadline).getTime())) {
+      return {
+        deadline,
+        docTypes,
+      };
+    }
+  }
+
+  const pendingDocumentRequests = (application.documentRequests ?? []).filter((request) => request.status === 'pending');
+  const fallbackDocTypes = Array.from(new Set(pendingDocumentRequests.map((request) => request.type)));
+  const fallbackDeadline = pendingDocumentRequests
+    .map((request) => request.deadline)
+    .find((deadline): deadline is string => typeof deadline === 'string' && !Number.isNaN(new Date(deadline).getTime()));
+
+  if (fallbackDocTypes.length === 0 || !fallbackDeadline) {
+    return null;
+  }
+
+  return {
+    deadline: fallbackDeadline,
+    docTypes: fallbackDocTypes,
+  };
+}
 
 export async function POST(req: NextRequest) {
   const { session, error: authError } = await requireAuth('lender');
@@ -123,6 +170,34 @@ export async function POST(req: NextRequest) {
           applicationId,
           email: application.borrower.email,
         });
+      }
+    }
+
+    if (action === 'request_docs') {
+      const requestDocsEmailDetails = getRequestDocsEmailDetails(
+        isRecord(terms) ? terms : undefined,
+        application
+      );
+
+      if (!requestDocsEmailDetails) {
+        serverLogger.warn('Skipping consumer documents requested email: missing request details', {
+          applicationId,
+          email: application.borrower.email,
+        });
+      } else {
+        const emailResult = await sendDocumentsRequestedEmail(
+          application.borrower.email,
+          requestDocsEmailDetails.docTypes,
+          requestDocsEmailDetails.deadline,
+          dashboardUrl
+        );
+
+        if (!emailResult.success) {
+          serverLogger.error('Failed to send consumer documents requested email', {
+            applicationId,
+            email: application.borrower.email,
+          });
+        }
       }
     }
 
