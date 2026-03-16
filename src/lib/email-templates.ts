@@ -12,6 +12,8 @@ export interface EmailData {
   html: string;
 }
 
+type EmailContent = Omit<EmailData, 'to'>;
+
 const BRAND_COLOR = '#2563eb'; // blue-600
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://autoloanpro.co';
@@ -346,13 +348,31 @@ export function rateExpiringEmail(
 
 export function consumerOfferExpiringEmail(
   email: string,
+  name: string,
   daysRemaining: number,
   lenderName: string,
   dashboardUrl: string
 ): EmailData {
+  const emailContent = offerExpiringSoonEmail(name, lenderName, daysRemaining, dashboardUrl);
+
+  return {
+    to: email,
+    ...emailContent,
+  };
+}
+
+export function offerExpiringSoonEmail(
+  name: string,
+  lenderName: string,
+  daysRemaining: number,
+  dashboardUrl: string
+): EmailContent {
   const content = `
     <div class="content">
       <h2 style="color: #111827; margin-top: 0;">Your Offer Expires Soon</h2>
+      <p style="color: #374151; line-height: 1.6;">
+        Hi ${name},
+      </p>
       <p style="color: #374151; line-height: 1.6;">
         Your offer from <strong>${lenderName}</strong> expires in <strong>${daysRemaining} day${daysRemaining !== 1 ? 's' : ''}</strong>.
       </p>
@@ -366,7 +386,6 @@ export function consumerOfferExpiringEmail(
   `;
 
   return {
-    to: email,
     subject: `Your ${lenderName} Offer Expires in ${daysRemaining} Day${daysRemaining !== 1 ? 's' : ''}`,
     html: emailWrapper(content),
   };

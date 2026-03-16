@@ -8,11 +8,12 @@ import {
 
 export async function sendOfferExpiringEmail(
   email: string,
-  daysRemaining: number,
+  name: string,
   lenderName: string,
+  daysRemaining: number,
   dashboardUrl: string
 ) {
-  return sendEmail(consumerOfferExpiringEmail(email, daysRemaining, lenderName, dashboardUrl));
+  return sendEmail(consumerOfferExpiringEmail(email, name, daysRemaining, lenderName, dashboardUrl));
 }
 
 export async function sendDocumentsRequestedEmail(

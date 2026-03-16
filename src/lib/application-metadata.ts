@@ -4,6 +4,7 @@ import type {
   ApplicationMetadataTimelineEntry,
   ApplicationNotification,
   ApplicationNotificationType,
+  OfferExpirationNotification,
 } from '@/lib/types';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -56,6 +57,20 @@ export function normalizeApplicationMetadata(metadata: unknown): ApplicationMeta
     }
     : undefined;
 
+  const offerExpirationNotifications = Array.isArray(metadata.offerExpirationNotifications)
+    ? metadata.offerExpirationNotifications.filter((notification): notification is OfferExpirationNotification => {
+      if (!isRecord(notification)) {
+        return false;
+      }
+
+      return (
+        (notification.daysRemaining === 1 || notification.daysRemaining === 3 || notification.daysRemaining === 7) &&
+        typeof notification.offerExpiresAt === 'string' &&
+        typeof notification.sentAt === 'string'
+      );
+    })
+    : [];
+
   const timeline = Array.isArray(metadata.timeline)
     ? metadata.timeline.filter((entry): entry is ApplicationMetadataTimelineEntry => {
       if (!isRecord(entry)) {
@@ -78,6 +93,7 @@ export function normalizeApplicationMetadata(metadata: unknown): ApplicationMeta
     ...(counterOffer ? { counterOffer } : {}),
     ...(messages.length > 0 ? { messages } : {}),
     ...(notifications.length > 0 ? { notifications } : {}),
+    ...(offerExpirationNotifications.length > 0 ? { offerExpirationNotifications } : {}),
     ...(timeline.length > 0 ? { timeline } : {}),
   };
 }

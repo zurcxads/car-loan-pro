@@ -64,6 +64,12 @@ export interface ApplicationNotification {
   readAt?: string | null;
 }
 
+export interface OfferExpirationNotification {
+  daysRemaining: 1 | 3 | 7;
+  offerExpiresAt: string;
+  sentAt: string;
+}
+
 export interface ApplicationMetadata {
   counterOffer?: {
     terms: Record<string, unknown>;
@@ -71,6 +77,7 @@ export interface ApplicationMetadata {
   };
   messages?: ApplicationMetadataMessage[];
   notifications?: ApplicationNotification[];
+  offerExpirationNotifications?: OfferExpirationNotification[];
   timeline?: ApplicationMetadataTimelineEntry[];
 }
 
