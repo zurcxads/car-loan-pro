@@ -68,21 +68,21 @@ export default function Header() {
             : "bg-white/80 shadow-none"
         }`}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <Link
             href="/"
             className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
-            <Logo size="md" />
+            <Logo size="sm" />
           </Link>
 
-          <nav role="navigation" aria-label="Primary" className="hidden items-center gap-8 lg:flex">
+          <nav role="navigation" aria-label="Primary" className="hidden items-center gap-7 lg:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 aria-current={isActive(link.href) ? "page" : undefined}
-                className={`premium-nav-link text-sm font-medium ${
+                className={`premium-nav-link text-[13px] font-medium ${
                   isActive(link.href)
                     ? "text-[#0A2540]"
                     : "text-[#425466]"
@@ -96,7 +96,7 @@ export default function Header() {
           <div className="hidden items-center gap-4 lg:flex">
             <Link
               href="/apply"
-              className="premium-button inline-flex min-h-11 items-center justify-center rounded-full bg-[#2563EB] bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 text-sm font-semibold text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="premium-button inline-flex items-center justify-center rounded-full bg-[#2563EB] px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#1d4ed8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Get Pre-Approved
             </Link>
@@ -105,12 +105,12 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((open) => !open)}
-            className="premium-button flex h-11 w-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white text-[#425466] hover:text-[#0A2540] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 lg:hidden"
+            className="premium-button flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EE] bg-white text-[#425466] hover:text-[#0A2540] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 lg:hidden"
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-navigation-dialog"
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
         </div>
       </header>
@@ -132,14 +132,14 @@ export default function Header() {
             tabIndex={-1}
             className="fixed inset-x-0 top-0 z-50 border-b border-[#E3E8EE] bg-white lg:hidden"
           >
-            <div className="mx-auto max-w-6xl px-6 py-4">
-              <div className="flex items-center justify-between">
+            <div className="mx-auto max-w-6xl px-6">
+              <div className="flex h-14 items-center justify-between">
                 <Link
                   href="/"
                   onClick={() => setMobileMenuOpen(false)}
                   className="rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                 >
-                  <Logo size="md" />
+                  <Logo size="sm" />
                 </Link>
                 <h2 id="mobile-navigation-title" className="sr-only">
                   Mobile navigation
@@ -147,10 +147,10 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="premium-button flex h-11 w-11 items-center justify-center rounded-full border border-[#E3E8EE] bg-white text-[#425466] hover:text-[#0A2540] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                  className="premium-button flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EE] bg-white text-[#425466] hover:text-[#0A2540] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   aria-label="Close menu"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
 
