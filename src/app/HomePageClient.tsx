@@ -632,16 +632,15 @@ export default function HomePage() {
             </div>
 
             <div className="feature-card-hover stagger-4 rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FFFFFF_0%,#F8FBFF_100%)] p-8 [will-change:transform]">
-              <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_auto_0.9fr]">
+              <div className="grid items-center gap-8 lg:grid-cols-2">
                 <div>
                   <h3 className="text-2xl font-semibold text-[#0A2540]">Shop Anywhere with Your Pre-Approval</h3>
                   <p className="mt-3 max-w-xl text-[#425466]">
                     Secure financing first, then take your approval with you to any dealership and focus on the car instead of the finance office.
                   </p>
                   <div className="mt-8 max-w-md rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-6">
-                    <div className="flex items-center justify-between">
-                      <Logo size="sm" />
-                      <span className="rounded-full border border-[#E3E8EE] bg-white px-3 py-1.5 text-xs font-medium text-[#425466]">
+                    <div>
+                      <span className="rounded-full border border-[#BFDBFE] bg-blue-50 px-3 py-1.5 text-xs font-semibold text-[#2563EB]">
                         Pre-Approval
                       </span>
                     </div>
@@ -659,12 +658,6 @@ export default function HomePage() {
                         <p className="mt-1 font-semibold text-[#0A2540]">May 30, 2026</p>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#E3E8EE] bg-white">
-                    <ArrowRight className="h-6 w-6 text-[#2563EB]" />
                   </div>
                 </div>
 
