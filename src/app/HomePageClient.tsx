@@ -247,16 +247,36 @@ const PhoneMockup = memo(function PhoneMockup() {
 const OffersMockup = memo(function OffersMockup() {
   return (
     <div className="mt-8">
-      <div className="rounded-xl border border-[#E3E8EE] bg-white p-5 md:hidden">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold text-[#0A2540]">Best available offer</p>
-            <p className="mt-2 text-4xl font-semibold text-[#0A2540]">3.9%</p>
-            <p className="mt-1 text-sm text-[#425466]">$459/mo for 60 months</p>
+      <div className="space-y-3 md:hidden">
+        <div className="rounded-xl border-2 border-[#2563EB] bg-white p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#DBEAFE] text-sm font-semibold text-[#2563EB]">C</div>
+              <div>
+                <p className="text-sm font-semibold text-[#0A2540]">Crest Credit</p>
+                <p className="text-xs text-[#6B7C93]">60 months</p>
+              </div>
+            </div>
+            <span className="rounded-full bg-[#DBEAFE] px-2.5 py-1 text-xs font-medium text-[#2563EB]">Best rate</span>
           </div>
-          <div className="rounded-xl bg-[#DBEAFE] px-3 py-2 text-right">
-            <p className="text-xs uppercase tracking-[0.12em] text-[#2563EB]">Top pick</p>
-            <p className="mt-1 text-sm font-semibold text-[#0A2540]">Crest Credit</p>
+          <div className="mt-3 flex items-baseline gap-3">
+            <p className="text-3xl font-semibold text-[#0A2540]">3.9%</p>
+            <p className="text-sm text-[#425466]">$459/mo</p>
+          </div>
+        </div>
+        <div className="rounded-xl border border-[#E3E8EE] bg-white p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#F6F9FC] text-sm font-semibold text-[#0A2540]">A</div>
+              <div>
+                <p className="text-sm font-semibold text-[#0A2540]">Atlas Bank</p>
+                <p className="text-xs text-[#6B7C93]">72 months</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline gap-3">
+            <p className="text-3xl font-semibold text-[#0A2540]">5.2%</p>
+            <p className="text-sm text-[#425466]">$487/mo</p>
           </div>
         </div>
       </div>
@@ -553,7 +573,7 @@ export default function HomePage() {
                 </p>
                 <PhoneMockup />
               </div>
-              <div className="feature-card-hover stagger-2 h-full min-h-[460px] rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F8FBFF_100%)] p-8 [will-change:transform] lg:col-span-5">
+              <div className="feature-card-hover stagger-2 h-full rounded-xl border border-[#E3E8EE] bg-[linear-gradient(180deg,#FCFDFE_0%,#F8FBFF_100%)] p-8 [will-change:transform] lg:col-span-5 lg:min-h-[460px]">
                 <h3 className="text-2xl font-semibold text-[#0A2540]">Compare Real Offers</h3>
                 <p className="mt-3 max-w-sm text-[#425466]">
                   See rates, terms, and monthly payments at a glance so the best offer is obvious.
