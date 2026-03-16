@@ -14,6 +14,7 @@ import {
 
 // All DB operations use service role client to bypass RLS
 const db = () => getServiceClient();
+export { getServiceClient } from './supabase';
 const hasDatabaseAccess = () => isSupabaseConfigured() && !!process.env.SUPABASE_SERVICE_ROLE_KEY;
 const canUseMockData = () => shouldUseMockData() || !hasDatabaseAccess();
 

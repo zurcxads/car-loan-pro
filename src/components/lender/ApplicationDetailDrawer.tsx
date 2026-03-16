@@ -230,31 +230,36 @@ export default function ApplicationDetailDrawer({
             {supplementalSections}
           </div>
 
-          {footer ? (
+          {footer || onApprove || onDecline || onCounter || onRequestDocs ? (
             <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4">
-              {footer}
-            </div>
-          ) : onApprove || onDecline || onCounter || onRequestDocs ? (
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex gap-2">
-              {onDecline ? (
-                <button onClick={onDecline} className="px-4 py-2.5 text-xs border border-red-200 text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
-                  Decline
-                </button>
+              {onApprove || onDecline || onCounter || onRequestDocs ? (
+                <div className="flex flex-wrap gap-2">
+                  {onDecline ? (
+                    <button onClick={onDecline} className="px-4 py-2.5 text-xs border border-red-200 text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+                      Decline
+                    </button>
+                  ) : null}
+                  {onRequestDocs ? (
+                    <button onClick={onRequestDocs} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+                      Request Docs
+                    </button>
+                  ) : null}
+                  {onCounter ? (
+                    <button onClick={onCounter} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
+                      Counter
+                    </button>
+                  ) : null}
+                  {onApprove ? (
+                    <button onClick={onApprove} className="flex-1 px-4 py-2.5 text-xs bg-green-600 hover:bg-green-500 rounded-xl transition-colors duration-200 cursor-pointer font-medium text-white">
+                      Approve
+                    </button>
+                  ) : null}
+                </div>
               ) : null}
-              {onRequestDocs ? (
-                <button onClick={onRequestDocs} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
-                  Request Docs
-                </button>
-              ) : null}
-              {onCounter ? (
-                <button onClick={onCounter} className="px-4 py-2.5 text-xs border border-gray-200 hover:border-gray-200 rounded-xl transition-colors duration-200 cursor-pointer font-medium">
-                  Counter
-                </button>
-              ) : null}
-              {onApprove ? (
-                <button onClick={onApprove} className="flex-1 px-4 py-2.5 text-xs bg-green-600 hover:bg-green-500 rounded-xl transition-colors duration-200 cursor-pointer font-medium text-gray-900">
-                  Approve
-                </button>
+              {footer ? (
+                <div className={onApprove || onDecline || onCounter || onRequestDocs ? 'mt-3' : ''}>
+                  {footer}
+                </div>
               ) : null}
             </div>
           ) : null}

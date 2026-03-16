@@ -34,6 +34,26 @@ export type DocumentRequestType =
 export type DocumentRequestStatus = 'pending' | 'uploaded' | 'reviewed' | 'approved' | 'rejected';
 export type MessageSenderRole = 'consumer' | 'lender' | 'admin';
 export type ApplicationNotificationType = 'documents_uploaded';
+export type ApplicationMetadataActorRole = MessageSenderRole | 'system';
+
+export interface ApplicationMetadataMessage {
+  id: string;
+  actorId?: string;
+  actorName?: string;
+  actorRole: ApplicationMetadataActorRole;
+  createdAt: string;
+  message: string;
+}
+
+export interface ApplicationMetadataTimelineEntry {
+  id: string;
+  actorId?: string;
+  actorName?: string;
+  actorRole: ApplicationMetadataActorRole;
+  createdAt: string;
+  details?: Record<string, unknown>;
+  type: 'lender_approved' | 'lender_declined' | 'lender_countered' | 'consumer_document_uploaded';
+}
 
 export interface ApplicationNotification {
   id: string;
@@ -49,7 +69,9 @@ export interface ApplicationMetadata {
     terms: Record<string, unknown>;
     updatedAt: string;
   };
+  messages?: ApplicationMetadataMessage[];
   notifications?: ApplicationNotification[];
+  timeline?: ApplicationMetadataTimelineEntry[];
 }
 
 // Step 1: Personal Info

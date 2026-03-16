@@ -15,6 +15,7 @@ type DecisionAction = 'approve' | 'decline' | 'counter' | 'request_docs';
 interface Props {
   app: MockApplication;
   action: DecisionAction;
+  lenderId: string;
   onClose: () => void;
   onSubmitted?: () => void;
 }
@@ -62,31 +63,26 @@ function buildDeadline(daysFromNow: string) {
   return deadline.toISOString();
 }
 
-export default function DecisionModal({ app, action, onClose, onSubmitted }: Props) {
+export default function DecisionModal({ app, action, lenderId, onClose, onSubmitted }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
-  // Approve / Counter state
+  const [approvalNotes, setApprovalNotes] = useState('');
   const [apr, setApr] = useState('5.49');
-  const [amount, setAmount] = useState(String(app.loanAmount));
-  const [term, setTerm] = useState('60');
+  const [amount, setAmount] = useState(String(app.loanAmount ?? app.dealStructure.totalAmountFinanced ?? 0));
+  const [term, setTerm] = useState(String(app.dealStructure.requestedTerm));
   const [conditions, setConditions] = useState<string[]>([]);
   const [customCondition, setCustomCondition] = useState('');
   const [submitted, setSubmitted] = useState(false);
-
-  // Decline state
   const [declineReason, setDeclineReason] = useState('');
   const [internalNotes, setInternalNotes] = useState('');
-  const [generateAdverse, setGenerateAdverse] = useState(true);
-
-  // Request docs state
   const [requestedDocs, setRequestedDocs] = useState<DocumentRequestType[]>([]);
   const [deadlineDays, setDeadlineDays] = useState<(typeof DEADLINE_OPTIONS)[number]['value']>('14');
-  const [requestNotes, setRequestNotes] = useState(`Please upload the selected documents so we can complete your application review.`);
+  const [requestNotes, setRequestNotes] = useState('Please upload the selected documents so we can complete your application review.');
   const [submitting, setSubmitting] = useState(false);
 
   const monthlyPayment = computeMonthlyPayment(Number(amount), Number(apr), Number(term));
   const title =
     action === 'approve'
-      ? `Build Offer -- ${app.id}`
+      ? `Approve Application -- ${app.id}`
       : action === 'decline'
         ? `Decline Application -- ${app.id}`
         : action === 'counter'
@@ -95,59 +91,156 @@ export default function DecisionModal({ app, action, onClose, onSubmitted }: Pro
 
   useFocusTrap(!submitted, dialogRef, onClose);
 
-  const toggleCondition = (c: string) => {
-    setConditions(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
+  const toggleCondition = (condition: string) => {
+    setConditions((currentConditions) =>
+      currentConditions.includes(condition)
+        ? currentConditions.filter((currentCondition) => currentCondition !== condition)
+        : [...currentConditions, condition]
+    );
   };
 
-  const toggleDoc = (d: DocumentRequestType) => {
-    setRequestedDocs(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
+  const toggleDoc = (documentType: DocumentRequestType) => {
+    setRequestedDocs((currentDocs) =>
+      currentDocs.includes(documentType)
+        ? currentDocs.filter((currentDoc) => currentDoc !== documentType)
+        : [...currentDocs, documentType]
+    );
+  };
+
+  const finishSubmission = () => {
+    setSubmitted(true);
+    setTimeout(() => {
+      onSubmitted?.();
+      onClose();
+    }, 900);
   };
 
   const handleSubmit = async () => {
-    if (action === 'request_docs') {
-      if (requestedDocs.length === 0) {
-        return;
-      }
+    if (submitting) {
+      return;
+    }
 
-      setSubmitting(true);
+    if (action === 'decline' && !declineReason) {
+      return;
+    }
 
-      try {
-        const response = await fetch('/api/lender/document-requests', {
+    if (action === 'request_docs' && requestedDocs.length === 0) {
+      return;
+    }
+
+    if (action === 'counter' && (!Number(amount) || !Number(apr) || !Number(term))) {
+      toast.error('Enter valid counter-offer terms.');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      if (action === 'approve') {
+        const response = await fetch(`/api/lender/applications/${encodeURIComponent(app.id)}/approve`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            applicationId: app.id,
-            docTypes: requestedDocs,
-            deadline: buildDeadline(deadlineDays),
-            notes: requestNotes.trim() || undefined,
+            lenderId,
+            notes: approvalNotes.trim() || undefined,
           }),
         });
-
-        const payload = await response.json() as
-          | { success: true }
-          | { success: false; error?: string };
-
+        const payload = await response.json() as { success?: boolean };
         if (!response.ok || !payload.success) {
-          toast.error(payload.success ? 'Unable to send document request.' : payload.error || 'Unable to send document request.');
+          toast.error('Unable to approve application.');
           return;
         }
+        toast.success('Application approved.');
+        finishSubmission();
+        return;
+      }
 
-        onSubmitted?.();
-      } catch {
+      if (action === 'decline') {
+        const reason = internalNotes.trim()
+          ? `${declineReason}${declineReason.endsWith('.') ? '' : '.'} ${internalNotes.trim()}`
+          : declineReason;
+        const response = await fetch(`/api/lender/applications/${encodeURIComponent(app.id)}/decline`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            lenderId,
+            reason,
+          }),
+        });
+        const payload = await response.json() as { success?: boolean };
+        if (!response.ok || !payload.success) {
+          toast.error('Unable to decline application.');
+          return;
+        }
+        toast.success('Application declined.');
+        finishSubmission();
+        return;
+      }
+
+      if (action === 'counter') {
+        const nextConditions = customCondition.trim()
+          ? Array.from(new Set([...conditions, customCondition.trim()]))
+          : conditions;
+        const response = await fetch(`/api/lender/applications/${encodeURIComponent(app.id)}/counter`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: Number(amount),
+            apr: Number(apr),
+            conditions: nextConditions,
+            lenderId,
+            monthlyPayment,
+            term: Number(term),
+          }),
+        });
+        const payload = await response.json() as { success?: boolean };
+        if (!response.ok || !payload.success) {
+          toast.error('Unable to create counter offer.');
+          return;
+        }
+        toast.success('Counter offer created.');
+        finishSubmission();
+        return;
+      }
+
+      const response = await fetch('/api/lender/document-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          applicationId: app.id,
+          docTypes: requestedDocs,
+          deadline: buildDeadline(deadlineDays),
+          notes: requestNotes.trim() || undefined,
+        }),
+      });
+      const payload = await response.json() as { success?: boolean };
+      if (!response.ok || !payload.success) {
         toast.error('Unable to send document request.');
         return;
-      } finally {
-        setSubmitting(false);
       }
+      toast.success('Document request sent.');
+      finishSubmission();
+    } catch {
+      toast.error(
+        action === 'approve'
+          ? 'Unable to approve application.'
+          : action === 'decline'
+            ? 'Unable to decline application.'
+            : action === 'counter'
+              ? 'Unable to create counter offer.'
+              : 'Unable to send document request.'
+      );
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitted(true);
-    setTimeout(() => {
-      onSubmitted?.();
-      onClose();
-    }, 1200);
   };
 
   if (submitted) {
@@ -158,10 +251,10 @@ export default function DecisionModal({ app, action, onClose, onSubmitted }: Pro
             <Check className="h-7 w-7 text-blue-600" />
           </div>
           <h3 className="mb-2 text-lg font-semibold text-[#0A2540]">
-            {action === 'approve' ? 'Offer Sent' : action === 'decline' ? 'Application Declined' : action === 'counter' ? 'Counter Offer Sent' : 'Document Request Sent'}
+            {action === 'approve' ? 'Application Approved' : action === 'decline' ? 'Application Declined' : action === 'counter' ? 'Counter Offer Created' : 'Document Request Sent'}
           </h3>
           <p className="text-sm text-[#6B7C93]">
-            {action === 'approve' ? `Offer sent to ${app.borrower.firstName} ${app.borrower.lastName}` : action === 'decline' ? 'Adverse action notice will be generated' : action === 'counter' ? 'Counter offer sent to borrower' : 'Document request sent via email'}
+            {action === 'approve' ? 'The borrower record has been updated.' : action === 'decline' ? 'The decline has been recorded.' : action === 'counter' ? 'The new offer terms are now active.' : 'The consumer has been asked for documents.'}
           </p>
         </motion.div>
       </div>
@@ -183,98 +276,104 @@ export default function DecisionModal({ app, action, onClose, onSubmitted }: Pro
           className="w-full max-w-lg rounded-2xl border border-[#E3E8EE] bg-white p-8"
         >
           <h2 id="decision-modal-title" className="sr-only">{title}</h2>
-          {/* APPROVE / COUNTER */}
           {(action === 'approve' || action === 'counter') && (
             <>
-              <h3 className="mb-1 text-lg font-semibold text-gray-900">{action === 'approve' ? 'Build Offer' : 'Counter Offer'} -- {app.id}</h3>
-              {action === 'counter' && (
-                <p className="mb-4 text-xs text-gray-500">Original request: {app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'} at {app.dealStructure.requestedTerm} months</p>
-              )}
-              <div className="space-y-4 mt-4">
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500">APR (%)</label>
-                  <input type="number" step="0.01" value={apr} onChange={e => setApr(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50" />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500">Approved Amount ($)</label>
-                  <input type="number" value={amount} onChange={e => setAmount(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50" />
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500">Term</label>
-                  <select value={term} onChange={e => setTerm(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50">
-                    {[36, 48, 60, 72, 84].map(t => <option key={t} value={t}>{t} months</option>)}
-                  </select>
-                </div>
-
-                {/* Live computed payment */}
-                <div className="rounded-xl bg-blue-50 border border-blue-200 p-4 text-center">
-                  <span className="text-[10px] uppercase tracking-wider text-gray-500">Est. Monthly Payment</span>
-                  <div className="text-2xl font-bold text-blue-600 mt-1">{formatCurrency(monthlyPayment)}</div>
-                </div>
-
-                {/* Conditions */}
-                <div>
-                  <label className="mb-2 block text-xs font-medium text-gray-500">Conditions</label>
-                  <div className="flex flex-wrap gap-2">
-                    {CONDITION_OPTIONS.map(c => (
-                      <button
-                        key={c}
-                        onClick={() => toggleCondition(c)}
-                        className={`px-3 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer ${
-                          conditions.includes(c) ? 'bg-blue-50 border-blue-200 text-blue-600' : 'border-gray-200 text-gray-500'
-                        }`}
-                      >
-                        {c}
-                      </button>
-                    ))}
+              <h3 className="mb-1 text-lg font-semibold text-gray-900">{action === 'approve' ? 'Approve Application' : 'Counter Offer'} -- {app.id}</h3>
+              {action === 'approve' ? (
+                <div className="mt-4 space-y-4">
+                  <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-900">
+                    Confirm approval for {app.borrower.firstName} {app.borrower.lastName}. This will mark the application approved and update the active offer.
                   </div>
-                  <input
-                    type="text"
-                    value={customCondition}
-                    onChange={e => setCustomCondition(e.target.value)}
-                    placeholder="Add custom condition..."
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50"
-                  />
+                  <div>
+                    <label className="mb-1.5 block text-xs font-medium text-gray-500">Notes (optional)</label>
+                    <textarea
+                      value={approvalNotes}
+                      onChange={(event) => setApprovalNotes(event.target.value)}
+                      rows={3}
+                      className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50"
+                      placeholder="Add internal approval notes"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-3 mt-6">
+              ) : (
+                <>
+                  <p className="mb-4 text-xs text-gray-500">Original request: {app.loanAmount ? formatCurrency(app.loanAmount) : 'Pre-Approval'} at {app.dealStructure.requestedTerm} months</p>
+                  <div className="space-y-4 mt-4">
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-gray-500">APR (%)</label>
+                      <input type="number" step="0.01" value={apr} onChange={(event) => setApr(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50" />
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-gray-500">Approved Amount ($)</label>
+                      <input type="number" value={amount} onChange={(event) => setAmount(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50" />
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-gray-500">Term</label>
+                      <select value={term} onChange={(event) => setTerm(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50">
+                        {[36, 48, 60, 72, 84].map((termOption) => <option key={termOption} value={termOption}>{termOption} months</option>)}
+                      </select>
+                    </div>
+                    <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-center">
+                      <span className="text-[10px] uppercase tracking-wider text-gray-500">Est. Monthly Payment</span>
+                      <div className="mt-1 text-2xl font-bold text-blue-600">{formatCurrency(monthlyPayment)}</div>
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-medium text-gray-500">Conditions</label>
+                      <div className="flex flex-wrap gap-2">
+                        {CONDITION_OPTIONS.map((condition) => (
+                          <button
+                            key={condition}
+                            type="button"
+                            onClick={() => toggleCondition(condition)}
+                            className={`px-3 py-1.5 text-xs rounded-lg border transition-colors cursor-pointer ${
+                              conditions.includes(condition) ? 'bg-blue-50 border-blue-200 text-blue-600' : 'border-gray-200 text-gray-500'
+                            }`}
+                          >
+                            {condition}
+                          </button>
+                        ))}
+                      </div>
+                      <input
+                        type="text"
+                        value={customCondition}
+                        onChange={(event) => setCustomCondition(event.target.value)}
+                        placeholder="Add custom condition..."
+                        className="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+              <div className="mt-6 flex gap-3">
                 <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50">Cancel</button>
-                <button onClick={handleSubmit} className="flex-1 cursor-pointer rounded-xl bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-500">Send Offer to Borrower</button>
+                <button onClick={() => void handleSubmit()} disabled={submitting} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium text-white transition-colors ${submitting ? 'cursor-not-allowed bg-blue-300' : 'cursor-pointer bg-blue-600 hover:bg-blue-500'}`}>{submitting ? 'Saving...' : action === 'approve' ? 'Confirm Approval' : 'Create Counter Offer'}</button>
               </div>
             </>
           )}
 
-          {/* DECLINE */}
           {action === 'decline' && (
             <>
               <h3 className="mb-4 text-lg font-semibold text-gray-900">Decline Application -- {app.id}</h3>
               <div className="space-y-4">
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-gray-500">Decline Reason</label>
-                  <select value={declineReason} onChange={e => setDeclineReason(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50">
+                  <select value={declineReason} onChange={(event) => setDeclineReason(event.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:outline-none focus:border-blue-600/50">
                     <option value="">Select reason...</option>
-                    {DECLINE_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+                    {DECLINE_REASONS.map((reason) => <option key={reason} value={reason}>{reason}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-gray-500">Internal Notes (optional)</label>
-                  <textarea value={internalNotes} onChange={e => setInternalNotes(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50" placeholder="Not shown to borrower..." />
+                  <label className="mb-1.5 block text-xs font-medium text-gray-500">Notes (optional)</label>
+                  <textarea value={internalNotes} onChange={(event) => setInternalNotes(event.target.value)} rows={3} className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:border-blue-600/50" placeholder="Add supporting context for the decline" />
                 </div>
-                <label className="flex items-center gap-2 cursor-pointer" onClick={() => setGenerateAdverse(!generateAdverse)}>
-                  <div className={`flex h-4 w-4 items-center justify-center rounded border ${generateAdverse ? 'border-blue-600 bg-blue-600' : 'border-gray-200'}`}>
-                    {generateAdverse && <Check className="h-3 w-3 text-white" />}
-                  </div>
-                  <span className="text-xs text-gray-500">Generate ECOA Adverse Action Notice</span>
-                </label>
               </div>
-              <div className="flex gap-3 mt-6">
+              <div className="mt-6 flex gap-3">
                 <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-gray-200 px-4 py-3 text-sm transition-colors hover:bg-gray-50">Cancel</button>
-                <button onClick={handleSubmit} disabled={!declineReason} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${declineReason ? 'cursor-pointer bg-red-600 text-white hover:bg-red-500' : 'cursor-not-allowed bg-gray-200 text-gray-500'}`}>Confirm Decline</button>
+                <button onClick={() => void handleSubmit()} disabled={!declineReason || submitting} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${declineReason && !submitting ? 'cursor-pointer bg-red-600 text-white hover:bg-red-500' : 'cursor-not-allowed bg-gray-200 text-gray-500'}`}>{submitting ? 'Saving...' : 'Confirm Decline'}</button>
               </div>
             </>
           )}
 
-          {/* REQUEST DOCS */}
           {action === 'request_docs' && (
             <>
               <h3 className="mb-1 text-lg font-semibold text-[#0A2540]">Request Documents -- {app.id}</h3>
@@ -325,13 +424,13 @@ export default function DecisionModal({ app, action, onClose, onSubmitted }: Pro
                   <label className="mb-1.5 block text-xs font-medium uppercase tracking-[0.18em] text-[#6B7C93]">Notes to Consumer</label>
                   <textarea
                     value={requestNotes}
-                    onChange={e => setRequestNotes(e.target.value)}
+                    onChange={(event) => setRequestNotes(event.target.value)}
                     rows={4}
                     className="w-full resize-none rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] focus:border-blue-600 focus:outline-none"
                   />
                 </div>
               </div>
-              <div className="flex gap-3 mt-6">
+              <div className="mt-6 flex gap-3">
                 <button onClick={onClose} className="flex-1 cursor-pointer rounded-xl border border-[#E3E8EE] px-4 py-3 text-sm text-[#0A2540] transition-colors hover:bg-[#F6F9FC]">Cancel</button>
                 <button onClick={() => void handleSubmit()} disabled={requestedDocs.length === 0 || submitting} className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${requestedDocs.length > 0 && !submitting ? 'cursor-pointer bg-blue-600 text-white hover:bg-blue-500' : 'cursor-not-allowed bg-[#E3E8EE] text-[#6B7C93]'}`}>{submitting ? 'Sending...' : 'Send Request'}</button>
               </div>

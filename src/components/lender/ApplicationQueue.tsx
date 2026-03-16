@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import ApplicationDetailDrawer from './ApplicationDetailDrawer';
-import { countUnreadApplicationNotifications } from '@/lib/application-metadata';
+import { countUnreadApplicationNotifications, normalizeApplicationMetadata } from '@/lib/application-metadata';
 import type { MockApplication, MockOffer } from '@/lib/mock-data';
 import type { Message } from '@/lib/types';
 
@@ -70,6 +70,7 @@ function formatMessageTime(value: string) {
 export default function ApplicationQueue({ lenderId }: { lenderId: string | null }) {
   const [search, setSearch] = useState('');
   const [selectedApplication, setSelectedApplication] = useState<ActiveApplication | null>(null);
+  const [decisionAction, setDecisionAction] = useState<'approve' | 'decline' | 'counter' | null>(null);
   const [requestDocsApplication, setRequestDocsApplication] = useState<MockApplication | null>(null);
   const [applications, setApplications] = useState<ActiveApplication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -371,67 +372,92 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
       {selectedApplication ? (
         <ApplicationDetailDrawer
           app={selectedApplication.application}
+          onApprove={() => setDecisionAction('approve')}
           onClose={() => setSelectedApplication(null)}
+          onCounter={() => setDecisionAction('counter')}
+          onDecline={() => setDecisionAction('decline')}
+          onRequestDocs={() => setRequestDocsApplication(selectedApplication.application)}
           supplementalSections={(
-            <section className="mb-6">
-              <h3 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-gray-500">Messages</h3>
-              <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
-                {messagesLoading ? (
-                  <div className="rounded-xl border border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
-                    Loading messages...
-                  </div>
-                ) : messagesError ? (
-                  <div className="rounded-xl border border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
-                    {messagesError}
-                  </div>
-                ) : messages.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
-                    No messages yet. Start the conversation if you need anything from this borrower.
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {messages.map((message) => {
-                      const isLenderMessage = message.senderRole === 'lender' || message.senderRole === 'admin';
+            <>
+              <section className="mb-6">
+                <h3 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-gray-500">Application Updates</h3>
+                <div className="space-y-3 rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
+                  {normalizeApplicationMetadata(selectedApplication.application.metadata).messages?.length ? (
+                    normalizeApplicationMetadata(selectedApplication.application.metadata).messages?.slice().reverse().map((entry) => (
+                      <div key={entry.id} className="rounded-xl border border-[#E3E8EE] bg-white px-4 py-3">
+                        <p className="text-sm font-medium text-[#0A2540]">{entry.message}</p>
+                        <p className="mt-1 text-xs text-[#6B7C93]">
+                          {entry.actorRole.charAt(0).toUpperCase() + entry.actorRole.slice(1)} • {formatMessageTime(entry.createdAt)}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded-xl border border-dashed border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
+                      No lender-facing updates yet.
+                    </div>
+                  )}
+                </div>
+              </section>
+              <section className="mb-6">
+                <h3 className="mb-3 text-[10px] font-medium uppercase tracking-widest text-gray-500">Messages</h3>
+                <div className="rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] p-4">
+                  {messagesLoading ? (
+                    <div className="rounded-xl border border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
+                      Loading messages...
+                    </div>
+                  ) : messagesError ? (
+                    <div className="rounded-xl border border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
+                      {messagesError}
+                    </div>
+                  ) : messages.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-[#E3E8EE] bg-white px-4 py-6 text-sm text-[#6B7C93]">
+                      No messages yet. Start the conversation if you need anything from this borrower.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {messages.map((message) => {
+                        const isLenderMessage = message.senderRole === 'lender' || message.senderRole === 'admin';
 
-                      return (
-                        <div key={message.id} className={`flex ${isLenderMessage ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${isLenderMessage ? 'bg-blue-600 text-white' : 'border border-[#E3E8EE] bg-white text-[#0A2540]'}`}>
-                            <p className="leading-6">{message.content}</p>
-                            <p className={`mt-2 text-xs ${isLenderMessage ? 'text-blue-100' : 'text-[#6B7C93]'}`}>
-                              {formatMessageTime(message.createdAt)}
-                            </p>
+                        return (
+                          <div key={message.id} className={`flex ${isLenderMessage ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${isLenderMessage ? 'bg-blue-600 text-white' : 'border border-[#E3E8EE] bg-white text-[#0A2540]'}`}>
+                              <p className="leading-6">{message.content}</p>
+                              <p className={`mt-2 text-xs ${isLenderMessage ? 'text-blue-100' : 'text-[#6B7C93]'}`}>
+                                {formatMessageTime(message.createdAt)}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
+                        );
+                      })}
+                    </div>
+                  )}
 
-                <div className="mt-4 border-t border-[#E3E8EE] pt-4">
-                  <label htmlFor="lender-message-draft" className="mb-2 block text-sm font-medium text-[#0A2540]">
-                    Send a message
-                  </label>
-                  <textarea
-                    id="lender-message-draft"
-                    value={messageDraft}
-                    onChange={(event) => setMessageDraft(event.target.value)}
-                    rows={3}
-                    placeholder="Ask for clarification or give the borrower an update"
-                    className="w-full resize-none rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] outline-none transition focus:border-blue-600"
-                  />
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => void handleSendMessage()}
-                      disabled={messageSubmitting || !messageDraft.trim()}
-                      className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-300"
-                    >
-                      {messageSubmitting ? 'Sending...' : 'Send Message'}
-                    </button>
+                  <div className="mt-4 border-t border-[#E3E8EE] pt-4">
+                    <label htmlFor="lender-message-draft" className="mb-2 block text-sm font-medium text-[#0A2540]">
+                      Send a message
+                    </label>
+                    <textarea
+                      id="lender-message-draft"
+                      value={messageDraft}
+                      onChange={(event) => setMessageDraft(event.target.value)}
+                      rows={3}
+                      placeholder="Ask for clarification or give the borrower an update"
+                      className="w-full resize-none rounded-xl border border-[#E3E8EE] bg-white px-4 py-3 text-sm text-[#0A2540] outline-none transition focus:border-blue-600"
+                    />
+                    <div className="mt-3 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => void handleSendMessage()}
+                        disabled={messageSubmitting || !messageDraft.trim()}
+                        className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-blue-300"
+                      >
+                        {messageSubmitting ? 'Sending...' : 'Send Message'}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
+              </section>
+            </>
           )}
           footer={(
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
@@ -446,7 +472,6 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
                 type="button"
                 onClick={() => {
                   setRequestDocsApplication(selectedApplication.application);
-                  setSelectedApplication(null);
                 }}
                 className="rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
               >
@@ -460,8 +485,22 @@ export default function ApplicationQueue({ lenderId }: { lenderId: string | null
         <DecisionModal
           app={requestDocsApplication}
           action="request_docs"
+          lenderId={lenderId ?? ''}
           onClose={() => setRequestDocsApplication(null)}
           onSubmitted={() => {
+            void reloadApplications();
+          }}
+        />
+      ) : null}
+      {selectedApplication && decisionAction && lenderId ? (
+        <DecisionModal
+          app={selectedApplication.application}
+          action={decisionAction}
+          lenderId={lenderId}
+          onClose={() => setDecisionAction(null)}
+          onSubmitted={() => {
+            setDecisionAction(null);
+            setSelectedApplication(null);
             void reloadApplications();
           }}
         />

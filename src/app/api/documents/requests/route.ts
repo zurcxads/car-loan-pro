@@ -1,7 +1,12 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { apiError, apiSuccess, getConsumerSessionToken } from '@/lib/api-helpers';
-import { appendApplicationNotification, normalizeApplicationMetadata } from '@/lib/application-metadata';
+import {
+  appendApplicationMetadataMessage,
+  appendApplicationNotification,
+  appendApplicationTimelineEntry,
+  normalizeApplicationMetadata,
+} from '@/lib/application-metadata';
 import { dbGetApplicationByIdAndSessionToken, dbUpdateApplication } from '@/lib/db';
 import { isSupabaseConfigured, getServiceClient } from '@/lib/supabase';
 import { serverLogger } from '@/lib/server-logger';
@@ -159,6 +164,42 @@ function updateDocumentRequest(
   return found ? nextRequests : null;
 }
 
+function buildMetadataForConsumerUpload(
+  metadata: unknown,
+  applicationId: string,
+  fileName: string,
+  allUploadedAfterUpdate: boolean
+) {
+  let nextMetadata = appendApplicationTimelineEntry(
+    appendApplicationNotification(
+      appendApplicationMetadataMessage(normalizeApplicationMetadata(metadata), {
+        actorRole: 'consumer',
+        message: `Consumer uploaded ${fileName}`,
+      }),
+      {
+        applicationId,
+        message: `Consumer uploaded ${fileName}`,
+        type: 'documents_uploaded',
+      }
+    ),
+    {
+      actorRole: 'consumer',
+      details: { fileName },
+      type: 'consumer_document_uploaded',
+    }
+  );
+
+  if (allUploadedAfterUpdate) {
+    nextMetadata = appendApplicationNotification(nextMetadata, {
+      type: 'documents_uploaded',
+      applicationId,
+      message: 'All requested documents have been uploaded',
+    });
+  }
+
+  return nextMetadata;
+}
+
 export async function GET(request: NextRequest) {
   const applicationId = request.nextUrl.searchParams.get('applicationId');
   if (!applicationId) {
@@ -229,14 +270,12 @@ export async function POST(request: NextRequest) {
       }
 
       const allUploadedAfterUpdate = areAllRequestedDocumentsUploaded(nextRequests);
-      const shouldNotifyLender = !allUploadedBeforeUpdate && allUploadedAfterUpdate;
-      const nextMetadata = shouldNotifyLender
-        ? appendApplicationNotification(normalizeApplicationMetadata(application.metadata), {
-          type: 'documents_uploaded',
-          applicationId,
-          message: 'All requested documents have been uploaded',
-        })
-        : normalizeApplicationMetadata(application.metadata);
+      const nextMetadata = buildMetadataForConsumerUpload(
+        application.metadata,
+        applicationId,
+        file.name,
+        !allUploadedBeforeUpdate && allUploadedAfterUpdate
+      );
 
       const updatedApplication = await dbUpdateApplication(applicationId, {
         documentRequests: nextRequests,
@@ -295,14 +334,12 @@ export async function POST(request: NextRequest) {
     }
 
     const allUploadedAfterUpdate = areAllRequestedDocumentsUploaded(nextRequests);
-    const shouldNotifyLender = !allUploadedBeforeUpdate && allUploadedAfterUpdate;
-    const nextMetadata = shouldNotifyLender
-      ? appendApplicationNotification(normalizeApplicationMetadata(application.metadata), {
-        type: 'documents_uploaded',
-        applicationId,
-        message: 'All requested documents have been uploaded',
-      })
-      : normalizeApplicationMetadata(application.metadata);
+    const nextMetadata = buildMetadataForConsumerUpload(
+      application.metadata,
+      applicationId,
+      fileName,
+      !allUploadedBeforeUpdate && allUploadedAfterUpdate
+    );
 
     const updatedApplication = await dbUpdateApplication(applicationId, {
       documentRequests: nextRequests,

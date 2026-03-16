@@ -759,19 +759,18 @@ export default function ApplyPage() {
 
   return (
     <div className="premium-page min-h-screen bg-white pb-24 font-sans sm:pb-0">
-      <div className="mx-auto max-w-2xl px-4 pb-16 pt-20 sm:px-6">
-        <div className="mb-6 rounded-xl border border-[#E3E8EE] bg-[#F6F9FC] px-5 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#2563EB]">
-              <ShieldCheck className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#0A2540]">Auto Loan Pro</p>
-              <p className="text-xs text-[#6B7C93]">Secure application — 256-bit encrypted</p>
-            </div>
+      <div className="mx-auto max-w-2xl px-4 pb-16 pt-16 sm:px-6">
+        <div className="sticky top-14 z-30 -mx-4 border-b border-[#E3E8EE] bg-white/95 px-4 pb-4 pt-3 backdrop-blur-sm sm:-mx-6 sm:px-6">
+        <div className="mb-3 flex items-center justify-between">
+          <Link href="/" className="text-sm font-medium text-[#0A2540]">
+            Auto Loan <span className="font-bold text-[#2563EB]">Pro</span>
+          </Link>
+          <div className="inline-flex items-center gap-1.5 text-xs text-[#6B7C93]">
+            <Lock className="h-3 w-3" />
+            Encrypted
           </div>
         </div>
-        <div className="mb-6 space-y-4">
+        <div className="space-y-3">
           {activeOfferLender && (
             <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
               You have an active offer with {activeOfferLender}. Cancel it to apply again.{' '}
@@ -836,20 +835,9 @@ export default function ApplyPage() {
             {`Application step ${step + 1} of 4: ${STEP_NAMES[step]}`}
           </div>
         </div>
+        </div>
 
         <div className={`rounded-xl border border-[#E3E8EE] bg-white shadow-[0_18px_50px_rgba(15,23,42,0.06)] ${shakeForm ? 'animate-shake' : ''}`}>
-          <div className="border-b border-[#E3E8EE] px-6 py-5 sm:px-8">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-medium text-[#0A2540]">Auto Loan Pro application</p>
-                <p className="text-sm text-[#6B7C93]">Complete your application in a few secure steps.</p>
-              </div>
-              <div className="inline-flex items-center gap-2 text-sm text-[#425466]">
-                <ShieldCheck className="h-4 w-4 text-emerald-500" />
-                256-bit encrypted
-              </div>
-            </div>
-          </div>
 
           <div className="px-6 py-6 sm:px-8 sm:py-8">
             <AnimatePresence mode="wait" custom={direction}>

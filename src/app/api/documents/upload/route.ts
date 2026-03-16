@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  appendApplicationMetadataMessage,
+  appendApplicationNotification,
+  appendApplicationTimelineEntry,
+  normalizeApplicationMetadata,
+} from '@/lib/application-metadata';
 import { createClient } from '@/lib/supabase/server';
 import { createApplicationEvent } from '@/lib/application-events';
-import { dbCreateNotification } from '@/lib/db';
+import { dbCreateNotification, dbGetApplication, dbUpdateApplication } from '@/lib/db';
 import { requireAuth } from '@/lib/api-helpers';
 import { serverLogger } from '@/lib/server-logger';
 
@@ -116,6 +122,40 @@ export async function POST(req: NextRequest) {
         read: false,
         data: { document_id: document.id, type },
       });
+
+      const application = await dbGetApplication(applicationId);
+      if (application) {
+        const nextMetadata = appendApplicationTimelineEntry(
+          appendApplicationNotification(
+            appendApplicationMetadataMessage(normalizeApplicationMetadata(application.metadata), {
+              actorRole: 'consumer',
+              message: `Consumer uploaded ${file.name}`,
+            }),
+            {
+              applicationId,
+              message: `Consumer uploaded ${file.name}`,
+              type: 'documents_uploaded',
+            }
+          ),
+          {
+            actorRole: 'consumer',
+            details: { fileName: file.name, type },
+            type: 'consumer_document_uploaded',
+          }
+        );
+
+        const updatedApplication = await dbUpdateApplication(applicationId, {
+          metadata: nextMetadata,
+        });
+
+        if (!updatedApplication) {
+          serverLogger.warn('Failed to append lender-facing upload metadata', {
+            applicationId,
+            documentId: document.id,
+            fileName: file.name,
+          });
+        }
+      }
     }
 
     return NextResponse.json({ document });
