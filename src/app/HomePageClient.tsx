@@ -345,26 +345,24 @@ const ApprovalMockup = memo(function ApprovalMockup() {
 
 const SecurityMockup = memo(function SecurityMockup() {
   return (
-    <div className="relative mt-8 flex min-h-[220px] items-center justify-center [will-change:transform]">
-      <div className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#F6F9FC]" />
-      <div className="relative flex h-24 w-24 items-center justify-center rounded-xl border border-[#E3E8EE] bg-white">
-        <Shield className="h-11 w-11 text-[#2563EB]" />
+    <div className="mt-6 space-y-3">
+      <div className="flex items-center gap-3 rounded-lg border border-[#E3E8EE] bg-white px-4 py-3">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-50">
+          <Shield className="h-4 w-4 text-green-600" />
+        </div>
+        <span className="text-sm font-medium text-[#0A2540]">256-bit SSL encryption</span>
       </div>
-      <div className="absolute left-12 top-12 flex h-10 w-10 items-center justify-center rounded-full border border-[#E3E8EE] bg-white">
-        <Lock className="h-4 w-4 text-[#6B7C93]" />
+      <div className="flex items-center gap-3 rounded-lg border border-[#E3E8EE] bg-white px-4 py-3">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-50">
+          <Lock className="h-4 w-4 text-green-600" />
+        </div>
+        <span className="text-sm font-medium text-[#0A2540]">SSN encrypted at rest</span>
       </div>
-      <div className="absolute right-14 top-16 flex h-10 w-10 items-center justify-center rounded-full border border-[#E3E8EE] bg-white">
-        <Key className="h-4 w-4 text-[#6B7C93]" />
-      </div>
-      <div className="absolute bottom-8 left-14 space-y-2">
-        <div className="h-2 w-24 rounded-full bg-[#E3E8EE]" />
-        <div className="h-2 w-20 rounded-full bg-[#E3E8EE]" />
-        <div className="h-2 w-28 rounded-full bg-[#E3E8EE]" />
-      </div>
-      <div className="absolute bottom-8 right-10 space-y-2">
-        <div className="h-2 w-20 rounded-full bg-[#E3E8EE]" />
-        <div className="h-2 w-24 rounded-full bg-[#E3E8EE]" />
-        <div className="h-2 w-16 rounded-full bg-[#E3E8EE]" />
+      <div className="flex items-center gap-3 rounded-lg border border-[#E3E8EE] bg-white px-4 py-3">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-green-50">
+          <Key className="h-4 w-4 text-green-600" />
+        </div>
+        <span className="text-sm font-medium text-[#0A2540]">Role-based access controls</span>
       </div>
     </div>
   );
