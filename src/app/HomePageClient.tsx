@@ -628,7 +628,7 @@ export default function HomePage() {
                         Pre-Approval
                       </span>
                     </div>
-                    <div className="mt-8">
+                    <div className="mt-4">
                       <p className="text-sm text-[#6B7C93]">Approved amount</p>
                       <p className="mt-1 text-4xl font-semibold text-[#0A2540]">$38,500</p>
                     </div>
